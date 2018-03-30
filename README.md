@@ -25,7 +25,7 @@ Feel free to contribute to this project after reading the
 [contributing guidelines](https://github.com/CityOfZion/neo-go/blob/master/CONTRIBUTING.md).
 
 Before starting to work on a certain topic, create an new issue first,
-describing the feauture/topic you are going to implement and remember use [development](https://github.com/CityOfZion/neo-hypervm/tree/development) branch.
+describing the feauture/topic you are going to implement and remember to use [development](https://github.com/CityOfZion/neo-hypervm/tree/development) branch.
 
 # Compilation
 
