@@ -1,0 +1,173 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Enums">
+      <UniqueIdentifier>{233a7a49-02aa-46b8-91b1-44cb8403445d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Types">
+      <UniqueIdentifier>{322e283d-0f13-4014-946d-9e0a0952dd4e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Engine">
+      <UniqueIdentifier>{eac0f714-a52d-4ad5-9516-5448694b61d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Engine">
+      <UniqueIdentifier>{106df064-6568-4b7c-bc85-af055260022f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Types">
+      <UniqueIdentifier>{c56fb988-69f8-4e8d-bbb6-f2e89b89874f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Types\Collections">
+      <UniqueIdentifier>{590b0b68-ca09-420f-b2b1-9891dcd395bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Types\Collections">
+      <UniqueIdentifier>{75a65fbe-3a6b-433e-ae67-fd3bde468b77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Types\StackItems">
+      <UniqueIdentifier>{6d35e3a3-515d-442b-925b-af8cfaa658cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Types\StackItems">
+      <UniqueIdentifier>{84808e77-44d9-403c-8d07-83105ae2ea9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Interfaces">
+      <UniqueIdentifier>{1e2ed381-3b6c-430a-9ce9-62958a86d546}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Crypto">
+      <UniqueIdentifier>{708146e1-d664-47d6-b020-421bcafc7f21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Crypto">
+      <UniqueIdentifier>{ee4a16d4-11da-499d-9c02-750553c38678}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Interfaces">
+      <UniqueIdentifier>{4ee6fc87-9061-44f3-b1f3-c479acef0cd3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="NeoVM.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="EStackItemType.h">
+      <Filter>Header Files\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="ExecutionEngine.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="BoolStackItem.h">
+      <Filter>Header Files\Types\StackItems</Filter>
+    </ClInclude>
+    <ClInclude Include="StackItems.h">
+      <Filter>Header Files\Types\Collections</Filter>
+    </ClInclude>
+    <ClInclude Include="ExecutionContext.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Callbacks.h">
+      <Filter>Header Files\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="ArrayStackItem.h">
+      <Filter>Header Files\Types\StackItems</Filter>
+    </ClInclude>
+    <ClInclude Include="ByteArrayStackItem.h">
+      <Filter>Header Files\Types\StackItems</Filter>
+    </ClInclude>
+    <ClInclude Include="InteropStackItem.h">
+      <Filter>Header Files\Types\StackItems</Filter>
+    </ClInclude>
+    <ClInclude Include="IntegerStackItem.h">
+      <Filter>Header Files\Types\StackItems</Filter>
+    </ClInclude>
+    <ClInclude Include="MapStackItem.h">
+      <Filter>Header Files\Types\StackItems</Filter>
+    </ClInclude>
+    <ClInclude Include="IStackItem.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="ExecutionContextStack.h">
+      <Filter>Header Files\Types\Collections</Filter>
+    </ClInclude>
+    <ClInclude Include="EVMOpCode.h">
+      <Filter>Header Files\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="EVMState.h">
+      <Filter>Header Files\Enums</Filter>
+    </ClInclude>
+    <ClInclude Include="SHA256.h">
+      <Filter>Header Files\Crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="RIPEMD160.h">
+      <Filter>Header Files\Crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="Crypto.h">
+      <Filter>Header Files\Crypto</Filter>
+    </ClInclude>
+    <ClInclude Include="BigInteger.h">
+      <Filter>Header Files\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="SHA1.h">
+      <Filter>Header Files\Crypto</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NeoVM.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="ExecutionEngine.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="StackItems.cpp">
+      <Filter>Source Files\Types\Collections</Filter>
+    </ClCompile>
+    <ClCompile Include="BoolStackItem.cpp">
+      <Filter>Source Files\Types\StackItems</Filter>
+    </ClCompile>
+    <ClCompile Include="ExecutionContext.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="ArrayStackItem.cpp">
+      <Filter>Source Files\Types\StackItems</Filter>
+    </ClCompile>
+    <ClCompile Include="ByteArrayStackItem.cpp">
+      <Filter>Source Files\Types\StackItems</Filter>
+    </ClCompile>
+    <ClCompile Include="InteropStackItem.cpp">
+      <Filter>Source Files\Types\StackItems</Filter>
+    </ClCompile>
+    <ClCompile Include="IntegerStackItem.cpp">
+      <Filter>Source Files\Types\StackItems</Filter>
+    </ClCompile>
+    <ClCompile Include="MapStackItem.cpp">
+      <Filter>Source Files\Types\StackItems</Filter>
+    </ClCompile>
+    <ClCompile Include="ExecutionContextStack.cpp">
+      <Filter>Source Files\Types\Collections</Filter>
+    </ClCompile>
+    <ClCompile Include="SHA256.cpp">
+      <Filter>Source Files\Crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="RIPEMD160.cpp">
+      <Filter>Source Files\Crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="Crypto.cpp">
+      <Filter>Source Files\Crypto</Filter>
+    </ClCompile>
+    <ClCompile Include="BigInteger.cpp">
+      <Filter>Source Files\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="IStackItem.cpp">
+      <Filter>Source Files\Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="SHA1.cpp">
+      <Filter>Source Files\Crypto</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
