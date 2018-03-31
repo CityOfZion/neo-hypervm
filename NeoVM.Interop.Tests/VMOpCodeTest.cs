@@ -21,6 +21,9 @@ namespace NeoVM.Interop.Tests
         /// </summary>
         public static readonly BigInteger[] TestBigIntegers = new BigInteger[]
         {
+            new BigInteger(long.MinValue)*new BigInteger(long.MinValue)*new BigInteger(long.MinValue),
+            new BigInteger(ulong.MaxValue)*new BigInteger(ulong.MaxValue)*new BigInteger(ulong.MaxValue),
+
             new BigInteger(ulong.MaxValue),
             new BigInteger(ulong.MinValue),
             new BigInteger(long.MaxValue),
