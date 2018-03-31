@@ -108,11 +108,10 @@ namespace NeoVM.Interop.Tests
                         foreach (BigInteger bb in new BigInteger[] { pair.A, pair.B })
                         {
                             byte[] bba = bb.ToByteArray();
-                            byte sizea = (byte)bba.Length;
 
                             script.WriteByte((byte)EVMOpCode.PUSHDATA1);
-                            script.WriteByte(sizea);
-                            script.Write(bba, 0, sizea);
+                            script.WriteByte((byte)bba.Length);
+                            script.Write(bba, 0, bba.Length);
                         }
 
                         script.WriteByte((byte)operand);
@@ -126,11 +125,14 @@ namespace NeoVM.Interop.Tests
 
                         // PUSH A
                         engine.StepInto();
+                        Assert.AreEqual(1, engine.EvaluationStack.Count);
+
                         // PUSH B
                         engine.StepInto();
+                        Assert.AreEqual(2, engine.EvaluationStack.Count);
+
                         // Operand
                         engine.StepInto();
-
                         check(engine, pair.A, pair.B);
 
                         // RET
