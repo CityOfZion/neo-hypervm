@@ -857,27 +857,88 @@ ExecuteOpCode:
 		return;
 	}
 	/*
-	// Bitwise logic
+	// 
+
 	case OpCode.INVERT:
 	{
 	BigInteger x = EvaluationStack.Pop().GetBigInteger();
 	EvaluationStack.Push(~x);
 	return;
 	}
-	case OpCode.AND:
+	*/
+	case EVMOpCode::AND:
 	{
-	BigInteger x2 = EvaluationStack.Pop().GetBigInteger();
-	BigInteger x1 = EvaluationStack.Pop().GetBigInteger();
-	EvaluationStack.Push(x1 & x2);
-	return;
+		if (this->EvaluationStack->Count() < 2)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem* x2 = this->EvaluationStack->Pop();
+		IStackItem* x1 = this->EvaluationStack->Pop();
+
+		BigInteger *i2 = x2->GetBigInteger();
+		BigInteger *i1 = x1->GetBigInteger();
+
+		IStackItem::Free(x1);
+		IStackItem::Free(x2);
+
+		if (i2 == NULL || i1 == NULL)
+		{
+			if (i2 != NULL) delete(i2);
+			if (i1 != NULL) delete(i1);
+
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		BigInteger *iret = i1->And(i2);
+		IStackItem *ret = new IntegerStackItem(iret);
+
+		delete(iret);
+		delete(i2);
+		delete(i1);
+
+		this->EvaluationStack->Push(ret);
+		return;
 	}
-	case OpCode.OR:
+	case EVMOpCode::OR:
 	{
-	BigInteger x2 = EvaluationStack.Pop().GetBigInteger();
-	BigInteger x1 = EvaluationStack.Pop().GetBigInteger();
-	EvaluationStack.Push(x1 | x2);
-	return;
+		if (this->EvaluationStack->Count() < 2)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem* x2 = this->EvaluationStack->Pop();
+		IStackItem* x1 = this->EvaluationStack->Pop();
+
+		BigInteger *i2 = x2->GetBigInteger();
+		BigInteger *i1 = x1->GetBigInteger();
+
+		IStackItem::Free(x1);
+		IStackItem::Free(x2);
+
+		if (i2 == NULL || i1 == NULL)
+		{
+			if (i2 != NULL) delete(i2);
+			if (i1 != NULL) delete(i1);
+
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		BigInteger *iret = i1->Or(i2);
+		IStackItem *ret = new IntegerStackItem(iret);
+
+		delete(iret);
+		delete(i2);
+		delete(i1);
+
+		this->EvaluationStack->Push(ret);
+		return;
 	}
+	/*
 	case OpCode.XOR:
 	{
 	BigInteger x2 = EvaluationStack.Pop().GetBigInteger();

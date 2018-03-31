@@ -37,6 +37,154 @@ BigInteger::BigInteger(BigInteger *value)
 	// AssertValid();
 }
 
+void BigInteger::CopyInternal(__int32 sign, unsigned __int32 *bits, __int32 bitSize)
+{
+	this->_sign = sign;
+	this->_bitsSize = bitSize;
+
+	if (bitSize > 0)
+	{
+		this->_bits = new unsigned __int32[bitSize];
+
+		for (int x = 0; x < bitSize; x++)
+			this->_bits[x] = bits[x];
+	}
+	else
+	{
+		if (this->_bits != NULL)
+		{
+			delete[]this->_bits;
+			this->_bits = NULL;
+		}
+	}
+}
+
+BigInteger::BigInteger(unsigned __int32 * value, int size)
+{
+	if (value == NULL)
+	{
+		this->_sign = 0;
+		this->_bitsSize = 0;
+		this->_bits = NULL;
+		return;
+	}
+
+	int dwordCount = size;
+	bool isNegative = dwordCount > 0 && ((value[dwordCount - 1] & 0x80000000) == 0x80000000);
+
+	// Try to conserve space as much as possible by checking for wasted leading uint[] entries 
+	while (dwordCount > 0 && value[dwordCount - 1] == 0) dwordCount--;
+
+	if (dwordCount == 0)
+	{
+		// BigInteger.Zero
+
+		this->_sign = 0;
+		this->_bitsSize = 0;
+		this->_bits = NULL;
+
+		// AssertValid();
+		return;
+	}
+	if (dwordCount == 1)
+	{
+		if ((int)value[0] < 0 && !isNegative)
+		{
+			this->_bits = new unsigned __int32[1]{ value[0] };
+			this->_bitsSize = 1;
+			this->_sign = +1;
+		}
+		// handle the special cases where the BigInteger likely fits into _sign
+		else if (Int32MinValue == (int)value[0])
+		{
+			CopyInternal(Min._sign, Min._bits, Min._bitsSize);
+		}
+		else
+		{
+			this->_sign = (int)value[0];
+			this->_bitsSize = 0;
+			this->_bits = NULL;
+		}
+
+		//AssertValid();
+		return;
+	}
+
+	if (!isNegative)
+	{
+		// handle the simple postive value cases where the input is already in sign magnitude
+		if (dwordCount != size)
+		{
+			this->_sign = +1;
+			this->_bitsSize = dwordCount;
+			this->_bits = new unsigned __int32[dwordCount];
+
+			for (int x = 0; x < dwordCount; x++)
+				this->_bits[x] = value[x];
+		}
+		// no trimming is possible.  Assign value directly to _bits.  
+		else
+		{
+			this->_sign = +1;
+			this->_bitsSize = size;
+			this->_bits = new unsigned __int32[size];
+			for (int x = 0; x < size; x++)
+				this->_bits[x] = value[x];
+		}
+
+		// AssertValid();
+		return;
+	}
+
+	// finally handle the more complex cases where we must transform the input into sign magnitude
+	// NumericsHelpers.DangerousMakeTwosComplement(value); // mutates val
+	// pack _bits to remove any wasted space after the twos complement
+
+	int len = size;
+	while (len > 0 && value[len - 1] == 0) len--;
+
+	// the number is represented by a single dword
+	if (len == 1 && ((int)(value[0])) > 0)
+	{
+		if (value[0] == 1 /* abs(-1) */)
+		{
+			CopyInternal(MinusOne._sign, MinusOne._bits, MinusOne._bitsSize);
+		}
+		else if (value[0] == kuMaskHighBit /* abs(Int32.MinValue) */)
+		{
+			CopyInternal(Min._sign, Min._bits, Min._bitsSize);
+		}
+		else
+		{
+			this->_sign = (-1) * ((int)value[0]);
+			this->_bitsSize = 0;
+			this->_bits = NULL;
+		}
+	}
+	// the number is represented by multiple dwords
+	// trim off any wasted uint values when possible
+	else if (len != size)
+	{
+		this->_sign = -1;
+		this->_bitsSize = len;
+		this->_bits = new unsigned __int32[len];
+
+		for (int x = 0; x < len; x++)
+			this->_bits[x] = value[x];
+	}
+	// no trimming is possible.  Assign value directly to _bits.  
+	else
+	{
+		this->_sign = -1;
+		this->_bitsSize = size;
+		this->_bits = new unsigned __int32[size];
+		for (int x = 0; x < size; x++)
+			this->_bits[x] = value[x];
+	}
+
+	//AssertValid();
+}
+
 BigInteger::BigInteger(unsigned char * value, int byteCount)
 {
 	if (byteCount <= 0 || value == NULL)
@@ -231,16 +379,151 @@ int BigInteger::GetDiffLength(unsigned __int32 *rgu1, unsigned __int32 * rgu2, i
 	return 0;
 }
 
-void BigInteger::Add(BigInteger *bi)
+int BigInteger::ToUInt32Array(unsigned __int32 * &output)
+{
+	if (this->_bits == NULL && this->_sign == 0)
+	{
+		output = new unsigned __int32[1]{ 0 };
+		return 1;
+	}
+
+	int dwords_size;
+	unsigned __int32 *dwords;
+	unsigned __int32 highDWord;
+
+	if (this->_bits == NULL)
+	{
+		dwords = new unsigned __int32[1]{ (unsigned __int32)this->_sign };
+		dwords_size = 1;
+		highDWord = (this->_sign < 0) ? UInt32MaxValue : 0;
+	}
+	else if (_sign == -1)
+	{
+		dwords = this->_bits;
+		dwords_size = this->_bitsSize;
+		//NumericsHelpers.DangerousMakeTwosComplement(dwords);  // mutates dwords
+		highDWord = UInt32MaxValue;
+	}
+	else
+	{
+		dwords = this->_bits;
+		dwords_size = this->_bitsSize;
+		highDWord = 0;
+	}
+
+	// find highest significant byte
+	int msb;
+	for (msb = dwords_size - 1; msb > 0; msb--)
+	{
+		if (dwords[msb] != highDWord) break;
+	}
+	// ensure high bit is 0 if positive, 1 if negative
+	bool needExtraByte = (dwords[msb] & 0x80000000) != (highDWord & 0x80000000);
+
+	int trimmed_size = msb + 1 + (needExtraByte ? 1 : 0);
+	output = new unsigned __int32[trimmed_size];
+
+	for (int x = 0, m = msb + 1; x < m; x++)
+		output[x] = dwords[x];
+
+	if (needExtraByte) output[trimmed_size - 1] = highDWord;
+
+	// Clean
+
+	if (dwords != this->_bits)
+		delete[]dwords;
+
+	return trimmed_size;
+}
+
+BigInteger* BigInteger::Or(BigInteger* & bi)
+{
+	if (bi == NULL || bi->_sign == 0) // IsZero
+	{
+		return new BigInteger(this);
+	}
+
+	if (this->_sign == 0) // IsZero
+	{
+		return new BigInteger(bi);
+	}
+
+	unsigned __int32 *x, *y, *z;
+
+	int sizex = this->ToUInt32Array(x);
+	int sizey = bi->ToUInt32Array(y);
+	int sizez = sizex > sizey ? sizex : sizey;
+
+	z = new unsigned __int32[sizez];
+
+	unsigned __int32 xExtend = (this->_sign < 0) ? UInt32MaxValue : 0;
+	unsigned __int32 yExtend = (bi->_sign < 0) ? UInt32MaxValue : 0;
+
+	unsigned __int32 xu, yu;
+
+	for (int i = 0; i < sizez; i++)
+	{
+		xu = (i < sizex) ? x[i] : xExtend;
+		yu = (i < sizey) ? y[i] : yExtend;
+		z[i] = xu | yu;
+	}
+
+	BigInteger *ret = new BigInteger(z, sizez);
+
+	delete[]x;
+	delete[]y;
+	delete[]z;
+
+	return ret;
+}
+
+BigInteger* BigInteger::And(BigInteger* & bi)
+{
+	if (bi == NULL || bi->_sign == 0 || this->_sign == 0) // IsZero
+	{
+		return new BigInteger(BigInteger::Zero);
+	}
+
+	unsigned __int32 *x, *y, *z;
+
+	int sizex = this->ToUInt32Array(x);
+	int sizey = bi->ToUInt32Array(y);
+	int sizez = sizex > sizey ? sizex : sizey;
+
+	z = new unsigned __int32[sizez];
+
+	unsigned __int32 xExtend = (this->_sign < 0) ? UInt32MaxValue : 0;
+	unsigned __int32 yExtend = (bi->_sign < 0) ? UInt32MaxValue : 0;
+
+	unsigned __int32 xu, yu;
+
+	for (int i = 0; i < sizez; i++)
+	{
+		xu = (i < sizex) ? x[i] : xExtend;
+		yu = (i < sizey) ? y[i] : yExtend;
+		z[i] = xu & yu;
+	}
+
+	BigInteger *ret = new BigInteger(z, sizez);
+
+	delete[]x;
+	delete[]y;
+	delete[]z;
+
+	return ret;
+}
+
+BigInteger* BigInteger::Add(BigInteger* & bi)
 {
 	// left.AssertValid();
 	// right.AssertValid();
 
-	if (bi == NULL || bi->_sign == 0) // IsZero
+	if (bi->_sign == 0) // IsZero
 	{
-		return;
+		return NULL;
 	}
 
+	/*
 	if (this->_sign == 0) // IsZero
 	{
 		this->_sign = bi->_sign;
@@ -259,34 +542,36 @@ void BigInteger::Add(BigInteger *bi)
 			for (int x = 0; x < this->_bitsSize; x++)
 				this->_bits[x] = bi->_bits[x];
 		}
-		return;
+		return NULL;
 	}
 
-	/*
 	int sign1 = +1;
 	int sign2 = +1;
 	BigIntegerBuilder reg1 = new BigIntegerBuilder(left, ref sign1);
 	BigIntegerBuilder reg2 = new BigIntegerBuilder(right, ref sign2);
 
 	if (sign1 == sign2)
-		reg1.Add(ref reg2);
+	reg1.Add(ref reg2);
 	else
-		reg1.Sub(ref sign1, ref reg2);
+	reg1.Sub(ref sign1, ref reg2);
 
 	return reg1.GetInteger(sign1);
 	*/
+
+	return NULL;
 }
 
-void BigInteger::Sub(BigInteger *bi)
+BigInteger* BigInteger::Sub(BigInteger* &bi)
 {
 	// left.AssertValid();
 	// right.AssertValid();
 
-	if (bi == NULL || bi->_sign == 0) // IsZero
+	if (bi->_sign == 0) // IsZero
 	{
-		return;
+		return NULL;
 	}
 
+	/*
 	if (this->_sign == 0) // IsZero
 	{
 		this->_sign = -bi->_sign;
@@ -305,10 +590,9 @@ void BigInteger::Sub(BigInteger *bi)
 			for (int x = 0; x < this->_bitsSize; x++)
 				this->_bits[x] = bi->_bits[x];
 		}
-		return;
+		return NULL;
 	}
 
-	/*
 	int sign1 = +1;
 	int sign2 = -1;
 	BigIntegerBuilder reg1 = new BigIntegerBuilder(left, ref sign1);
@@ -321,6 +605,7 @@ void BigInteger::Sub(BigInteger *bi)
 
 	return reg1.GetInteger(sign1);
 	*/
+	return NULL;
 }
 
 int BigInteger::CompareTo(BigInteger bi)
