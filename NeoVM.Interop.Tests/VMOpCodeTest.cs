@@ -131,7 +131,6 @@ namespace NeoVM.Interop.Tests
 
                         // RET
                         engine.StepInto();
-
                         Assert.AreEqual(EVMState.HALT, engine.State);
 
                         // Check

@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\NeoVM.Interop\NeoVM.Interop.Tests\NeoVM.Interop.Tests.csproj" />
+    <ProjectReference Include="..\NeoVM.Interop.Tests\NeoVM.Interop.Tests.csproj" />
   </ItemGroup>
 
 </Project>
