@@ -30,6 +30,7 @@ public:
 	BigInteger* Sub(BigInteger* &other);
 	BigInteger* And(BigInteger* &other);
 	BigInteger* Or(BigInteger* &other);
+	BigInteger* Xor(BigInteger* &other);
 
 	int CompareTo(BigInteger bi);
 	int CompareTo(BigInteger *bi);

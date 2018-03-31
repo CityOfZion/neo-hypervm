@@ -478,6 +478,47 @@ BigInteger* BigInteger::Or(BigInteger* & bi)
 	return ret;
 }
 
+BigInteger* BigInteger::Xor(BigInteger* & bi)
+{
+	if (bi == NULL || bi->_sign == 0) // IsZero
+	{
+		return new BigInteger(this);
+	}
+
+	if (this->_sign == 0) // IsZero
+	{
+		return new BigInteger(bi);
+	}
+
+	unsigned __int32 *x, *y, *z;
+
+	int sizex = this->ToUInt32Array(x);
+	int sizey = bi->ToUInt32Array(y);
+	int sizez = sizex > sizey ? sizex : sizey;
+
+	z = new unsigned __int32[sizez];
+
+	unsigned __int32 xExtend = (this->_sign < 0) ? UInt32MaxValue : 0;
+	unsigned __int32 yExtend = (bi->_sign < 0) ? UInt32MaxValue : 0;
+
+	unsigned __int32 xu, yu;
+
+	for (int i = 0; i < sizez; i++)
+	{
+		xu = (i < sizex) ? x[i] : xExtend;
+		yu = (i < sizey) ? y[i] : yExtend;
+		z[i] = xu ^ yu;
+	}
+
+	BigInteger *ret = new BigInteger(z, sizez);
+
+	delete[]x;
+	delete[]y;
+	delete[]z;
+
+	return ret;
+}
+
 BigInteger* BigInteger::And(BigInteger* & bi)
 {
 	if (bi == NULL || bi->_sign == 0 || this->_sign == 0) // IsZero
