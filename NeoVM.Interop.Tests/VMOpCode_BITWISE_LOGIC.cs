@@ -26,5 +26,15 @@ namespace NeoVM.Interop.Tests
                 engine.EvaluationStack.Pop();
             });
         }
+
+        [TestMethod]
+        public void XOR()
+        {
+            InternalTestBigInteger(EVMOpCode.XOR, (engine, a, b) =>
+            {
+                Assert.IsTrue(engine.EvaluationStack.Peek<IntegerStackItem>(0).Value == (a ^ b));
+                engine.EvaluationStack.Pop();
+            });
+        }
     }
 }

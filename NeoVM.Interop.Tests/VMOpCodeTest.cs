@@ -21,6 +21,9 @@ namespace NeoVM.Interop.Tests
         /// </summary>
         public static readonly BigInteger[] TestBigIntegers = new BigInteger[]
         {
+            new BigInteger(long.MinValue)*new BigInteger(long.MinValue)*new BigInteger(long.MinValue),
+            new BigInteger(ulong.MaxValue)*new BigInteger(ulong.MaxValue)*new BigInteger(ulong.MaxValue),
+
             new BigInteger(ulong.MaxValue),
             new BigInteger(ulong.MinValue),
             new BigInteger(long.MaxValue),
@@ -138,6 +141,58 @@ namespace NeoVM.Interop.Tests
                         CheckClean(engine);
                     }
                 }
+        }
+
+        /// <summary>
+        /// Check operand with one BigIntegers
+        /// </summary>
+        /// <param name="operand">Operand</param>
+        /// <param name="check">Check</param>
+        protected void InternalTestBigInteger(EVMOpCode operand, Action<ExecutionEngine, BigInteger> check)
+        {
+            foreach (BigInteger bi in TestBigIntegers)
+            {
+                using (MemoryStream script = new MemoryStream())
+                using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+                {
+                    // Make the script
+
+                    byte[] bba = bi.ToByteArray();
+
+                    script.WriteByte((byte)EVMOpCode.PUSHDATA1);
+                    script.WriteByte((byte)bba.Length);
+                    script.Write(bba, 0, bba.Length);
+
+                    script.WriteByte((byte)operand);
+                    script.WriteByte((byte)EVMOpCode.RET);
+
+                    // Load script
+
+                    engine.LoadScript(script.ToArray());
+
+                    // Execute
+
+                    // PUSH A
+                    engine.StepInto();
+                    Assert.AreEqual(1, engine.EvaluationStack.Count);
+
+                    // PUSH B
+                    engine.StepInto();
+                    Assert.AreEqual(2, engine.EvaluationStack.Count);
+
+                    // Operand
+                    engine.StepInto();
+                    check(engine, bi);
+
+                    // RET
+                    engine.StepInto();
+                    Assert.AreEqual(EVMState.HALT, engine.State);
+
+                    // Check
+
+                    CheckClean(engine);
+                }
+            }
         }
 
         /// <summary>

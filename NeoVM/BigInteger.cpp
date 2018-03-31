@@ -232,7 +232,7 @@ BigInteger::BigInteger(unsigned char * value, int byteCount)
 			// example: Int64 value 2362232011 (0xCB, 0xCC, 0xCC, 0x8C, 0x0)
 			// can be naively packed into 4 bytes (due to the leading 0x0)
 			// it overflows into the int32 sign bit
-			
+
 			this->_bits = new unsigned __int32[1]{ (unsigned __int32)this->_sign };
 			this->_sign = +1;
 			this->_bitsSize = 1;
@@ -257,7 +257,7 @@ BigInteger::BigInteger(unsigned char * value, int byteCount)
 		int unalignedBytes = byteCount % 4;
 		int dwordCount = byteCount / 4 + (unalignedBytes == 0 ? 0 : 1);
 		bool isZero = true;
-		unsigned __int32 *val = new unsigned __int32[dwordCount];
+		unsigned __int32 *val = new unsigned __int32[dwordCount]();
 
 		// Copy all dwords, except but don't do the last one if it's not a full four bytes
 		int curDword, curByte, byteInDword;
@@ -467,6 +467,47 @@ BigInteger* BigInteger::Or(BigInteger* & bi)
 		xu = (i < sizex) ? x[i] : xExtend;
 		yu = (i < sizey) ? y[i] : yExtend;
 		z[i] = xu | yu;
+	}
+
+	BigInteger *ret = new BigInteger(z, sizez);
+
+	delete[]x;
+	delete[]y;
+	delete[]z;
+
+	return ret;
+}
+
+BigInteger* BigInteger::Xor(BigInteger* & bi)
+{
+	if (bi == NULL || bi->_sign == 0) // IsZero
+	{
+		return new BigInteger(this);
+	}
+
+	if (this->_sign == 0) // IsZero
+	{
+		return new BigInteger(bi);
+	}
+
+	unsigned __int32 *x, *y, *z;
+
+	int sizex = this->ToUInt32Array(x);
+	int sizey = bi->ToUInt32Array(y);
+	int sizez = sizex > sizey ? sizex : sizey;
+
+	z = new unsigned __int32[sizez];
+
+	unsigned __int32 xExtend = (this->_sign < 0) ? UInt32MaxValue : 0;
+	unsigned __int32 yExtend = (bi->_sign < 0) ? UInt32MaxValue : 0;
+
+	unsigned __int32 xu, yu;
+
+	for (int i = 0; i < sizez; i++)
+	{
+		xu = (i < sizex) ? x[i] : xExtend;
+		yu = (i < sizey) ? y[i] : yExtend;
+		z[i] = xu ^ yu;
 	}
 
 	BigInteger *ret = new BigInteger(z, sizez);
@@ -804,7 +845,7 @@ int BigInteger::ToByteArray(unsigned char * output, int length)
 		highByte = 0x00;
 	}
 
-	unsigned __int8 *bytes = new unsigned __int8[4 * dwordsSize];
+	unsigned __int8 *bytes = new unsigned __int8[4 * dwordsSize]/*()*/;
 	int curByte = 0;
 
 	unsigned __int32 dword;

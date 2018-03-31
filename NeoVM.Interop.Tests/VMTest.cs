@@ -280,12 +280,9 @@ namespace NeoVM.Interop.Tests
 
                 // Integer
 
-                using (IntegerStackItem bOne = engine.CreateInteger(1))
-                using (IntegerStackItem bTwo = engine.CreateInteger(2))
-                {
-                    Assert.IsTrue(bOne.Value == 1);
-                    Assert.IsTrue(bTwo.Value == 2);
-                }
+                foreach (BigInteger bi in TestBigIntegers)
+                    using (IntegerStackItem bnat = engine.CreateInteger(bi))
+                        Assert.IsTrue(bnat.Value == bi);
 
                 // ByteArray
 
@@ -322,30 +319,7 @@ namespace NeoVM.Interop.Tests
                 Assert.AreEqual(engine.AltStack.Count, 0);
                 Assert.IsFalse(engine.AltStack.TryPeek(0, out IStackItem obj));
 
-                foreach (BigInteger bi in new BigInteger[]
-                {
-                    new BigInteger(new byte[]{ 0x80,0x00,0x00,0x00,0x00,0x00}),
-                    new BigInteger(new byte[]{ 0x00,0x00,0x00,0x00,0x00,0x80}),
-                    new BigInteger(long.MinValue)*new BigInteger(long.MinValue)*new BigInteger(long.MinValue),
-                    new BigInteger(ulong.MaxValue)*new BigInteger(ulong.MaxValue)*new BigInteger(ulong.MaxValue),
-                    new BigInteger(long.MaxValue),
-                    new BigInteger(long.MinValue),
-                    new BigInteger(ulong.MaxValue),
-                    new BigInteger(ulong.MinValue),
-                    new BigInteger(int.MaxValue),
-                    new BigInteger(int.MinValue),
-                    new BigInteger(uint.MaxValue),
-                    new BigInteger(uint.MinValue),
-                    new BigInteger(short.MaxValue),
-                    new BigInteger(short.MinValue),
-                    new BigInteger(ushort.MaxValue),
-                    new BigInteger(ushort.MinValue),
-                    new BigInteger(byte.MaxValue),
-                    new BigInteger(sbyte.MinValue),
-                    new BigInteger(-1),
-                    new BigInteger(0),
-                    new BigInteger(1),
-                })
+                foreach (BigInteger bi in TestBigIntegers)
                 {
                     CheckItem(engine, engine.CreateInteger(bi));
                 }
