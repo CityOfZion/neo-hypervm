@@ -856,9 +856,12 @@ ExecuteOpCode:
 		this->EvaluationStack->Push(item);
 		return;
 	}
-	/*
-	// 
 
+#pragma endregion
+
+#pragma region Bitwise logic
+
+	/*
 	case OpCode.INVERT:
 	{
 	BigInteger x = EvaluationStack.Pop().GetBigInteger();
@@ -953,8 +956,13 @@ ExecuteOpCode:
 	EvaluationStack.Push(x1.Equals(x2));
 	return;
 	}
+	*/
 
-	// Numeric
+#pragma endregion
+
+#pragma region Numeric
+
+	/*
 	case OpCode.INC:
 	{
 	BigInteger x = EvaluationStack.Pop().GetBigInteger();
