@@ -1004,12 +1004,32 @@ ExecuteOpCode:
 	EvaluationStack.Push(x.Sign);
 	return;
 	}
-	case OpCode.NEGATE:
+	*/
+	case EVMOpCode::NEGATE:
 	{
-	BigInteger x = EvaluationStack.Pop().GetBigInteger();
-	EvaluationStack.Push(-x);
-	return;
+		if (this->EvaluationStack->Count() < 1)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem* item = this->EvaluationStack->Pop();
+		BigInteger* bi = item->GetBigInteger();
+		IStackItem::Free(item);
+
+		if (bi == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		BigInteger *ret = bi->Negate();
+		delete(bi);
+
+		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		return;
 	}
+	/*
 	case OpCode.ABS:
 	{
 	BigInteger x = EvaluationStack.Pop().GetBigInteger();

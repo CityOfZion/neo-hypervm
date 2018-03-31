@@ -31,6 +31,7 @@ public:
 	BigInteger* And(BigInteger* &other);
 	BigInteger* Or(BigInteger* &other);
 	BigInteger* Xor(BigInteger* &other);
+	BigInteger* Negate();
 
 	int CompareTo(BigInteger bi);
 	int CompareTo(BigInteger *bi);
@@ -58,5 +59,5 @@ private:
 	int ToUInt32Array(unsigned __int32 * &output);
 	int Length(unsigned __int32 *rgu, int size);
 	int GetDiffLength(unsigned __int32 *rgu1, unsigned __int32 * rgu2, int cu);
-	BigInteger(int sign, unsigned __int32 rgu[], int rguSize);
+	BigInteger(int sign, unsigned __int32 *rgu, int rguSize);
 };

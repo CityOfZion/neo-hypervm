@@ -189,10 +189,10 @@ BigInteger::BigInteger(unsigned char * value, int byteCount)
 {
 	if (byteCount <= 0 || value == NULL)
 	{
+		// BigInteger.Zero
 		this->_sign = 0;
-		this->_bits = NULL;
 		this->_bitsSize = 0;
-
+		this->_bits = NULL;
 		return;
 	}
 
@@ -204,11 +204,9 @@ BigInteger::BigInteger(unsigned char * value, int byteCount)
 	if (byteCount == 0)
 	{
 		// BigInteger.Zero
-
 		this->_sign = 0;
-		this->_bits = NULL;
 		this->_bitsSize = 0;
-
+		this->_bits = NULL;
 		// AssertValid();
 		return;
 	}
@@ -260,9 +258,11 @@ BigInteger::BigInteger(unsigned char * value, int byteCount)
 		unsigned __int32 *val = new unsigned __int32[dwordCount]();
 
 		// Copy all dwords, except but don't do the last one if it's not a full four bytes
-		int curDword, curByte, byteInDword;
-		curByte = 3;
-		for (curDword = 0; curDword < dwordCount - (unalignedBytes == 0 ? 0 : 1); curDword++)
+
+		int max = dwordCount - (unalignedBytes == 0 ? 0 : 1);
+		int curDword = 0, curByte = 3, byteInDword;
+
+		for (; curDword < max; curDword++)
 		{
 			byteInDword = 0;
 			while (byteInDword < 4)
@@ -291,8 +291,8 @@ BigInteger::BigInteger(unsigned char * value, int byteCount)
 		if (isZero)
 		{
 			this->_sign = 0;
-			this->_bits = NULL;
 			this->_bitsSize = 0;
+			this->_bits = NULL;
 		}
 		else if (isNegative)
 		{
@@ -650,6 +650,11 @@ BigInteger* BigInteger::Sub(BigInteger* &bi)
 	return NULL;
 }
 
+BigInteger* BigInteger::Negate()
+{
+	return new BigInteger(-this->_sign, this->_bits, this->_bitsSize);
+}
+
 int BigInteger::CompareTo(BigInteger bi)
 {
 	// AssertValid();
@@ -764,7 +769,7 @@ BigInteger::BigInteger(unsigned __int32 value)
 	// AssertValid();
 }
 
-BigInteger::BigInteger(int sign, unsigned __int32 rgu[], int rguSize)
+BigInteger::BigInteger(int sign, unsigned __int32 *rgu, int rguSize)
 {
 	this->_sign = sign;
 
