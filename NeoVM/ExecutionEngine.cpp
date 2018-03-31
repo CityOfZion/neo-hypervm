@@ -895,10 +895,8 @@ ExecuteOpCode:
 			return;
 		}
 
-		BigInteger *iret = i1->And(i2);
-		IStackItem *ret = new IntegerStackItem(iret);
+		IStackItem *ret = new IntegerStackItem(i1->And(i2), true);
 
-		delete(iret);
 		delete(i2);
 		delete(i1);
 
@@ -931,10 +929,8 @@ ExecuteOpCode:
 			return;
 		}
 
-		BigInteger *iret = i1->Or(i2);
-		IStackItem *ret = new IntegerStackItem(iret);
+		IStackItem *ret = new IntegerStackItem(i1->Or(i2), true);
 
-		delete(iret);
 		delete(i2);
 		delete(i1);
 
@@ -967,10 +963,8 @@ ExecuteOpCode:
 			return;
 		}
 
-		BigInteger *iret = i1->Xor(i2);
-		IStackItem *ret = new IntegerStackItem(iret);
+		IStackItem *ret = new IntegerStackItem(i1->Xor(i2), true);
 
-		delete(iret);
 		delete(i2);
 		delete(i1);
 
@@ -1380,10 +1374,18 @@ ExecuteOpCode:
 			return;
 		}
 
-		IStackItem *ret = new IntegerStackItem(i1->CompareTo(i2) >= 0 ? i2 : i1);
+		IStackItem *ret;
 
-		delete(i2);
-		delete(i1);
+		if (i1->CompareTo(i2) >= 0)
+		{
+			delete(i1);
+			ret = new IntegerStackItem(i2, true);
+		}
+		else
+		{
+			delete(i2);
+			ret = new IntegerStackItem(i1, true);
+		}
 
 		this->EvaluationStack->Push(ret);
 		return;
@@ -1414,10 +1416,18 @@ ExecuteOpCode:
 			return;
 		}
 
-		IStackItem *ret = new IntegerStackItem(i1->CompareTo(i2) >= 0 ? i1 : i2);
+		IStackItem *ret;
 
-		delete(i2);
-		delete(i1);
+		if (i1->CompareTo(i2) >= 0)
+		{
+			delete(i2);
+			ret = new IntegerStackItem(i1, true);
+		}
+		else
+		{
+			delete(i1);
+			ret = new IntegerStackItem(i2, true);
+		}
 
 		this->EvaluationStack->Push(ret);
 		return;
