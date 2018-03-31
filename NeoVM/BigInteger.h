@@ -16,16 +16,21 @@ public:
 	BigInteger(int value);
 	BigInteger(BigInteger *value);
 	BigInteger(unsigned __int32 value);
+	BigInteger(unsigned __int32 * value, int size);
 	BigInteger(unsigned char * value, int byteCount);
 
 	BigInteger *Clone();
+	void CopyInternal(__int32 sign, unsigned __int32 *bits, __int32 bitSize);
 
 	bool ToInt32(int &ret);
 	int ToByteArraySize();
 	int ToByteArray(unsigned char * output, int length);
 
-	void Add(BigInteger *bi);
-	void Sub(BigInteger *bi);
+	BigInteger* Add(BigInteger* &other);
+	BigInteger* Sub(BigInteger* &other);
+	BigInteger* And(BigInteger* &other);
+	BigInteger* Or(BigInteger* &other);
+
 	int CompareTo(BigInteger bi);
 	int CompareTo(BigInteger *bi);
 
@@ -49,6 +54,7 @@ private:
 	unsigned __int32 * _bits;
 	__int32 _bitsSize;
 
+	int ToUInt32Array(unsigned __int32 * &output);
 	int Length(unsigned __int32 *rgu, int size);
 	int GetDiffLength(unsigned __int32 *rgu1, unsigned __int32 * rgu2, int cu);
 	BigInteger(int sign, unsigned __int32 rgu[], int rguSize);

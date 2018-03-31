@@ -146,8 +146,6 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void TestArrayItem()
         {
-            Random r = new Random();
-
             using (ExecutionEngine engine = NeoVM.CreateEngine(null))
                 for (int x = 0; x < 2; x++)
                 {
@@ -161,7 +159,7 @@ namespace NeoVM.Interop.Tests
 
                         // Create two random integer types
 
-                        using (IntegerStackItem btest1 = engine.CreateInteger(r.Next()))
+                        using (IntegerStackItem btest1 = engine.CreateInteger(Rand.Next()))
                         using (IntegerStackItem btest2 = engine.CreateInteger(btest1.Value + 1))
                         {
                             // Check contains
@@ -359,11 +357,10 @@ namespace NeoVM.Interop.Tests
 
                 // Push integer and ByteArray
 
-                Random r = new Random();
                 for (int x = 0; x < 100; x++)
                 {
-                    CheckItem(engine, engine.CreateInteger(r.Next()));
-                    CheckItem(engine, engine.CreateByteArray(new BigInteger(r.Next()).ToByteArray()));
+                    CheckItem(engine, engine.CreateInteger(Rand.Next()));
+                    CheckItem(engine, engine.CreateByteArray(new BigInteger(Rand.Next()).ToByteArray()));
                 }
 
                 // Interop
