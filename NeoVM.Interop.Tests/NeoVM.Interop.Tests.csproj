@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="echo copy $(SolutionDir)..\NeoVM\x64\$(ConfigurationName)\NeoVM.dll =&gt; $(TargetDir)Windows\x64\NeoVM.dll&#xD;&#xA;mkdir $(TargetDir)Windows\x64&#xD;&#xA;copy  /Y $(SolutionDir)..\NeoVM\x64\$(ConfigurationName)\NeoVM.dll $(TargetDir)Windows\x64\NeoVM.dll" />
+    <Exec Command="mkdir $(TargetDir)Windows\x64&#xD;&#xA;copy  /Y $(SolutionDir)\NeoVM\x64\$(ConfigurationName)\NeoVM.dll $(TargetDir)Windows\x64\NeoVM.dll" />
   </Target>
 
 </Project>

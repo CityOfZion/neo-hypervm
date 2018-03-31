@@ -19,38 +19,32 @@ namespace NeoVM.Interop.Tests
         /// <summary>
         /// Test BigInteger array
         /// </summary>
-        public static BigInteger[] TestBigIntegers
+        public static readonly BigInteger[] TestBigIntegers = new BigInteger[]
         {
-            get
-            {
-                return new BigInteger[]
-                {
-                    new BigInteger(ulong.MaxValue),
-                    new BigInteger(ulong.MinValue),
-                    new BigInteger(long.MaxValue),
-                    new BigInteger(long.MinValue),
+            new BigInteger(ulong.MaxValue),
+            new BigInteger(ulong.MinValue),
+            new BigInteger(long.MaxValue),
+            new BigInteger(long.MinValue),
 
-                    new BigInteger(uint.MaxValue),
-                    new BigInteger(uint.MinValue),
-                    new BigInteger(int.MaxValue),
-                    new BigInteger(int.MinValue),
+            new BigInteger(uint.MaxValue),
+            new BigInteger(uint.MinValue),
+            new BigInteger(int.MaxValue),
+            new BigInteger(int.MinValue),
 
-                    new BigInteger(ushort.MaxValue),
-                    new BigInteger(ushort.MinValue),
-                    new BigInteger(short.MaxValue),
-                    new BigInteger(short.MinValue),
+            new BigInteger(ushort.MaxValue),
+            new BigInteger(ushort.MinValue),
+            new BigInteger(short.MaxValue),
+            new BigInteger(short.MinValue),
 
-                    new BigInteger(sbyte.MaxValue),
-                    new BigInteger(sbyte.MinValue),
-                    new BigInteger(byte.MaxValue),
-                    new BigInteger(byte.MinValue),
+            new BigInteger(sbyte.MaxValue),
+            new BigInteger(sbyte.MinValue),
+            new BigInteger(byte.MaxValue),
+            new BigInteger(byte.MinValue),
 
-                    BigInteger.MinusOne,
-                    BigInteger.One,
-                    BigInteger.Zero,
-                };
-            }
-        }
+            BigInteger.MinusOne,
+            BigInteger.One,
+            BigInteger.Zero,
+        };
 
         /// <summary>
         /// Regular arguments
@@ -67,7 +61,7 @@ namespace NeoVM.Interop.Tests
         /// </summary>
         /// <param name="bi">Integer</param>
         /// <returns>BigIntegerPair</returns>
-        internal static IEnumerable<BigIntegerPair> IntIteration(BigInteger bi)
+        protected static IEnumerable<BigIntegerPair> IntIteration(BigInteger bi)
         {
             // Equal
             yield return new BigIntegerPair(bi, bi);
@@ -137,7 +131,6 @@ namespace NeoVM.Interop.Tests
 
                         // RET
                         engine.StepInto();
-
                         Assert.AreEqual(EVMState.HALT, engine.State);
 
                         // Check
