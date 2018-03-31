@@ -262,7 +262,9 @@ void ArrayStackItem_Clear(ArrayStackItem* array)
 
 IStackItem* ArrayStackItem_Get(ArrayStackItem* array, int index)
 {
-	return array->Get(index);
+	IStackItem* ret = array->Get(index);
+	if (ret != NULL) ret->Claims++;
+	return ret;
 }
 
 void ArrayStackItem_Add(ArrayStackItem* array, IStackItem* item)
