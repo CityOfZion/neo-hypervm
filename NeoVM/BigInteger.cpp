@@ -59,6 +59,36 @@ void BigInteger::CopyInternal(__int32 sign, unsigned __int32 *bits, __int32 bitS
 	}
 }
 
+// Do an in-place twos complement of d and also return the result.
+// "Dangerous" because it causes a mutation and needs to be used
+// with care for immutable types
+void BigInteger::DangerousMakeTwosComplement(unsigned __int32 *d, int dSize)
+{
+	// first do complement and +1 as long as carry is needed
+	int i = 0;
+	unsigned __int32 v = 0;
+	for (; i < dSize; i++)
+	{
+		v = ~d[i] + 1;
+		d[i] = v;
+		if (v != 0) { i++; break; }
+	}
+	if (v != 0)
+	{
+		// now ones complement is sufficient
+		for (; i < dSize; i++) {
+			d[i] = ~d[i];
+		}
+	}/*
+	else
+	{
+		//??? this is weird
+		d = resize(d, d.Length + 1);
+		d[d.Length - 1] = 1;
+	}*/
+	// return d;
+}
+
 BigInteger::BigInteger(unsigned __int32 * value, int size)
 {
 	if (value == NULL)
@@ -137,7 +167,7 @@ BigInteger::BigInteger(unsigned __int32 * value, int size)
 	}
 
 	// finally handle the more complex cases where we must transform the input into sign magnitude
-	// NumericsHelpers.DangerousMakeTwosComplement(value); // mutates val
+	this->DangerousMakeTwosComplement(value, size); // mutates val
 	// pack _bits to remove any wasted space after the twos complement
 
 	int len = size;
@@ -296,7 +326,7 @@ BigInteger::BigInteger(unsigned char * value, int byteCount)
 		}
 		else if (isNegative)
 		{
-			// NumericsHelpers.DangerousMakeTwosComplement(val); // mutates val
+			this->DangerousMakeTwosComplement(val, dwordCount); // mutates val
 			// pack _bits to remove any wasted space after the twos complement
 
 			int len = dwordCount;
@@ -402,7 +432,7 @@ int BigInteger::ToUInt32Array(unsigned __int32 * &output)
 	{
 		dwords = this->_bits;
 		dwords_size = this->_bitsSize;
-		//NumericsHelpers.DangerousMakeTwosComplement(dwords);  // mutates dwords
+		this->DangerousMakeTwosComplement(dwords, dwords_size);  // mutates dwords
 		highDWord = UInt32MaxValue;
 	}
 	else
@@ -655,6 +685,14 @@ BigInteger* BigInteger::Negate()
 	return new BigInteger(-this->_sign, this->_bits, this->_bitsSize);
 }
 
+BigInteger* BigInteger::Abs()
+{
+	if (this->CompareTo(BigInteger::Zero) >= 0)
+		return new BigInteger(this);
+
+	return new BigInteger(-this->_sign, this->_bits, this->_bitsSize);
+}
+
 int BigInteger::CompareTo(BigInteger bi)
 {
 	// AssertValid();
@@ -827,7 +865,7 @@ int BigInteger::ToByteArray(unsigned char * output, int length)
 	// and then another pass to remove unneeded bytes at the top of the array.
 
 	int dwordsSize;
-	__int8 highByte;
+	unsigned __int8 highByte;
 	unsigned __int32 *dwords;
 
 	if (this->_bitsSize == 0)
@@ -840,7 +878,7 @@ int BigInteger::ToByteArray(unsigned char * output, int length)
 	{
 		dwords = _bits;
 		dwordsSize = this->_bitsSize;
-		//NumericsHelpers.DangerousMakeTwosComplement(dwords);  // mutates dwords
+		this->DangerousMakeTwosComplement(dwords, dwordsSize);  // mutates dwords
 		highByte = 0xff;
 	}
 	else

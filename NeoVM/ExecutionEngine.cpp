@@ -1029,14 +1029,30 @@ ExecuteOpCode:
 		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
 		return;
 	}
-	/*
-	case OpCode.ABS:
+	case EVMOpCode::ABS:
 	{
-	BigInteger x = EvaluationStack.Pop().GetBigInteger();
-	EvaluationStack.Push(BigInteger.Abs(x));
-	return;
+		if (this->EvaluationStack->Count() < 1)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem* item = this->EvaluationStack->Pop();
+		BigInteger* bi = item->GetBigInteger();
+		IStackItem::Free(item);
+
+		if (bi == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		BigInteger *ret = bi->Abs();
+		delete(bi);
+
+		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		return;
 	}
-	*/
 	case EVMOpCode::NOT:
 	{
 		if (this->EvaluationStack->Count() < 1)
