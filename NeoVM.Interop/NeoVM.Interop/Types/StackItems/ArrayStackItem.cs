@@ -1,5 +1,4 @@
 ﻿using NeoVM.Interop.Enums;
-using NeoVM.Interop.Helpers;
 using NeoVM.Interop.Interfaces;
 using System;
 using System.Collections;

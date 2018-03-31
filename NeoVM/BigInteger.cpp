@@ -232,6 +232,7 @@ BigInteger::BigInteger(unsigned char * value, int byteCount)
 			// example: Int64 value 2362232011 (0xCB, 0xCC, 0xCC, 0x8C, 0x0)
 			// can be naively packed into 4 bytes (due to the leading 0x0)
 			// it overflows into the int32 sign bit
+			
 			this->_bits = new unsigned __int32[1]{ (unsigned __int32)this->_sign };
 			this->_sign = +1;
 			this->_bitsSize = 1;

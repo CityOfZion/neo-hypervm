@@ -3,16 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeoVM.Interop", "NeoVM.Interop\NeoVM.Interop.csproj", "{700DA9D9-92F6-4B9D-9C25-F8D7F59F3DD7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeoVM.Interop", "NeoVM.Interop\NeoVM.Interop\NeoVM.Interop.csproj", "{700DA9D9-92F6-4B9D-9C25-F8D7F59F3DD7}"
 	ProjectSection(ProjectDependencies) = postProject
 		{DEFBCE64-AD40-4A45-8A3C-415F9466EEA2} = {DEFBCE64-AD40-4A45-8A3C-415F9466EEA2}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeoVM.Interop.Tests", "NeoVM.Interop.Tests\NeoVM.Interop.Tests.csproj", "{D3A0AE0D-E4B6-4246-AA6B-D87967CC467D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeoVM.Interop.Tests", "NeoVM.Interop\NeoVM.Interop.Tests\NeoVM.Interop.Tests.csproj", "{D3A0AE0D-E4B6-4246-AA6B-D87967CC467D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NeoVM", "..\NeoVM\NeoVM.vcxproj", "{DEFBCE64-AD40-4A45-8A3C-415F9466EEA2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NeoVM", "NeoVM\NeoVM.vcxproj", "{DEFBCE64-AD40-4A45-8A3C-415F9466EEA2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeoVM.Interop.Benchmarks", "NeoVM.Interop.Benchmarks\NeoVM.Interop.Benchmarks.csproj", "{8ACA1596-025E-4528-A8F4-78DC2E87C713}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeoVM.Interop.Benchmarks", "NeoVM.Interop\NeoVM.Interop.Benchmarks\NeoVM.Interop.Benchmarks.csproj", "{8ACA1596-025E-4528-A8F4-78DC2E87C713}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
