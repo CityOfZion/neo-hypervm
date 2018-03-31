@@ -7,11 +7,11 @@ IntegerStackItem::IntegerStackItem(int value) : IStackItem(EStackItemType::Integ
 Value(new BigInteger(value)) {}
 
 IntegerStackItem::IntegerStackItem(BigInteger *value, bool copyPointer) : IStackItem(EStackItemType::Integer),
-Value(copyPointer ? new BigInteger(value) : value) {}
+Value(copyPointer ? value : new BigInteger(value)) {}
 
 IntegerStackItem::~IntegerStackItem()
 {
-	if (this->Value = NULL)return;
+	if (this->Value = NULL) return;
 
 	delete(this->Value);
 	this->Value = NULL;
