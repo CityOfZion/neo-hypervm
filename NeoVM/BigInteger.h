@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include <cstring>
 
 // Ported from 
 // - https://referencesource.microsoft.com/#System.Numerics/System/Numerics/BigInteger.cs
@@ -17,6 +17,7 @@ public:
 	BigInteger(BigInteger *value);
 	BigInteger(unsigned __int32 value);
 	BigInteger(unsigned __int32 * value, int size);
+	BigInteger(unsigned __int32* value, int size, bool negative);
 	BigInteger(unsigned char * value, int byteCount);
 
 	BigInteger *Clone();
@@ -33,6 +34,8 @@ public:
 	BigInteger* Xor(BigInteger* &other);
 	BigInteger* Negate();
 	BigInteger* Abs();
+	BigInteger* Shl(int shift);
+	BigInteger* Shr(int shift);
 	int GetSign();
 
 	int CompareTo(BigInteger bi);
@@ -58,6 +61,7 @@ private:
 	unsigned __int32 * _bits;
 	__int32 _bitsSize;
 
+	static bool GetPartsForBitManipulation(BigInteger *x, unsigned __int32 * &xd, int &xl);
 	void DangerousMakeTwosComplement(unsigned __int32 *d, int dSize);
 	int ToUInt32Array(unsigned __int32 * &output);
 	int Length(unsigned __int32 *rgu, int size);

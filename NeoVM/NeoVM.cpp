@@ -98,6 +98,8 @@ IStackItem* StackItems_Pop(StackItems* stack, int count)
 {
 	if (count == 1)
 	{
+		if (stack->Count() <= 0) return NULL;
+
 		IStackItem * ret = stack->Pop();
 		ret->Claims++;
 		return ret;

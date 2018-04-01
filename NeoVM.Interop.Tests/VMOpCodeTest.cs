@@ -4,6 +4,7 @@ using NeoVM.Interop.Tests.Extra;
 using NeoVM.Interop.Types;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Numerics;
 
@@ -23,6 +24,8 @@ namespace NeoVM.Interop.Tests
         {
             new BigInteger(long.MinValue)*new BigInteger(long.MinValue)*new BigInteger(long.MinValue),
             new BigInteger(ulong.MaxValue)*new BigInteger(ulong.MaxValue)*new BigInteger(ulong.MaxValue),
+            new BigInteger(long.MinValue)*new BigInteger(long.MinValue),
+            new BigInteger(ulong.MaxValue)*new BigInteger(ulong.MaxValue),
 
             new BigInteger(ulong.MaxValue),
             new BigInteger(ulong.MinValue),
@@ -92,7 +95,7 @@ namespace NeoVM.Interop.Tests
         /// </summary>
         /// <param name="operand">Operand</param>
         /// <param name="check">Check</param>
-        protected void InternalTestBigInteger(EVMOpCode operand, Action<ExecutionEngine, BigInteger, BigInteger> check)
+        protected void InternalTestBigInteger(EVMOpCode operand, Action<ExecutionEngine, BigInteger, BigInteger, CancelEventArgs> check)
         {
             foreach (BigInteger bi in TestBigIntegers)
                 foreach (BigIntegerPair pair in IntIteration(bi))
@@ -129,8 +132,10 @@ namespace NeoVM.Interop.Tests
                         Assert.AreEqual(2, engine.EvaluationStack.Count);
 
                         // Operand
+                        CancelEventArgs cancel = new CancelEventArgs(false);
                         engine.StepInto();
-                        check(engine, pair.A, pair.B);
+                        check(engine, pair.A, pair.B, cancel);
+                        if (cancel.Cancel) continue;
 
                         // RET
                         engine.StepInto();
@@ -148,7 +153,7 @@ namespace NeoVM.Interop.Tests
         /// </summary>
         /// <param name="operand">Operand</param>
         /// <param name="check">Check</param>
-        protected void InternalTestBigInteger(EVMOpCode operand, Action<ExecutionEngine, BigInteger> check)
+        protected void InternalTestBigInteger(EVMOpCode operand, Action<ExecutionEngine, BigInteger, CancelEventArgs> check)
         {
             foreach (BigInteger bi in TestBigIntegers)
             {
@@ -177,8 +182,10 @@ namespace NeoVM.Interop.Tests
                     Assert.AreEqual(1, engine.EvaluationStack.Count);
 
                     // Operand
+                    CancelEventArgs cancel = new CancelEventArgs(false);
                     engine.StepInto();
-                    check(engine, bi);
+                    check(engine, bi, cancel);
+                    if (cancel.Cancel) continue;
 
                     // RET
                     engine.StepInto();
