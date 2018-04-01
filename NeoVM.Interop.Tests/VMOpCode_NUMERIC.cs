@@ -8,7 +8,7 @@ namespace NeoVM.Interop.Tests
     [TestClass]
     public class VMOpCode_NUMERIC : VMOpCodeTest
     {
-        //[TestMethod]
+        [TestMethod]
         public void INC()
         {
             InternalTestBigInteger(EVMOpCode.INC, (engine, a, cancel) =>
@@ -17,7 +17,7 @@ namespace NeoVM.Interop.Tests
             });
         }
 
-        //[TestMethod]
+        [TestMethod]
         public void DEC()
         {
             InternalTestBigInteger(EVMOpCode.DEC, (engine, a, cancel) =>
@@ -53,7 +53,7 @@ namespace NeoVM.Interop.Tests
             });
         }
 
-        //[TestMethod]
+        [TestMethod]
         public void ADD()
         {
             InternalTestBigInteger(EVMOpCode.ADD, (engine, a, b, cancel) =>
@@ -62,7 +62,7 @@ namespace NeoVM.Interop.Tests
             });
         }
 
-        //[TestMethod]
+        [TestMethod]
         public void SUB()
         {
             InternalTestBigInteger(EVMOpCode.SUB, (engine, a, b, cancel) =>

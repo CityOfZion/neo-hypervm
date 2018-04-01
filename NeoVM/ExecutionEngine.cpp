@@ -985,20 +985,57 @@ ExecuteOpCode:
 
 #pragma region Numeric
 
-	/*
-	case OpCode.INC:
+	case EVMOpCode::INC:
 	{
-	BigInteger x = EvaluationStack.Pop().GetBigInteger();
-	EvaluationStack.Push(x + 1);
-	return;
+		if (this->EvaluationStack->Count() < 1)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem* item = this->EvaluationStack->Pop();
+		BigInteger* bi = item->GetBigInteger();
+		IStackItem::Free(item);
+
+		if (bi == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		BigInteger *add = new BigInteger(BigInteger::One);
+		BigInteger *ret = bi->Add(add);
+		delete(bi);
+
+		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		return;
 	}
-	case OpCode.DEC:
+	case EVMOpCode::DEC:
 	{
-	BigInteger x = EvaluationStack.Pop().GetBigInteger();
-	EvaluationStack.Push(x - 1);
-	return;
+		if (this->EvaluationStack->Count() < 1)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem* item = this->EvaluationStack->Pop();
+		BigInteger* bi = item->GetBigInteger();
+		IStackItem::Free(item);
+
+		if (bi == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		BigInteger *add = new BigInteger(BigInteger::One);
+		BigInteger *ret = bi->Sub(add);
+		delete(add);
+		delete(bi);
+
+		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		return;
 	}
-	*/
 	case EVMOpCode::SIGN:
 	{
 		if (this->EvaluationStack->Count() < 1)
@@ -1111,21 +1148,69 @@ ExecuteOpCode:
 		this->EvaluationStack->Push(ret);
 		return;
 	}
+	case EVMOpCode::ADD:
+	{
+		if (this->EvaluationStack->Count() < 2)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem* i2 = this->EvaluationStack->Pop();
+		IStackItem* i1 = this->EvaluationStack->Pop();
+		BigInteger* x2 = i2->GetBigInteger();
+		BigInteger* x1 = i1->GetBigInteger();
+		IStackItem::Free(i2);
+		IStackItem::Free(i1);
+
+		if (x2 == NULL || x1 == NULL)
+		{
+			if (x2 != NULL) delete(x2);
+			if (x1 != NULL) delete(x1);
+
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		BigInteger *ret = x1->Add(x2);
+		delete(x2);
+		delete(x1);
+
+		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		return;
+	}
+	case EVMOpCode::SUB:
+	{
+		if (this->EvaluationStack->Count() < 2)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem* i2 = this->EvaluationStack->Pop();
+		IStackItem* i1 = this->EvaluationStack->Pop();
+		BigInteger* x2 = i2->GetBigInteger();
+		BigInteger* x1 = i1->GetBigInteger();
+		IStackItem::Free(i2);
+		IStackItem::Free(i1);
+
+		if (x2 == NULL || x1 == NULL)
+		{
+			if (x2 != NULL) delete(x2);
+			if (x1 != NULL) delete(x1);
+
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		BigInteger *ret = x1->Sub(x2);
+		delete(x2);
+		delete(x1);
+
+		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		return;
+	}
 	/*
-	case OpCode.ADD:
-	{
-		BigInteger x2 = EvaluationStack.Pop().GetBigInteger();
-		BigInteger x1 = EvaluationStack.Pop().GetBigInteger();
-		EvaluationStack.Push(x1 + x2);
-		return;
-	}
-	case OpCode.SUB:
-	{
-		BigInteger x2 = EvaluationStack.Pop().GetBigInteger();
-		BigInteger x1 = EvaluationStack.Pop().GetBigInteger();
-		EvaluationStack.Push(x1 - x2);
-		return;
-	}
 	case OpCode.MUL:
 	{
 		BigInteger x2 = EvaluationStack.Pop().GetBigInteger();

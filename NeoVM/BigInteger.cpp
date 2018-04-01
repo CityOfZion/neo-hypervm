@@ -1,4 +1,5 @@
 #include "BigInteger.h"
+#include "BigIntegerBuilder.h"
 
 // Constants
 
@@ -515,7 +516,7 @@ int BigInteger::ToUInt32Array(unsigned __int32 * &output)
 	return trimmed_size;
 }
 
-BigInteger* BigInteger::Or(BigInteger* & bi)
+BigInteger* BigInteger::Or(BigInteger* bi)
 {
 	if (bi == NULL || bi->_sign == 0) // IsZero
 	{
@@ -556,7 +557,7 @@ BigInteger* BigInteger::Or(BigInteger* & bi)
 	return ret;
 }
 
-BigInteger* BigInteger::Xor(BigInteger* & bi)
+BigInteger* BigInteger::Xor(BigInteger* bi)
 {
 	if (bi == NULL || bi->_sign == 0) // IsZero
 	{
@@ -745,7 +746,7 @@ BigInteger* BigInteger::Shr(int shift)
 	return ret;
 }
 
-BigInteger* BigInteger::And(BigInteger* & bi)
+BigInteger* BigInteger::And(BigInteger* bi)
 {
 	if (bi == NULL || bi->_sign == 0 || this->_sign == 0) // IsZero
 	{
@@ -781,99 +782,71 @@ BigInteger* BigInteger::And(BigInteger* & bi)
 	return ret;
 }
 
-BigInteger* BigInteger::Add(BigInteger* & bi)
+BigInteger* BigInteger::Add(BigInteger* bi)
 {
 	// left.AssertValid();
 	// right.AssertValid();
 
 	if (bi->_sign == 0) // IsZero
 	{
-		return NULL;
+		return new BigInteger(this);
 	}
 
-	/*
 	if (this->_sign == 0) // IsZero
 	{
-		this->_sign = bi->_sign;
-		this->_bitsSize = bi->_bitsSize;
-
-		if (this->_bits != NULL)
-		{
-			delete[]this->_bits;
-			this->_bits = NULL;
-		}
-
-		if (bi->_bits != NULL)
-		{
-			this->_bits = new unsigned __int32[this->_bitsSize];
-
-			for (int x = 0; x < this->_bitsSize; x++)
-				this->_bits[x] = bi->_bits[x];
-		}
-		return NULL;
+		return new BigInteger(bi);
 	}
 
 	int sign1 = +1;
 	int sign2 = +1;
-	BigIntegerBuilder reg1 = new BigIntegerBuilder(left, ref sign1);
-	BigIntegerBuilder reg2 = new BigIntegerBuilder(right, ref sign2);
+
+	BigIntegerBuilder reg1(this->_sign, this->_bits, this->_bitsSize, sign1);
+	BigIntegerBuilder reg2(bi->_sign, bi->_bits, bi->_bitsSize, sign2);
 
 	if (sign1 == sign2)
-	reg1.Add(ref reg2);
+		reg1.Add(reg2);
 	else
-	reg1.Sub(ref sign1, ref reg2);
+		reg1.Sub(sign1, reg2);
 
-	return reg1.GetInteger(sign1);
-	*/
+	int bitSize;
+	unsigned __int32 *bits;
+	reg1.GetInteger(sign1, bits, bitSize);
 
-	return NULL;
+	return new BigInteger(sign1, bits, bitSize);
 }
 
-BigInteger* BigInteger::Sub(BigInteger* &bi)
+BigInteger* BigInteger::Sub(BigInteger* bi)
 {
 	// left.AssertValid();
 	// right.AssertValid();
 
 	if (bi->_sign == 0) // IsZero
 	{
-		return NULL;
+		return new BigInteger(this);
 	}
 
-	/*
 	if (this->_sign == 0) // IsZero
 	{
-		this->_sign = -bi->_sign;
-		this->_bitsSize = bi->_bitsSize;
-
-		if (this->_bits != NULL)
-		{
-			delete[]this->_bits;
-			this->_bits = NULL;
-		}
-
-		if (bi->_bits != NULL)
-		{
-			this->_bits = new unsigned __int32[this->_bitsSize];
-
-			for (int x = 0; x < this->_bitsSize; x++)
-				this->_bits[x] = bi->_bits[x];
-		}
-		return NULL;
+		// negate
+		return bi->Negate();
 	}
 
 	int sign1 = +1;
 	int sign2 = -1;
-	BigIntegerBuilder reg1 = new BigIntegerBuilder(left, ref sign1);
-	BigIntegerBuilder reg2 = new BigIntegerBuilder(right, ref sign2);
+
+	BigIntegerBuilder reg1(this->_sign, this->_bits, this->_bitsSize, sign1);
+	BigIntegerBuilder reg2(bi->_sign, bi->_bits, bi->_bitsSize, sign2);
 
 	if (sign1 == sign2)
-	reg1.Add(ref reg2);
+		reg1.Add(reg2);
 	else
-	reg1.Sub(ref sign1, ref reg2);
+		reg1.Sub(sign1, reg2);
 
-	return reg1.GetInteger(sign1);
-	*/
-	return NULL;
+	int bitSize;
+	unsigned __int32 *bits;
+	reg1.GetInteger(sign1, bits, bitSize);
+
+	return new BigInteger(sign1, bits, bitSize);
 }
 
 BigInteger* BigInteger::Negate()

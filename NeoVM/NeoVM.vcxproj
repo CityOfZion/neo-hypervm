@@ -157,6 +157,7 @@
   <ItemGroup>
     <ClInclude Include="ArrayStackItem.h" />
     <ClInclude Include="BigInteger.h" />
+    <ClInclude Include="BigIntegerBuilder.h" />
     <ClInclude Include="BoolStackItem.h" />
     <ClInclude Include="ByteArrayStackItem.h" />
     <ClInclude Include="Callbacks.h" />
@@ -180,6 +181,7 @@
   <ItemGroup>
     <ClCompile Include="ArrayStackItem.cpp" />
     <ClCompile Include="BigInteger.cpp" />
+    <ClCompile Include="BigIntegerBuilder.cpp" />
     <ClCompile Include="BoolStackItem.cpp" />
     <ClCompile Include="ByteArrayStackItem.cpp" />
     <ClCompile Include="Crypto.cpp" />
