@@ -1,5 +1,5 @@
 #pragma once
-#include <vector>
+#include <cstring>
 
 // Ported from 
 // - https://referencesource.microsoft.com/#System.Numerics/System/Numerics/BigInteger.cs
