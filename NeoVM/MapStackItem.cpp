@@ -10,7 +10,7 @@ MapStackItem::~MapStackItem()
 
 }
 
-int MapStackItem::Count()
+int32 MapStackItem::Count()
 {
 	return -1;
 }
@@ -25,17 +25,17 @@ BigInteger * MapStackItem::GetBigInteger()
 	return NULL;
 }
 
-bool MapStackItem::GetInt32(int &ret)
+bool MapStackItem::GetInt32(int32 &ret)
 {
 	return false;
 }
 
-int MapStackItem::ReadByteArray(unsigned char * output, int sourceIndex, int count)
+int32 MapStackItem::ReadByteArray(byte * output, int32 sourceIndex, int32 count)
 {
 	return -1;
 }
 
-int MapStackItem::ReadByteArraySize()
+int32 MapStackItem::ReadByteArraySize()
 {
 	return -1;
 }
@@ -53,12 +53,12 @@ void MapStackItem::Set(IStackItem* key, IStackItem* value)
 
 // Serialize
 
-int MapStackItem::Serialize(unsigned char * data, int length)
+int32 MapStackItem::Serialize(byte * data, int32 length)
 {
 	return 0;
 }
 
-int MapStackItem::GetSerializedSize()
+int32 MapStackItem::GetSerializedSize()
 {
 	return 0;
 }

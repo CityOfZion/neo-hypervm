@@ -1,20 +1,22 @@
 #pragma once
+#include "Types.h"
+
 class BigIntegerBuilder
 {
 private:
 
-	static const int kcbitUint = 32;
+	static const int32 kcbitUint = 32;
 
 	// For a single uint, _iuLast is 0.
-	int _iuLast;
+	int32 _iuLast;
 
 	// Used if _iuLast == 0.
-	unsigned __int32 _uSmall;
+	uint32 _uSmall;
 
 	// Used if _iuLast > 0.
-	unsigned __int32 *_rgu;
+	uint32 *_rgu;
 
-	int _rguLength;
+	int32 _rguLength;
 
 public:
 
@@ -24,13 +26,13 @@ public:
 	void Div(BigIntegerBuilder &reg);
 	void Mod(BigIntegerBuilder &reg);
 	void Add(BigIntegerBuilder &reg);
-	void Sub(int &sign, BigIntegerBuilder &reg);
-	void GetInteger(int &sign, unsigned __int32 * &bits, int &bitSize);
+	void Sub(int32 &sign, BigIntegerBuilder &reg);
+	void GetInteger(int32 &sign, uint32 * &bits, int32 &bitSize);
 
 	// Constructor
 
-	//BigIntegerBuilder(__int32 sign, unsigned __int32 * bits, int bitSize);
-	BigIntegerBuilder(__int32 sign, unsigned __int32 * bits, int bitSize, __int32 &outSign);
+	//BigIntegerBuilder(int32 sign, uint32 * bits, int32 bitSize);
+	BigIntegerBuilder(int32 sign, uint32 * bits, int32 bitSize, int32 &outSign);
 
 	// Destructor
 

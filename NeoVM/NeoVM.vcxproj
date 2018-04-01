@@ -160,7 +160,7 @@
     <ClInclude Include="BigIntegerBuilder.h" />
     <ClInclude Include="BoolStackItem.h" />
     <ClInclude Include="ByteArrayStackItem.h" />
-    <ClInclude Include="Callbacks.h" />
+    <ClInclude Include="Types.h" />
     <ClInclude Include="Crypto.h" />
     <ClInclude Include="ExecutionContext.h" />
     <ClInclude Include="ExecutionEngine.h" />

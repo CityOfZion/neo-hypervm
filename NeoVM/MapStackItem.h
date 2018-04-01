@@ -9,14 +9,14 @@ public:
 
 	bool GetBoolean();
 	BigInteger * GetBigInteger();
-	bool GetInt32(int &ret);
+	bool GetInt32(int32 &ret);
 	IStackItem* Clone();
-	int ReadByteArray(unsigned char * output, int sourceIndex, int count);
-	int ReadByteArraySize();
+	int32 ReadByteArray(byte * output, int32 sourceIndex, int32 count);
+	int32 ReadByteArraySize();
 
 	// Map Methods
 
-	int Count();
+	int32 Count();
 	void Set(IStackItem* key, IStackItem* value);
 
 	// Constructor
@@ -29,6 +29,6 @@ public:
 
 	// Serialize
 
-	int Serialize(unsigned char * data, int length);
-	int GetSerializedSize();
+	int32 Serialize(byte * data, int32 length);
+	int32 GetSerializedSize();
 };

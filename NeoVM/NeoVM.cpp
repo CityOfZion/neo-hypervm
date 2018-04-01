@@ -8,7 +8,7 @@
 
 #pragma region ExecutionContext
 
-int ExecutionContext_GetScriptHash(ExecutionContext* context, unsigned char* output, int index)
+int32 ExecutionContext_GetScriptHash(ExecutionContext* context, byte* output, int32 index)
 {
 	return context->GetScriptHash(&output[index]);
 }
@@ -46,17 +46,17 @@ void ExecutionEngine_Free(ExecutionEngine * & engine)
 	engine = NULL;
 }
 
-void ExecutionEngine_LoadScript(ExecutionEngine* engine, unsigned char * script, int scriptLength)
+void ExecutionEngine_LoadScript(ExecutionEngine* engine, byte * script, int32 scriptLength)
 {
 	engine->LoadScript(script, scriptLength);
 }
 
-void ExecutionEngine_LoadPushOnlyScript(ExecutionEngine* engine, unsigned char * script, int scriptLength)
+void ExecutionEngine_LoadPushOnlyScript(ExecutionEngine* engine, byte * script, int32 scriptLength)
 {
 	engine->LoadPushOnlyScript(script, scriptLength);
 }
 
-__int8 ExecutionEngine_Execute(ExecutionEngine* engine)
+byte ExecutionEngine_Execute(ExecutionEngine* engine)
 {
 	return (__int8)engine->Execute();
 }
@@ -76,12 +76,12 @@ void ExecutionEngine_StepOut(ExecutionEngine* engine)
 	engine->StepOut();
 }
 
-int ExecutionEngine_GetState(ExecutionEngine* engine)
+int32 ExecutionEngine_GetState(ExecutionEngine* engine)
 {
 	return engine->GetState();
 }
 
-int StackItems_Drop(StackItems* stack, int count)
+int32 StackItems_Drop(StackItems* stack, int32 count)
 {
 	int ret = stack->Count();
 	ret = ret > count ? count : ret;
@@ -94,7 +94,7 @@ int StackItems_Drop(StackItems* stack, int count)
 
 #pragma region StackItems
 
-IStackItem* StackItems_Pop(StackItems* stack, int count)
+IStackItem* StackItems_Pop(StackItems* stack, int32 count)
 {
 	if (count == 1)
 	{
@@ -118,14 +118,14 @@ void StackItems_Push(StackItems* stack, IStackItem * item)
 	stack->Push(item);
 }
 
-IStackItem* StackItems_Peek(StackItems* stack, int index)
+IStackItem* StackItems_Peek(StackItems* stack, int32 index)
 {
 	IStackItem * ret = stack->Count() <= index ? NULL : stack->Peek(index);
 	if (ret != NULL) ret->Claims++;
 	return ret;
 }
 
-int StackItems_Count(StackItems* stack)
+int32 StackItems_Count(StackItems* stack)
 {
 	return stack->Count();
 }
@@ -134,7 +134,7 @@ int StackItems_Count(StackItems* stack)
 
 #pragma region ExecutionContextStack
 
-int ExecutionContextStack_Drop(ExecutionContextStack* stack, int count)
+int32 ExecutionContextStack_Drop(ExecutionContextStack* stack, int32 count)
 {
 	int ret = stack->Count();
 	ret = ret > count ? count : ret;
@@ -143,12 +143,12 @@ int ExecutionContextStack_Drop(ExecutionContextStack* stack, int count)
 	return ret;
 }
 
-ExecutionContext* ExecutionContextStack_Peek(ExecutionContextStack* stack, int index)
+ExecutionContext* ExecutionContextStack_Peek(ExecutionContextStack* stack, int32 index)
 {
 	return stack->Count() <= index ? NULL : stack->Peek(index);
 }
 
-int ExecutionContextStack_Count(ExecutionContextStack* stack)
+int32 ExecutionContextStack_Count(ExecutionContextStack* stack)
 {
 	return stack->Count();
 }
@@ -162,7 +162,7 @@ void StackItem_Free(IStackItem*& item)
 	IStackItem::Free(item);
 }
 
-IStackItem* StackItem_Create(EStackItemType type, unsigned char *data, int size)
+IStackItem* StackItem_Create(EStackItemType type, byte *data, int32 size)
 {
 	switch (type)
 	{
@@ -231,12 +231,12 @@ IStackItem* StackItem_Create(EStackItemType type, unsigned char *data, int size)
 	}
 }
 
-int StackItem_SerializeData(IStackItem* item, unsigned char * output, int length)
+int32 StackItem_SerializeData(IStackItem* item, byte * output, int32 length)
 {
 	return item->Serialize(output, length);
 }
 
-EStackItemType StackItem_SerializeDetails(IStackItem* item, int &size)
+EStackItemType StackItem_SerializeDetails(IStackItem* item, int32 &size)
 {
 	if (item == NULL)
 	{
@@ -252,7 +252,7 @@ EStackItemType StackItem_SerializeDetails(IStackItem* item, int &size)
 
 #pragma region ArrayStackItem
 
-int ArrayStackItem_Count(ArrayStackItem* array)
+int32 ArrayStackItem_Count(ArrayStackItem* array)
 {
 	return array->Count();
 }
@@ -262,7 +262,7 @@ void ArrayStackItem_Clear(ArrayStackItem* array)
 	array->Clear();
 }
 
-IStackItem* ArrayStackItem_Get(ArrayStackItem* array, int index)
+IStackItem* ArrayStackItem_Get(ArrayStackItem* array, int32 index)
 {
 	IStackItem* ret = array->Get(index);
 	if (ret != NULL) ret->Claims++;
@@ -274,22 +274,22 @@ void ArrayStackItem_Add(ArrayStackItem* array, IStackItem* item)
 	array->Add(item);
 }
 
-void ArrayStackItem_Set(ArrayStackItem* array, int index, IStackItem* item)
+void ArrayStackItem_Set(ArrayStackItem* array, int32 index, IStackItem* item)
 {
 	array->Set(index, item, true);
 }
 
-int ArrayStackItem_IndexOf(ArrayStackItem* array, IStackItem* item)
+int32 ArrayStackItem_IndexOf(ArrayStackItem* array, IStackItem* item)
 {
 	return array->IndexOf(item);
 }
 
-void ArrayStackItem_Insert(ArrayStackItem* array, int index, IStackItem* item)
+void ArrayStackItem_Insert(ArrayStackItem* array, int32 index, IStackItem* item)
 {
 	array->Insert(index, item);
 }
 
-void ArrayStackItem_RemoveAt(ArrayStackItem* array, int index, unsigned char dispose)
+void ArrayStackItem_RemoveAt(ArrayStackItem* array, int32 index, byte dispose)
 {
 	array->RemoveAt(index, dispose == 0x01);
 }

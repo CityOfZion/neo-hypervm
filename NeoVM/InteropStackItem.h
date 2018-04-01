@@ -5,8 +5,8 @@ class InteropStackItem : public IStackItem
 {
 private:
 
-	int PayloadLength;
-	unsigned char* Payload;
+	int32 PayloadLength;
+	byte* Payload;
 
 public:
 
@@ -14,14 +14,14 @@ public:
 
 	bool GetBoolean();
 	BigInteger * GetBigInteger();
-	bool GetInt32(int &ret);
+	bool GetInt32(int32 &ret);
 	IStackItem* Clone();
-	int ReadByteArray(unsigned char * output, int sourceIndex, int count);
-	int ReadByteArraySize();
+	int32 ReadByteArray(byte * output, int32 sourceIndex, int32 count);
+	int32 ReadByteArraySize();
 
 	// Constructor
 
-	InteropStackItem(unsigned char* data, int length);
+	InteropStackItem(byte* data, int32 length);
 
 	// Destructor
 
@@ -29,6 +29,6 @@ public:
 
 	// Serialize
 
-	int Serialize(unsigned char * data, int length);
-	int GetSerializedSize();
+	int32 Serialize(byte * data, int32 length);
+	int32 GetSerializedSize();
 };

@@ -1,6 +1,6 @@
 #include "ExecutionContextStack.h"
 
-int ExecutionContextStack::Count()
+int32 ExecutionContextStack::Count()
 {
 	return this->Size;
 }
@@ -11,7 +11,7 @@ void ExecutionContextStack::Push(ExecutionContext * i)
 	this->Stack.push_front(i);
 }
 
-ExecutionContext* ExecutionContextStack::Peek(int index)
+ExecutionContext* ExecutionContextStack::Peek(int32 index)
 {
 	if (index == 0) return this->Stack.front();
 	if (index < 0) return NULL;

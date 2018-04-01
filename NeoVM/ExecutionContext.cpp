@@ -2,7 +2,7 @@
 #include "Crypto.h"
 #include <cstring>
 
-ExecutionContext::ExecutionContext(unsigned char* script, int scriptLength, bool pushOnly, int instructorPointer)
+ExecutionContext::ExecutionContext(byte* script, int32 scriptLength, bool pushOnly, int32 instructorPointer)
 	:ScriptLength(scriptLength), IsPushOnly(pushOnly), InstructionPointer(instructorPointer), IsScriptHashCalculated(false)
 {
 	// Copy script
@@ -11,7 +11,7 @@ ExecutionContext::ExecutionContext(unsigned char* script, int scriptLength, bool
 	memcpy(this->Script, script, scriptLength);
 }
 
-bool ExecutionContext::ReadUInt8(unsigned __int8 &ret)
+bool ExecutionContext::ReadUInt8(byte &ret)
 {
 	unsigned char data[1];
 
@@ -22,7 +22,7 @@ bool ExecutionContext::ReadUInt8(unsigned __int8 &ret)
 	return true;
 }
 
-bool ExecutionContext::ReadUInt16(unsigned __int16 &ret)
+bool ExecutionContext::ReadUInt16(uint16 &ret)
 {
 	unsigned char data[2];
 
@@ -33,7 +33,7 @@ bool ExecutionContext::ReadUInt16(unsigned __int16 &ret)
 	return true;
 }
 
-bool ExecutionContext::ReadInt16(__int16 &ret)
+bool ExecutionContext::ReadInt16(int16 &ret)
 {
 	unsigned char data[2];
 
@@ -44,7 +44,7 @@ bool ExecutionContext::ReadInt16(__int16 &ret)
 	return true;
 }
 
-bool ExecutionContext::ReadUInt32(unsigned __int32 &ret)
+bool ExecutionContext::ReadUInt32(uint32 &ret)
 {
 	unsigned char data[4];
 
@@ -55,7 +55,7 @@ bool ExecutionContext::ReadUInt32(unsigned __int32 &ret)
 	return true;
 }
 
-bool ExecutionContext::ReadInt32(__int32 &ret)
+bool ExecutionContext::ReadInt32(int32 &ret)
 {
 	unsigned char data[4];
 
@@ -66,7 +66,7 @@ bool ExecutionContext::ReadInt32(__int32 &ret)
 	return true;
 }
 
-bool ExecutionContext::ReadInt64(__int64 &ret)
+bool ExecutionContext::ReadInt64(int64 &ret)
 {
 	unsigned char data[8];
 
@@ -80,7 +80,7 @@ bool ExecutionContext::ReadInt64(__int64 &ret)
 	return true;
 }
 
-bool ExecutionContext::ReadUInt64(unsigned __int64 &ret)
+bool ExecutionContext::ReadUInt64(uint64 &ret)
 {
 	unsigned char data[8];
 
@@ -94,7 +94,7 @@ bool ExecutionContext::ReadUInt64(unsigned __int64 &ret)
 	return true;
 }
 
-bool ExecutionContext::ReadVarBytes(__int64 &ret, __int64 max)
+bool ExecutionContext::ReadVarBytes(int64 &ret, int64 max)
 {
 	unsigned __int8 fb = 0;
 
@@ -121,7 +121,7 @@ bool ExecutionContext::ReadVarBytes(__int64 &ret, __int64 max)
 	}
 	else if (fb == 0xFF)
 	{
-		unsigned __int64 v = 0;
+		uint64 v = 0;
 
 		if (!this->ReadUInt64(v))
 			return false;
@@ -137,7 +137,7 @@ bool ExecutionContext::ReadVarBytes(__int64 &ret, __int64 max)
 	return true;
 }
 
-int ExecutionContext::Read(unsigned char * data, int length)
+int32 ExecutionContext::Read(byte * data, int32 length)
 {
 	if (data == NULL)
 	{
@@ -184,7 +184,7 @@ EVMOpCode ExecutionContext::ReadNextInstruction()
 	}
 }
 
-int ExecutionContext::GetScriptHash(unsigned char* hash)
+int32 ExecutionContext::GetScriptHash(byte* hash)
 {
 	if (!this->IsScriptHashCalculated)
 	{
@@ -196,7 +196,7 @@ int ExecutionContext::GetScriptHash(unsigned char* hash)
 	return this->ScriptHashLength;
 }
 
-void ExecutionContext::Seek(int position)
+void ExecutionContext::Seek(int32 position)
 {
 	this->InstructionPointer = position;
 }

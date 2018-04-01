@@ -7,7 +7,7 @@ ArrayStackItem::ArrayStackItem(bool isStruct) :
 	List = std::list<IStackItem*>();
 }
 
-ArrayStackItem::ArrayStackItem(bool isStruct, int count) :
+ArrayStackItem::ArrayStackItem(bool isStruct, int32 count) :
 	IStackItem(isStruct ? EStackItemType::Struct : EStackItemType::Array), IsStruct(isStruct)
 {
 	List = std::list<IStackItem*>();
@@ -24,12 +24,12 @@ ArrayStackItem::~ArrayStackItem()
 
 // Serialize
 
-int ArrayStackItem::Serialize(unsigned char * data, int length)
+int32 ArrayStackItem::Serialize(byte * data, int32 length)
 {
 	return 0;
 }
 
-int ArrayStackItem::GetSerializedSize()
+int32 ArrayStackItem::GetSerializedSize()
 {
 	return 0;
 }
@@ -44,17 +44,17 @@ BigInteger * ArrayStackItem::GetBigInteger()
 	return NULL;
 }
 
-bool ArrayStackItem::GetInt32(int &ret)
+bool ArrayStackItem::GetInt32(int32 &ret)
 {
 	return false;
 }
 
-int ArrayStackItem::ReadByteArray(unsigned char * output, int sourceIndex, int count)
+int32 ArrayStackItem::ReadByteArray(byte * output, int32 sourceIndex, int32 count)
 {
 	return -1;
 }
 
-int ArrayStackItem::ReadByteArraySize()
+int32 ArrayStackItem::ReadByteArraySize()
 {
 	return -1;
 }
@@ -69,7 +69,7 @@ IStackItem* ArrayStackItem::Clone()
 	return ret;
 }
 
-int ArrayStackItem::Count()
+int32 ArrayStackItem::Count()
 {
 	return static_cast<int>(this->List.size());
 }
@@ -85,7 +85,7 @@ void ArrayStackItem::Clear()
 	this->List.clear();
 }
 
-IStackItem* ArrayStackItem::Get(int index)
+IStackItem* ArrayStackItem::Get(int32 index)
 {
 	if (index == 0)
 		return this->List.front();
@@ -104,7 +104,7 @@ void ArrayStackItem::Add(IStackItem* item)
 	this->List.push_back(item);
 }
 
-void ArrayStackItem::Set(int index, IStackItem* item, bool disposePrev)
+void ArrayStackItem::Set(int32 index, IStackItem* item, bool disposePrev)
 {
 	if (item != NULL)
 		item->Claims++;
@@ -120,7 +120,7 @@ void ArrayStackItem::Set(int index, IStackItem* item, bool disposePrev)
 	s = item;
 }
 
-int ArrayStackItem::IndexOf(IStackItem* item)
+int32 ArrayStackItem::IndexOf(IStackItem* item)
 {
 	auto it = std::find(this->List.begin(), this->List.end(), item);
 	if (it == this->List.end())
@@ -129,7 +129,7 @@ int ArrayStackItem::IndexOf(IStackItem* item)
 	return std::distance(this->List.begin(), it);
 }
 
-void ArrayStackItem::Insert(int index, IStackItem* item)
+void ArrayStackItem::Insert(int32 index, IStackItem* item)
 {
 	if (item != NULL)
 		item->Claims++;
@@ -140,7 +140,7 @@ void ArrayStackItem::Insert(int index, IStackItem* item)
 	this->List.insert(it, item);
 }
 
-void ArrayStackItem::RemoveAt(int index, bool dispose)
+void ArrayStackItem::RemoveAt(int32 index, bool dispose)
 {
 	std::list<IStackItem*>::iterator it = this->List.begin();
 	if (index > 0) std::advance(it, index);

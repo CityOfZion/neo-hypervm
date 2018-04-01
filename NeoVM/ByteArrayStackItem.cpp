@@ -1,7 +1,7 @@
 #include "ByteArrayStackItem.h"
 #include <cstring>
 
-ByteArrayStackItem::ByteArrayStackItem(unsigned char * data, int size, bool copyPointer) :IStackItem(EStackItemType::ByteArray), PayloadLength(size)
+ByteArrayStackItem::ByteArrayStackItem(byte * data, int32 size, bool copyPointer) :IStackItem(EStackItemType::ByteArray), PayloadLength(size)
 {
 	if (size > 0 && data != NULL)
 	{
@@ -21,7 +21,7 @@ ByteArrayStackItem::ByteArrayStackItem(unsigned char * data, int size, bool copy
 	}
 }
 
-int ByteArrayStackItem::ReadByteArray(unsigned char * output, int sourceIndex, int count)
+int32 ByteArrayStackItem::ReadByteArray(byte * output, int32 sourceIndex, int32 count)
 {
 	if (sourceIndex < 0)
 	{
@@ -38,7 +38,7 @@ int ByteArrayStackItem::ReadByteArray(unsigned char * output, int sourceIndex, i
 	return l;
 }
 
-int ByteArrayStackItem::ReadByteArraySize()
+int32 ByteArrayStackItem::ReadByteArraySize()
 {
 	return this->PayloadLength;
 }
@@ -78,7 +78,7 @@ BigInteger * ByteArrayStackItem::GetBigInteger()
 	return new BigInteger(this->Payload, this->PayloadLength);
 }
 
-bool ByteArrayStackItem::GetInt32(int &ret)
+bool ByteArrayStackItem::GetInt32(int32 &ret)
 {
 	BigInteger * bi = this->GetBigInteger();
 	if (bi == NULL) return false;
@@ -96,7 +96,7 @@ IStackItem* ByteArrayStackItem::Clone()
 
 // Serialize
 
-int ByteArrayStackItem::Serialize(unsigned char * data, int length)
+int32 ByteArrayStackItem::Serialize(byte * data, int32 length)
 {
 	if (this->PayloadLength > 0 && length > 0)
 	{
@@ -108,7 +108,7 @@ int ByteArrayStackItem::Serialize(unsigned char * data, int length)
 	return 0;
 }
 
-int ByteArrayStackItem::GetSerializedSize()
+int32 ByteArrayStackItem::GetSerializedSize()
 {
 	return this->PayloadLength;
 }

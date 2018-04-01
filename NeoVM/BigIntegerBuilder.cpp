@@ -1,7 +1,7 @@
 #include "BigIntegerBuilder.h"
 
 /*
-BigIntegerBuilder::BigIntegerBuilder(__int32 sign, unsigned __int32 *bits, int bitSize)
+BigIntegerBuilder::BigIntegerBuilder(int32 sign, uint32 *bits, int32 bitSize)
 {
 	this->_rguLength = bitSize;
 
@@ -29,7 +29,7 @@ BigIntegerBuilder::BigIntegerBuilder(__int32 sign, unsigned __int32 *bits, int b
 }
 */
 
-BigIntegerBuilder::BigIntegerBuilder(__int32 sign, unsigned __int32 * bits, int bitSize, __int32 &outSign)
+BigIntegerBuilder::BigIntegerBuilder(int32 sign, uint32 * bits, int32 bitSize, int32 &outSign)
 {
 	this->_rguLength = bitSize;
 
@@ -57,7 +57,7 @@ BigIntegerBuilder::BigIntegerBuilder(__int32 sign, unsigned __int32 * bits, int 
 	// AssertValid(true);
 }
 
-void BigIntegerBuilder::GetInteger(int &sign, unsigned __int32 * &bits, int &bitSize)
+void BigIntegerBuilder::GetInteger(int32 &sign, uint32 * &bits, int32 &bitSize)
 {
 	// Contract.Requires(sign == +1 || sign == -1);
 	// AssertValid(true);
@@ -250,7 +250,7 @@ void BigIntegerBuilder::Add(BigIntegerBuilder &reg)
 	// AssertValid(true);
 }
 
-void BigIntegerBuilder::Sub(int &sign, BigIntegerBuilder &reg)
+void BigIntegerBuilder::Sub(int32 &sign, BigIntegerBuilder &reg)
 {
 	// Contract.Requires(sign == +1 || sign == -1);
 	// AssertValid(true);

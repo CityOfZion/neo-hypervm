@@ -3,12 +3,12 @@
 
 // Constants
 
-const BigInteger BigInteger::Min = BigInteger(-1, new unsigned __int32[1]{ BigInteger::kuMaskHighBit }, 1);
+const BigInteger BigInteger::Min = BigInteger(-1, new uint32[1]{ BigInteger::kuMaskHighBit }, 1);
 const BigInteger BigInteger::One = BigInteger(1);
 const BigInteger BigInteger::Zero = BigInteger(0);
 const BigInteger BigInteger::MinusOne = BigInteger(-1);
 
-BigInteger::BigInteger(int value)
+BigInteger::BigInteger(int32 value)
 {
 	this->_sign = value;
 	this->_bits = NULL;
@@ -38,7 +38,7 @@ BigInteger::BigInteger(BigInteger *value)
 	// AssertValid();
 }
 
-void BigInteger::CopyInternal(__int32 sign, unsigned __int32 *bits, __int32 bitSize)
+void BigInteger::CopyInternal(int32 sign, uint32 *bits, int32 bitSize)
 {
 	this->_sign = sign;
 	this->_bitsSize = bitSize;
@@ -63,7 +63,7 @@ void BigInteger::CopyInternal(__int32 sign, unsigned __int32 *bits, __int32 bitS
 // Do an in-place twos complement of d and also return the result.
 // "Dangerous" because it causes a mutation and needs to be used
 // with care for immutable types
-void BigInteger::DangerousMakeTwosComplement(unsigned __int32 *d, int dSize)
+void BigInteger::DangerousMakeTwosComplement(uint32 *d, int32 dSize)
 {
 	// first do complement and +1 as long as carry is needed
 	int i = 0;
@@ -90,7 +90,7 @@ void BigInteger::DangerousMakeTwosComplement(unsigned __int32 *d, int dSize)
 	// return d;
 }
 
-BigInteger::BigInteger(unsigned __int32* value, int valueSize, bool negative)
+BigInteger::BigInteger(uint32* value, int32 valueSize, bool negative)
 {
 	if (value == NULL)
 	{
@@ -138,7 +138,7 @@ BigInteger::BigInteger(unsigned __int32* value, int valueSize, bool negative)
 	// AssertValid();
 }
 
-BigInteger::BigInteger(unsigned __int32 * value, int size)
+BigInteger::BigInteger(uint32 * value, int32 size)
 {
 	if (value == NULL)
 	{
@@ -264,7 +264,7 @@ BigInteger::BigInteger(unsigned __int32 * value, int size)
 	//AssertValid();
 }
 
-BigInteger::BigInteger(unsigned char * value, int byteCount)
+BigInteger::BigInteger(byte * value, int32 byteCount)
 {
 	if (byteCount <= 0 || value == NULL)
 	{
@@ -440,7 +440,7 @@ BigInteger* BigInteger::Clone()
 	return new BigInteger(this->_sign, this->_bits, this->_bitsSize);
 }
 
-int BigInteger::Length(unsigned __int32 *rgu, int size)
+int32 BigInteger::Length(uint32 *rgu, int32 size)
 {
 	if (rgu[size - 1] != 0)
 		return size;
@@ -449,7 +449,7 @@ int BigInteger::Length(unsigned __int32 *rgu, int size)
 	return size - 1;
 }
 
-int BigInteger::GetDiffLength(unsigned __int32 *rgu1, unsigned __int32 * rgu2, int cu)
+int32 BigInteger::GetDiffLength(uint32 *rgu1, uint32 * rgu2, int32 cu)
 {
 	for (int iv = cu; --iv >= 0; )
 	{
@@ -459,7 +459,7 @@ int BigInteger::GetDiffLength(unsigned __int32 *rgu1, unsigned __int32 * rgu2, i
 	return 0;
 }
 
-int BigInteger::ToUInt32Array(unsigned __int32 * &output)
+int32 BigInteger::ToUInt32Array(uint32 * &output)
 {
 	if (this->_bits == NULL && this->_sign == 0)
 	{
@@ -598,7 +598,7 @@ BigInteger* BigInteger::Xor(BigInteger* bi)
 	return ret;
 }
 
-bool BigInteger::GetPartsForBitManipulation(BigInteger *x, unsigned __int32 * &xd, int &xl)
+bool BigInteger::GetPartsForBitManipulation(BigInteger *x, uint32 * &xd, int32 &xl)
 {
 	if (x->_bits == NULL)
 	{
@@ -632,7 +632,7 @@ bool BigInteger::GetPartsForBitManipulation(BigInteger *x, unsigned __int32 * &x
 	return x->_sign < 0;
 }
 
-BigInteger* BigInteger::Shl(int shift)
+BigInteger* BigInteger::Shl(int32 shift)
 {
 	if (shift == 0) return new BigInteger(this);
 	else if (shift == Int32MinValue) return this->Shr(Int32MaxValue)->Shr(1);
@@ -676,7 +676,7 @@ BigInteger* BigInteger::Shl(int shift)
 	return ret;
 }
 
-BigInteger* BigInteger::Shr(int shift)
+BigInteger* BigInteger::Shr(int32 shift)
 {
 	if (shift == 0) return new BigInteger(this);
 	else if (shift == Int32MinValue) return this->Shl(Int32MaxValue)->Shl(1);
@@ -917,7 +917,7 @@ BigInteger* BigInteger::Abs()
 	return new BigInteger(-this->_sign, this->_bits, this->_bitsSize);
 }
 
-int BigInteger::CompareTo(BigInteger bi)
+int32 BigInteger::CompareTo(BigInteger bi)
 {
 	// AssertValid();
 	// other.AssertValid();
@@ -949,7 +949,7 @@ int BigInteger::CompareTo(BigInteger bi)
 	return this->_bits[cuDiff - 1] < bi._bits[cuDiff - 1] ? -this->_sign : this->_sign;
 }
 
-int BigInteger::CompareTo(BigInteger *bi)
+int32 BigInteger::CompareTo(BigInteger *bi)
 {
 	// AssertValid();
 	// other.AssertValid();
@@ -981,7 +981,7 @@ int BigInteger::CompareTo(BigInteger *bi)
 	return this->_bits[cuDiff - 1] < bi->_bits[cuDiff - 1] ? -this->_sign : this->_sign;
 }
 
-bool BigInteger::ToInt32(int &ret)
+bool BigInteger::ToInt32(int32 &ret)
 {
 	// value.AssertValid();
 	if (this->_bits == NULL)
@@ -1014,12 +1014,12 @@ bool BigInteger::ToInt32(int &ret)
 	}
 }
 
-int BigInteger::GetSign()
+int32 BigInteger::GetSign()
 {
 	return (this->_sign >> (BigInteger::kcbitUint - 1)) - (-this->_sign >> (BigInteger::kcbitUint - 1));
 }
 
-BigInteger::BigInteger(unsigned __int32 value)
+BigInteger::BigInteger(uint32 value)
 {
 	if (value <= Int32MaxValue)
 	{
@@ -1037,7 +1037,7 @@ BigInteger::BigInteger(unsigned __int32 value)
 	// AssertValid();
 }
 
-BigInteger::BigInteger(int sign, unsigned __int32 *rgu, int rguSize)
+BigInteger::BigInteger(int32 sign, uint32 *rgu, int32 rguSize)
 {
 	this->_sign = sign;
 
@@ -1059,7 +1059,7 @@ BigInteger::BigInteger(int sign, unsigned __int32 *rgu, int rguSize)
 	// AssertValid();
 }
 
-int BigInteger::ToByteArraySize()
+int32 BigInteger::ToByteArraySize()
 {
 	// TODO: Is not the exactly size of ToByteArray
 
@@ -1077,7 +1077,8 @@ int BigInteger::ToByteArraySize()
 		return (this->_bitsSize * 4) + 1;
 	}
 }
-int BigInteger::ToByteArray(unsigned char * output, int length)
+
+int32 BigInteger::ToByteArray(byte * output, int32 length)
 {
 	if (this->_bitsSize == 0 && _sign == 0)
 	{

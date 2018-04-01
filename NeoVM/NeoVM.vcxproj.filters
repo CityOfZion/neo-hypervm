@@ -68,9 +68,6 @@
     <ClInclude Include="ExecutionContext.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Callbacks.h">
-      <Filter>Header Files\Types</Filter>
-    </ClInclude>
     <ClInclude Include="ArrayStackItem.h">
       <Filter>Header Files\Types\StackItems</Filter>
     </ClInclude>
@@ -114,6 +111,9 @@
       <Filter>Header Files\Crypto</Filter>
     </ClInclude>
     <ClInclude Include="BigIntegerBuilder.h">
+      <Filter>Header Files\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Types.h">
       <Filter>Header Files\Types</Filter>
     </ClInclude>
   </ItemGroup>

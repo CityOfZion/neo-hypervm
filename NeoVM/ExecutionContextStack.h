@@ -5,16 +5,16 @@
 
 class ExecutionContextStack
 {
-	int Size;
+	int32 Size;
 	std::list<ExecutionContext*> Stack;
 
 public:
-	int Count();
+	int32 Count();
 
 	void Drop();
 	ExecutionContext* Pop();
 	void Push(ExecutionContext * i);
-	ExecutionContext* Peek(int index);
+	ExecutionContext* Peek(int32 index);
 
 	~ExecutionContextStack();
 };

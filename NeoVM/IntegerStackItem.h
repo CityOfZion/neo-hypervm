@@ -14,16 +14,16 @@ public:
 
 	bool GetBoolean();
 	BigInteger * GetBigInteger();
-	bool GetInt32(int &ret);
-	int ReadByteArray(unsigned char * output, int sourceIndex, int count);
+	bool GetInt32(int32 &ret);
+	int32 ReadByteArray(byte * output, int32 sourceIndex, int32 count);
 	IStackItem* Clone();
-	int ReadByteArraySize();
+	int32 ReadByteArraySize();
 
 	// Constructor
 
-	IntegerStackItem(int value);
+	IntegerStackItem(int32 value);
 	IntegerStackItem(BigInteger *value, bool copyPointer);
-	IntegerStackItem(unsigned char* data, int length);
+	IntegerStackItem(byte* data, int32 length);
 
 	// Destructor
 
@@ -31,6 +31,6 @@ public:
 
 	// Serialize
 
-	int Serialize(unsigned char * data, int length);
-	int GetSerializedSize();
+	int32 Serialize(byte * data, int32 length);
+	int32 GetSerializedSize();
 };

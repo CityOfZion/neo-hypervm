@@ -380,7 +380,7 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::SYSCALL:
 	{
-		__int64 length = 0;
+		int64 length = 0;
 		if (!context->ReadVarBytes(length, 252) || length < 0)
 		{
 			this->State = EVMState::FAULT;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Callbacks.h"
+#include "Types.h"
 #include "StackItems.h"
 #include "ExecutionContextStack.h"
 #include "EVMState.h"
