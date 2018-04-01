@@ -11,13 +11,13 @@ BigIntegerBuilder::BigIntegerBuilder(int32 sign, uint32 *bits, int32 bitSize)
 		this->_iuLast = 0;
 
 		// _uSmall = NumericsHelpers.Abs(bn._Sign);
-		unsigned __int32 mask = (unsigned __int32)(sign >> 31);
-		this->_uSmall = ((unsigned __int32)sign ^ mask) - mask;
+		uint32 mask = (uint32)(sign >> 31);
+		this->_uSmall = ((uint32)sign ^ mask) - mask;
 	}
 	else
 	{
-		this->_rgu = new unsigned[bitSize];
-		for (int i = 0; i < bitSize; i++) this->_rgu[i] = bits[i];
+		this->_rgu = new uint32[bitSize];
+		for (int32 i = 0; i < bitSize; i++) this->_rgu[i] = bits[i];
 
 		this->_iuLast = this->_rguLength - 1;
 		this->_uSmall = this->_rgu[0];
@@ -33,20 +33,20 @@ BigIntegerBuilder::BigIntegerBuilder(int32 sign, uint32 * bits, int32 bitSize, i
 {
 	this->_rguLength = bitSize;
 
-	int n = sign;
-	int mask = n >> (kcbitUint - 1);
+	int32 n = sign;
+	int32 mask = n >> (kcbitUint - 1);
 	outSign = (outSign ^ mask) - mask;
 
 	if (bits == 0)
 	{
 		this->_rgu = 0;
 		this->_iuLast = 0;
-		this->_uSmall = (unsigned __int32)((n ^ mask) - mask);
+		this->_uSmall = (uint32)((n ^ mask) - mask);
 	}
 	else
 	{
-		this->_rgu = new unsigned[bitSize];
-		for (int i = 0; i < bitSize; i++) this->_rgu[i] = bits[i];
+		this->_rgu = new uint32[bitSize];
+		for (int32 i = 0; i < bitSize; i++) this->_rgu[i] = bits[i];
 
 		this->_iuLast = this->_rguLength - 1;
 		this->_uSmall = this->_rgu[0];
@@ -89,7 +89,7 @@ void BigIntegerBuilder::GetInteger(int32 &sign, uint32 * &bits, int32 &bitSize)
 	// The sign is +/- 1.
 	sign = signSrc;
 
-	int cuExtra = _rgu.Length - _iuLast - 1;
+	int32 cuExtra = _rgu.Length - _iuLast - 1;
 	// Contract.Assert(cuExtra >= 0);
 	if (cuExtra <= 1) 
 	{
@@ -167,7 +167,7 @@ void BigIntegerBuilder::Mul(BigIntegerBuilder &regMul)
       if (regMul._iuLast == 0)
         Mul(regMul._uSmall);
       else if (_iuLast == 0) {
-        uint u = _uSmall;
+        uint32 u = _uSmall;
         if (u == 1)
           this = new BigIntegerBuilder(ref regMul);
         else if (u != 0) {
@@ -176,17 +176,17 @@ void BigIntegerBuilder::Mul(BigIntegerBuilder &regMul)
         }
       }
       else {
-        int cuBase = _iuLast + 1;
+        int32 cuBase = _iuLast + 1;
         SetSizeKeep(cuBase + regMul._iuLast, 1);
  
-        for (int iu = cuBase; --iu >= 0; ) {
-          uint uMul = _rgu[iu];
+        for (int32 iu = cuBase; --iu >= 0; ) {
+          uint32 uMul = _rgu[iu];
           _rgu[iu] = 0;
-          uint uCarry = 0;
-          for (int iuSrc = 0; iuSrc <= regMul._iuLast; iuSrc++)
+          uint32 uCarry = 0;
+          for (int32 iuSrc = 0; iuSrc <= regMul._iuLast; iuSrc++)
             uCarry = AddMulCarry(ref _rgu[iu + iuSrc], regMul._rgu[iuSrc], uMul, uCarry);
           if (uCarry != 0) {
-            for (int iuDst = iu + regMul._iuLast + 1; uCarry != 0 && iuDst <= _iuLast; iuDst++)
+            for (int32 iuDst = iu + regMul._iuLast + 1; uCarry != 0 && iuDst <= _iuLast; iuDst++)
               uCarry = AddCarry(ref _rgu[iuDst], 0, uCarry);
             if (uCarry != 0) {
               SetSizeKeep(_iuLast + 2, 0);
@@ -212,7 +212,7 @@ void BigIntegerBuilder::Add(BigIntegerBuilder &reg)
 	  }
 	  if (_iuLast == 0)
 	  {
-		uint u = _uSmall;
+		uint32 u = _uSmall;
 		if (u == 0)
 		  this = new BigIntegerBuilder(ref reg);
 		else
@@ -225,7 +225,7 @@ void BigIntegerBuilder::Add(BigIntegerBuilder &reg)
 
 	  EnsureWritable(Math.Max(_iuLast, reg._iuLast) + 1, 1);
 
-	  int cuAdd = reg._iuLast + 1;
+	  int32 cuAdd = reg._iuLast + 1;
 	  if (_iuLast < reg._iuLast)
 	  {
 		cuAdd = _iuLast + 1;
@@ -235,8 +235,8 @@ void BigIntegerBuilder::Add(BigIntegerBuilder &reg)
 	  }
 
 	  // Add, tracking carry.
-	  uint uCarry = 0;
-	  for (int iu = 0; iu < cuAdd; iu++)
+	  uint32 uCarry = 0;
+	  for (int32 iu = 0; iu < cuAdd; iu++)
 	  {
 		uCarry = AddCarry(ref _rgu[iu], reg._rgu[iu], uCarry);
 		Contract.Assert(uCarry <= 1);
@@ -264,7 +264,7 @@ void BigIntegerBuilder::Sub(int32 &sign, BigIntegerBuilder &reg)
 	  }
 	  if (_iuLast == 0)
 	  {
-		uint u = _uSmall;
+		uint32 u = _uSmall;
 		if (u == 0)
 		  this = new BigIntegerBuilder(ref reg);
 		else
@@ -283,7 +283,7 @@ void BigIntegerBuilder::Sub(int32 &sign, BigIntegerBuilder &reg)
 		return;
 	  }
 
-	  int cuSub = reg._iuLast + 1;
+	  int32 cuSub = reg._iuLast + 1;
 	  if (_iuLast == reg._iuLast)
 	  {
 		// Determine which is larger.
@@ -295,8 +295,8 @@ void BigIntegerBuilder::Sub(int32 &sign, BigIntegerBuilder &reg)
 		  return;
 		}
 
-		uint u1 = _rgu[_iuLast];
-		uint u2 = reg._rgu[_iuLast];
+		uint32 u1 = _rgu[_iuLast];
+		uint32 u2 = reg._rgu[_iuLast];
 		if (_iuLast == 0)
 		{
 		  if (u1 < u2) {
@@ -325,8 +325,8 @@ void BigIntegerBuilder::Sub(int32 &sign, BigIntegerBuilder &reg)
 	  EnsureWritable();
 
 	  // Subtract, tracking borrow.
-	  uint uBorrow = 0;
-	  for (int iu = 0; iu < cuSub; iu++)
+	  uint32 uBorrow = 0;
+	  for (int32 iu = 0; iu < cuSub; iu++)
 	  {
 		uBorrow = SubBorrow(ref _rgu[iu], reg._rgu[iu], uBorrow);
 		Contract.Assert(uBorrow <= 1);
@@ -344,6 +344,6 @@ BigIntegerBuilder::~BigIntegerBuilder()
 {
 	if (this->_rgu == 0) return;
 
-	delete[](_rgu);
-	_rgu = 0;
+	delete[](this->_rgu);
+	this->_rgu = 0;
 }

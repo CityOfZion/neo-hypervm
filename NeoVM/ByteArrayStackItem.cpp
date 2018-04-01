@@ -11,7 +11,7 @@ ByteArrayStackItem::ByteArrayStackItem(byte * data, int32 size, bool copyPointer
 		}
 		else
 		{
-			this->Payload = new unsigned char[size];
+			this->Payload = new byte[size];
 			memcpy(this->Payload, data, size);
 		}
 	}
@@ -28,7 +28,7 @@ int32 ByteArrayStackItem::ReadByteArray(byte * output, int32 sourceIndex, int32 
 		return -1;
 	}
 
-	int l = count > this->PayloadLength - sourceIndex ? this->PayloadLength - sourceIndex : count;
+	int32 l = count > this->PayloadLength - sourceIndex ? this->PayloadLength - sourceIndex : count;
 
 	if (l > 0)
 	{
@@ -45,11 +45,11 @@ int32 ByteArrayStackItem::ReadByteArraySize()
 
 ByteArrayStackItem::~ByteArrayStackItem()
 {
-	if (this->Payload != NULL)
-	{
-		delete(this->Payload);
-		this->Payload = NULL;
-	}
+	if (this->Payload == NULL)
+		return;
+
+	delete[](this->Payload);
+	this->Payload = NULL;
 }
 
 bool ByteArrayStackItem::GetBoolean()
@@ -62,7 +62,7 @@ bool ByteArrayStackItem::GetBoolean()
 	{
 		if (this->PayloadLength <= 0) return false;
 
-		for (int x = 0; x < this->PayloadLength; x++)
+		for (int32 x = 0; x < this->PayloadLength; x++)
 			if (this->Payload[x] != 0x00)
 				return true;
 
@@ -105,6 +105,7 @@ int32 ByteArrayStackItem::Serialize(byte * data, int32 length)
 
 		return length;
 	}
+
 	return 0;
 }
 

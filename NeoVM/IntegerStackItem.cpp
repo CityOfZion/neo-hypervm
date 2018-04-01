@@ -22,7 +22,7 @@ bool IntegerStackItem::GetBoolean()
 	// TODO: Check this
 	// return value != BigInteger.Zero;
 
-	int ret = 0;
+	int32 ret = 0;
 	if (this->Value->ToInt32(ret)) return ret > 0;
 
 	return false;

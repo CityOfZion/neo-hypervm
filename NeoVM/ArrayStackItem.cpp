@@ -13,7 +13,7 @@ ArrayStackItem::ArrayStackItem(bool isStruct, int32 count) :
 	List = std::list<IStackItem*>();
 
 	// Init size
-	for (int i = 0; i < count; i++)
+	for (int32 i = 0; i < count; i++)
 		this->List.push_back(new BoolStackItem(false));
 }
 
@@ -63,7 +63,7 @@ IStackItem* ArrayStackItem::Clone()
 {
 	ArrayStackItem* ret = new ArrayStackItem(this->IsStruct);
 
-	for (int x = 0, m = this->Count(); x < m; x++)
+	for (int32 x = 0, m = this->Count(); x < m; x++)
 		ret->Add(this->Get(x)->Clone());
 
 	return ret;
@@ -122,7 +122,7 @@ void ArrayStackItem::Set(int32 index, IStackItem* item, bool disposePrev)
 
 int32 ArrayStackItem::IndexOf(IStackItem* item)
 {
-	auto it = std::find(this->List.begin(), this->List.end(), item);
+	std::list<IStackItem*>::iterator it = std::find(this->List.begin(), this->List.end(), item);
 	if (it == this->List.end())
 		return -1;
 

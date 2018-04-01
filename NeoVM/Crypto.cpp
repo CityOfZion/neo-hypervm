@@ -5,7 +5,7 @@
 
 void Crypto::ComputeHash160(byte* data, int32 length, byte *output)
 {
-	unsigned char digest[SHA256::DIGEST_SIZE];
+	byte digest[SHA256::DIGEST_SIZE];
 
 	// First SHA256
 
@@ -21,7 +21,7 @@ void Crypto::ComputeHash160(byte* data, int32 length, byte *output)
 
 void Crypto::ComputeHash256(byte* data, int32 length, byte *output)
 {
-	unsigned char digest[SHA256::DIGEST_SIZE];
+	byte digest[SHA256::DIGEST_SIZE];
 
 	// First SHA256
 

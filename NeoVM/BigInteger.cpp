@@ -29,9 +29,9 @@ BigInteger::BigInteger(BigInteger *value)
 	else
 	{
 		this->_bitsSize = value->_bitsSize;
-		this->_bits = new unsigned __int32[value->_bitsSize];
+		this->_bits = new uint32[value->_bitsSize];
 
-		for (int x = 0; x < value->_bitsSize; x++)
+		for (int32 x = 0; x < value->_bitsSize; x++)
 			this->_bits[x] = value->_bits[x];
 	}
 
@@ -45,9 +45,9 @@ void BigInteger::CopyInternal(int32 sign, uint32 *bits, int32 bitSize)
 
 	if (bitSize > 0)
 	{
-		this->_bits = new unsigned __int32[bitSize];
+		this->_bits = new uint32[bitSize];
 
-		for (int x = 0; x < bitSize; x++)
+		for (int32 x = 0; x < bitSize; x++)
 			this->_bits[x] = bits[x];
 	}
 	else
@@ -66,8 +66,8 @@ void BigInteger::CopyInternal(int32 sign, uint32 *bits, int32 bitSize)
 void BigInteger::DangerousMakeTwosComplement(uint32 *d, int32 dSize)
 {
 	// first do complement and +1 as long as carry is needed
-	int i = 0;
-	unsigned __int32 v = 0;
+	int32 i = 0;
+	uint32 v = 0;
 	for (; i < dSize; i++)
 	{
 		v = ~d[i] + 1;
@@ -102,7 +102,7 @@ BigInteger::BigInteger(uint32* value, int32 valueSize, bool negative)
 
 	// Contract.EndContractBlock();
 
-	int len;
+	int32 len;
 
 	// Try to conserve space as much as possible by checking for wasted leading uint[] entries 
 	// sometimes the uint[] has leading zeros from bit manipulation operations & and ^
@@ -130,8 +130,8 @@ BigInteger::BigInteger(uint32* value, int32 valueSize, bool negative)
 	{
 		this->_bitsSize = len;
 		this->_sign = negative ? -1 : +1;
-		this->_bits = new unsigned __int32[len];
-		for (int x = 0; x < len; x++)
+		this->_bits = new uint32[len];
+		for (int32 x = 0; x < len; x++)
 			this->_bits[x] = value[x];
 	}
 
@@ -148,7 +148,7 @@ BigInteger::BigInteger(uint32 * value, int32 size)
 		return;
 	}
 
-	int dwordCount = size;
+	int32 dwordCount = size;
 	bool isNegative = dwordCount > 0 && ((value[dwordCount - 1] & 0x80000000) == 0x80000000);
 
 	// Try to conserve space as much as possible by checking for wasted leading uint[] entries 
@@ -169,7 +169,7 @@ BigInteger::BigInteger(uint32 * value, int32 size)
 	{
 		if ((int)value[0] < 0 && !isNegative)
 		{
-			this->_bits = new unsigned __int32[1]{ value[0] };
+			this->_bits = new uint32[1]{ value[0] };
 			this->_bitsSize = 1;
 			this->_sign = +1;
 		}
@@ -196,9 +196,9 @@ BigInteger::BigInteger(uint32 * value, int32 size)
 		{
 			this->_sign = +1;
 			this->_bitsSize = dwordCount;
-			this->_bits = new unsigned __int32[dwordCount];
+			this->_bits = new uint32[dwordCount];
 
-			for (int x = 0; x < dwordCount; x++)
+			for (int32 x = 0; x < dwordCount; x++)
 				this->_bits[x] = value[x];
 		}
 		// no trimming is possible.  Assign value directly to _bits.  
@@ -206,8 +206,8 @@ BigInteger::BigInteger(uint32 * value, int32 size)
 		{
 			this->_sign = +1;
 			this->_bitsSize = size;
-			this->_bits = new unsigned __int32[size];
-			for (int x = 0; x < size; x++)
+			this->_bits = new uint32[size];
+			for (int32 x = 0; x < size; x++)
 				this->_bits[x] = value[x];
 		}
 
@@ -219,7 +219,7 @@ BigInteger::BigInteger(uint32 * value, int32 size)
 	this->DangerousMakeTwosComplement(value, size); // mutates val
 	// pack _bits to remove any wasted space after the twos complement
 
-	int len = size;
+	int32 len = size;
 	while (len > 0 && value[len - 1] == 0) len--;
 
 	// the number is represented by a single dword
@@ -246,9 +246,9 @@ BigInteger::BigInteger(uint32 * value, int32 size)
 	{
 		this->_sign = -1;
 		this->_bitsSize = len;
-		this->_bits = new unsigned __int32[len];
+		this->_bits = new uint32[len];
 
-		for (int x = 0; x < len; x++)
+		for (int32 x = 0; x < len; x++)
 			this->_bits[x] = value[x];
 	}
 	// no trimming is possible.  Assign value directly to _bits.  
@@ -256,8 +256,8 @@ BigInteger::BigInteger(uint32 * value, int32 size)
 	{
 		this->_sign = -1;
 		this->_bitsSize = size;
-		this->_bits = new unsigned __int32[size];
-		for (int x = 0; x < size; x++)
+		this->_bits = new uint32[size];
+		for (int32 x = 0; x < size; x++)
 			this->_bits[x] = value[x];
 	}
 
@@ -297,7 +297,7 @@ BigInteger::BigInteger(byte * value, int32 byteCount)
 		else
 			this->_sign = 0;
 
-		for (int i = byteCount - 1; i >= 0; i--)
+		for (int32 i = byteCount - 1; i >= 0; i--)
 		{
 			this->_sign <<= 8;
 			this->_sign |= value[i];
@@ -310,7 +310,7 @@ BigInteger::BigInteger(byte * value, int32 byteCount)
 			// can be naively packed into 4 bytes (due to the leading 0x0)
 			// it overflows into the int32 sign bit
 
-			this->_bits = new unsigned __int32[1]{ (unsigned __int32)this->_sign };
+			this->_bits = new uint32[1]{ (uint32)this->_sign };
 			this->_sign = +1;
 			this->_bitsSize = 1;
 
@@ -320,7 +320,7 @@ BigInteger::BigInteger(byte * value, int32 byteCount)
 		if (_sign == Int32MinValue)
 		{
 			this->_sign = -1;
-			this->_bits = new unsigned __int32[1]{ BigInteger::kuMaskHighBit };
+			this->_bits = new uint32[1]{ BigInteger::kuMaskHighBit };
 			this->_bitsSize = 1;
 
 			// AssertValid();
@@ -331,15 +331,15 @@ BigInteger::BigInteger(byte * value, int32 byteCount)
 	}
 	else
 	{
-		int unalignedBytes = byteCount % 4;
-		int dwordCount = byteCount / 4 + (unalignedBytes == 0 ? 0 : 1);
+		int32 unalignedBytes = byteCount % 4;
+		int32 dwordCount = byteCount / 4 + (unalignedBytes == 0 ? 0 : 1);
 		bool isZero = true;
-		unsigned __int32 *val = new unsigned __int32[dwordCount]();
+		uint32 *val = new uint32[dwordCount]();
 
 		// Copy all dwords, except but don't do the last one if it's not a full four bytes
 
-		int max = dwordCount - (unalignedBytes == 0 ? 0 : 1);
-		int curDword = 0, curByte = 3, byteInDword;
+		int32 max = dwordCount - (unalignedBytes == 0 ? 0 : 1);
+		int32 curDword = 0, curByte = 3, byteInDword;
 
 		for (; curDword < max; curDword++)
 		{
@@ -378,7 +378,7 @@ BigInteger::BigInteger(byte * value, int32 byteCount)
 			this->DangerousMakeTwosComplement(val, dwordCount); // mutates val
 			// pack _bits to remove any wasted space after the twos complement
 
-			int len = dwordCount;
+			int32 len = dwordCount;
 			while (len > 0 && val[len - 1] == 0)
 				len--;
 
@@ -393,7 +393,7 @@ BigInteger::BigInteger(byte * value, int32 byteCount)
 				else if (val[0] == kuMaskHighBit) // abs(Int32.MinValue)
 				{
 					this->_sign = -1;
-					this->_bits = new unsigned __int32[1]{ BigInteger::kuMaskHighBit };
+					this->_bits = new uint32[1]{ BigInteger::kuMaskHighBit };
 					this->_bitsSize = 1;
 				}
 				else
@@ -406,10 +406,10 @@ BigInteger::BigInteger(byte * value, int32 byteCount)
 			else if (len != dwordCount)
 			{
 				this->_sign = -1;
-				this->_bits = new unsigned __int32[len];
+				this->_bits = new uint32[len];
 				this->_bitsSize = len;
 
-				for (int x = 0; x < len; x++)
+				for (int32 x = 0; x < len; x++)
 					this->_bits[x] = val[x];
 			}
 			else
@@ -451,7 +451,7 @@ int32 BigInteger::Length(uint32 *rgu, int32 size)
 
 int32 BigInteger::GetDiffLength(uint32 *rgu1, uint32 * rgu2, int32 cu)
 {
-	for (int iv = cu; --iv >= 0; )
+	for (int32 iv = cu; --iv >= 0; )
 	{
 		if (rgu1[iv] != rgu2[iv])
 			return iv + 1;
@@ -463,17 +463,17 @@ int32 BigInteger::ToUInt32Array(uint32 * &output)
 {
 	if (this->_bits == NULL && this->_sign == 0)
 	{
-		output = new unsigned __int32[1]{ 0 };
+		output = new uint32[1]{ 0 };
 		return 1;
 	}
 
-	int dwords_size;
-	unsigned __int32 *dwords;
-	unsigned __int32 highDWord;
+	int32 dwords_size;
+	uint32 *dwords;
+	uint32 highDWord;
 
 	if (this->_bits == NULL)
 	{
-		dwords = new unsigned __int32[1]{ (unsigned __int32)this->_sign };
+		dwords = new uint32[1]{ (uint32)this->_sign };
 		dwords_size = 1;
 		highDWord = (this->_sign < 0) ? UInt32MaxValue : 0;
 	}
@@ -492,7 +492,7 @@ int32 BigInteger::ToUInt32Array(uint32 * &output)
 	}
 
 	// find highest significant byte
-	int msb;
+	int32 msb;
 	for (msb = dwords_size - 1; msb > 0; msb--)
 	{
 		if (dwords[msb] != highDWord) break;
@@ -500,10 +500,10 @@ int32 BigInteger::ToUInt32Array(uint32 * &output)
 	// ensure high bit is 0 if positive, 1 if negative
 	bool needExtraByte = (dwords[msb] & 0x80000000) != (highDWord & 0x80000000);
 
-	int trimmed_size = msb + 1 + (needExtraByte ? 1 : 0);
-	output = new unsigned __int32[trimmed_size];
+	int32 trimmed_size = msb + 1 + (needExtraByte ? 1 : 0);
+	output = new uint32[trimmed_size];
 
-	for (int x = 0, m = msb + 1; x < m; x++)
+	for (int32 x = 0, m = msb + 1; x < m; x++)
 		output[x] = dwords[x];
 
 	if (needExtraByte) output[trimmed_size - 1] = highDWord;
@@ -528,20 +528,20 @@ BigInteger* BigInteger::Or(BigInteger* bi)
 		return new BigInteger(bi);
 	}
 
-	unsigned __int32 *x, *y, *z;
+	uint32 *x, *y, *z;
 
-	int sizex = this->ToUInt32Array(x);
-	int sizey = bi->ToUInt32Array(y);
-	int sizez = sizex > sizey ? sizex : sizey;
+	int32 sizex = this->ToUInt32Array(x);
+	int32 sizey = bi->ToUInt32Array(y);
+	int32 sizez = sizex > sizey ? sizex : sizey;
 
-	z = new unsigned __int32[sizez];
+	z = new uint32[sizez];
 
-	unsigned __int32 xExtend = (this->_sign < 0) ? UInt32MaxValue : 0;
-	unsigned __int32 yExtend = (bi->_sign < 0) ? UInt32MaxValue : 0;
+	uint32 xExtend = (this->_sign < 0) ? UInt32MaxValue : 0;
+	uint32 yExtend = (bi->_sign < 0) ? UInt32MaxValue : 0;
 
-	unsigned __int32 xu, yu;
+	uint32 xu, yu;
 
-	for (int i = 0; i < sizez; i++)
+	for (int32 i = 0; i < sizez; i++)
 	{
 		xu = (i < sizex) ? x[i] : xExtend;
 		yu = (i < sizey) ? y[i] : yExtend;
@@ -569,20 +569,20 @@ BigInteger* BigInteger::Xor(BigInteger* bi)
 		return new BigInteger(bi);
 	}
 
-	unsigned __int32 *x, *y, *z;
+	uint32 *x, *y, *z;
 
-	int sizex = this->ToUInt32Array(x);
-	int sizey = bi->ToUInt32Array(y);
-	int sizez = sizex > sizey ? sizex : sizey;
+	int32 sizex = this->ToUInt32Array(x);
+	int32 sizey = bi->ToUInt32Array(y);
+	int32 sizez = sizex > sizey ? sizex : sizey;
 
-	z = new unsigned __int32[sizez];
+	z = new uint32[sizez];
 
-	unsigned __int32 xExtend = (this->_sign < 0) ? UInt32MaxValue : 0;
-	unsigned __int32 yExtend = (bi->_sign < 0) ? UInt32MaxValue : 0;
+	uint32 xExtend = (this->_sign < 0) ? UInt32MaxValue : 0;
+	uint32 yExtend = (bi->_sign < 0) ? UInt32MaxValue : 0;
 
-	unsigned __int32 xu, yu;
+	uint32 xu, yu;
 
-	for (int i = 0; i < sizez; i++)
+	for (int32 i = 0; i < sizez; i++)
 	{
 		xu = (i < sizex) ? x[i] : xExtend;
 		yu = (i < sizey) ? y[i] : yExtend;
@@ -604,11 +604,11 @@ bool BigInteger::GetPartsForBitManipulation(BigInteger *x, uint32 * &xd, int32 &
 	{
 		if (x->_sign < 0)
 		{
-			xd = new unsigned __int32[1]{ (unsigned __int32)-x->_sign };
+			xd = new uint32[1]{ (uint32)-x->_sign };
 		}
 		else
 		{
-			xd = new unsigned __int32[1]{ (unsigned __int32)x->_sign };
+			xd = new uint32[1]{ (uint32)x->_sign };
 		}
 
 		xl = 1;
@@ -619,8 +619,8 @@ bool BigInteger::GetPartsForBitManipulation(BigInteger *x, uint32 * &xd, int32 &
 
 		if (xl > 0)
 		{
-			xd = new unsigned __int32[xl];
-			for (int y = 0; y < xl; y++)
+			xd = new uint32[xl];
+			for (int32 y = 0; y < xl; y++)
 				xd[y] = x->_bits[y];
 		}
 		else
@@ -638,31 +638,31 @@ BigInteger* BigInteger::Shl(int32 shift)
 	else if (shift == Int32MinValue) return this->Shr(Int32MaxValue)->Shr(1);
 	else if (shift < 0) return this->Shr(-shift);
 
-	int digitShift = shift / kcbitUint;
-	int smallShift = shift - (digitShift * kcbitUint);
+	int32 digitShift = shift / kcbitUint;
+	int32 smallShift = shift - (digitShift * kcbitUint);
 
-	int xl;
-	unsigned __int32 *xd;
+	int32 xl;
+	uint32 *xd;
 	bool negx = this->GetPartsForBitManipulation(this, xd, xl);
 
-	int zl = xl + digitShift + 1;
-	unsigned __int32 *zd = new unsigned __int32[zl]();
+	int32 zl = xl + digitShift + 1;
+	uint32 *zd = new uint32[zl]();
 
 	if (smallShift == 0)
 	{
-		for (int i = 0; i < xl; i++)
+		for (int32 i = 0; i < xl; i++)
 		{
 			zd[i + digitShift] = xd[i];
 		}
 	}
 	else
 	{
-		int carryShift = kcbitUint - smallShift;
-		unsigned __int32 carry = 0;
-		int i;
+		int32 carryShift = kcbitUint - smallShift;
+		uint32 carry = 0;
+		int32 i;
 		for (i = 0; i < xl; i++)
 		{
-			unsigned __int32 rot = xd[i];
+			uint32 rot = xd[i];
 			zd[i + digitShift] = rot << smallShift | carry;
 			carry = rot >> carryShift;
 		}
@@ -682,11 +682,11 @@ BigInteger* BigInteger::Shr(int32 shift)
 	else if (shift == Int32MinValue) return this->Shl(Int32MaxValue)->Shl(1);
 	else if (shift < 0) return this->Shl(-shift);
 
-	int digitShift = shift / kcbitUint;
-	int smallShift = shift - (digitShift * kcbitUint);
+	int32 digitShift = shift / kcbitUint;
+	int32 smallShift = shift - (digitShift * kcbitUint);
 
-	unsigned __int32 *xd;
-	int xl;
+	uint32 *xd;
+	int32 xl;
 	bool negx = this->GetPartsForBitManipulation(this, xd, xl);
 
 	if (negx)
@@ -699,8 +699,8 @@ BigInteger* BigInteger::Shr(int32 shift)
 		// This version don't require this copy, because `GetPartsForBitManipulation` always return a copy
 
 		/*
-		unsigned __int32 *temp = new unsigned __int32[xl];
-		for (int i = 0; i < xl; i++)temp[i] = xd[i];  // make a copy of immutable value._bits
+		uint32 *temp = new uint32[xl];
+		for (int32 i = 0; i < xl; i++)temp[i] = xd[i];  // make a copy of immutable value._bits
 		delete[](xd);
 		xd = temp;
 		*/
@@ -708,24 +708,24 @@ BigInteger* BigInteger::Shr(int32 shift)
 		this->DangerousMakeTwosComplement(xd, xl); // mutates xd
 	}
 
-	int zl = xl - digitShift;
+	int32 zl = xl - digitShift;
 	if (zl < 0) zl = 0;
-	unsigned __int32 * zd = new unsigned __int32[zl];
+	uint32 * zd = new uint32[zl];
 
 	if (smallShift == 0)
 	{
-		for (int i = xl - 1; i >= digitShift; i--)
+		for (int32 i = xl - 1; i >= digitShift; i--)
 		{
 			zd[i - digitShift] = xd[i];
 		}
 	}
 	else
 	{
-		int carryShift = kcbitUint - smallShift;
-		unsigned __int32 carry = 0;
-		for (int i = xl - 1; i >= digitShift; i--)
+		int32 carryShift = kcbitUint - smallShift;
+		uint32 carry = 0;
+		for (int32 i = xl - 1; i >= digitShift; i--)
 		{
-			unsigned __int32 rot = xd[i];
+			uint32 rot = xd[i];
 			if (negx && i == xl - 1)
 				// sign-extend the first shift for negative ints then let the carry propagate
 				zd[i - digitShift] = (rot >> smallShift) | (0xFFFFFFFF << carryShift);
@@ -753,20 +753,20 @@ BigInteger* BigInteger::And(BigInteger* bi)
 		return new BigInteger(BigInteger::Zero);
 	}
 
-	unsigned __int32 *x, *y, *z;
+	uint32 *x, *y, *z;
 
-	int sizex = this->ToUInt32Array(x);
-	int sizey = bi->ToUInt32Array(y);
-	int sizez = sizex > sizey ? sizex : sizey;
+	int32 sizex = this->ToUInt32Array(x);
+	int32 sizey = bi->ToUInt32Array(y);
+	int32 sizez = sizex > sizey ? sizex : sizey;
 
-	z = new unsigned __int32[sizez];
+	z = new uint32[sizez];
 
-	unsigned __int32 xExtend = (this->_sign < 0) ? UInt32MaxValue : 0;
-	unsigned __int32 yExtend = (bi->_sign < 0) ? UInt32MaxValue : 0;
+	uint32 xExtend = (this->_sign < 0) ? UInt32MaxValue : 0;
+	uint32 yExtend = (bi->_sign < 0) ? UInt32MaxValue : 0;
 
-	unsigned __int32 xu, yu;
+	uint32 xu, yu;
 
-	for (int i = 0; i < sizez; i++)
+	for (int32 i = 0; i < sizez; i++)
 	{
 		xu = (i < sizex) ? x[i] : xExtend;
 		yu = (i < sizey) ? y[i] : yExtend;
@@ -787,14 +787,14 @@ BigInteger* BigInteger::Div(BigInteger* bi)
 	// dividend.AssertValid();
 	// divisor.AssertValid();
 
-	int sign = +1;
+	int32 sign = +1;
 	BigIntegerBuilder regNum(this->_sign, this->_bits, this->_bitsSize, sign);
 	BigIntegerBuilder regDen(bi->_sign, bi->_bits, bi->_bitsSize, sign);
 
 	regNum.Div(regDen);
 
-	int bitSize;
-	unsigned __int32 *bits;
+	int32 bitSize;
+	uint32 *bits;
 	regNum.GetInteger(sign, bits, bitSize);
 
 	return new BigInteger(sign, bits, bitSize);
@@ -805,14 +805,14 @@ BigInteger* BigInteger::Mul(BigInteger* bi)
 	// left.AssertValid();
 	// right.AssertValid();
 
-	int sign = +1;
+	int32 sign = +1;
 	BigIntegerBuilder reg1(this->_sign, this->_bits, this->_bitsSize, sign);
 	BigIntegerBuilder reg2(bi->_sign, bi->_bits, bi->_bitsSize, sign);
 
 	reg1.Mul(reg2);
 
-	int bitSize;
-	unsigned __int32 *bits;
+	int32 bitSize;
+	uint32 *bits;
 	reg1.GetInteger(sign, bits, bitSize);
 
 	return new BigInteger(sign, bits, bitSize);
@@ -823,15 +823,15 @@ BigInteger* BigInteger::Mod(BigInteger* bi)
 	// dividend.AssertValid();
 	// divisor.AssertValid();
 
-	int signNum = +1;
-	int signDen = +1;
+	int32 signNum = +1;
+	int32 signDen = +1;
 	BigIntegerBuilder regNum(this->_sign, this->_bits, this->_bitsSize, signNum);
 	BigIntegerBuilder regDen(bi->_sign, bi->_bits, bi->_bitsSize, signDen);
 
 	regNum.Mod(regDen);
 
-	int bitSize;
-	unsigned __int32 *bits;
+	int32 bitSize;
+	uint32 *bits;
 	regNum.GetInteger(signNum, bits, bitSize);
 
 	return new BigInteger(signNum, bits, bitSize);
@@ -852,8 +852,8 @@ BigInteger* BigInteger::Add(BigInteger* bi)
 		return new BigInteger(bi);
 	}
 
-	int sign1 = +1;
-	int sign2 = +1;
+	int32 sign1 = +1;
+	int32 sign2 = +1;
 
 	BigIntegerBuilder reg1(this->_sign, this->_bits, this->_bitsSize, sign1);
 	BigIntegerBuilder reg2(bi->_sign, bi->_bits, bi->_bitsSize, sign2);
@@ -863,8 +863,8 @@ BigInteger* BigInteger::Add(BigInteger* bi)
 	else
 		reg1.Sub(sign1, reg2);
 
-	int bitSize;
-	unsigned __int32 *bits;
+	int32 bitSize;
+	uint32 *bits;
 	reg1.GetInteger(sign1, bits, bitSize);
 
 	return new BigInteger(sign1, bits, bitSize);
@@ -886,8 +886,8 @@ BigInteger* BigInteger::Sub(BigInteger* bi)
 		return bi->Negate();
 	}
 
-	int sign1 = +1;
-	int sign2 = -1;
+	int32 sign1 = +1;
+	int32 sign2 = -1;
 
 	BigIntegerBuilder reg1(this->_sign, this->_bits, this->_bitsSize, sign1);
 	BigIntegerBuilder reg2(bi->_sign, bi->_bits, bi->_bitsSize, sign2);
@@ -897,8 +897,8 @@ BigInteger* BigInteger::Sub(BigInteger* bi)
 	else
 		reg1.Sub(sign1, reg2);
 
-	int bitSize;
-	unsigned __int32 *bits;
+	int32 bitSize;
+	uint32 *bits;
 	reg1.GetInteger(sign1, bits, bitSize);
 
 	return new BigInteger(sign1, bits, bitSize);
@@ -935,14 +935,14 @@ int32 BigInteger::CompareTo(BigInteger bi)
 			return this->_sign < bi._sign ? -1 : this->_sign > bi._sign ? +1 : 0;
 		return -bi._sign;
 	}
-	int cuThis, cuOther;
+	int32 cuThis, cuOther;
 	if (bi._bits == NULL || (cuThis = Length(this->_bits, this->_bitsSize)) > (cuOther = Length(bi._bits, this->_bitsSize)))
 		return this->_sign;
 
 	if (cuThis < cuOther)
 		return -this->_sign;
 
-	int cuDiff = GetDiffLength(this->_bits, bi._bits, cuThis);
+	int32 cuDiff = GetDiffLength(this->_bits, bi._bits, cuThis);
 	if (cuDiff == 0)
 		return 0;
 
@@ -967,14 +967,14 @@ int32 BigInteger::CompareTo(BigInteger *bi)
 			return this->_sign < bi->_sign ? -1 : this->_sign > bi->_sign ? +1 : 0;
 		return -bi->_sign;
 	}
-	int cuThis, cuOther;
+	int32 cuThis, cuOther;
 	if (bi->_bits == NULL || (cuThis = Length(this->_bits, this->_bitsSize)) > (cuOther = Length(bi->_bits, this->_bitsSize)))
 		return this->_sign;
 
 	if (cuThis < cuOther)
 		return -this->_sign;
 
-	int cuDiff = GetDiffLength(this->_bits, bi->_bits, cuThis);
+	int32 cuDiff = GetDiffLength(this->_bits, bi->_bits, cuThis);
 	if (cuDiff == 0)
 		return 0;
 
@@ -1023,14 +1023,14 @@ BigInteger::BigInteger(uint32 value)
 {
 	if (value <= Int32MaxValue)
 	{
-		this->_sign = (int)value;
+		this->_sign = (int32)value;
 		this->_bits = NULL;
 		this->_bitsSize = 0;
 	}
 	else
 	{
 		this->_sign = +1;
-		this->_bits = new unsigned __int32[1]{ value };
+		this->_bits = new uint32[1]{ value };
 		this->_bitsSize = 1;
 	}
 
@@ -1051,9 +1051,9 @@ BigInteger::BigInteger(int32 sign, uint32 *rgu, int32 rguSize)
 	}
 
 	this->_bitsSize = rguSize;
-	this->_bits = new unsigned __int32[rguSize];
+	this->_bits = new uint32[rguSize];
 
-	for (int x = 0; x < rguSize; x++)
+	for (int32 x = 0; x < rguSize; x++)
 		this->_bits[x] = rgu[x];
 
 	// AssertValid();
@@ -1095,15 +1095,15 @@ int32 BigInteger::ToByteArray(byte * output, int32 length)
 	// The current code does one pass for uint array -> byte array conversion,
 	// and then another pass to remove unneeded bytes at the top of the array.
 
-	int dwordsSize;
-	unsigned __int8 highByte;
-	unsigned __int32 *dwords;
+	int32 dwordsSize;
+	byte highByte;
+	uint32 *dwords;
 
 	if (this->_bitsSize == 0)
 	{
-		dwords = new unsigned __int32[1]{ (unsigned __int32)_sign };
+		dwords = new uint32[1]{ (uint32)_sign };
 		dwordsSize = 1;
-		highByte = (__int8)((_sign < 0) ? 0xff : 0x00);
+		highByte = (byte)((_sign < 0) ? 0xff : 0x00);
 	}
 	else if (_sign == -1)
 	{
@@ -1112,8 +1112,8 @@ int32 BigInteger::ToByteArray(byte * output, int32 length)
 		if (this->_bits != NULL)
 		{
 			// Clone
-			dwords = new unsigned __int32[dwordsSize];
-			for (int x = 0; x < dwordsSize; x++)
+			dwords = new uint32[dwordsSize];
+			for (int32 x = 0; x < dwordsSize; x++)
 				dwords[x] = this->_bits[x];
 
 			this->DangerousMakeTwosComplement(dwords, dwordsSize);  // mutates dwords
@@ -1132,22 +1132,22 @@ int32 BigInteger::ToByteArray(byte * output, int32 length)
 		highByte = 0x00;
 	}
 
-	unsigned __int8 *bytes = new unsigned __int8[4 * dwordsSize]/*()*/;
-	int curByte = 0;
+	byte *bytes = new byte[4 * dwordsSize]/*()*/;
+	int32 curByte = 0;
 
-	unsigned __int32 dword;
-	for (int i = 0; i < dwordsSize; i++)
+	uint32 dword;
+	for (int32 i = 0; i < dwordsSize; i++)
 	{
 		dword = dwords[i];
-		for (int j = 0; j < 4; j++)
+		for (int32 j = 0; j < 4; j++)
 		{
-			bytes[curByte++] = (unsigned __int8)(dword & 0xff);
+			bytes[curByte++] = (byte)(dword & 0xff);
 			dword >>= 8;
 		}
 	}
 
 	// find highest significant byte
-	int msb;
+	int32 msb;
 	for (msb = (4 * dwordsSize) - 1; msb > 0; msb--)
 	{
 		if (bytes[msb] != highByte) break;
@@ -1156,7 +1156,7 @@ int32 BigInteger::ToByteArray(byte * output, int32 length)
 	// ensure high bit is 0 if positive, 1 if negative
 	bool needExtraByte = (bytes[msb] & 0x80) != (highByte & 0x80);
 
-	int l = msb + 1 + (needExtraByte ? 1 : 0);
+	int32 l = msb + 1 + (needExtraByte ? 1 : 0);
 
 	if (l <= length)
 	{
