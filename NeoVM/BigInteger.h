@@ -1,4 +1,5 @@
 #pragma once
+
 #include <cstring>
 #include "Types.h"
 
@@ -66,6 +67,7 @@ private:
 	int32 _bitsSize;
 
 	static bool GetPartsForBitManipulation(BigInteger *x, uint32 * &xd, int32 &xl);
+
 	void DangerousMakeTwosComplement(uint32 *d, int32 dSize);
 	int32 ToUInt32Array(uint32 * &output);
 	int32 Length(uint32 *rgu, int32 size);

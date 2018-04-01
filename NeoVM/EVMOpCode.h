@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-enum EVMOpCode : unsigned __int8
+enum EVMOpCode : byte
 {
 	// Constants
 	PUSH0 = 0x00, // An empty array of bytes is pushed onto the stack.

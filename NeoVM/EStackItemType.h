@@ -1,6 +1,6 @@
 #pragma once
 
-enum EStackItemType
+enum EStackItemType : byte
 {
 	None = 0,
 

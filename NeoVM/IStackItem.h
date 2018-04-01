@@ -1,4 +1,5 @@
 #pragma once
+
 #include "EStackItemType.h"
 #include "BigInteger.h"
 

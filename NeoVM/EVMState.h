@@ -1,6 +1,6 @@
 #pragma once
 
-enum EVMState :__int8
+enum EVMState : byte
 {
 	// Normal state
 	NONE = 0,
