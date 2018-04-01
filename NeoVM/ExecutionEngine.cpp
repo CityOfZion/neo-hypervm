@@ -998,13 +998,31 @@ ExecuteOpCode:
 	EvaluationStack.Push(x - 1);
 	return;
 	}
-	case OpCode.SIGN:
-	{
-	BigInteger x = EvaluationStack.Pop().GetBigInteger();
-	EvaluationStack.Push(x.Sign);
-	return;
-	}
 	*/
+	case EVMOpCode::SIGN:
+	{
+		if (this->EvaluationStack->Count() < 1)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem* item = this->EvaluationStack->Pop();
+		BigInteger* bi = item->GetBigInteger();
+		IStackItem::Free(item);
+
+		if (bi == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		BigInteger *ret = new BigInteger(bi->GetSign());
+		delete(bi);
+
+		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		return;
+	}
 	case EVMOpCode::NEGATE:
 	{
 		if (this->EvaluationStack->Count() < 1)

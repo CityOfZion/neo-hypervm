@@ -26,7 +26,7 @@ namespace NeoVM.Interop.Tests
             });
         }
 
-        //[TestMethod]
+        [TestMethod]
         public void SIGN()
         {
             InternalTestBigInteger(EVMOpCode.SIGN, (engine, a) =>

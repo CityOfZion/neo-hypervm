@@ -789,6 +789,11 @@ bool BigInteger::ToInt32(int &ret)
 	}
 }
 
+int BigInteger::GetSign()
+{
+	return (this->_sign >> (BigInteger::kcbitUint - 1)) - (-this->_sign >> (BigInteger::kcbitUint - 1));
+}
+
 BigInteger::BigInteger(unsigned __int32 value)
 {
 	if (value <= Int32MaxValue)

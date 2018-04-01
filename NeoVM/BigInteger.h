@@ -33,6 +33,7 @@ public:
 	BigInteger* Xor(BigInteger* &other);
 	BigInteger* Negate();
 	BigInteger* Abs();
+	int GetSign();
 
 	int CompareTo(BigInteger bi);
 	int CompareTo(BigInteger *bi);
