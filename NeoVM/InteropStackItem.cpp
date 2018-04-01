@@ -3,7 +3,7 @@
 
 InteropStackItem::InteropStackItem(byte * data, int32 size) :IStackItem(EStackItemType::Interop)
 {
-	this->Payload = new unsigned char[size];
+	this->Payload = new byte[size];
 	this->PayloadLength = size;
 
 	memcpy(this->Payload, data, size);
@@ -11,7 +11,10 @@ InteropStackItem::InteropStackItem(byte * data, int32 size) :IStackItem(EStackIt
 
 InteropStackItem::~InteropStackItem()
 {
-	delete(this->Payload);
+	if (this->Payload == NULL) return;
+
+	delete[](this->Payload);
+	this->Payload = NULL;
 }
 
 bool InteropStackItem::GetBoolean()

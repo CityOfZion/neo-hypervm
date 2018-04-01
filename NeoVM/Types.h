@@ -13,6 +13,10 @@ typedef unsigned int uint32;
 typedef long int64;
 typedef unsigned long uint64;
 
+#ifndef NULL
+#define NULL 0
+#endif
+
 // ExecutionEngine Callbacks
 
 typedef byte(__stdcall * InvokeInteropCallback)(const char* method);
