@@ -24,6 +24,8 @@ namespace NeoVM.Interop.Tests
         {
             new BigInteger(long.MinValue)*new BigInteger(long.MinValue)*new BigInteger(long.MinValue),
             new BigInteger(ulong.MaxValue)*new BigInteger(ulong.MaxValue)*new BigInteger(ulong.MaxValue),
+            new BigInteger(long.MinValue)*new BigInteger(long.MinValue),
+            new BigInteger(ulong.MaxValue)*new BigInteger(ulong.MaxValue),
 
             new BigInteger(ulong.MaxValue),
             new BigInteger(ulong.MinValue),
