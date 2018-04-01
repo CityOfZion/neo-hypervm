@@ -782,6 +782,61 @@ BigInteger* BigInteger::And(BigInteger* bi)
 	return ret;
 }
 
+BigInteger* BigInteger::Div(BigInteger* bi)
+{
+	// dividend.AssertValid();
+	// divisor.AssertValid();
+
+	int sign = +1;
+	BigIntegerBuilder regNum(this->_sign, this->_bits, this->_bitsSize, sign);
+	BigIntegerBuilder regDen(bi->_sign, bi->_bits, bi->_bitsSize, sign);
+
+	regNum.Div(regDen);
+
+	int bitSize;
+	unsigned __int32 *bits;
+	regNum.GetInteger(sign, bits, bitSize);
+
+	return new BigInteger(sign, bits, bitSize);
+}
+
+BigInteger* BigInteger::Mul(BigInteger* bi)
+{
+	// left.AssertValid();
+	// right.AssertValid();
+
+	int sign = +1;
+	BigIntegerBuilder reg1(this->_sign, this->_bits, this->_bitsSize, sign);
+	BigIntegerBuilder reg2(bi->_sign, bi->_bits, bi->_bitsSize, sign);
+
+	reg1.Mul(reg2);
+
+	int bitSize;
+	unsigned __int32 *bits;
+	reg1.GetInteger(sign, bits, bitSize);
+
+	return new BigInteger(sign, bits, bitSize);
+}
+
+BigInteger* BigInteger::Mod(BigInteger* bi)
+{
+	// dividend.AssertValid();
+	// divisor.AssertValid();
+
+	int signNum = +1;
+	int signDen = +1;
+	BigIntegerBuilder regNum(this->_sign, this->_bits, this->_bitsSize, signNum);
+	BigIntegerBuilder regDen(bi->_sign, bi->_bits, bi->_bitsSize, signDen);
+
+	regNum.Mod(regDen);
+
+	int bitSize;
+	unsigned __int32 *bits;
+	regNum.GetInteger(signNum, bits, bitSize);
+
+	return new BigInteger(signNum, bits, bitSize);
+}
+
 BigInteger* BigInteger::Add(BigInteger* bi)
 {
 	// left.AssertValid();

@@ -118,6 +118,87 @@ void BigIntegerBuilder::GetInteger(int &sign, unsigned __int32 * &bits, int &bit
 	*/
 }
 
+void BigIntegerBuilder::Div(BigIntegerBuilder &reg)
+{
+	// AssertValid(true);
+	// regDen.AssertValid(true);
+
+	/* 
+      if (regDen._iuLast == 0) {
+        DivMod(regDen._uSmall);
+        return;
+      }
+      if (_iuLast == 0) {
+        _uSmall = 0;
+        return;
+      }
+ 
+      BigIntegerBuilder regTmp = new BigIntegerBuilder();
+      ModDivCore(ref this, ref regDen, true, ref regTmp);
+      NumericsHelpers.Swap(ref this, ref regTmp);
+	*/
+}
+
+void BigIntegerBuilder::Mod(BigIntegerBuilder &reg)
+{
+	// AssertValid(true);
+	// regDen.AssertValid(true);
+
+	/*
+	if (regDen._iuLast == 0) 
+	{
+		Set(Mod(ref this, regDen._uSmall));
+		return;
+	}
+	if (_iuLast == 0)
+		return;
+
+	BigIntegerBuilder regTmp = new BigIntegerBuilder();
+	ModDivCore(ref this, ref regDen, false, ref regTmp);
+	*/
+}
+
+void BigIntegerBuilder::Mul(BigIntegerBuilder &regMul)
+{
+	// AssertValid(true);
+	// regMul.AssertValid(true);
+	
+	/* 
+      if (regMul._iuLast == 0)
+        Mul(regMul._uSmall);
+      else if (_iuLast == 0) {
+        uint u = _uSmall;
+        if (u == 1)
+          this = new BigIntegerBuilder(ref regMul);
+        else if (u != 0) {
+          Load(ref regMul, 1);
+          Mul(u);
+        }
+      }
+      else {
+        int cuBase = _iuLast + 1;
+        SetSizeKeep(cuBase + regMul._iuLast, 1);
+ 
+        for (int iu = cuBase; --iu >= 0; ) {
+          uint uMul = _rgu[iu];
+          _rgu[iu] = 0;
+          uint uCarry = 0;
+          for (int iuSrc = 0; iuSrc <= regMul._iuLast; iuSrc++)
+            uCarry = AddMulCarry(ref _rgu[iu + iuSrc], regMul._rgu[iuSrc], uMul, uCarry);
+          if (uCarry != 0) {
+            for (int iuDst = iu + regMul._iuLast + 1; uCarry != 0 && iuDst <= _iuLast; iuDst++)
+              uCarry = AddCarry(ref _rgu[iuDst], 0, uCarry);
+            if (uCarry != 0) {
+              SetSizeKeep(_iuLast + 2, 0);
+              _rgu[_iuLast] = uCarry;
+            }
+          }
+        }
+        // AssertValid(true);
+      }
+	*/
+}
+
 void BigIntegerBuilder::Add(BigIntegerBuilder &reg)
 {
 	// AssertValid(true);
@@ -166,7 +247,7 @@ void BigIntegerBuilder::Add(BigIntegerBuilder &reg)
 		ApplyCarry(cuAdd);
 	  */
 
-	  // AssertValid(true);
+	// AssertValid(true);
 }
 
 void BigIntegerBuilder::Sub(int &sign, BigIntegerBuilder &reg)
@@ -176,7 +257,6 @@ void BigIntegerBuilder::Sub(int &sign, BigIntegerBuilder &reg)
 	// reg.AssertValid(true);
 
 	/*
-
 	  if (reg._iuLast == 0)
 	  {
 		Sub(ref sign, reg._uSmall);

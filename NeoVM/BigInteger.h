@@ -27,11 +27,14 @@ public:
 	int ToByteArraySize();
 	int ToByteArray(unsigned char * output, int length);
 
-	BigInteger* Add(BigInteger* other);
-	BigInteger* Sub(BigInteger* other);
-	BigInteger* And(BigInteger* other);
-	BigInteger* Or(BigInteger* other);
-	BigInteger* Xor(BigInteger* other);
+	BigInteger* Div(BigInteger* reg);
+	BigInteger* Mul(BigInteger* reg);
+	BigInteger* Mod(BigInteger* reg);
+	BigInteger* Add(BigInteger* reg);
+	BigInteger* Sub(BigInteger* reg);
+	BigInteger* And(BigInteger* reg);
+	BigInteger* Or(BigInteger* reg);
+	BigInteger* Xor(BigInteger* reg);
 	BigInteger* Negate();
 	BigInteger* Abs();
 	BigInteger* Shl(int shift);

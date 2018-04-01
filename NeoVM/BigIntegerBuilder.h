@@ -20,6 +20,9 @@ public:
 
 	// Methods
 
+	void Mul(BigIntegerBuilder &reg);
+	void Div(BigIntegerBuilder &reg);
+	void Mod(BigIntegerBuilder &reg);
 	void Add(BigIntegerBuilder &reg);
 	void Sub(int &sign, BigIntegerBuilder &reg);
 	void GetInteger(int &sign, unsigned __int32 * &bits, int &bitSize);

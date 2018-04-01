@@ -71,7 +71,7 @@ namespace NeoVM.Interop.Tests
             });
         }
 
-        //[TestMethod]
+        [TestMethod]
         public void MUL()
         {
             InternalTestBigInteger(EVMOpCode.MUL, (engine, a, b, cancel) =>
@@ -80,7 +80,7 @@ namespace NeoVM.Interop.Tests
             });
         }
 
-        //[TestMethod]
+        [TestMethod]
         public void DIV()
         {
             InternalTestBigInteger(EVMOpCode.DIV, (engine, a, b, cancel) =>
@@ -89,7 +89,7 @@ namespace NeoVM.Interop.Tests
             });
         }
 
-        //[TestMethod]
+        [TestMethod]
         public void MOD()
         {
             InternalTestBigInteger(EVMOpCode.MOD, (engine, a, b, cancel) =>
