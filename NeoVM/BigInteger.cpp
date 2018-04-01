@@ -970,7 +970,8 @@ bool BigInteger::ToInt32(int &ret)
 	else if (this->_sign > 0)
 	{
 		ret = (__int32)this->_bits[0];
-		return true;
+		// checked
+		return ret >= 0;
 	}
 	else
 	{
