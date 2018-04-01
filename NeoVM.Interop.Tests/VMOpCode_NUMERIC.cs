@@ -11,7 +11,7 @@ namespace NeoVM.Interop.Tests
         //[TestMethod]
         public void INC()
         {
-            InternalTestBigInteger(EVMOpCode.INC, (engine, a) =>
+            InternalTestBigInteger(EVMOpCode.INC, (engine, a, cancel) =>
             {
                 Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a + 1));
             });
@@ -20,7 +20,7 @@ namespace NeoVM.Interop.Tests
         //[TestMethod]
         public void DEC()
         {
-            InternalTestBigInteger(EVMOpCode.DEC, (engine, a) =>
+            InternalTestBigInteger(EVMOpCode.DEC, (engine, a, cancel) =>
             {
                 Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a + 1));
             });
@@ -29,7 +29,7 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void SIGN()
         {
-            InternalTestBigInteger(EVMOpCode.SIGN, (engine, a) =>
+            InternalTestBigInteger(EVMOpCode.SIGN, (engine, a, cancel) =>
             {
                 Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, a.Sign);
             });
@@ -38,7 +38,7 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void NEGATE()
         {
-            InternalTestBigInteger(EVMOpCode.NEGATE, (engine, a) =>
+            InternalTestBigInteger(EVMOpCode.NEGATE, (engine, a, cancel) =>
             {
                 Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, -a);
             });
@@ -47,7 +47,7 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void ABS()
         {
-            InternalTestBigInteger(EVMOpCode.ABS, (engine, a) =>
+            InternalTestBigInteger(EVMOpCode.ABS, (engine, a, cancel) =>
             {
                 Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, BigInteger.Abs(a));
             });
@@ -56,7 +56,7 @@ namespace NeoVM.Interop.Tests
         //[TestMethod]
         public void ADD()
         {
-            InternalTestBigInteger(EVMOpCode.ADD, (engine, a, b) =>
+            InternalTestBigInteger(EVMOpCode.ADD, (engine, a, b, cancel) =>
             {
                 Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a + b));
             });
@@ -65,7 +65,7 @@ namespace NeoVM.Interop.Tests
         //[TestMethod]
         public void SUB()
         {
-            InternalTestBigInteger(EVMOpCode.SUB, (engine, a, b) =>
+            InternalTestBigInteger(EVMOpCode.SUB, (engine, a, b, cancel) =>
             {
                 Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a - b));
             });
@@ -74,7 +74,7 @@ namespace NeoVM.Interop.Tests
         //[TestMethod]
         public void MUL()
         {
-            InternalTestBigInteger(EVMOpCode.MUL, (engine, a, b) =>
+            InternalTestBigInteger(EVMOpCode.MUL, (engine, a, b, cancel) =>
             {
                 Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a * b));
             });
@@ -83,7 +83,7 @@ namespace NeoVM.Interop.Tests
         //[TestMethod]
         public void DIV()
         {
-            InternalTestBigInteger(EVMOpCode.DIV, (engine, a, b) =>
+            InternalTestBigInteger(EVMOpCode.DIV, (engine, a, b, cancel) =>
             {
                 Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a / b));
             });
@@ -92,27 +92,47 @@ namespace NeoVM.Interop.Tests
         //[TestMethod]
         public void MOD()
         {
-            InternalTestBigInteger(EVMOpCode.MOD, (engine, a, b) =>
+            InternalTestBigInteger(EVMOpCode.MOD, (engine, a, b, cancel) =>
             {
                 Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a % b));
             });
         }
 
-        //[TestMethod]
+        [TestMethod]
         public void SHL()
         {
-            InternalTestBigInteger(EVMOpCode.SHL, (engine, a, b) =>
+            InternalTestBigInteger(EVMOpCode.SHL, (engine, bi, shift, cancel) =>
             {
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a << (int)b));
+                int ishift;
+
+                try { ishift = (int)shift; }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (bi << ishift));
             });
         }
 
-        //[TestMethod]
+        [TestMethod]
         public void SHR()
         {
-            InternalTestBigInteger(EVMOpCode.SHR, (engine, a, b) =>
+            InternalTestBigInteger(EVMOpCode.SHR, (engine, bi, shift, cancel) =>
             {
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a >> (int)b));
+                int ishift;
+
+                try { ishift = (int)shift; }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (bi >> ishift));
             });
         }
     }

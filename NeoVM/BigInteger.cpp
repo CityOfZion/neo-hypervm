@@ -89,6 +89,54 @@ void BigInteger::DangerousMakeTwosComplement(unsigned __int32 *d, int dSize)
 	// return d;
 }
 
+BigInteger::BigInteger(unsigned __int32* value, int valueSize, bool negative)
+{
+	if (value == NULL)
+	{
+		this->_sign = 0;
+		this->_bitsSize = 0;
+		this->_bits = NULL;
+		return;
+	}
+
+	// Contract.EndContractBlock();
+
+	int len;
+
+	// Try to conserve space as much as possible by checking for wasted leading uint[] entries 
+	// sometimes the uint[] has leading zeros from bit manipulation operations & and ^
+	for (len = valueSize; len > 0 && value[len - 1] == 0; len--);
+
+	if (len == 0)
+	{
+		this->_sign = 0;
+		this->_bitsSize = 0;
+		this->_bits = NULL;
+	}
+	// values like (Int32.MaxValue+1) are stored as "0x80000000" and as such cannot be packed into _sign
+	else if (len == 1 && value[0] < kuMaskHighBit)
+	{
+		this->_sign = (negative ? -(int)value[0] : (int)value[0]);
+		this->_bitsSize = 0;
+		this->_bits = NULL;
+		// Although Int32.MinValue fits in _sign, we represent this case differently for negate
+		if (this->_sign == Int32MinValue)
+		{
+			CopyInternal(Min._sign, Min._bits, Min._bitsSize);
+		}
+	}
+	else
+	{
+		this->_bitsSize = len;
+		this->_sign = negative ? -1 : +1;
+		this->_bits = new unsigned __int32[len];
+		for (int x = 0; x < len; x++)
+			this->_bits[x] = value[x];
+	}
+
+	// AssertValid();
+}
+
 BigInteger::BigInteger(unsigned __int32 * value, int size)
 {
 	if (value == NULL)
@@ -545,6 +593,154 @@ BigInteger* BigInteger::Xor(BigInteger* & bi)
 	delete[]x;
 	delete[]y;
 	delete[]z;
+
+	return ret;
+}
+
+bool BigInteger::GetPartsForBitManipulation(BigInteger *x, unsigned __int32 * &xd, int &xl)
+{
+	if (x->_bits == NULL)
+	{
+		if (x->_sign < 0)
+		{
+			xd = new unsigned __int32[1]{ (unsigned __int32)-x->_sign };
+		}
+		else
+		{
+			xd = new unsigned __int32[1]{ (unsigned __int32)x->_sign };
+		}
+
+		xl = 1;
+	}
+	else
+	{
+		xl = x->_bitsSize;
+
+		if (xl > 0)
+		{
+			xd = new unsigned __int32[xl];
+			for (int y = 0; y < xl; y++)
+				xd[y] = x->_bits[y];
+		}
+		else
+		{
+			xd = NULL;
+		}
+	}
+
+	return x->_sign < 0;
+}
+
+BigInteger* BigInteger::Shl(int shift)
+{
+	if (shift == 0) return new BigInteger(this);
+	else if (shift == Int32MinValue) return this->Shr(Int32MaxValue)->Shr(1);
+	else if (shift < 0) return this->Shr(-shift);
+
+	int digitShift = shift / kcbitUint;
+	int smallShift = shift - (digitShift * kcbitUint);
+
+	int xl;
+	unsigned __int32 *xd;
+	bool negx = this->GetPartsForBitManipulation(this, xd, xl);
+
+	int zl = xl + digitShift + 1;
+	unsigned __int32 *zd = new unsigned __int32[zl]();
+
+	if (smallShift == 0)
+	{
+		for (int i = 0; i < xl; i++)
+		{
+			zd[i + digitShift] = xd[i];
+		}
+	}
+	else
+	{
+		int carryShift = kcbitUint - smallShift;
+		unsigned __int32 carry = 0;
+		int i;
+		for (i = 0; i < xl; i++)
+		{
+			unsigned __int32 rot = xd[i];
+			zd[i + digitShift] = rot << smallShift | carry;
+			carry = rot >> carryShift;
+		}
+		zd[i + digitShift] = carry;
+	}
+
+	delete[](xd);
+	BigInteger * ret = new BigInteger(zd, zl, negx);
+	delete[](zd);
+
+	return ret;
+}
+
+BigInteger* BigInteger::Shr(int shift)
+{
+	if (shift == 0) return new BigInteger(this);
+	else if (shift == Int32MinValue) return this->Shl(Int32MaxValue)->Shl(1);
+	else if (shift < 0) return this->Shl(-shift);
+
+	int digitShift = shift / kcbitUint;
+	int smallShift = shift - (digitShift * kcbitUint);
+
+	unsigned __int32 *xd;
+	int xl;
+	bool negx = this->GetPartsForBitManipulation(this, xd, xl);
+
+	if (negx)
+	{
+		if (shift >= (kcbitUint * xl))
+		{
+			return new BigInteger(BigInteger::MinusOne);
+		}
+
+		// This version don't require this copy, because `GetPartsForBitManipulation` always return a copy
+
+		/*
+		unsigned __int32 *temp = new unsigned __int32[xl];
+		for (int i = 0; i < xl; i++)temp[i] = xd[i];  // make a copy of immutable value._bits
+		delete[](xd);
+		xd = temp;
+		*/
+
+		this->DangerousMakeTwosComplement(xd, xl); // mutates xd
+	}
+
+	int zl = xl - digitShift;
+	if (zl < 0) zl = 0;
+	unsigned __int32 * zd = new unsigned __int32[zl];
+
+	if (smallShift == 0)
+	{
+		for (int i = xl - 1; i >= digitShift; i--)
+		{
+			zd[i - digitShift] = xd[i];
+		}
+	}
+	else
+	{
+		int carryShift = kcbitUint - smallShift;
+		unsigned __int32 carry = 0;
+		for (int i = xl - 1; i >= digitShift; i--)
+		{
+			unsigned __int32 rot = xd[i];
+			if (negx && i == xl - 1)
+				// sign-extend the first shift for negative ints then let the carry propagate
+				zd[i - digitShift] = (rot >> smallShift) | (0xFFFFFFFF << carryShift);
+			else
+				zd[i - digitShift] = (rot >> smallShift) | carry;
+			carry = rot << carryShift;
+		}
+	}
+	if (negx)
+	{
+		this->DangerousMakeTwosComplement(zd, zl); // mutates zd
+	}
+
+	delete[](xd);
+	BigInteger *ret = new BigInteger(zd, zl, negx);
+	delete[](zd);
 
 	return ret;
 }

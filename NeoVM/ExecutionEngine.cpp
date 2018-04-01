@@ -1147,21 +1147,75 @@ ExecuteOpCode:
 		EvaluationStack.Push(x1 % x2);
 		return;
 	}
-	case OpCode.SHL:
-	{
-		int n = (int)EvaluationStack.Pop().GetBigInteger();
-		BigInteger x = EvaluationStack.Pop().GetBigInteger();
-		EvaluationStack.Push(x << n);
-		return;
-	}
-	case OpCode.SHR:
-	{
-		int n = (int)EvaluationStack.Pop().GetBigInteger();
-		BigInteger x = EvaluationStack.Pop().GetBigInteger();
-		EvaluationStack.Push(x >> n);
-		return;
-	}
 	*/
+	case EVMOpCode::SHL:
+	{
+		if (this->EvaluationStack->Count() < 2)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem* n = this->EvaluationStack->Pop();
+		IStackItem* x = this->EvaluationStack->Pop();
+
+		BigInteger *in = n->GetBigInteger();
+		BigInteger *ix = x->GetBigInteger();
+
+		IStackItem::Free(n);
+		IStackItem::Free(x);
+
+		int iin;
+		if (in == NULL || ix == NULL || !in->ToInt32(iin))
+		{
+			if (ix != NULL) delete(ix);
+			if (in != NULL) delete(in);
+
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		delete(in);
+		IntegerStackItem *ret = new IntegerStackItem(ix->Shl(iin), true);
+		delete(ix);
+
+		this->EvaluationStack->Push(ret);
+		return;
+	}
+	case EVMOpCode::SHR:
+	{
+		if (this->EvaluationStack->Count() < 2)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem* n = this->EvaluationStack->Pop();
+		IStackItem* x = this->EvaluationStack->Pop();
+
+		BigInteger *in = n->GetBigInteger();
+		BigInteger *ix = x->GetBigInteger();
+
+		IStackItem::Free(n);
+		IStackItem::Free(x);
+
+		int iin;
+		if (in == NULL || ix == NULL || !in->ToInt32(iin))
+		{
+			if (ix != NULL) delete(ix);
+			if (in != NULL) delete(in);
+
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		delete(in);
+		IntegerStackItem *ret = new IntegerStackItem(ix->Shr(iin), true);
+		delete(ix);
+
+		this->EvaluationStack->Push(ret);
+		return;
+	}
 	case EVMOpCode::BOOLAND:
 	{
 		if (this->EvaluationStack->Count() < 2)

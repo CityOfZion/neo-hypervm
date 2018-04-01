@@ -10,7 +10,7 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void AND()
         {
-            InternalTestBigInteger(EVMOpCode.AND, (engine, a, b) =>
+            InternalTestBigInteger(EVMOpCode.AND, (engine, a, b, cancel) =>
             {
                 Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a & b));
             });
@@ -19,7 +19,7 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void OR()
         {
-            InternalTestBigInteger(EVMOpCode.OR, (engine, a, b) =>
+            InternalTestBigInteger(EVMOpCode.OR, (engine, a, b, cancel) =>
             {
                 Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a | b));
             });
@@ -28,7 +28,7 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void XOR()
         {
-            InternalTestBigInteger(EVMOpCode.XOR, (engine, a, b) =>
+            InternalTestBigInteger(EVMOpCode.XOR, (engine, a, b, cancel) =>
             {
                 Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a ^ b));
             });
