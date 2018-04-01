@@ -23,22 +23,24 @@ StackItems* ExecutionEngine::GetAltStack() { return this->AltStack; }
 
 // Constructor
 
-ExecutionEngine::ExecutionEngine(
-	InvokeInteropCallback invokeInteropCallback, GetScriptCallback getScriptCallback, GetMessageCallback getMessageCallback) :
-	InteropCallback(invokeInteropCallback), ScriptCallback(getScriptCallback), MessageCallback(getMessageCallback)
+ExecutionEngine::ExecutionEngine
+(
+	InvokeInteropCallback invokeInteropCallback, GetScriptCallback getScriptCallback, GetMessageCallback getMessageCallback
+) 
+: InteropCallback(invokeInteropCallback), ScriptCallback(getScriptCallback), MessageCallback(getMessageCallback)
 {
 	this->InvocationStack = new ExecutionContextStack();
 	this->EvaluationStack = new StackItems();
 	this->AltStack = new StackItems();
 }
 
-void ExecutionEngine::LoadScript(unsigned char * script, int scriptLength)
+void ExecutionEngine::LoadScript(byte * script, int32 scriptLength)
 {
 	ExecutionContext * context = new ExecutionContext(script, scriptLength, false, 0);
 	this->InvocationStack->Push(context);
 }
 
-void ExecutionEngine::LoadPushOnlyScript(unsigned char * script, int scriptLength)
+void ExecutionEngine::LoadPushOnlyScript(byte * script, int32 scriptLength)
 {
 	ExecutionContext * context = new ExecutionContext(script, scriptLength, true, 0);
 	this->InvocationStack->Push(context);
@@ -59,7 +61,7 @@ ExecutionContext* ExecutionEngine::GetEntryContext()
 	return this->InvocationStack->Peek(this->InvocationStack->Count() - 1);
 }
 
-unsigned char ExecutionEngine::GetState()
+byte ExecutionEngine::GetState()
 {
 	return this->State;
 }
