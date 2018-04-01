@@ -8,33 +8,30 @@ namespace NeoVM.Interop.Tests
     [TestClass]
     public class VMOpCode_NUMERIC : VMOpCodeTest
     {
-        [TestMethod]
+        //[TestMethod]
         public void INC()
         {
             InternalTestBigInteger(EVMOpCode.INC, (engine, a) =>
             {
-                Assert.IsTrue(engine.EvaluationStack.Peek<IntegerStackItem>(0).Value == (a + 1));
-                engine.EvaluationStack.Pop();
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a + 1));
             });
         }
 
-        [TestMethod]
+        //[TestMethod]
         public void DEC()
         {
             InternalTestBigInteger(EVMOpCode.DEC, (engine, a) =>
             {
-                Assert.IsTrue(engine.EvaluationStack.Peek<IntegerStackItem>(0).Value == (a + 1));
-                engine.EvaluationStack.Pop();
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a + 1));
             });
         }
 
-        [TestMethod]
+        //[TestMethod]
         public void SIGN()
         {
             InternalTestBigInteger(EVMOpCode.SIGN, (engine, a) =>
             {
-                Assert.IsTrue(engine.EvaluationStack.Peek<IntegerStackItem>(0).Value == a.Sign);
-                engine.EvaluationStack.Pop();
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, a.Sign);
             });
         }
 
@@ -43,8 +40,7 @@ namespace NeoVM.Interop.Tests
         {
             InternalTestBigInteger(EVMOpCode.NEGATE, (engine, a) =>
             {
-                Assert.IsTrue(engine.EvaluationStack.Peek<IntegerStackItem>(0).Value == -a);
-                engine.EvaluationStack.Pop();
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, -a);
             });
         }
 
@@ -53,78 +49,70 @@ namespace NeoVM.Interop.Tests
         {
             InternalTestBigInteger(EVMOpCode.ABS, (engine, a) =>
             {
-                Assert.IsTrue(engine.EvaluationStack.Peek<IntegerStackItem>(0).Value == BigInteger.Abs(a));
-                engine.EvaluationStack.Pop();
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, BigInteger.Abs(a));
             });
         }
 
-        [TestMethod]
+        //[TestMethod]
         public void ADD()
         {
             InternalTestBigInteger(EVMOpCode.ADD, (engine, a, b) =>
             {
-                Assert.IsTrue(engine.EvaluationStack.Peek<IntegerStackItem>(0).Value == (a + b));
-                engine.EvaluationStack.Pop();
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a + b));
             });
         }
 
-        [TestMethod]
+        //[TestMethod]
         public void SUB()
         {
             InternalTestBigInteger(EVMOpCode.SUB, (engine, a, b) =>
             {
-                Assert.IsTrue(engine.EvaluationStack.Peek<IntegerStackItem>(0).Value == (a - b));
-                engine.EvaluationStack.Pop();
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a - b));
             });
         }
 
-        [TestMethod]
+        //[TestMethod]
         public void MUL()
         {
             InternalTestBigInteger(EVMOpCode.MUL, (engine, a, b) =>
             {
-                Assert.IsTrue(engine.EvaluationStack.Peek<IntegerStackItem>(0).Value == (a * b));
-                engine.EvaluationStack.Pop();
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a * b));
             });
         }
 
-        [TestMethod]
+        //[TestMethod]
         public void DIV()
         {
             InternalTestBigInteger(EVMOpCode.DIV, (engine, a, b) =>
             {
-                Assert.IsTrue(engine.EvaluationStack.Peek<IntegerStackItem>(0).Value == (a / b));
-                engine.EvaluationStack.Pop();
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a / b));
             });
         }
 
-        [TestMethod]
+        //[TestMethod]
         public void MOD()
         {
             InternalTestBigInteger(EVMOpCode.MOD, (engine, a, b) =>
             {
-                Assert.IsTrue(engine.EvaluationStack.Peek<IntegerStackItem>(0).Value == (a % b));
-                engine.EvaluationStack.Pop();
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a % b));
             });
         }
 
-        [TestMethod]
+        //[TestMethod]
         public void SHL()
         {
             InternalTestBigInteger(EVMOpCode.SHL, (engine, a, b) =>
             {
-                Assert.IsTrue(engine.EvaluationStack.Peek<IntegerStackItem>(0).Value == (a << (int)b));
-                engine.EvaluationStack.Pop();
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a << (int)b));
             });
         }
 
-        [TestMethod]
+        //[TestMethod]
         public void SHR()
         {
             InternalTestBigInteger(EVMOpCode.SHR, (engine, a, b) =>
             {
-                Assert.IsTrue(engine.EvaluationStack.Peek<IntegerStackItem>(0).Value == (a >> (int)b));
-                engine.EvaluationStack.Pop();
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a >> (int)b));
             });
         }
     }

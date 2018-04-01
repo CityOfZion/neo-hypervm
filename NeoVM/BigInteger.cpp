@@ -79,13 +79,13 @@ void BigInteger::DangerousMakeTwosComplement(unsigned __int32 *d, int dSize)
 		for (; i < dSize; i++) {
 			d[i] = ~d[i];
 		}
-	}/*
+	}
 	else
 	{
 		//??? this is weird
-		d = resize(d, d.Length + 1);
-		d[d.Length - 1] = 1;
-	}*/
+		//d = resize(d, d.Length + 1);
+		//d[d.Length - 1] = 1;
+	}
 	// return d;
 }
 
@@ -876,14 +876,27 @@ int BigInteger::ToByteArray(unsigned char * output, int length)
 	}
 	else if (_sign == -1)
 	{
-		dwords = _bits;
 		dwordsSize = this->_bitsSize;
-		this->DangerousMakeTwosComplement(dwords, dwordsSize);  // mutates dwords
+
+		if (this->_bits != NULL)
+		{
+			// Clone
+			dwords = new unsigned __int32[dwordsSize];
+			for (int x = 0; x < dwordsSize; x++)
+				dwords[x] = this->_bits[x];
+
+			this->DangerousMakeTwosComplement(dwords, dwordsSize);  // mutates dwords
+		}
+		else
+		{
+			dwords = NULL;
+		}
+
 		highByte = 0xff;
 	}
 	else
 	{
-		dwords = _bits;
+		dwords = this->_bits;
 		dwordsSize = this->_bitsSize;
 		highByte = 0x00;
 	}
