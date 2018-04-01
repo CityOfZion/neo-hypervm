@@ -1,15 +1,21 @@
 #include "IntegerStackItem.h"
 
 IntegerStackItem::IntegerStackItem(unsigned char * data, int size) :IStackItem(EStackItemType::Integer),
-Value(BigInteger(data, size)) {}
+Value(new BigInteger(data, size)) {}
 
 IntegerStackItem::IntegerStackItem(int value) : IStackItem(EStackItemType::Integer),
-Value(BigInteger(value)) {}
+Value(new BigInteger(value)) {}
 
-IntegerStackItem::IntegerStackItem(BigInteger *value) : IStackItem(EStackItemType::Integer),
-Value(BigInteger(value)) {}
+IntegerStackItem::IntegerStackItem(BigInteger *value, bool copyPointer) : IStackItem(EStackItemType::Integer),
+Value(copyPointer ? value : new BigInteger(value)) {}
 
-IntegerStackItem::~IntegerStackItem() { }
+IntegerStackItem::~IntegerStackItem()
+{
+	if (this->Value = NULL) return;
+
+	delete(this->Value);
+	this->Value = NULL;
+}
 
 bool IntegerStackItem::GetBoolean()
 {
@@ -17,19 +23,19 @@ bool IntegerStackItem::GetBoolean()
 	// return value != BigInteger.Zero;
 
 	int ret = 0;
-	if (this->Value.ToInt32(ret)) return ret > 0;
+	if (this->Value->ToInt32(ret)) return ret > 0;
 
 	return false;
 }
 
 BigInteger* IntegerStackItem::GetBigInteger()
 {
-	return this->Value.Clone();
+	return this->Value->Clone();
 }
 
 bool IntegerStackItem::GetInt32(int &ret)
 {
-	return this->Value.ToInt32(ret);
+	return this->Value->ToInt32(ret);
 }
 
 int IntegerStackItem::ReadByteArray(unsigned char * output, int sourceIndex, int count)
@@ -39,27 +45,27 @@ int IntegerStackItem::ReadByteArray(unsigned char * output, int sourceIndex, int
 		return -1;
 	}
 
-	return this->Value.ToByteArray(output, count);
+	return this->Value->ToByteArray(output, count);
 }
 
 int IntegerStackItem::ReadByteArraySize()
 {
-	return this->Value.ToByteArraySize();
+	return this->Value->ToByteArraySize();
 }
 
 IStackItem* IntegerStackItem::Clone()
 {
-	return new IntegerStackItem(&this->Value);
+	return new IntegerStackItem(this->Value, false);
 }
 
 // Serialize
 
 int IntegerStackItem::Serialize(unsigned char * data, int length)
 {
-	return this->Value.ToByteArray(data, length);
+	return this->Value->ToByteArray(data, length);
 }
 
 int IntegerStackItem::GetSerializedSize()
 {
-	return this->Value.ToByteArraySize();
+	return this->Value->ToByteArraySize();
 }

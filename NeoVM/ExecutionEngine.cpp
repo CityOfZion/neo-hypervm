@@ -895,10 +895,8 @@ ExecuteOpCode:
 			return;
 		}
 
-		BigInteger *iret = i1->And(i2);
-		IStackItem *ret = new IntegerStackItem(iret);
+		IStackItem *ret = new IntegerStackItem(i1->And(i2), true);
 
-		delete(iret);
 		delete(i2);
 		delete(i1);
 
@@ -931,10 +929,8 @@ ExecuteOpCode:
 			return;
 		}
 
-		BigInteger *iret = i1->Or(i2);
-		IStackItem *ret = new IntegerStackItem(iret);
+		IStackItem *ret = new IntegerStackItem(i1->Or(i2), true);
 
-		delete(iret);
 		delete(i2);
 		delete(i1);
 
@@ -967,10 +963,8 @@ ExecuteOpCode:
 			return;
 		}
 
-		BigInteger *iret = i1->Xor(i2);
-		IStackItem *ret = new IntegerStackItem(iret);
+		IStackItem *ret = new IntegerStackItem(i1->Xor(i2), true);
 
-		delete(iret);
 		delete(i2);
 		delete(i1);
 
@@ -1004,25 +998,79 @@ ExecuteOpCode:
 	EvaluationStack.Push(x - 1);
 	return;
 	}
-	case OpCode.SIGN:
-	{
-	BigInteger x = EvaluationStack.Pop().GetBigInteger();
-	EvaluationStack.Push(x.Sign);
-	return;
-	}
-	case OpCode.NEGATE:
-	{
-	BigInteger x = EvaluationStack.Pop().GetBigInteger();
-	EvaluationStack.Push(-x);
-	return;
-	}
-	case OpCode.ABS:
-	{
-	BigInteger x = EvaluationStack.Pop().GetBigInteger();
-	EvaluationStack.Push(BigInteger.Abs(x));
-	return;
-	}
 	*/
+	case EVMOpCode::SIGN:
+	{
+		if (this->EvaluationStack->Count() < 1)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem* item = this->EvaluationStack->Pop();
+		BigInteger* bi = item->GetBigInteger();
+		IStackItem::Free(item);
+
+		if (bi == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		BigInteger *ret = new BigInteger(bi->GetSign());
+		delete(bi);
+
+		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		return;
+	}
+	case EVMOpCode::NEGATE:
+	{
+		if (this->EvaluationStack->Count() < 1)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem* item = this->EvaluationStack->Pop();
+		BigInteger* bi = item->GetBigInteger();
+		IStackItem::Free(item);
+
+		if (bi == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		BigInteger *ret = bi->Negate();
+		delete(bi);
+
+		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		return;
+	}
+	case EVMOpCode::ABS:
+	{
+		if (this->EvaluationStack->Count() < 1)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem* item = this->EvaluationStack->Pop();
+		BigInteger* bi = item->GetBigInteger();
+		IStackItem::Free(item);
+
+		if (bi == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		BigInteger *ret = bi->Abs();
+		delete(bi);
+
+		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		return;
+	}
 	case EVMOpCode::NOT:
 	{
 		if (this->EvaluationStack->Count() < 1)
@@ -1380,10 +1428,18 @@ ExecuteOpCode:
 			return;
 		}
 
-		IStackItem *ret = new IntegerStackItem(i1->CompareTo(i2) >= 0 ? i2 : i1);
+		IStackItem *ret;
 
-		delete(i2);
-		delete(i1);
+		if (i1->CompareTo(i2) >= 0)
+		{
+			delete(i1);
+			ret = new IntegerStackItem(i2, true);
+		}
+		else
+		{
+			delete(i2);
+			ret = new IntegerStackItem(i1, true);
+		}
 
 		this->EvaluationStack->Push(ret);
 		return;
@@ -1414,10 +1470,18 @@ ExecuteOpCode:
 			return;
 		}
 
-		IStackItem *ret = new IntegerStackItem(i1->CompareTo(i2) >= 0 ? i1 : i2);
+		IStackItem *ret;
 
-		delete(i2);
-		delete(i1);
+		if (i1->CompareTo(i2) >= 0)
+		{
+			delete(i2);
+			ret = new IntegerStackItem(i1, true);
+		}
+		else
+		{
+			delete(i1);
+			ret = new IntegerStackItem(i2, true);
+		}
 
 		this->EvaluationStack->Push(ret);
 		return;

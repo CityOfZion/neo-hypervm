@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/CityOfZion/neo-hypervm.svg?branch=master)](https://travis-ci.org/CityOfZion/neo-hypervm)
+
 <p align="center">
   <img src="http://res.cloudinary.com/vidsy/image/upload/v1503160820/CoZ_Icon_DARKBLUE_200x178px_oq0gxm.png" width="125px">
 </p>

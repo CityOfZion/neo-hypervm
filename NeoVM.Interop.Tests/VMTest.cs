@@ -159,30 +159,31 @@ namespace NeoVM.Interop.Tests
 
                         // Create two random integer types
 
-                        using (IntegerStackItem btest1 = engine.CreateInteger(Rand.Next()))
-                        using (IntegerStackItem btest2 = engine.CreateInteger(btest1.Value + 1))
-                        {
-                            // Check contains
+                        foreach (BigInteger bi in TestBigIntegers)
+                            using (IntegerStackItem btest = engine.CreateInteger(bi))
+                            {
+                                // Check contains
 
-                            Assert.IsFalse(ar.Contains(btest1));
-                            Assert.IsFalse(ar.Contains(btest2));
+                                Assert.IsFalse(ar.Contains(btest));
 
-                            // Check empty
+                                // Check empty
 
-                            Assert.AreEqual(0, ar.Count);
+                                Assert.AreEqual(0, ar.Count);
 
-                            // Add and check count
+                                // Add and check count
 
-                            ar.Add(btest1);
-                            ar.Add(btest2);
+                                ar.Add(btest);
 
-                            Assert.AreEqual(2, ar.Count);
+                                Assert.AreEqual(1, ar.Count);
 
-                            // Check item by position
+                                // Check item by position
 
-                            Assert.AreEqual(((IntegerStackItem)ar[0]).Value, btest1.Value);
-                            Assert.AreEqual(((IntegerStackItem)ar[1]).Value, btest2.Value);
-                        }
+                                Assert.AreEqual(((IntegerStackItem)ar[0]).Value, btest.Value);
+
+                                // Remove
+
+                                Assert.IsTrue(ar.Remove(btest));
+                            }
 
                         // Clear
 
@@ -282,7 +283,7 @@ namespace NeoVM.Interop.Tests
 
                 foreach (BigInteger bi in TestBigIntegers)
                     using (IntegerStackItem bnat = engine.CreateInteger(bi))
-                        Assert.IsTrue(bnat.Value == bi);
+                        Assert.AreEqual(bnat.Value, bi);
 
                 // ByteArray
 

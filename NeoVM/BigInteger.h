@@ -31,6 +31,9 @@ public:
 	BigInteger* And(BigInteger* &other);
 	BigInteger* Or(BigInteger* &other);
 	BigInteger* Xor(BigInteger* &other);
+	BigInteger* Negate();
+	BigInteger* Abs();
+	int GetSign();
 
 	int CompareTo(BigInteger bi);
 	int CompareTo(BigInteger *bi);
@@ -55,8 +58,9 @@ private:
 	unsigned __int32 * _bits;
 	__int32 _bitsSize;
 
+	void DangerousMakeTwosComplement(unsigned __int32 *d, int dSize);
 	int ToUInt32Array(unsigned __int32 * &output);
 	int Length(unsigned __int32 *rgu, int size);
 	int GetDiffLength(unsigned __int32 *rgu1, unsigned __int32 * rgu2, int cu);
-	BigInteger(int sign, unsigned __int32 rgu[], int rguSize);
+	BigInteger(int sign, unsigned __int32 *rgu, int rguSize);
 };

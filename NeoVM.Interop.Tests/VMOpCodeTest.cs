@@ -176,10 +176,6 @@ namespace NeoVM.Interop.Tests
                     engine.StepInto();
                     Assert.AreEqual(1, engine.EvaluationStack.Count);
 
-                    // PUSH B
-                    engine.StepInto();
-                    Assert.AreEqual(2, engine.EvaluationStack.Count);
-
                     // Operand
                     engine.StepInto();
                     check(engine, bi);

@@ -12,8 +12,7 @@ namespace NeoVM.Interop.Tests
         {
             InternalTestBigInteger(EVMOpCode.AND, (engine, a, b) =>
             {
-                Assert.IsTrue(engine.EvaluationStack.Peek<IntegerStackItem>(0).Value == (a & b));
-                engine.EvaluationStack.Pop();
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a & b));
             });
         }
 
@@ -22,8 +21,7 @@ namespace NeoVM.Interop.Tests
         {
             InternalTestBigInteger(EVMOpCode.OR, (engine, a, b) =>
             {
-                Assert.IsTrue(engine.EvaluationStack.Peek<IntegerStackItem>(0).Value == (a | b));
-                engine.EvaluationStack.Pop();
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a | b));
             });
         }
 
@@ -32,8 +30,7 @@ namespace NeoVM.Interop.Tests
         {
             InternalTestBigInteger(EVMOpCode.XOR, (engine, a, b) =>
             {
-                Assert.IsTrue(engine.EvaluationStack.Peek<IntegerStackItem>(0).Value == (a ^ b));
-                engine.EvaluationStack.Pop();
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a ^ b));
             });
         }
     }
