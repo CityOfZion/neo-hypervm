@@ -7,6 +7,9 @@ class BigIntegerBuilder
 private:
 
 	static const int32 kcbitUint = 32;
+	const static int32 Int32MaxValue = 0x7FFFFFFF;
+
+	bool disposable;
 
 	// For a single uint, _iuLast is 0.
 	int32 _iuLast;

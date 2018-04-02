@@ -4,6 +4,7 @@
 BigIntegerBuilder::BigIntegerBuilder(int32 sign, uint32 *bits, int32 bitSize)
 {
 	this->_rguLength = bitSize;
+	this->disposable = true;
 
 	if (bits == 0)
 	{
@@ -36,6 +37,7 @@ BigIntegerBuilder::BigIntegerBuilder(int32 sign, uint32 * bits, int32 bitSize, i
 	int32 n = sign;
 	int32 mask = n >> (kcbitUint - 1);
 	outSign = (outSign ^ mask) - mask;
+	this->disposable = true;
 
 	if (bits == 0)
 	{
@@ -61,57 +63,66 @@ void BigIntegerBuilder::GetInteger(int32 &sign, uint32 * &bits, int32 &bitSize)
 {
 	// Contract.Requires(sign == +1 || sign == -1);
 	// AssertValid(true);
-
 	// uint[] bits;
 	// GetIntegerParts(sign, out sign, out bits);
 	// return new BigInteger(sign, bits);
-
 	// Contract.Requires(signSrc == +1 || signSrc == -1);
 	// AssertValid(true);
 
-	/*
-	if (_iuLast == 0) 
+	if (_iuLast == 0)
 	{
-		if (_uSmall <= int.MaxValue) 
+		if (_uSmall <= Int32MaxValue)
 		{
-			sign = signSrc * (int)_uSmall;
-			bits = null;
+			sign = sign * (int)_uSmall;
+			bits = NULL;
+			bitSize = 0;
 			return;
 		}
-		if (_rgu == null)
-			_rgu = new uint[1]{ _uSmall };
-		else if (_fWritable)
-			_rgu[0] = _uSmall;
-		else if (_rgu[0] != _uSmall)
-			_rgu = new uint[1]{ _uSmall };
+
+		if (this->_rgu == NULL)
+		{
+			this->_rgu = new uint32[1]{ _uSmall };
+			this->_rguLength = 1;
+		}
+		else
+		{
+			this->_rgu[0] = _uSmall;
+		}
 	}
 
 	// The sign is +/- 1.
-	sign = signSrc;
+	// sign = signSrc;
 
-	int32 cuExtra = _rgu.Length - _iuLast - 1;
+	int32 cuExtra = this->_rguLength - _iuLast - 1;
 	// Contract.Assert(cuExtra >= 0);
-	if (cuExtra <= 1) 
+
+	if (cuExtra <= 1)
 	{
-		if (cuExtra == 0 || _rgu[_iuLast + 1] == 0) 
+		if (cuExtra == 0 || this->_rgu[_iuLast + 1] == 0)
 		{
-			_fWritable = false;
-			bits = _rgu;
+			this->disposable = false;
+			bits = this->_rgu;
+			bitSize = this->_rguLength;
 			return;
 		}
-		if (_fWritable) 
-		{
-			_rgu[_iuLast + 1] = 0;
-			_fWritable = false;
-			bits = _rgu;
-			return;
-		}
+		//if (this->_fWritable)
+		//{
+		this->_rgu[_iuLast + 1] = 0;
+		this->disposable = false;
+		bits = this->_rgu;
+		bitSize = this->_rguLength;
+		return;
+		//}
 		// The buffer isn't writable, but has an extra uint that is non-zero,
 		// so we have to allocate a new buffer.
 	}
 
+	bits = this->_rgu;
+	bitSize = this->_rguLength;
+	this->disposable = false;
+
+	/*
 	// Keep the bigger buffer (if it is writable), but create a smaller one for the BigInteger.
-	bits = _rgu;
 	Array.Resize(ref bits, _iuLast + 1);
 	if (!_fWritable)
 		_rgu = bits;
@@ -123,19 +134,19 @@ void BigIntegerBuilder::Div(BigIntegerBuilder &reg)
 	// AssertValid(true);
 	// regDen.AssertValid(true);
 
-	/* 
-      if (regDen._iuLast == 0) {
-        DivMod(regDen._uSmall);
-        return;
-      }
-      if (_iuLast == 0) {
-        _uSmall = 0;
-        return;
-      }
- 
-      BigIntegerBuilder regTmp = new BigIntegerBuilder();
-      ModDivCore(ref this, ref regDen, true, ref regTmp);
-      NumericsHelpers.Swap(ref this, ref regTmp);
+	/*
+	  if (regDen._iuLast == 0) {
+		DivMod(regDen._uSmall);
+		return;
+	  }
+	  if (_iuLast == 0) {
+		_uSmall = 0;
+		return;
+	  }
+
+	  BigIntegerBuilder regTmp = new BigIntegerBuilder();
+	  ModDivCore(ref this, ref regDen, true, ref regTmp);
+	  NumericsHelpers.Swap(ref this, ref regTmp);
 	*/
 }
 
@@ -145,7 +156,7 @@ void BigIntegerBuilder::Mod(BigIntegerBuilder &reg)
 	// regDen.AssertValid(true);
 
 	/*
-	if (regDen._iuLast == 0) 
+	if (regDen._iuLast == 0)
 	{
 		Set(Mod(ref this, regDen._uSmall));
 		return;
@@ -162,40 +173,40 @@ void BigIntegerBuilder::Mul(BigIntegerBuilder &regMul)
 {
 	// AssertValid(true);
 	// regMul.AssertValid(true);
-	
-	/* 
-      if (regMul._iuLast == 0)
-        Mul(regMul._uSmall);
-      else if (_iuLast == 0) {
-        uint32 u = _uSmall;
-        if (u == 1)
-          this = new BigIntegerBuilder(ref regMul);
-        else if (u != 0) {
-          Load(ref regMul, 1);
-          Mul(u);
-        }
-      }
-      else {
-        int32 cuBase = _iuLast + 1;
-        SetSizeKeep(cuBase + regMul._iuLast, 1);
- 
-        for (int32 iu = cuBase; --iu >= 0; ) {
-          uint32 uMul = _rgu[iu];
-          _rgu[iu] = 0;
-          uint32 uCarry = 0;
-          for (int32 iuSrc = 0; iuSrc <= regMul._iuLast; iuSrc++)
-            uCarry = AddMulCarry(ref _rgu[iu + iuSrc], regMul._rgu[iuSrc], uMul, uCarry);
-          if (uCarry != 0) {
-            for (int32 iuDst = iu + regMul._iuLast + 1; uCarry != 0 && iuDst <= _iuLast; iuDst++)
-              uCarry = AddCarry(ref _rgu[iuDst], 0, uCarry);
-            if (uCarry != 0) {
-              SetSizeKeep(_iuLast + 2, 0);
-              _rgu[_iuLast] = uCarry;
-            }
-          }
-        }
-        // AssertValid(true);
-      }
+
+	/*
+	  if (regMul._iuLast == 0)
+		Mul(regMul._uSmall);
+	  else if (_iuLast == 0) {
+		uint32 u = _uSmall;
+		if (u == 1)
+		  this = new BigIntegerBuilder(ref regMul);
+		else if (u != 0) {
+		  Load(ref regMul, 1);
+		  Mul(u);
+		}
+	  }
+	  else {
+		int32 cuBase = _iuLast + 1;
+		SetSizeKeep(cuBase + regMul._iuLast, 1);
+
+		for (int32 iu = cuBase; --iu >= 0; ) {
+		  uint32 uMul = _rgu[iu];
+		  _rgu[iu] = 0;
+		  uint32 uCarry = 0;
+		  for (int32 iuSrc = 0; iuSrc <= regMul._iuLast; iuSrc++)
+			uCarry = AddMulCarry(ref _rgu[iu + iuSrc], regMul._rgu[iuSrc], uMul, uCarry);
+		  if (uCarry != 0) {
+			for (int32 iuDst = iu + regMul._iuLast + 1; uCarry != 0 && iuDst <= _iuLast; iuDst++)
+			  uCarry = AddCarry(ref _rgu[iuDst], 0, uCarry);
+			if (uCarry != 0) {
+			  SetSizeKeep(_iuLast + 2, 0);
+			  _rgu[_iuLast] = uCarry;
+			}
+		  }
+		}
+		// AssertValid(true);
+	  }
 	*/
 }
 
@@ -247,7 +258,7 @@ void BigIntegerBuilder::Add(BigIntegerBuilder &reg)
 		ApplyCarry(cuAdd);
 	  */
 
-	// AssertValid(true);
+	  // AssertValid(true);
 }
 
 void BigIntegerBuilder::Sub(int32 &sign, BigIntegerBuilder &reg)
@@ -342,8 +353,8 @@ void BigIntegerBuilder::Sub(int32 &sign, BigIntegerBuilder &reg)
 
 BigIntegerBuilder::~BigIntegerBuilder()
 {
-	if (this->_rgu == 0) return;
+	if (this->_rgu == NULL || !this->disposable) return;
 
 	delete[](this->_rgu);
-	this->_rgu = 0;
+	this->_rgu = NULL;
 }
