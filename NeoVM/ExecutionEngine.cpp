@@ -26,8 +26,8 @@ StackItems* ExecutionEngine::GetAltStack() { return this->AltStack; }
 ExecutionEngine::ExecutionEngine
 (
 	InvokeInteropCallback invokeInteropCallback, GetScriptCallback getScriptCallback, GetMessageCallback getMessageCallback
-) 
-: InteropCallback(invokeInteropCallback), ScriptCallback(getScriptCallback), MessageCallback(getMessageCallback)
+)
+	: InteropCallback(invokeInteropCallback), ScriptCallback(getScriptCallback), MessageCallback(getMessageCallback)
 {
 	this->InvocationStack = new ExecutionContextStack();
 	this->EvaluationStack = new StackItems();

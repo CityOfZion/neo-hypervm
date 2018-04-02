@@ -11,6 +11,6 @@
 
         Array = 5,
         Struct = 6,
-        Map = 7,
+        Map = 7
     }
 }

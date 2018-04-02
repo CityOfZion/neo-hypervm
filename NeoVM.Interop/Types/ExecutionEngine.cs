@@ -234,6 +234,7 @@ namespace NeoVM.Interop.Types
             EStackItemType state = NeoVM.StackItem_SerializeDetails(item, out int size);
             if (state == EStackItemType.None) return null;
 
+            int readed;
             byte[] payload;
 
             if (size > 0)
@@ -241,16 +242,12 @@ namespace NeoVM.Interop.Types
                 payload = new byte[size];
                 fixed (byte* p = payload)
                 {
-                    int s = NeoVM.StackItem_SerializeData(item, (IntPtr)p, size);
-                    if (s != size)
-                    {
-                        // TODO: Try to fix this issue with BigInteger
-                        Array.Resize(ref payload, s);
-                    }
+                    readed = NeoVM.StackItem_SerializeData(item, (IntPtr)p, size);
                 }
             }
             else
             {
+                readed = 0;
                 payload = null;
             }
 
@@ -267,7 +264,16 @@ namespace NeoVM.Interop.Types
                         return new InteropStackItem(this, item, Marshal.GetObjectForIUnknown(ptr), ptr);
                     }
                 case EStackItemType.ByteArray: return new ByteArrayStackItem(this, item, payload ?? (new byte[] { }));
-                case EStackItemType.Integer: return new IntegerStackItem(this, item, payload ?? (new byte[] { }));
+                case EStackItemType.Integer:
+                    {
+                        if (readed != size)
+                        {
+                            // TODO: Try to fix this issue with BigInteger
+                            Array.Resize(ref payload, readed);
+                        }
+
+                        return new IntegerStackItem(this, item, payload ?? (new byte[] { }));
+                    }
                 case EStackItemType.Bool: return new BooleanStackItem(this, item, payload ?? (new byte[] { }));
 
                 default: throw new ExternalException();
@@ -368,11 +374,6 @@ namespace NeoVM.Interop.Types
         protected virtual void Dispose(bool disposing)
         {
             if (Handle == IntPtr.Zero) return;
-
-            if (disposing)
-            {
-                // dispose managed state (managed objects).
-            }
 
             // free unmanaged resources (unmanaged objects) and override a finalizer below. set large fields to null.
             NeoVM.ExecutionEngine_Free(ref Handle);
