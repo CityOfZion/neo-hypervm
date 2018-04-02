@@ -96,28 +96,18 @@ namespace NeoVM.Interop.Interfaces
         #endregion
 
         #region IDisposable Support
-        /// <summary>
-        /// To detect redundant calls
-        /// </summary>
-        bool disposedValue = false;
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (NativeHandle == IntPtr.Zero) return;
+
+            if (disposing)
             {
-                disposedValue = true;
-
-                if (disposing)
-                {
-                    // Dispose managed state (managed objects).
-                }
-
-                // Free unmanaged resources (unmanaged objects) and override a finalizer below and set large fields to null.
-                if (NativeHandle != IntPtr.Zero)
-                {
-                    FreeLibrary();
-                }
+                // Dispose managed state (managed objects).
             }
+
+            // Free unmanaged resources (unmanaged objects) and override a finalizer below and set large fields to null.
+            FreeLibrary();
         }
 
         /// <summary>

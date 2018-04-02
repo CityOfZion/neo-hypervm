@@ -137,7 +137,7 @@ bool ExecutionContext::ReadVarBytes(int64 &ret, int64 max)
 	return true;
 }
 
-int32 ExecutionContext::Read(byte * data, int32 length)
+int32 ExecutionContext::Read(byte * data, int64 length)
 {
 	if (data == NULL)
 	{
