@@ -58,7 +58,7 @@ void ExecutionEngine_LoadPushOnlyScript(ExecutionEngine* engine, byte * script, 
 
 byte ExecutionEngine_Execute(ExecutionEngine* engine)
 {
-	return (__int8)engine->Execute();
+	return (byte)engine->Execute();
 }
 
 void ExecutionEngine_StepInto(ExecutionEngine* engine)

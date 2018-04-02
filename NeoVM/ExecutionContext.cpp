@@ -13,97 +13,97 @@ ExecutionContext::ExecutionContext(byte* script, int32 scriptLength, bool pushOn
 
 bool ExecutionContext::ReadUInt8(byte &ret)
 {
-	unsigned char data[1];
+	byte data[1];
 
 	if (Read(data, 1) != 1)
 		return false;
 
-	ret = (unsigned __int8)data[0];
+	ret = (byte)data[0];
 	return true;
 }
 
 bool ExecutionContext::ReadUInt16(uint16 &ret)
 {
-	unsigned char data[2];
+	byte data[2];
 
 	if (Read(data, 2) != 2)
 		return false;
 
-	ret = (unsigned __int16)((int)data[0] | (int)data[1] << 8);
+	ret = (uint16)((int)data[0] | (int)data[1] << 8);
 	return true;
 }
 
 bool ExecutionContext::ReadInt16(int16 &ret)
 {
-	unsigned char data[2];
+    byte data[2];
 
 	if (Read(data, 2) != 2)
 		return false;
 
-	ret = (__int16)((int)data[0] | (int)data[1] << 8);
+	ret = (int16)((int)data[0] | (int)data[1] << 8);
 	return true;
 }
 
 bool ExecutionContext::ReadUInt32(uint32 &ret)
 {
-	unsigned char data[4];
+	byte data[4];
 
 	if (Read(data, 4) != 4)
 		return false;
 
-	ret = (unsigned __int32)((int)data[0] | (int)data[1] << 8 | (int)data[2] << 16 | (int)data[3] << 24);
+	ret = (uint32)((int)data[0] | (int)data[1] << 8 | (int)data[2] << 16 | (int)data[3] << 24);
 	return true;
 }
 
 bool ExecutionContext::ReadInt32(int32 &ret)
 {
-	unsigned char data[4];
+	byte data[4];
 
 	if (Read(data, 4) != 4)
 		return false;
 
-	ret = (__int32)((int)data[0] | (int)data[1] << 8 | (int)data[2] << 16 | (int)data[3] << 24);
+	ret = (int32)((int)data[0] | (int)data[1] << 8 | (int)data[2] << 16 | (int)data[3] << 24);
 	return true;
 }
 
 bool ExecutionContext::ReadInt64(int64 &ret)
 {
-	unsigned char data[8];
+	byte data[8];
 
 	if (Read(data, 8) != 8)
 		return false;
 
-	int a = ((__int32)((int)data[0] | (int)data[1] << 8 | (int)data[2] << 16 | (int)data[3] << 24));
-	int b = ((__int32)((int)data[4] | (int)data[5] << 8 | (int)data[6] << 16 | (int)data[7] << 24));
+	int a = ((int32)((int)data[0] | (int)data[1] << 8 | (int)data[2] << 16 | (int)data[3] << 24));
+	int b = ((int32)((int)data[4] | (int)data[5] << 8 | (int)data[6] << 16 | (int)data[7] << 24));
 
-	ret = (__int64)(b << 32 | a);
+	ret = (int64)(b << 32 | a);
 	return true;
 }
 
 bool ExecutionContext::ReadUInt64(uint64 &ret)
 {
-	unsigned char data[8];
+	byte data[8];
 
 	if (Read(data, 8) != 8)
 		return false;
 
-	unsigned int a = ((unsigned __int32)((int)data[0] | (int)data[1] << 8 | (int)data[2] << 16 | (int)data[3] << 24));
-	unsigned int b = ((unsigned __int32)((int)data[4] | (int)data[5] << 8 | (int)data[6] << 16 | (int)data[7] << 24));
+    uint32 a = ((uint32)((int)data[0] | (int)data[1] << 8 | (int)data[2] << 16 | (int)data[3] << 24));
+	uint32 b = ((uint32)((int)data[4] | (int)data[5] << 8 | (int)data[6] << 16 | (int)data[7] << 24));
 
-	ret = (unsigned __int64)(b << 32 | a);
+	ret = (uint64)(b << 32 | a);
 	return true;
 }
 
 bool ExecutionContext::ReadVarBytes(int64 &ret, int64 max)
 {
-	unsigned __int8 fb = 0;
+	byte fb = 0;
 
 	if (!this->ReadUInt8(fb))
 		return false;
 
 	if (fb == 0xFD)
 	{
-		unsigned __int16 v = 0;
+		uint16 v = 0;
 
 		if (!this->ReadUInt16(v))
 			return false;
@@ -112,7 +112,7 @@ bool ExecutionContext::ReadVarBytes(int64 &ret, int64 max)
 	}
 	else if (fb == 0xFE)
 	{
-		unsigned __int32 v = 0;
+		uint32 v = 0;
 
 		if (!this->ReadUInt32(v))
 			return false;

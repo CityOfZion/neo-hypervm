@@ -5,6 +5,8 @@
 #include "ExecutionEngine.h"
 #include "ExecutionContextStack.h"
 
+#if _WINDOWS
+
 #define DllExport __declspec( dllexport ) 
 
 extern "C"
@@ -62,3 +64,5 @@ extern "C"
 	DllExport void ArrayStackItem_Insert(ArrayStackItem* array, int32 index, IStackItem* item);
 	DllExport void ArrayStackItem_RemoveAt(ArrayStackItem* array, int32 index, byte dispose);
 }
+
+# endif
