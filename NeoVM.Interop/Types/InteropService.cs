@@ -49,7 +49,6 @@ namespace NeoVM.Interop.Types
         {
             Entries[method] = handler;
         }
-
         /// <summary>
         /// Clear entries
         /// </summary>
@@ -57,7 +56,6 @@ namespace NeoVM.Interop.Types
         {
             Entries.Clear();
         }
-
         /// <summary>
         /// Invoke
         /// </summary>
@@ -83,19 +81,28 @@ namespace NeoVM.Interop.Types
 
         static bool GetExecutingScriptHash(ExecutionEngine engine)
         {
-            engine.EvaluationStack.Push(engine.CreateByteArray(engine.CurrentContext.ScriptHash));
+            ExecutionContext ctx = engine.CurrentContext;
+            if (ctx == null) return false;
+
+            engine.EvaluationStack.Push(engine.CreateByteArray(ctx.ScriptHash));
             return true;
         }
 
         static bool GetCallingScriptHash(ExecutionEngine engine)
         {
-            engine.EvaluationStack.Push(engine.CreateByteArray(engine.CallingContext.ScriptHash));
+            ExecutionContext ctx = engine.CallingContext;
+            if (ctx == null) return false;
+
+            engine.EvaluationStack.Push(engine.CreateByteArray(ctx.ScriptHash));
             return true;
         }
 
         static bool GetEntryScriptHash(ExecutionEngine engine)
         {
-            engine.EvaluationStack.Push(engine.CreateByteArray(engine.EntryContext.ScriptHash));
+            ExecutionContext ctx = engine.EntryContext;
+            if (ctx == null) return false;
+
+            engine.EvaluationStack.Push(engine.CreateByteArray(ctx.ScriptHash));
             return true;
         }
 

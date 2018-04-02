@@ -19,9 +19,9 @@ namespace NeoVM.Interop.Interfaces
         /// </summary>
         public readonly EStackItemType Type;
         /// <summary>
-        /// Is memory released
+        /// Is Disposed
         /// </summary>
-        public bool IsReleased => Handle == IntPtr.Zero;
+        public bool IsDisposed => Handle == IntPtr.Zero;
 
         /// <summary>
         /// Constructor
@@ -70,10 +70,10 @@ namespace NeoVM.Interop.Interfaces
             byte[] data = GetNativeByteArray();
             Handle = NeoVM.StackItem_Create(Type, data, data.Length);
         }
-        /// <summary>
-        /// Free native resources
-        /// </summary>
-        protected virtual void Free()
+
+        #region IDisposable Support
+
+        protected virtual void Dispose(bool disposing)
         {
             lock (this)
             {
@@ -81,19 +81,6 @@ namespace NeoVM.Interop.Interfaces
 
                 NeoVM.StackItem_Free(ref Handle);
             }
-        }
-
-        #region IDisposable Support
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                // dispose managed state (managed objects).
-            }
-
-            // free unmanaged resources (unmanaged objects) and override a finalizer below. set large fields to null.
-            Free();
         }
 
         ~IStackItem()

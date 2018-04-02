@@ -1,4 +1,5 @@
 ﻿using NeoVM.Interop.Enums;
+using NeoVM.Interop.Helpers;
 using NeoVM.Interop.Interfaces;
 using NeoVM.Interop.Types.Collections;
 using NeoVM.Interop.Types.StackItems;
@@ -262,7 +263,7 @@ namespace NeoVM.Interop.Types
                     {
                         // Extract object
 
-                        IntPtr ptr = new IntPtr(BitConverter.ToInt64(payload, 0));
+                        IntPtr ptr = new IntPtr(BitHelper.ToInt64(payload, 0));
                         return new InteropStackItem(this, item, Marshal.GetObjectForIUnknown(ptr), ptr);
                     }
                 case EStackItemType.ByteArray: return new ByteArrayStackItem(this, item, payload ?? (new byte[] { }));

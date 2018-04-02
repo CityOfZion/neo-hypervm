@@ -32,14 +32,18 @@ namespace NeoVM.Interop.Types.StackItems
             ObjectPointer = ptr;
         }
 
-        protected override void Free()
+        protected override void Dispose(bool disposing)
         {
-            base.Free();
+            base.Dispose(disposing);
 
-            if (ObjectPointer != IntPtr.Zero)
+            if (ObjectPointer == IntPtr.Zero) return;
+
+            Marshal.Release(ObjectPointer);
+            ObjectPointer = IntPtr.Zero;
+
+            if (disposing && Value is IDisposable dsp)
             {
-                Marshal.Release(ObjectPointer);
-                ObjectPointer = IntPtr.Zero;
+                dsp.Dispose();
             }
         }
 

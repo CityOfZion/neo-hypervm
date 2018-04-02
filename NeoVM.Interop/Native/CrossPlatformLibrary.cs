@@ -101,11 +101,6 @@ namespace NeoVM.Interop.Interfaces
         {
             if (NativeHandle == IntPtr.Zero) return;
 
-            if (disposing)
-            {
-                // Dispose managed state (managed objects).
-            }
-
             // Free unmanaged resources (unmanaged objects) and override a finalizer below and set large fields to null.
             FreeLibrary();
         }
