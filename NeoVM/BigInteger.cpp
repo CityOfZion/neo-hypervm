@@ -429,7 +429,7 @@ BigInteger::BigInteger(byte * value, int32 byteCount)
 		// Free resources
 
 		if (this->_bits != val)
-			delete(val);
+			delete[](val);
 	}
 
 	// AssertValid();

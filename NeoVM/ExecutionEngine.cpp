@@ -133,7 +133,7 @@ ExecuteOpCode:
 		{
 			this->State = EVMState::FAULT;
 
-			delete(data);
+			delete[](data);
 			return;
 		}
 
@@ -179,7 +179,7 @@ ExecuteOpCode:
 		{
 			this->State = EVMState::FAULT;
 
-			delete(data);
+			delete[](data);
 			return;
 		}
 
@@ -202,7 +202,7 @@ ExecuteOpCode:
 		{
 			this->State = EVMState::FAULT;
 
-			delete(data);
+			delete[](data);
 			return;
 		}
 
@@ -228,7 +228,7 @@ ExecuteOpCode:
 		{
 			this->State = EVMState::FAULT;
 
-			delete(data);
+			delete[](data);
 			return;
 		}
 
@@ -396,14 +396,14 @@ ExecuteOpCode:
 		{
 			this->State = EVMState::FAULT;
 
-			delete(data);
+			delete[](data);
 			return;
 		}
 
 		if (this->InvokeInterop(data) != 0x01)
 			this->State = EVMState::FAULT;
 
-		delete(data);
+		delete[](data);
 		return;
 	}
 
