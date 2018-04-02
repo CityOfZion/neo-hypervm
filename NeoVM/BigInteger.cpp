@@ -38,58 +38,6 @@ BigInteger::BigInteger(BigInteger *value)
 	// AssertValid();
 }
 
-void BigInteger::CopyInternal(int32 sign, uint32 *bits, int32 bitSize)
-{
-	this->_sign = sign;
-	this->_bitsSize = bitSize;
-
-	if (bitSize > 0)
-	{
-		this->_bits = new uint32[bitSize];
-
-		for (int32 x = 0; x < bitSize; x++)
-			this->_bits[x] = bits[x];
-	}
-	else
-	{
-		if (this->_bits != NULL)
-		{
-			delete[]this->_bits;
-			this->_bits = NULL;
-		}
-	}
-}
-
-// Do an in-place twos complement of d and also return the result.
-// "Dangerous" because it causes a mutation and needs to be used
-// with care for immutable types
-void BigInteger::DangerousMakeTwosComplement(uint32 *d, int32 dSize)
-{
-	// first do complement and +1 as long as carry is needed
-	int32 i = 0;
-	uint32 v = 0;
-	for (; i < dSize; i++)
-	{
-		v = ~d[i] + 1;
-		d[i] = v;
-		if (v != 0) { i++; break; }
-	}
-	if (v != 0)
-	{
-		// now ones complement is sufficient
-		for (; i < dSize; i++) {
-			d[i] = ~d[i];
-		}
-	}
-	else
-	{
-		//??? this is weird
-		//d = resize(d, d.Length + 1);
-		//d[d.Length - 1] = 1;
-	}
-	// return d;
-}
-
 BigInteger::BigInteger(uint32* value, int32 valueSize, bool negative)
 {
 	if (value == NULL)
@@ -433,6 +381,57 @@ BigInteger::BigInteger(byte * value, int32 byteCount)
 	}
 
 	// AssertValid();
+}
+
+void BigInteger::CopyInternal(int32 sign, uint32 *bits, int32 bitSize)
+{
+	this->_sign = sign;
+	this->_bitsSize = bitSize;
+
+	if (bitSize > 0)
+	{
+		this->_bits = new uint32[bitSize];
+
+		for (int32 x = 0; x < bitSize; x++)
+			this->_bits[x] = bits[x];
+	}
+	else
+	{
+		if (this->_bits != NULL)
+		{
+			delete[]this->_bits;
+			this->_bits = NULL;
+		}
+	}
+}
+
+// Do an in-place twos complement of d and also return the result.
+// "Dangerous" because it causes a mutation and needs to be used
+// with care for immutable types
+void BigInteger::DangerousMakeTwosComplement(uint32 *d, int32 dSize)
+{
+	// first do complement and +1 as long as carry is needed
+	int32 i = 0;
+	uint32 v = 0;
+	for (; i < dSize; i++)
+	{
+		v = ~d[i] + 1;
+		d[i] = v;
+		if (v != 0) { i++; break; }
+	}
+	if (v != 0)
+	{
+		// now ones complement is sufficient
+		for (; i < dSize; i++)
+			d[i] = ~d[i];
+	}
+	else
+	{
+		//??? this is weird
+		//d = resize(d, d.Length + 1);
+		//d[d.Length - 1] = 1;
+	}
+	// return d;
 }
 
 BigInteger* BigInteger::Clone()

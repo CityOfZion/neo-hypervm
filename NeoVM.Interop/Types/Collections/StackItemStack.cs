@@ -37,7 +37,7 @@ namespace NeoVM.Interop.Types.Collections
         /// <returns>Return the first element of the stack</returns>
         public IStackItem Pop()
         {
-            IntPtr ptr = NeoVM.StackItems_Pop(Handle, 1);
+            IntPtr ptr = NeoVM.StackItems_Pop(Handle);
 
             if (ptr == IntPtr.Zero)
                 throw (new IndexOutOfRangeException());

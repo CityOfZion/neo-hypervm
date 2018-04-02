@@ -94,23 +94,13 @@ int32 StackItems_Drop(StackItems* stack, int32 count)
 
 #pragma region StackItems
 
-IStackItem* StackItems_Pop(StackItems* stack, int32 count)
+IStackItem* StackItems_Pop(StackItems* stack)
 {
-	if (count == 1)
-	{
-		if (stack->Count() <= 0) return NULL;
+	if (stack->Count() <= 0) return NULL;
 
-		IStackItem * ret = stack->Pop();
-		ret->Claims++;
-		return ret;
-	}
-
-	IStackItem * item = stack->Count() < count ? NULL : stack->Peek(count - 1);
-	if (item == NULL) return NULL;
-
-	item->Claims++;
-	for (int x = 0; x < count; x++) stack->Drop();
-	return item;
+	IStackItem * ret = stack->Pop();
+	ret->Claims++;
+	return ret;
 }
 
 void StackItems_Push(StackItems* stack, IStackItem * item)

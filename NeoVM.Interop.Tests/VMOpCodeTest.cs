@@ -5,6 +5,7 @@ using NeoVM.Interop.Types;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 
@@ -97,6 +98,8 @@ namespace NeoVM.Interop.Tests
         /// <param name="check">Check</param>
         protected void InternalTestBigInteger(EVMOpCode operand, Action<ExecutionEngine, BigInteger, BigInteger, CancelEventArgs> check)
         {
+            Stopwatch sw = new Stopwatch();
+
             foreach (BigInteger bi in TestBigIntegers)
                 foreach (BigIntegerPair pair in IntIteration(bi))
                 {
@@ -132,9 +135,14 @@ namespace NeoVM.Interop.Tests
                         Assert.AreEqual(2, engine.EvaluationStack.Count);
 
                         // Operand
+
                         CancelEventArgs cancel = new CancelEventArgs(false);
+                        sw.Restart();
                         engine.StepInto();
                         check(engine, pair.A, pair.B, cancel);
+                        sw.Stop();
+                        Console.WriteLine("[" + sw.Elapsed.ToString() + "] " + pair.A + " " + operand.ToString() + " " + pair.B);
+
                         if (cancel.Cancel) continue;
 
                         // RET
@@ -155,6 +163,8 @@ namespace NeoVM.Interop.Tests
         /// <param name="check">Check</param>
         protected void InternalTestBigInteger(EVMOpCode operand, Action<ExecutionEngine, BigInteger, CancelEventArgs> check)
         {
+            Stopwatch sw = new Stopwatch();
+
             foreach (BigInteger bi in TestBigIntegers)
             {
                 using (MemoryStream script = new MemoryStream())
@@ -182,9 +192,14 @@ namespace NeoVM.Interop.Tests
                     Assert.AreEqual(1, engine.EvaluationStack.Count);
 
                     // Operand
+
                     CancelEventArgs cancel = new CancelEventArgs(false);
+                    sw.Restart();
                     engine.StepInto();
                     check(engine, bi, cancel);
+                    sw.Stop();
+                    Console.WriteLine("[" + sw.Elapsed.ToString() + "] " + bi);
+
                     if (cancel.Cancel) continue;
 
                     // RET

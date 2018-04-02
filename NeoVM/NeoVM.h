@@ -35,7 +35,7 @@ extern "C"
 	// StackItems
 
 	DllExport int32 StackItems_Count(StackItems* stack);
-	DllExport IStackItem* StackItems_Pop(StackItems* stack, int32 count);
+	DllExport IStackItem* StackItems_Pop(StackItems* stack);
 	DllExport IStackItem* StackItems_Peek(StackItems* stack, int32 index);
 	DllExport void StackItems_Push(StackItems* stack, IStackItem *item);
 	DllExport int32 StackItems_Drop(StackItems* stack, int32 count);

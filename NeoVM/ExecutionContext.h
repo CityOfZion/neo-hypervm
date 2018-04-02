@@ -20,7 +20,7 @@ public:
 
 	// Reads
 
-	int32 Read(byte * data, int32 length);
+	int32 Read(byte * data, int64 length);
 
 	bool ReadUInt8(byte &ret);
 	bool ReadUInt16(uint16 &ret);

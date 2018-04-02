@@ -48,7 +48,7 @@ namespace NeoVM.Interop
 
         internal delegate int delStackItems_Count(IntPtr stackHandle);
         internal delegate void delStackItems_Push(IntPtr stackHandle, IntPtr item);
-        internal delegate IntPtr delStackItems_Pop(IntPtr stackHandle, int count);
+        internal delegate IntPtr delStackItems_Pop(IntPtr stackHandle);
         internal delegate IntPtr delStackItems_Peek(IntPtr stackHandle, int index);
         internal delegate int delStackItems_Drop(IntPtr stackHandle, int count);
 
