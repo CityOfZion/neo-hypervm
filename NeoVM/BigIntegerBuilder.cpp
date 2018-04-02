@@ -32,30 +32,27 @@ BigIntegerBuilder::BigIntegerBuilder(int32 sign, uint32 *bits, int32 bitSize)
 
 BigIntegerBuilder::BigIntegerBuilder(int32 sign, uint32 * bits, int32 bitSize, int32 &outSign)
 {
+	this->_fWritable = false;
+	this->_rgu = bits;
 	this->_rguLength = bitSize;
 
 	int32 n = sign;
 	int32 mask = n >> (kcbitUint - 1);
-	outSign = (outSign ^ mask) - mask;
-	this->disposable = true;
-
-	if (bits == 0)
+	sign = (sign ^ mask) - mask;
+	
+	if (this->_rgu == NULL)
 	{
-		this->_rgu = 0;
 		this->_iuLast = 0;
 		this->_uSmall = (uint32)((n ^ mask) - mask);
 	}
 	else
 	{
-		this->_rgu = new uint32[bitSize];
-		for (int32 i = 0; i < bitSize; i++) this->_rgu[i] = bits[i];
-
 		this->_iuLast = this->_rguLength - 1;
 		this->_uSmall = this->_rgu[0];
 		while (this->_iuLast > 0 && this->_rgu[this->_iuLast] == 0)
 			--this->_iuLast;
 	}
-
+	
 	// AssertValid(true);
 }
 
@@ -84,7 +81,7 @@ void BigIntegerBuilder::GetInteger(int32 &sign, uint32 * &bits, int32 &bitSize)
 			this->_rgu = new uint32[1]{ this->_uSmall };
 			this->_rguLength = 1;
 		}
-		else if (this->disposable)
+		else if (this->_fWritable)
 		{
 			this->_rgu[0] = this->_uSmall;
 		}
@@ -104,15 +101,15 @@ void BigIntegerBuilder::GetInteger(int32 &sign, uint32 * &bits, int32 &bitSize)
 	{
 		if (cuExtra == 0 || this->_rgu[this->_iuLast + 1] == 0)
 		{
-			this->disposable = false;
+			this->_fWritable = false;
 			bits = this->_rgu;
 			bitSize = this->_rguLength;
 			return;
 		}
-		if (this->disposable)
+		if (this->_fWritable)
 		{
 			this->_rgu[this->_iuLast + 1] = 0;
-			this->disposable = false;
+			this->_fWritable = false;
 			bits = this->_rgu;
 			bitSize = this->_rguLength;
 			return;
@@ -125,10 +122,10 @@ void BigIntegerBuilder::GetInteger(int32 &sign, uint32 * &bits, int32 &bitSize)
 
 	bits = this->_rgu;
 	bitSize = this->_rguLength;
-	this->disposable = false;
+	this->_fWritable = false;
 	// Array.Resize(ref bits, _iuLast + 1);
 
-	if (!this->disposable)
+	if (!this->_fWritable)
 		this->_rgu = bits;
 }
 
@@ -356,7 +353,7 @@ void BigIntegerBuilder::Sub(int32 &sign, BigIntegerBuilder &reg)
 
 BigIntegerBuilder::~BigIntegerBuilder()
 {
-	if (this->_rgu == NULL || !this->disposable) return;
+	if (this->_rgu == NULL || !this->_fWritable) return;
 
 	delete[](this->_rgu);
 	this->_rgu = NULL;
