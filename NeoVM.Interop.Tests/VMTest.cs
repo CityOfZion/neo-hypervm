@@ -194,7 +194,12 @@ namespace NeoVM.Interop.Tests
 
                         using (BooleanStackItem bkill = engine.CreateBool(true))
                         {
+                            Assert.AreEqual(ar.IndexOf(bkill), -1);
+
                             ar.Add(bkill);
+
+                            Assert.AreEqual(ar.IndexOf(ar), -1);
+
                             Assert.IsTrue(ar.Contains(bkill));
                         }
 

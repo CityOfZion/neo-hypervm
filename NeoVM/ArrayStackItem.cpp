@@ -122,11 +122,14 @@ void ArrayStackItem::Set(int32 index, IStackItem* item, bool disposePrev)
 
 int32 ArrayStackItem::IndexOf(IStackItem* item)
 {
-	std::list<IStackItem*>::iterator it = std::find(this->List.begin(), this->List.end(), item);
-	if (it == this->List.end())
-		return -1;
+	int index = 0;
+	for (std::list<IStackItem*>::iterator it = this->List.begin(); it != this->List.end(); ++it)
+	{
+		if ((IStackItem*)*it == item) return index;
+		index++;
+	}
 
-	return std::distance(this->List.begin(), it);
+	return -1;
 }
 
 void ArrayStackItem::Insert(int32 index, IStackItem* item)
