@@ -267,7 +267,7 @@ static void ripemd160_compress(ripemd160_state *self)
 	self->bufpos = 0;
 }
 
-void ripemd160_process(ripemd160_state *self, const unsigned char *p, unsigned long length)
+void ripemd160_process(ripemd160_state *self, const byte *p, uint32 length)
 {
 	unsigned long bytes_needed;
 
@@ -302,7 +302,7 @@ void ripemd160_process(ripemd160_state *self, const unsigned char *p, unsigned l
 	}
 }
 
-void ripemd160_done(ripemd160_state *self, unsigned char *out)
+void ripemd160_done(ripemd160_state *self, byte *out)
 {
 	/* Append the padding */
 	self->buf.b[self->bufpos++] = 0x80;
@@ -329,7 +329,7 @@ void ripemd160_done(ripemd160_state *self, unsigned char *out)
 	memcpy(out, &self->h, RIPEMD160_DIGEST_SIZE);
 }
 
-void ripemd160(const void* in, unsigned long length, void* out)
+void ripemd160(const void* in, uint32 length, void* out)
 {
 	ripemd160_state md;
 	ripemd160_init(&md);
