@@ -26,7 +26,7 @@ void ExecutionContextStack::Drop()
 {
 	ExecutionContext *it = this->Stack.front();
 	delete(it);
-	
+
 	this->Size--;
 	this->Stack.pop_front();
 }

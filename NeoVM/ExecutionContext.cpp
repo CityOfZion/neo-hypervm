@@ -35,7 +35,7 @@ bool ExecutionContext::ReadUInt16(uint16 &ret)
 
 bool ExecutionContext::ReadInt16(int16 &ret)
 {
-    byte data[2];
+	byte data[2];
 
 	if (Read(data, 2) != 2)
 		return false;
@@ -87,7 +87,7 @@ bool ExecutionContext::ReadUInt64(uint64 &ret)
 	if (Read(data, 8) != 8)
 		return false;
 
-    uint32 a = ((uint32)((int)data[0] | (int)data[1] << 8 | (int)data[2] << 16 | (int)data[3] << 24));
+	uint32 a = ((uint32)((int)data[0] | (int)data[1] << 8 | (int)data[2] << 16 | (int)data[3] << 24));
 	uint32 b = ((uint32)((int)data[4] | (int)data[5] << 8 | (int)data[6] << 16 | (int)data[7] << 24));
 
 	ret = (uint64)(b << 32 | a);
@@ -211,6 +211,6 @@ ExecutionContext::~ExecutionContext()
 	if (this->Script == NULL)
 		return;
 
-	delete(this->Script);
+	delete[](this->Script);
 	this->Script = NULL;
 }
