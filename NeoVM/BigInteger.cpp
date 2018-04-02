@@ -997,7 +997,7 @@ bool BigInteger::ToInt32(int32 &ret)
 	}
 	else if (this->_sign > 0)
 	{
-		ret = (__int32)this->_bits[0];
+		ret = (int32)this->_bits[0];
 		// checked
 		return ret >= 0;
 	}
@@ -1009,7 +1009,7 @@ bool BigInteger::ToInt32(int32 &ret)
 			//throw new OverflowException(SR.GetString(SR.Overflow_Int32));
 			return false;
 		}
-		ret = -(__int32)this->_bits[0];
+		ret = -(int32)this->_bits[0];
 		return true;
 	}
 }

@@ -215,7 +215,7 @@ ExecuteOpCode:
 		// TODO: uint ?
 		// https://github.com/neo-project/neo-vm/blob/master/src/neo-vm/ExecutionEngine.cs#L77
 
-		__int32 length = 0;
+		int32 length = 0;
 		if (!context->ReadInt32(length) || length < 0)
 		{
 			this->State = EVMState::FAULT;
@@ -252,7 +252,7 @@ ExecuteOpCode:
 	case EVMOpCode::JMPIF:
 	case EVMOpCode::JMPIFNOT:
 	{
-		__int16 offset = 0;
+		int16 offset = 0;
 		if (!context->ReadInt16(offset))
 		{
 			this->State = EVMState::FAULT;
