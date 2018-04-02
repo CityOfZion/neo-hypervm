@@ -1,6 +1,8 @@
 #pragma once
 
-enum EStackItemType
+#include "Types.h"
+
+enum EStackItemType : byte
 {
 	None = 0,
 

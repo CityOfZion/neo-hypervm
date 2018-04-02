@@ -1,5 +1,7 @@
 #pragma once
+
 #include "EVMOpCode.h"
+#include "Types.h"
 
 class ExecutionContext
 {
@@ -7,37 +9,37 @@ public:
 
 	// Constants
 
-	static const int ScriptHashLength = 20;
+	static const int32 ScriptHashLength = 20;
 
 	const bool IsPushOnly;
-	const int ScriptLength;
+	const int32 ScriptLength;
 
 	// Position
 
-	int InstructionPointer;
+	int32 InstructionPointer;
 
 	// Reads
 
-	int Read(unsigned char * data, int length);
+	int32 Read(byte * data, int32 length);
 
-	bool ReadUInt8(unsigned __int8 &ret);
-	bool ReadUInt16(unsigned __int16 &ret);
-	bool ReadInt16(__int16 &ret);
-	bool ReadUInt32(unsigned __int32 &ret);
-	bool ReadInt32(__int32 &ret);
-	bool ReadUInt64(unsigned __int64 &ret);
-	bool ReadInt64(__int64 &ret);
-	bool ReadVarBytes(__int64 &ret, __int64 max);
+	bool ReadUInt8(byte &ret);
+	bool ReadUInt16(uint16 &ret);
+	bool ReadInt16(int16 &ret);
+	bool ReadUInt32(uint32 &ret);
+	bool ReadInt32(int32 &ret);
+	bool ReadUInt64(uint64 &ret);
+	bool ReadInt64(int64 &ret);
+	bool ReadVarBytes(int64 &ret, int64 max);
 
 	// Get/Read next instruction
 
 	EVMOpCode GetNextInstruction();
 	EVMOpCode ReadNextInstruction();
-	void Seek(int position);
+	void Seek(int32 position);
 
 	// Get script hash
 
-	int GetScriptHash(unsigned char* hash);
+	int32 GetScriptHash(byte* hash);
 
 	// Clone execution context
 
@@ -45,7 +47,7 @@ public:
 
 	// Constructor
 
-	ExecutionContext(unsigned char* script, int scriptLength, bool pushOnly, int instructorPointer);
+	ExecutionContext(byte* script, int32 scriptLength, bool pushOnly, int32 instructorPointer);
 
 	// Destructor
 
@@ -55,7 +57,7 @@ private:
 
 	// Script
 
-	unsigned char* Script;
+	byte* Script;
 	bool IsScriptHashCalculated;
-	unsigned char ScriptHash[ScriptHashLength];
+	byte ScriptHash[ScriptHashLength];
 };

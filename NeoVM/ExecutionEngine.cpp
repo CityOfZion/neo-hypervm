@@ -8,7 +8,7 @@
 
 // Methods
 
-unsigned char ExecutionEngine::InvokeInterop(const char* method)
+byte ExecutionEngine::InvokeInterop(const char* method)
 {
 	// Fill defaults interops here
 
@@ -23,22 +23,24 @@ StackItems* ExecutionEngine::GetAltStack() { return this->AltStack; }
 
 // Constructor
 
-ExecutionEngine::ExecutionEngine(
-	InvokeInteropCallback invokeInteropCallback, GetScriptCallback getScriptCallback, GetMessageCallback getMessageCallback) :
-	InteropCallback(invokeInteropCallback), ScriptCallback(getScriptCallback), MessageCallback(getMessageCallback)
+ExecutionEngine::ExecutionEngine
+(
+	InvokeInteropCallback invokeInteropCallback, GetScriptCallback getScriptCallback, GetMessageCallback getMessageCallback
+) 
+: InteropCallback(invokeInteropCallback), ScriptCallback(getScriptCallback), MessageCallback(getMessageCallback)
 {
 	this->InvocationStack = new ExecutionContextStack();
 	this->EvaluationStack = new StackItems();
 	this->AltStack = new StackItems();
 }
 
-void ExecutionEngine::LoadScript(unsigned char * script, int scriptLength)
+void ExecutionEngine::LoadScript(byte * script, int32 scriptLength)
 {
 	ExecutionContext * context = new ExecutionContext(script, scriptLength, false, 0);
 	this->InvocationStack->Push(context);
 }
 
-void ExecutionEngine::LoadPushOnlyScript(unsigned char * script, int scriptLength)
+void ExecutionEngine::LoadPushOnlyScript(byte * script, int32 scriptLength)
 {
 	ExecutionContext * context = new ExecutionContext(script, scriptLength, true, 0);
 	this->InvocationStack->Push(context);
@@ -59,7 +61,7 @@ ExecutionContext* ExecutionEngine::GetEntryContext()
 	return this->InvocationStack->Peek(this->InvocationStack->Count() - 1);
 }
 
-unsigned char ExecutionEngine::GetState()
+byte ExecutionEngine::GetState()
 {
 	return this->State;
 }
@@ -76,7 +78,7 @@ EVMState ExecutionEngine::Execute()
 
 void ExecutionEngine::StepOut()
 {
-	int c = this->InvocationStack->Count();
+	int32 c = this->InvocationStack->Count();
 
 	while (this->State == EVMState::NONE && this->InvocationStack->Count() >= c)
 		this->StepInto();
@@ -86,7 +88,7 @@ void ExecutionEngine::StepOver()
 {
 	if (this->State != EVMState::NONE) return;
 
-	int c = this->InvocationStack->Count();
+	int32 c = this->InvocationStack->Count();
 
 	do
 	{
@@ -124,14 +126,14 @@ ExecuteOpCode:
 
 	if (opcode >= EVMOpCode::PUSHBYTES1 && opcode <= EVMOpCode::PUSHBYTES75)
 	{
-		const unsigned __int8 length = (unsigned __int8)opcode;
-		unsigned char *data = new unsigned char[length];
+		const byte length = (byte)opcode;
+		byte *data = new byte[length];
 
 		if (context->Read(data, length) != length)
 		{
 			this->State = EVMState::FAULT;
 
-			delete(data);
+			delete[](data);
 			return;
 		}
 
@@ -144,7 +146,7 @@ ExecuteOpCode:
 
 	if (opcode >= EVMOpCode::PUSH1 && opcode <= EVMOpCode::PUSH16)
 	{
-		IntegerStackItem* it = new IntegerStackItem(((unsigned __int8)opcode - (unsigned __int8)EVMOpCode::PUSH1) + 1);
+		IntegerStackItem* it = new IntegerStackItem(((byte)opcode - (byte)EVMOpCode::PUSH1) + 1);
 		this->EvaluationStack->Push(it);
 		return;
 	}
@@ -164,20 +166,20 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::PUSHDATA1:
 	{
-		unsigned __int8 length = 0;
+		byte length = 0;
 		if (!context->ReadUInt8(length))
 		{
 			this->State = EVMState::FAULT;
 			return;
 		}
 
-		unsigned char *data = new unsigned char[length];
+		byte *data = new byte[length];
 
 		if (context->Read(data, length) != length)
 		{
 			this->State = EVMState::FAULT;
 
-			delete(data);
+			delete[](data);
 			return;
 		}
 
@@ -187,20 +189,20 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::PUSHDATA2:
 	{
-		unsigned __int16 length = 0;
+		uint16 length = 0;
 		if (!context->ReadUInt16(length))
 		{
 			this->State = EVMState::FAULT;
 			return;
 		}
 
-		unsigned char *data = new unsigned char[length];
+		byte *data = new byte[length];
 
 		if (context->Read(data, length) != length)
 		{
 			this->State = EVMState::FAULT;
 
-			delete(data);
+			delete[](data);
 			return;
 		}
 
@@ -213,20 +215,20 @@ ExecuteOpCode:
 		// TODO: uint ?
 		// https://github.com/neo-project/neo-vm/blob/master/src/neo-vm/ExecutionEngine.cs#L77
 
-		__int32 length = 0;
+		int32 length = 0;
 		if (!context->ReadInt32(length) || length < 0)
 		{
 			this->State = EVMState::FAULT;
 			return;
 		}
 
-		unsigned char *data = new unsigned char[length];
+		byte *data = new byte[length];
 
 		if (context->Read(data, length) != length)
 		{
 			this->State = EVMState::FAULT;
 
-			delete(data);
+			delete[](data);
 			return;
 		}
 
@@ -250,7 +252,7 @@ ExecuteOpCode:
 	case EVMOpCode::JMPIF:
 	case EVMOpCode::JMPIFNOT:
 	{
-		__int16 offset = 0;
+		int16 offset = 0;
 		if (!context->ReadInt16(offset))
 		{
 			this->State = EVMState::FAULT;
@@ -327,7 +329,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		unsigned char script_hash[20];
+		byte script_hash[20];
 
 		if (context->Read(script_hash, 20) != 20)
 		{
@@ -336,7 +338,7 @@ ExecuteOpCode:
 		}
 
 		bool isEmpty = true;
-		for (int x = 0; x < 20; x++)
+		for (int32 x = 0; x < 20; x++)
 			if (script_hash[x] != 0x00) { isEmpty = false; break; }
 
 		if (isEmpty)
@@ -360,8 +362,8 @@ ExecuteOpCode:
 			IStackItem::Free(item);
 		}
 
-		unsigned char* script = NULL;
-		int length = ScriptCallback(&(script_hash[0]), script);
+		byte* script = NULL;
+		int32 length = ScriptCallback(&(script_hash[0]), script);
 
 		if (length <= 0)
 		{
@@ -380,7 +382,7 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::SYSCALL:
 	{
-		__int64 length = 0;
+		int64 length = 0;
 		if (!context->ReadVarBytes(length, 252) || length < 0)
 		{
 			this->State = EVMState::FAULT;
@@ -390,18 +392,18 @@ ExecuteOpCode:
 		char *data = new char[length + 1];
 		data[length] = 0x00;
 
-		if (context->Read((unsigned char*)data, length) != length)
+		if (context->Read((byte*)data, length) != length)
 		{
 			this->State = EVMState::FAULT;
 
-			delete(data);
+			delete[](data);
 			return;
 		}
 
 		if (this->InvokeInterop(data) != 0x01)
 			this->State = EVMState::FAULT;
 
-		delete(data);
+		delete[](data);
 		return;
 	}
 
@@ -433,7 +435,7 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::XDROP:
 	{
-		int ic = this->EvaluationStack->Count();
+		int32 ic = this->EvaluationStack->Count();
 		if (ic < 1)
 		{
 			this->State = EVMState::FAULT;
@@ -442,7 +444,7 @@ ExecuteOpCode:
 
 		IStackItem * it = this->EvaluationStack->Pop();
 
-		int n = 0;
+		int32 n = 0;
 		if (!it->GetInt32(n) || n < 0 || ic <= n + 1)
 		{
 			IStackItem::Free(it);
@@ -457,7 +459,7 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::XSWAP:
 	{
-		int ic = this->EvaluationStack->Count();
+		int32 ic = this->EvaluationStack->Count();
 		if (ic < 1)
 		{
 			this->State = EVMState::FAULT;
@@ -466,7 +468,7 @@ ExecuteOpCode:
 
 		IStackItem * it = this->EvaluationStack->Pop();
 
-		int n = 0;
+		int32 n = 0;
 		if (!it->GetInt32(n) || n < 0 || ic <= n + 1)
 		{
 			IStackItem::Free(it);
@@ -489,7 +491,7 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::XTUCK:
 	{
-		int ic = this->EvaluationStack->Count();
+		int32 ic = this->EvaluationStack->Count();
 		if (ic < 1)
 		{
 			this->State = EVMState::FAULT;
@@ -498,7 +500,7 @@ ExecuteOpCode:
 
 		IStackItem * it = this->EvaluationStack->Pop();
 
-		int n = 0;
+		int32 n = 0;
 		if (!it->GetInt32(n) || n <= 0 || ic < n + 1)
 		{
 			IStackItem::Free(it);
@@ -574,7 +576,7 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::PICK:
 	{
-		int ic = this->EvaluationStack->Count();
+		int32 ic = this->EvaluationStack->Count();
 		if (ic < 1)
 		{
 			this->State = EVMState::FAULT;
@@ -583,7 +585,7 @@ ExecuteOpCode:
 
 		IStackItem * it = this->EvaluationStack->Pop();
 
-		int n = 0;
+		int32 n = 0;
 		if (!it->GetInt32(n) || n < 0)
 		{
 			IStackItem::Free(it);
@@ -604,7 +606,7 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::ROLL:
 	{
-		int ic = this->EvaluationStack->Count();
+		int32 ic = this->EvaluationStack->Count();
 		if (ic < 1)
 		{
 			this->State = EVMState::FAULT;
@@ -613,7 +615,7 @@ ExecuteOpCode:
 
 		IStackItem * it = this->EvaluationStack->Pop();
 
-		int n = 0;
+		int32 n = 0;
 		if (!it->GetInt32(n) || n < 0)
 		{
 			IStackItem::Free(it);
@@ -692,8 +694,8 @@ ExecuteOpCode:
 
 		IStackItem * x2 = this->EvaluationStack->Pop();
 		IStackItem * x1 = this->EvaluationStack->Pop();
-		int size2 = x2->ReadByteArraySize();
-		int size1 = x1->ReadByteArraySize();
+		int32 size2 = x2->ReadByteArraySize();
+		int32 size1 = x1->ReadByteArraySize();
 
 		if (size2 < 0 || size1 < 0)
 		{
@@ -704,7 +706,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		unsigned char * data = new unsigned char[size2 + size1];
+		byte * data = new byte[size2 + size1];
 		x1->ReadByteArray(&data[0], 0, size1);
 		x2->ReadByteArray(&data[size1], 0, size2);
 
@@ -724,7 +726,7 @@ ExecuteOpCode:
 		}
 
 		IStackItem * it = this->EvaluationStack->Pop();
-		int count = 0;
+		int32 count = 0;
 
 		if (!it->GetInt32(count) || count < 0)
 		{
@@ -735,7 +737,7 @@ ExecuteOpCode:
 
 		IStackItem::Free(it);
 		it = this->EvaluationStack->Pop();
-		int index = 0;
+		int32 index = 0;
 
 		if (!it->GetInt32(index) || index < 0)
 		{
@@ -747,7 +749,7 @@ ExecuteOpCode:
 		IStackItem::Free(it);
 		it = this->EvaluationStack->Pop();
 
-		unsigned char * data = new unsigned char[count];
+		byte * data = new byte[count];
 		if (it->ReadByteArray(&data[0], index, count) != count)
 		{
 			IStackItem::Free(it);
@@ -771,7 +773,7 @@ ExecuteOpCode:
 		}
 
 		IStackItem * it = this->EvaluationStack->Pop();
-		int count = 0;
+		int32 count = 0;
 
 		if (!it->GetInt32(count) || count < 0)
 		{
@@ -783,7 +785,7 @@ ExecuteOpCode:
 		IStackItem::Free(it);
 		it = this->EvaluationStack->Pop();
 
-		unsigned char * data = new unsigned char[count];
+		byte * data = new byte[count];
 		if (it->ReadByteArray(&data[0], 0, count) != count)
 		{
 			IStackItem::Free(it);
@@ -807,7 +809,7 @@ ExecuteOpCode:
 		}
 
 		IStackItem * it = this->EvaluationStack->Pop();
-		int count = 0;
+		int32 count = 0;
 
 		if (!it->GetInt32(count) || count < 0)
 		{
@@ -819,7 +821,7 @@ ExecuteOpCode:
 		IStackItem::Free(it);
 		it = this->EvaluationStack->Pop();
 
-		unsigned char * data = new unsigned char[count];
+		byte * data = new byte[count];
 		if (it->ReadByteArray(&data[0], it->ReadByteArraySize() - count, count) != count)
 		{
 			IStackItem::Free(it);
@@ -843,7 +845,7 @@ ExecuteOpCode:
 		}
 
 		IStackItem * item = this->EvaluationStack->Pop();
-		int size = item->ReadByteArraySize();
+		int32 size = item->ReadByteArraySize();
 		IStackItem::Free(item);
 
 		if (size < 0)
@@ -985,20 +987,57 @@ ExecuteOpCode:
 
 #pragma region Numeric
 
-	/*
-	case OpCode.INC:
+	case EVMOpCode::INC:
 	{
-	BigInteger x = EvaluationStack.Pop().GetBigInteger();
-	EvaluationStack.Push(x + 1);
-	return;
+		if (this->EvaluationStack->Count() < 1)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem* item = this->EvaluationStack->Pop();
+		BigInteger* bi = item->GetBigInteger();
+		IStackItem::Free(item);
+
+		if (bi == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		BigInteger *add = new BigInteger(BigInteger::One);
+		BigInteger *ret = bi->Add(add);
+		delete(bi);
+
+		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		return;
 	}
-	case OpCode.DEC:
+	case EVMOpCode::DEC:
 	{
-	BigInteger x = EvaluationStack.Pop().GetBigInteger();
-	EvaluationStack.Push(x - 1);
-	return;
+		if (this->EvaluationStack->Count() < 1)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem* item = this->EvaluationStack->Pop();
+		BigInteger* bi = item->GetBigInteger();
+		IStackItem::Free(item);
+
+		if (bi == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		BigInteger *add = new BigInteger(BigInteger::One);
+		BigInteger *ret = bi->Sub(add);
+		delete(add);
+		delete(bi);
+
+		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		return;
 	}
-	*/
 	case EVMOpCode::SIGN:
 	{
 		if (this->EvaluationStack->Count() < 1)
@@ -1111,43 +1150,161 @@ ExecuteOpCode:
 		this->EvaluationStack->Push(ret);
 		return;
 	}
-	/*
-	case OpCode.ADD:
+	case EVMOpCode::ADD:
 	{
-		BigInteger x2 = EvaluationStack.Pop().GetBigInteger();
-		BigInteger x1 = EvaluationStack.Pop().GetBigInteger();
-		EvaluationStack.Push(x1 + x2);
+		if (this->EvaluationStack->Count() < 2)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem* i2 = this->EvaluationStack->Pop();
+		IStackItem* i1 = this->EvaluationStack->Pop();
+		BigInteger* x2 = i2->GetBigInteger();
+		BigInteger* x1 = i1->GetBigInteger();
+		IStackItem::Free(i2);
+		IStackItem::Free(i1);
+
+		if (x2 == NULL || x1 == NULL)
+		{
+			if (x2 != NULL) delete(x2);
+			if (x1 != NULL) delete(x1);
+
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		BigInteger *ret = x1->Add(x2);
+		delete(x2);
+		delete(x1);
+
+		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
 		return;
 	}
-	case OpCode.SUB:
+	case EVMOpCode::SUB:
 	{
-		BigInteger x2 = EvaluationStack.Pop().GetBigInteger();
-		BigInteger x1 = EvaluationStack.Pop().GetBigInteger();
-		EvaluationStack.Push(x1 - x2);
+		if (this->EvaluationStack->Count() < 2)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem* i2 = this->EvaluationStack->Pop();
+		IStackItem* i1 = this->EvaluationStack->Pop();
+		BigInteger* x2 = i2->GetBigInteger();
+		BigInteger* x1 = i1->GetBigInteger();
+		IStackItem::Free(i2);
+		IStackItem::Free(i1);
+
+		if (x2 == NULL || x1 == NULL)
+		{
+			if (x2 != NULL) delete(x2);
+			if (x1 != NULL) delete(x1);
+
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		BigInteger *ret = x1->Sub(x2);
+		delete(x2);
+		delete(x1);
+
+		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
 		return;
 	}
-	case OpCode.MUL:
+	case EVMOpCode::MUL:
 	{
-		BigInteger x2 = EvaluationStack.Pop().GetBigInteger();
-		BigInteger x1 = EvaluationStack.Pop().GetBigInteger();
-		EvaluationStack.Push(x1 * x2);
+		if (this->EvaluationStack->Count() < 2)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem* i2 = this->EvaluationStack->Pop();
+		IStackItem* i1 = this->EvaluationStack->Pop();
+		BigInteger* x2 = i2->GetBigInteger();
+		BigInteger* x1 = i1->GetBigInteger();
+		IStackItem::Free(i2);
+		IStackItem::Free(i1);
+
+		if (x2 == NULL || x1 == NULL)
+		{
+			if (x2 != NULL) delete(x2);
+			if (x1 != NULL) delete(x1);
+
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		BigInteger *ret = x1->Mul(x2);
+		delete(x2);
+		delete(x1);
+
+		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
 		return;
 	}
-	case OpCode.DIV:
+	case EVMOpCode::DIV:
 	{
-		BigInteger x2 = EvaluationStack.Pop().GetBigInteger();
-		BigInteger x1 = EvaluationStack.Pop().GetBigInteger();
-		EvaluationStack.Push(x1 / x2);
+		if (this->EvaluationStack->Count() < 2)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem* i2 = this->EvaluationStack->Pop();
+		IStackItem* i1 = this->EvaluationStack->Pop();
+		BigInteger* x2 = i2->GetBigInteger();
+		BigInteger* x1 = i1->GetBigInteger();
+		IStackItem::Free(i2);
+		IStackItem::Free(i1);
+
+		if (x2 == NULL || x1 == NULL)
+		{
+			if (x2 != NULL) delete(x2);
+			if (x1 != NULL) delete(x1);
+
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		BigInteger *ret = x1->Div(x2);
+		delete(x2);
+		delete(x1);
+
+		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
 		return;
 	}
-	case OpCode.MOD:
+	case EVMOpCode::MOD:
 	{
-		BigInteger x2 = EvaluationStack.Pop().GetBigInteger();
-		BigInteger x1 = EvaluationStack.Pop().GetBigInteger();
-		EvaluationStack.Push(x1 % x2);
+		if (this->EvaluationStack->Count() < 2)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem* i2 = this->EvaluationStack->Pop();
+		IStackItem* i1 = this->EvaluationStack->Pop();
+		BigInteger* x2 = i2->GetBigInteger();
+		BigInteger* x1 = i1->GetBigInteger();
+		IStackItem::Free(i2);
+		IStackItem::Free(i1);
+
+		if (x2 == NULL || x1 == NULL)
+		{
+			if (x2 != NULL) delete(x2);
+			if (x1 != NULL) delete(x1);
+
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		BigInteger *ret = x1->Mod(x2);
+		delete(x2);
+		delete(x1);
+
+		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
 		return;
 	}
-	*/
 	case EVMOpCode::SHL:
 	{
 		if (this->EvaluationStack->Count() < 2)
@@ -1165,7 +1322,7 @@ ExecuteOpCode:
 		IStackItem::Free(n);
 		IStackItem::Free(x);
 
-		int iin;
+		int32 iin;
 		if (in == NULL || ix == NULL || !in->ToInt32(iin))
 		{
 			if (ix != NULL) delete(ix);
@@ -1199,7 +1356,7 @@ ExecuteOpCode:
 		IStackItem::Free(n);
 		IStackItem::Free(x);
 
-		int iin;
+		int32 iin;
 		if (in == NULL || ix == NULL || !in->ToInt32(iin))
 		{
 			if (ix != NULL) delete(ix);
@@ -1594,8 +1751,8 @@ ExecuteOpCode:
 
 		IStackItem *item = this->EvaluationStack->Pop();
 
-		int size = item->ReadByteArraySize();
-		unsigned char* data = new unsigned char[size];
+		int32 size = item->ReadByteArraySize();
+		byte* data = new byte[size];
 
 		size = item->ReadByteArray(data, 0, size);
 		IStackItem::Free(item);
@@ -1606,7 +1763,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		unsigned char *hash = new unsigned char[Crypto::SHA1_LENGTH];
+		byte *hash = new byte[Crypto::SHA1_LENGTH];
 		Crypto::ComputeSHA1(data, size, hash);
 
 		delete[]data;
@@ -1625,8 +1782,8 @@ ExecuteOpCode:
 
 		IStackItem *item = this->EvaluationStack->Pop();
 
-		int size = item->ReadByteArraySize();
-		unsigned char* data = new unsigned char[size];
+		int32 size = item->ReadByteArraySize();
+		byte* data = new byte[size];
 
 		size = item->ReadByteArray(data, 0, size);
 		IStackItem::Free(item);
@@ -1637,7 +1794,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		unsigned char *hash = new unsigned char[Crypto::SHA256_LENGTH];
+		byte *hash = new byte[Crypto::SHA256_LENGTH];
 		Crypto::ComputeSHA256(data, size, hash);
 
 		delete[]data;
@@ -1656,8 +1813,8 @@ ExecuteOpCode:
 
 		IStackItem *item = this->EvaluationStack->Pop();
 
-		int size = item->ReadByteArraySize();
-		unsigned char* data = new unsigned char[size];
+		int32 size = item->ReadByteArraySize();
+		byte* data = new byte[size];
 
 		size = item->ReadByteArray(data, 0, size);
 		IStackItem::Free(item);
@@ -1668,7 +1825,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		unsigned char *hash = new unsigned char[Crypto::HASH160_LENGTH];
+		byte *hash = new byte[Crypto::HASH160_LENGTH];
 		Crypto::ComputeHash160(data, size, hash);
 
 		delete[]data;
@@ -1687,8 +1844,8 @@ ExecuteOpCode:
 
 		IStackItem *item = this->EvaluationStack->Pop();
 
-		int size = item->ReadByteArraySize();
-		unsigned char* data = new unsigned char[size];
+		int32 size = item->ReadByteArraySize();
+		byte* data = new byte[size];
 
 		size = item->ReadByteArray(data, 0, size);
 		IStackItem::Free(item);
@@ -1699,7 +1856,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		unsigned char *hash = new unsigned char[Crypto::HASH256_LENGTH];
+		byte *hash = new byte[Crypto::HASH256_LENGTH];
 		Crypto::ComputeHash256(data, size, hash);
 
 		delete[]data;
@@ -1728,8 +1885,8 @@ ExecuteOpCode:
 			return;
 		}
 
-		unsigned char* message;
-		int msgL = MessageCallback(this->Iteration, message);
+		byte* message;
+		int32 msgL = MessageCallback(this->Iteration, message);
 		if (msgL <= 0)
 		{
 			IStackItem::Free(ipubKey);
@@ -1763,7 +1920,7 @@ ExecuteOpCode:
 	case EVMOpCode::CHECKMULTISIG:
 	{
 		/*
-		int n;
+		int32 n;
 		byte[][] pubkeys;
 		StackItem item = EvaluationStack.Pop();
 		if (item is VMArray array1)
@@ -1785,10 +1942,10 @@ ExecuteOpCode:
 				return;
 			}
 			pubkeys = new byte[n][];
-			for (int i = 0; i < n; i++)
+			for (int32 i = 0; i < n; i++)
 				pubkeys[i] = EvaluationStack.Pop().GetByteArray();
 		}
-		int m;
+		int32 m;
 		byte[][] signatures;
 		item = EvaluationStack.Pop();
 		if (item is VMArray array2)
@@ -1810,14 +1967,14 @@ ExecuteOpCode:
 				return;
 			}
 			signatures = new byte[m][];
-			for (int i = 0; i < m; i++)
+			for (int32 i = 0; i < m; i++)
 				signatures[i] = EvaluationStack.Pop().GetByteArray();
 		}
 		byte[] message = ScriptContainer.GetMessage();
 		bool fSuccess = true;
 		try
 		{
-			for (int i = 0, j = 0; fSuccess && i < m && j < n;)
+			for (int32 i = 0, j = 0; fSuccess && i < m && j < n;)
 			{
 				if (Crypto.VerifySignature(message, signatures[i], pubkeys[j]))
 					i++;
@@ -1847,7 +2004,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		int size;
+		int32 size;
 		IStackItem *item = this->EvaluationStack->Pop();
 
 		switch (item->Type)
@@ -1887,7 +2044,7 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::PACK:
 	{
-		int ec = this->EvaluationStack->Count();
+		int32 ec = this->EvaluationStack->Count();
 		if (ec < 1)
 		{
 			this->State = EVMState::FAULT;
@@ -1896,7 +2053,7 @@ ExecuteOpCode:
 
 		IStackItem *item = this->EvaluationStack->Pop();
 
-		int size = 0;
+		int32 size = 0;
 		if (!item->GetInt32(size))
 		{
 			IStackItem::Free(item);
@@ -1913,7 +2070,7 @@ ExecuteOpCode:
 
 		ArrayStackItem *items = new ArrayStackItem(false);
 
-		for (int i = 0; i < size; i++)
+		for (int32 i = 0; i < size; i++)
 		{
 			items->Add(this->EvaluationStack->Pop());
 		}
@@ -1934,9 +2091,9 @@ ExecuteOpCode:
 		if (item->Type == EStackItemType::Array)
 		{
 			ArrayStackItem *array = (ArrayStackItem*)item;
-			int count = array->Count();
+			int32 count = array->Count();
 
-			for (int i = count - 1; i >= 0; i--)
+			for (int32 i = count - 1; i >= 0; i--)
 			{
 				IStackItem * v = array->Get(i);
 				this->EvaluationStack->Push(v);
@@ -1981,7 +2138,7 @@ ExecuteOpCode:
 		{
 			ArrayStackItem *arr = (ArrayStackItem*)item;
 
-			int index = 0;
+			int32 index = 0;
 			if (!key->GetInt32(index) || index < 0 || index >= arr->Count())
 			{
 				IStackItem::Free(key);
@@ -2061,7 +2218,7 @@ ExecuteOpCode:
 		{
 			ArrayStackItem *arr = (ArrayStackItem*)item;
 
-			int index = 0;
+			int32 index = 0;
 			if (!key->GetInt32(index) || index < 0 || index >= arr->Count())
 			{
 				IStackItem::Free(key);
@@ -2106,7 +2263,7 @@ ExecuteOpCode:
 
 		IStackItem *item = this->EvaluationStack->Pop();
 
-		int count = 0;
+		int32 count = 0;
 		if (!item->GetInt32(count))
 		{
 			IStackItem::Free(item);
@@ -2174,7 +2331,7 @@ ExecuteOpCode:
 		switch (EvaluationStack.Pop())
 		{
 		case VMArray array:
-			int index = (int)key.GetBigInteger();
+			int32 index = (int)key.GetBigInteger();
 			if (index < 0 || index >= array.Count)
 			{
 				State |= VMState.FAULT;
@@ -2204,7 +2361,7 @@ ExecuteOpCode:
 		switch (EvaluationStack.Pop())
 		{
 		case VMArray array:
-			int index = (int)key.GetBigInteger();
+			int32 index = (int)key.GetBigInteger();
 			if (index < 0)
 			{
 				State |= VMState.FAULT;

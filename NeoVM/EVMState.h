@@ -1,6 +1,8 @@
 #pragma once
 
-enum EVMState :__int8
+#include "Types.h"
+
+enum EVMState : byte
 {
 	// Normal state
 	NONE = 0,

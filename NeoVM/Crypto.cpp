@@ -3,9 +3,9 @@
 #include "SHA256.h"
 #include "RIPEMD160.h"
 
-void Crypto::ComputeHash160(unsigned char* data, int length, unsigned char *output)
+void Crypto::ComputeHash160(byte* data, int32 length, byte *output)
 {
-	unsigned char digest[SHA256::DIGEST_SIZE];
+	byte digest[SHA256::DIGEST_SIZE];
 
 	// First SHA256
 
@@ -19,9 +19,9 @@ void Crypto::ComputeHash160(unsigned char* data, int length, unsigned char *outp
 	ripemd160(digest, SHA256::DIGEST_SIZE, output);
 }
 
-void Crypto::ComputeHash256(unsigned char* data, int length, unsigned char *output)
+void Crypto::ComputeHash256(byte* data, int32 length, byte *output)
 {
-	unsigned char digest[SHA256::DIGEST_SIZE];
+	byte digest[SHA256::DIGEST_SIZE];
 
 	// First SHA256
 
@@ -37,7 +37,7 @@ void Crypto::ComputeHash256(unsigned char* data, int length, unsigned char *outp
 	ctx.final(output);
 }
 
-void Crypto::ComputeSHA256(unsigned char* data, int length, unsigned char *output)
+void Crypto::ComputeSHA256(byte* data, int32 length, byte *output)
 {
 	SHA256 ctx = SHA256();
 	ctx.init();
@@ -45,7 +45,7 @@ void Crypto::ComputeSHA256(unsigned char* data, int length, unsigned char *outpu
 	ctx.final(output);
 }
 
-void Crypto::ComputeSHA1(unsigned char* data, int length, unsigned char *output)
+void Crypto::ComputeSHA1(byte* data, int32 length, byte *output)
 {
 	SHA1 ctx = SHA1();
 	ctx.addBytes((const char*)data, length);

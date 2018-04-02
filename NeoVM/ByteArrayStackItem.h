@@ -5,8 +5,8 @@ class ByteArrayStackItem : public IStackItem
 {
 private:
 
-	int PayloadLength;
-	unsigned char* Payload;
+	int32 PayloadLength;
+	byte* Payload;
 
 public:
 
@@ -14,14 +14,14 @@ public:
 
 	bool GetBoolean();
 	BigInteger * GetBigInteger();
-	bool GetInt32(int &ret);
-	int ReadByteArray(unsigned char * output, int sourceIndex, int count);
+	bool GetInt32(int32 &ret);
+	int32 ReadByteArray(byte * output, int32 sourceIndex, int32 count);
 	IStackItem* Clone();
-	int ReadByteArraySize();
+	int32 ReadByteArraySize();
 
 	// Constructor
 
-	ByteArrayStackItem(unsigned char* data, int length, bool copyPointer);
+	ByteArrayStackItem(byte* data, int32 length, bool copyPointer);
 
 	// Destructor
 
@@ -29,6 +29,6 @@ public:
 
 	// Serialize
 
-	int Serialize(unsigned char * data, int length);
-	int GetSerializedSize();
+	int32 Serialize(byte * data, int32 length);
+	int32 GetSerializedSize();
 };

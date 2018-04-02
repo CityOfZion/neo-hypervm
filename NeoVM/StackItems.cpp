@@ -1,6 +1,6 @@
 #include "StackItems.h"
 
-int StackItems::Count()
+int32 StackItems::Count()
 {
 	return this->Size;
 }
@@ -14,7 +14,7 @@ void StackItems::Push(IStackItem * it)
 	this->Stack.push_front(it);
 }
 
-void StackItems::Insert(int index, IStackItem *it)
+void StackItems::Insert(int32 index, IStackItem *it)
 {
 	if (it != NULL)
 		it->Claims++;
@@ -36,7 +36,7 @@ void StackItems::Insert(int index, IStackItem *it)
 	this->Stack.insert(iter, it);
 }
 
-IStackItem* StackItems::Peek(int index)
+IStackItem* StackItems::Peek(int32 index)
 {
 	if (index == 0) return this->Stack.front();
 	if (index < 0) return NULL;
@@ -47,7 +47,7 @@ IStackItem* StackItems::Peek(int index)
 	return (IStackItem*)*it;
 }
 
-IStackItem* StackItems::Remove(int index)
+IStackItem* StackItems::Remove(int32 index)
 {
 	if (index < 0) return NULL;
 

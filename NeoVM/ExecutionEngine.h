@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Callbacks.h"
+#include "Types.h"
 #include "StackItems.h"
 #include "ExecutionContextStack.h"
 #include "EVMState.h"
@@ -11,7 +11,7 @@ private:
 
 	// Used for MessageCallback
 	
-	unsigned __int32 Iteration = 0;
+	uint32 Iteration = 0;
 
 	// Save the state of the execution
 	
@@ -31,18 +31,18 @@ private:
 
 	// Private methods
 
-	unsigned char InvokeInterop(const char* method);
+	byte InvokeInterop(const char* method);
 
 public:
 
 	// Load scripts
 
-	void LoadScript(unsigned char * script, int scriptLength);
-	void LoadPushOnlyScript(unsigned char * script, int scriptLength);
+	void LoadScript(byte * script, int32 scriptLength);
+	void LoadPushOnlyScript(byte * script, int32 scriptLength);
 
 	// Getters
 
-	unsigned char GetState();
+	byte GetState();
 
 	ExecutionContext* GetCurrentContext();
 	ExecutionContext* GetCallingContext();

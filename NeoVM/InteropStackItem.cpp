@@ -1,9 +1,9 @@
 #include "InteropStackItem.h"
 #include <cstring>
 
-InteropStackItem::InteropStackItem(unsigned char * data, int size) :IStackItem(EStackItemType::Interop)
+InteropStackItem::InteropStackItem(byte * data, int32 size) :IStackItem(EStackItemType::Interop)
 {
-	this->Payload = new unsigned char[size];
+	this->Payload = new byte[size];
 	this->PayloadLength = size;
 
 	memcpy(this->Payload, data, size);
@@ -11,7 +11,10 @@ InteropStackItem::InteropStackItem(unsigned char * data, int size) :IStackItem(E
 
 InteropStackItem::~InteropStackItem()
 {
-	delete(this->Payload);
+	if (this->Payload == NULL) return;
+
+	delete[](this->Payload);
+	this->Payload = NULL;
 }
 
 bool InteropStackItem::GetBoolean()
@@ -24,17 +27,17 @@ BigInteger * InteropStackItem::GetBigInteger()
 	return NULL;
 }
 
-bool InteropStackItem::GetInt32(int &ret)
+bool InteropStackItem::GetInt32(int32 &ret)
 {
 	return false;
 }
 
-int InteropStackItem::ReadByteArray(unsigned char * output, int sourceIndex, int count)
+int32 InteropStackItem::ReadByteArray(byte * output, int32 sourceIndex, int32 count)
 {
 	return -1;
 }
 
-int InteropStackItem::ReadByteArraySize()
+int32 InteropStackItem::ReadByteArraySize()
 {
 	return -1;
 }
@@ -46,7 +49,7 @@ IStackItem* InteropStackItem::Clone()
 
 // Serialize
 
-int InteropStackItem::Serialize(unsigned char * data, int length)
+int32 InteropStackItem::Serialize(byte * data, int32 length)
 {
 	if (this->PayloadLength > 0 && length > 0)
 	{
@@ -58,7 +61,7 @@ int InteropStackItem::Serialize(unsigned char * data, int length)
 	return 0;
 }
 
-int InteropStackItem::GetSerializedSize()
+int32 InteropStackItem::GetSerializedSize()
 {
 	return this->PayloadLength;
 }

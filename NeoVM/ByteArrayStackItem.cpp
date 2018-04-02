@@ -1,7 +1,7 @@
 #include "ByteArrayStackItem.h"
 #include <cstring>
 
-ByteArrayStackItem::ByteArrayStackItem(unsigned char * data, int size, bool copyPointer) :IStackItem(EStackItemType::ByteArray), PayloadLength(size)
+ByteArrayStackItem::ByteArrayStackItem(byte * data, int32 size, bool copyPointer) :IStackItem(EStackItemType::ByteArray), PayloadLength(size)
 {
 	if (size > 0 && data != NULL)
 	{
@@ -11,7 +11,7 @@ ByteArrayStackItem::ByteArrayStackItem(unsigned char * data, int size, bool copy
 		}
 		else
 		{
-			this->Payload = new unsigned char[size];
+			this->Payload = new byte[size];
 			memcpy(this->Payload, data, size);
 		}
 	}
@@ -21,14 +21,14 @@ ByteArrayStackItem::ByteArrayStackItem(unsigned char * data, int size, bool copy
 	}
 }
 
-int ByteArrayStackItem::ReadByteArray(unsigned char * output, int sourceIndex, int count)
+int32 ByteArrayStackItem::ReadByteArray(byte * output, int32 sourceIndex, int32 count)
 {
 	if (sourceIndex < 0)
 	{
 		return -1;
 	}
 
-	int l = count > this->PayloadLength - sourceIndex ? this->PayloadLength - sourceIndex : count;
+	int32 l = count > this->PayloadLength - sourceIndex ? this->PayloadLength - sourceIndex : count;
 
 	if (l > 0)
 	{
@@ -38,18 +38,18 @@ int ByteArrayStackItem::ReadByteArray(unsigned char * output, int sourceIndex, i
 	return l;
 }
 
-int ByteArrayStackItem::ReadByteArraySize()
+int32 ByteArrayStackItem::ReadByteArraySize()
 {
 	return this->PayloadLength;
 }
 
 ByteArrayStackItem::~ByteArrayStackItem()
 {
-	if (this->Payload != NULL)
-	{
-		delete(this->Payload);
-		this->Payload = NULL;
-	}
+	if (this->Payload == NULL)
+		return;
+
+	delete[](this->Payload);
+	this->Payload = NULL;
 }
 
 bool ByteArrayStackItem::GetBoolean()
@@ -62,7 +62,7 @@ bool ByteArrayStackItem::GetBoolean()
 	{
 		if (this->PayloadLength <= 0) return false;
 
-		for (int x = 0; x < this->PayloadLength; x++)
+		for (int32 x = 0; x < this->PayloadLength; x++)
 			if (this->Payload[x] != 0x00)
 				return true;
 
@@ -78,7 +78,7 @@ BigInteger * ByteArrayStackItem::GetBigInteger()
 	return new BigInteger(this->Payload, this->PayloadLength);
 }
 
-bool ByteArrayStackItem::GetInt32(int &ret)
+bool ByteArrayStackItem::GetInt32(int32 &ret)
 {
 	BigInteger * bi = this->GetBigInteger();
 	if (bi == NULL) return false;
@@ -96,7 +96,7 @@ IStackItem* ByteArrayStackItem::Clone()
 
 // Serialize
 
-int ByteArrayStackItem::Serialize(unsigned char * data, int length)
+int32 ByteArrayStackItem::Serialize(byte * data, int32 length)
 {
 	if (this->PayloadLength > 0 && length > 0)
 	{
@@ -105,10 +105,11 @@ int ByteArrayStackItem::Serialize(unsigned char * data, int length)
 
 		return length;
 	}
+
 	return 0;
 }
 
-int ByteArrayStackItem::GetSerializedSize()
+int32 ByteArrayStackItem::GetSerializedSize()
 {
 	return this->PayloadLength;
 }
