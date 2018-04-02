@@ -48,6 +48,6 @@ void Crypto::ComputeSHA256(byte* data, int32 length, byte *output)
 void Crypto::ComputeSHA1(byte* data, int32 length, byte *output)
 {
 	SHA1 ctx = SHA1();
-	ctx.addBytes((const char*)data, length);
+	ctx.addBytes((const byte*)data, length);
 	ctx.getDigest(output);
 }

@@ -14,27 +14,14 @@ accompanying LICENSE file.
 #include <stdlib.h>
 #include <assert.h>
 
-// print out memory in hexadecimal
-void SHA1::hexPrinter(unsigned char* c, int l)
-{
-	assert(c);
-	assert(l > 0);
-	while (l > 0)
-	{
-		printf(" %02x", *c);
-		l--;
-		c++;
-	}
-}
-
 // circular left bit rotation.  MSB wraps around to LSB
-Uint32 SHA1::lrot(Uint32 x, int bits)
+uint32 SHA1::lrot(uint32 x, int32 bits)
 {
 	return (x << bits) | (x >> (32 - bits));
 };
 
 // Save a 32-bit unsigned integer to memory, in big-endian order
-void SHA1::storeBigEndianUint32(unsigned char* byte, Uint32 num)
+void SHA1::storeBigEndianUint32(byte* byte, uint32 num)
 {
 	assert(byte);
 	byte[0] = (unsigned char)(num >> 24);
@@ -48,7 +35,7 @@ void SHA1::storeBigEndianUint32(unsigned char* byte, Uint32 num)
 SHA1::SHA1()
 {
 	// make sure that the data type is the right size
-	assert(sizeof(Uint32) * 5 == 20);
+	assert(sizeof(uint32) * 5 == 20);
 
 	// initialize
 	H0 = 0x67452301;
@@ -74,8 +61,8 @@ void SHA1::process()
 {
 	assert(unprocessedBytes == 64);
 	//printf( "process: " ); hexPrinter( bytes, 64 ); printf( "\n" );
-	int t;
-	Uint32 a, b, c, d, e, K, f, W[80];
+	int32 t;
+	uint32 a, b, c, d, e, K, f, W[80];
 	// starting values
 	a = H0;
 	b = H1;
@@ -90,7 +77,7 @@ void SHA1::process()
 	for (; t < 80; t++) W[t] = lrot(W[t - 3] ^ W[t - 8] ^ W[t - 14] ^ W[t - 16], 1);
 
 	/* main loop */
-	Uint32 temp;
+	uint32 temp;
 	for (t = 0; t < 80; t++)
 	{
 		if (t < 20) {
@@ -129,7 +116,7 @@ void SHA1::process()
 }
 
 // addBytes **********************************************************
-void SHA1::addBytes(const char* data, int num)
+void SHA1::addBytes(const byte* data, int32 num)
 {
 	assert(data);
 	assert(num > 0);
@@ -156,22 +143,24 @@ void SHA1::addBytes(const char* data, int num)
 }
 
 // digest ************************************************************
-void SHA1::getDigest(unsigned char * digest)
+void SHA1::getDigest(byte * digest)
 {
 	// save the message size
-	Uint32 totalBitsL = size << 3;
-	Uint32 totalBitsH = size >> 29;
+	uint32 totalBitsL = size << 3;
+	uint32 totalBitsH = size >> 29;
+	
 	// add 0x80 to the message
-	addBytes("\x80", 1);
+	const byte b080 = 0x80;
+	addBytes(&b080, 1);
 
-	unsigned char footer[64] = {
+	byte footer[64] = {
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	// block has no room for 8-byte filesize, so finish it
 	if (unprocessedBytes > 56)
-		addBytes((char*)footer, 64 - unprocessedBytes);
+		addBytes((byte*)footer, 64 - unprocessedBytes);
 	assert(unprocessedBytes <= 56);
 	// how many zeros do we need
 	int neededZeros = 56 - unprocessedBytes;
@@ -179,7 +168,7 @@ void SHA1::getDigest(unsigned char * digest)
 	storeBigEndianUint32(footer + neededZeros, totalBitsH);
 	storeBigEndianUint32(footer + neededZeros + 4, totalBitsL);
 	// finish the final block
-	addBytes((char*)footer, neededZeros + 8);
+	addBytes((byte*)footer, neededZeros + 8);
 
 	// copy the digest bytes
 	storeBigEndianUint32(digest, H0);
