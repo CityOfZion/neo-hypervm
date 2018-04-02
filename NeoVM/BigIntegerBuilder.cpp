@@ -38,7 +38,7 @@ BigIntegerBuilder::BigIntegerBuilder(int32 sign, uint32 * bits, int32 bitSize, i
 
 	int32 n = sign;
 	int32 mask = n >> (kcbitUint - 1);
-	sign = (sign ^ mask) - mask;
+	outSign = (outSign ^ mask) - mask;
 	
 	if (this->_rgu == NULL)
 	{
