@@ -16,6 +16,12 @@ typedef unsigned long long      uint64;
 
 // ExecutionEngine Callbacks
 
+#if _WINDOWS
+#define __stdcall __stdcall
+#else
+#define __stdcall 
+#endif
+
 typedef byte(__stdcall * InvokeInteropCallback)(const char* method);
 typedef int32(__stdcall * GetScriptCallback)(const byte* scriptHash, byte* &script);
 typedef int32(__stdcall * GetMessageCallback)(uint32 iteration, byte* &message);
