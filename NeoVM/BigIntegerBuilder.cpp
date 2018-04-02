@@ -69,11 +69,11 @@ void BigIntegerBuilder::GetInteger(int32 &sign, uint32 * &bits, int32 &bitSize)
 	// Contract.Requires(signSrc == +1 || signSrc == -1);
 	// AssertValid(true);
 
-	if (_iuLast == 0)
+	if (this->_iuLast == 0)
 	{
-		if (_uSmall <= Int32MaxValue)
+		if (this->_uSmall <= Int32MaxValue)
 		{
-			sign = sign * (int)_uSmall;
+			sign = sign * (int)this->_uSmall;
 			bits = NULL;
 			bitSize = 0;
 			return;
@@ -81,52 +81,55 @@ void BigIntegerBuilder::GetInteger(int32 &sign, uint32 * &bits, int32 &bitSize)
 
 		if (this->_rgu == NULL)
 		{
-			this->_rgu = new uint32[1]{ _uSmall };
+			this->_rgu = new uint32[1]{ this->_uSmall };
 			this->_rguLength = 1;
 		}
-		else
+		else if (this->disposable)
 		{
-			this->_rgu[0] = _uSmall;
+			this->_rgu[0] = this->_uSmall;
+		}
+		else if (this->_rgu[0] != this->_uSmall)
+		{
+			this->_rgu = new uint32[1]{ this->_uSmall };
 		}
 	}
 
 	// The sign is +/- 1.
 	// sign = signSrc;
 
-	int32 cuExtra = this->_rguLength - _iuLast - 1;
+	int32 cuExtra = this->_rguLength - this->_iuLast - 1;
 	// Contract.Assert(cuExtra >= 0);
 
 	if (cuExtra <= 1)
 	{
-		if (cuExtra == 0 || this->_rgu[_iuLast + 1] == 0)
+		if (cuExtra == 0 || this->_rgu[this->_iuLast + 1] == 0)
 		{
 			this->disposable = false;
 			bits = this->_rgu;
 			bitSize = this->_rguLength;
 			return;
 		}
-		//if (this->_fWritable)
-		//{
-		this->_rgu[_iuLast + 1] = 0;
-		this->disposable = false;
-		bits = this->_rgu;
-		bitSize = this->_rguLength;
-		return;
-		//}
+		if (this->disposable)
+		{
+			this->_rgu[this->_iuLast + 1] = 0;
+			this->disposable = false;
+			bits = this->_rgu;
+			bitSize = this->_rguLength;
+			return;
+		}
 		// The buffer isn't writable, but has an extra uint that is non-zero,
 		// so we have to allocate a new buffer.
 	}
 
+	// Keep the bigger buffer (if it is writable), but create a smaller one for the BigInteger.
+
 	bits = this->_rgu;
 	bitSize = this->_rguLength;
 	this->disposable = false;
+	// Array.Resize(ref bits, _iuLast + 1);
 
-	/*
-	// Keep the bigger buffer (if it is writable), but create a smaller one for the BigInteger.
-	Array.Resize(ref bits, _iuLast + 1);
-	if (!_fWritable)
-		_rgu = bits;
-	*/
+	if (!this->disposable)
+		this->_rgu = bits;
 }
 
 void BigIntegerBuilder::Div(BigIntegerBuilder &reg)
