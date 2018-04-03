@@ -931,7 +931,31 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void NOT()
         {
+            // Without push
+
             byte[] script = new byte[]
+                {
+                    (byte)EVMOpCode.NOT,
+                };
+
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Real test
+
+            script = new byte[]
                 {
                     (byte)EVMOpCode.PUSH0,
                     (byte)EVMOpCode.NOT,

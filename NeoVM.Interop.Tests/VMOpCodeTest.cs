@@ -109,6 +109,25 @@ namespace NeoVM.Interop.Tests
         {
             Stopwatch sw = new Stopwatch();
 
+            // Test without push
+
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(new byte[] { (byte)operand });
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Test with push
+
             foreach (BigInteger bi in TestBigIntegers)
                 foreach (BigIntegerPair pair in IntPairIteration(bi))
                 {
@@ -172,6 +191,47 @@ namespace NeoVM.Interop.Tests
         protected void InternalTestBigInteger(EVMOpCode operand, Action<ExecutionEngine, BigInteger, CancelEventArgs> check)
         {
             Stopwatch sw = new Stopwatch();
+
+            // Test without push
+
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(new byte[] { (byte)operand });
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Test with wrong type
+
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(new byte[]
+                {
+                    (byte)EVMOpCode.PUSH1,
+                    (byte)EVMOpCode.NEWARRAY,
+                    (byte)operand
+                });
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Test with push
 
             foreach (BigInteger bbi in TestBigIntegers) foreach (BigInteger bi in IntSingleIteration(bbi))
                 {

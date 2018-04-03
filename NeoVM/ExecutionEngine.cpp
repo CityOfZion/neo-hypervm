@@ -1036,6 +1036,7 @@ ExecuteOpCode:
 
 		BigInteger *add = new BigInteger(BigInteger::One);
 		BigInteger *ret = bi->Add(add);
+		delete(add);
 		delete(bi);
 
 		if (ret == NULL)
@@ -1097,16 +1098,10 @@ ExecuteOpCode:
 			return;
 		}
 
-		BigInteger *ret = new BigInteger(bi->GetSign());
+		int ret = bi->GetSign();
 		delete(bi);
 
-		if (ret == NULL)
-		{
-			this->State = EVMState::FAULT;
-			return;
-		}
-
-		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		this->EvaluationStack->Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::NEGATE:
@@ -2354,6 +2349,27 @@ ExecuteOpCode:
 		}
 	}
 	case EVMOpCode::NEWARRAY:
+	{
+		if (this->EvaluationStack->Count() < 1)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		int32 count = 0;
+		IStackItem *item = this->EvaluationStack->Pop();
+
+		if (!item->GetInt32(count))
+		{
+			IStackItem::Free(item);
+			this->State = EVMState::FAULT;
+			return;
+		}
+		
+		IStackItem::Free(item);
+		this->EvaluationStack->Push(new ArrayStackItem(false, count));
+		return;
+	}
 	case EVMOpCode::NEWSTRUCT:
 	{
 		if (this->EvaluationStack->Count() < 1)
@@ -2362,19 +2378,18 @@ ExecuteOpCode:
 			return;
 		}
 
-		IStackItem *item = this->EvaluationStack->Pop();
-
 		int32 count = 0;
+		IStackItem *item = this->EvaluationStack->Pop();
+		
 		if (!item->GetInt32(count))
 		{
 			IStackItem::Free(item);
 			this->State = EVMState::FAULT;
 			return;
 		}
+		
 		IStackItem::Free(item);
-
-		ArrayStackItem * ar = new ArrayStackItem(opcode == EVMOpCode::NEWSTRUCT, count);
-		this->EvaluationStack->Push(ar);
+		this->EvaluationStack->Push(new ArrayStackItem(true, count));
 		return;
 	}
 	case EVMOpCode::NEWMAP:
