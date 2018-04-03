@@ -319,7 +319,6 @@ ExecuteOpCode:
 		}
 
 		byte script_hash[20];
-
 		if (context->Read(script_hash, 20) != 20)
 		{
 			this->State = EVMState::FAULT;
@@ -339,11 +338,9 @@ ExecuteOpCode:
 			}
 
 			IStackItem* item = this->EvaluationStack->Pop();
-
 			if (item->ReadByteArray(&script_hash[0], 0, 20) != 20)
 			{
 				IStackItem::Free(item);
-
 				this->State = EVMState::FAULT;
 				return;
 			}
@@ -356,14 +353,13 @@ ExecuteOpCode:
 
 		if (length <= 0)
 		{
-			State = EVMState::FAULT;
+			this->State = EVMState::FAULT;
 			return;
 		}
 
 		if (opcode == EVMOpCode::TAILCALL)
 		{
-			ExecutionContext* c = this->InvocationStack->Pop();
-			delete(c);
+			delete(this->InvocationStack->Pop());
 		}
 
 		this->LoadScript(script, length);

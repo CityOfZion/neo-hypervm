@@ -16,8 +16,7 @@ namespace NeoVM.Interop.Tests.Extra
             {
                return new byte[]
                {
-                    (byte)EVMOpCode.PUSHBYTES1,
-                    0x05,
+                    (byte)EVMOpCode.PUSH5,
                };
             }
 

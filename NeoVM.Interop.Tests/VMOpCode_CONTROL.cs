@@ -108,15 +108,52 @@ namespace NeoVM.Interop.Tests
             }
         }
 
-        [TestMethod]
-        public void APPCALL()
+        public void APPCALL_AND_TAILCALL(EVMOpCode opcode)
         {
+            Assert.IsTrue(opcode == EVMOpCode.APPCALL || opcode == EVMOpCode.TAILCALL);
+
             byte[] script = new byte[]
-                {
-                (byte)EVMOpCode.APPCALL,
+            {
+                (byte)opcode,
                 0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,
                 0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,
-                };
+            };
+
+            // Check without IScriptTable
+
+            using (ExecutionEngine engine = NeoVM.CreateEngine(new ExecutionEngineArgs()))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Check without complete hash
+
+            using (ExecutionEngine engine = NeoVM.CreateEngine(new ExecutionEngineArgs()))
+            {
+                // Load script
+
+                engine.LoadScript(script.Take(script.Length - 1).ToArray());
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Check script
 
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
@@ -130,10 +167,63 @@ namespace NeoVM.Interop.Tests
 
                 // Check
 
-                Assert.IsTrue(engine.EvaluationStack.Pop<ByteArrayStackItem>().Value.SequenceEqual(new byte[] { 0x05 }));
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 0x05);
 
                 CheckClean(engine);
             }
+
+            // Check empty hash without push
+
+            script = new byte[]
+                {
+                (byte)opcode,
+                0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+                0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+                };
+
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Check empty with wrong push
+
+            script = new byte[]
+                {
+                (byte)EVMOpCode.PUSHBYTES1,
+                0x01,
+
+                (byte)opcode,
+                0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+                0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+                };
+
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Check empty with wight push
 
             script = new byte[]
                 {
@@ -141,7 +231,7 @@ namespace NeoVM.Interop.Tests
                 0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,
                 0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,
 
-                (byte)EVMOpCode.APPCALL,
+                (byte)opcode,
                 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
                 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
                 };
@@ -154,70 +244,87 @@ namespace NeoVM.Interop.Tests
 
                 // Execute
 
-                Assert.AreEqual(EVMState.HALT, engine.Execute());
+                // PUSH
+
+                engine.StepInto();
+                Assert.AreEqual(0, engine.AltStack.Count);
+                Assert.AreEqual(1, engine.EvaluationStack.Count);
+                Assert.AreEqual(1, engine.InvocationStack.Count);
+
+                if (opcode == EVMOpCode.APPCALL)
+                {
+                    // APP CALL
+
+                    engine.StepInto();
+                    Assert.AreEqual(0, engine.AltStack.Count);
+                    Assert.AreEqual(0, engine.EvaluationStack.Count);
+                    Assert.AreEqual(2, engine.InvocationStack.Count);
+
+                    // PUSH 0x05
+
+                    engine.StepInto();
+                    Assert.AreEqual(0, engine.AltStack.Count);
+                    Assert.AreEqual(1, engine.EvaluationStack.Count);
+                    Assert.AreEqual(2, engine.InvocationStack.Count);
+
+                    // RET 1
+
+                    engine.StepInto();
+                    Assert.AreEqual(0, engine.AltStack.Count);
+                    Assert.AreEqual(1, engine.EvaluationStack.Count);
+                    Assert.AreEqual(1, engine.InvocationStack.Count);
+
+                    // RET 2
+
+                    engine.StepInto();
+                    Assert.AreEqual(0, engine.AltStack.Count);
+                    Assert.AreEqual(1, engine.EvaluationStack.Count);
+                    Assert.AreEqual(0, engine.InvocationStack.Count);
+                }
+                else
+                {
+                    // TAIL CALL
+
+                    engine.StepInto();
+                    Assert.AreEqual(0, engine.AltStack.Count);
+                    Assert.AreEqual(0, engine.EvaluationStack.Count);
+                    Assert.AreEqual(1, engine.InvocationStack.Count);
+
+                    // PUSH 0x05
+
+                    engine.StepInto();
+                    Assert.AreEqual(0, engine.AltStack.Count);
+                    Assert.AreEqual(1, engine.EvaluationStack.Count);
+                    Assert.AreEqual(1, engine.InvocationStack.Count);
+
+                    // RET 1
+
+                    engine.StepInto();
+                    Assert.AreEqual(0, engine.AltStack.Count);
+                    Assert.AreEqual(1, engine.EvaluationStack.Count);
+                    Assert.AreEqual(0, engine.InvocationStack.Count);
+                }
+
+                Assert.AreEqual(EVMState.HALT, engine.State);
 
                 // Check
 
-                Assert.IsTrue(engine.EvaluationStack.Pop<ByteArrayStackItem>().Value.SequenceEqual(new byte[] { 0x05 }));
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 0x05);
 
                 CheckClean(engine);
             }
         }
 
         [TestMethod]
+        public void APPCALL()
+        {
+            APPCALL_AND_TAILCALL(EVMOpCode.APPCALL);
+        }
+
+        [TestMethod]
         public void TAILCALL()
         {
-            byte[] script = new byte[]
-                {
-                (byte)EVMOpCode.TAILCALL,
-                0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,
-                0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,
-                };
-
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
-            {
-                // Load script
-
-                engine.LoadScript(script);
-
-                // Execute
-
-                Assert.AreEqual(EVMState.HALT, engine.Execute());
-
-                // Check
-
-                Assert.IsTrue(engine.EvaluationStack.Pop<ByteArrayStackItem>().Value.SequenceEqual(new byte[] { 0x05 }));
-
-                CheckClean(engine);
-            }
-
-            script = new byte[]
-                {
-                (byte)EVMOpCode.PUSHBYTES1+19,
-                0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,
-                0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,
-
-                (byte)EVMOpCode.TAILCALL,
-                0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-                };
-
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
-            {
-                // Load script
-
-                engine.LoadScript(script);
-
-                // Execute
-
-                Assert.AreEqual(EVMState.HALT, engine.Execute());
-
-                // Check
-
-                Assert.IsTrue(engine.EvaluationStack.Pop<ByteArrayStackItem>().Value.SequenceEqual(new byte[] { 0x05 }));
-
-                CheckClean(engine);
-            }
+            APPCALL_AND_TAILCALL(EVMOpCode.TAILCALL);
         }
 
         [TestMethod]
