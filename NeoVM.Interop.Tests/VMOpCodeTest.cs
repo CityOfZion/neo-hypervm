@@ -2,6 +2,7 @@
 using NeoVM.Interop.Enums;
 using NeoVM.Interop.Tests.Extra;
 using NeoVM.Interop.Types;
+using NeoVM.Interop.Types.StackItems;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -140,7 +141,17 @@ namespace NeoVM.Interop.Tests
 
                 // Execute
 
-                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+                if (operand == EVMOpCode.EQUAL)
+                {
+                    // Equal command don't FAULT here
+
+                    Assert.AreEqual(EVMState.HALT, engine.Execute());
+                    Assert.AreEqual(engine.EvaluationStack.Pop<BooleanStackItem>().Value, false);
+                }
+                else
+                {
+                    Assert.AreEqual(EVMState.FAULT, engine.Execute());
+                }
 
                 // Check
 
