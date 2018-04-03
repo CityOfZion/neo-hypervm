@@ -15,6 +15,7 @@ public:
 	ExecutionContext* Pop();
 	void Push(ExecutionContext * i);
 	ExecutionContext* Peek(int32 index);
+	ExecutionContext* TryPeek(int32 index);
 
 	~ExecutionContextStack();
 };

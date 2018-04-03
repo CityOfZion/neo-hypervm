@@ -22,6 +22,18 @@ ExecutionContext* ExecutionContextStack::Peek(int32 index)
 	return (ExecutionContext*)*it;
 }
 
+ExecutionContext* ExecutionContextStack::TryPeek(int32 index)
+{
+	if (this->Size <= index) return NULL;
+	if (index == 0) return this->Stack.front();
+	if (index < 0) return NULL;
+
+	std::list<ExecutionContext*>::iterator it = this->Stack.begin();
+	std::advance(it, index);
+
+	return (ExecutionContext*)*it;
+}
+
 void ExecutionContextStack::Drop()
 {
 	ExecutionContext *it = this->Stack.front();

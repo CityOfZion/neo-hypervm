@@ -103,13 +103,14 @@ void ExecutionEngine::StepInto()
 		return;
 	}
 
-	if (this->InvocationStack->Count() == 0)
+	ExecutionContext * context = this->InvocationStack->TryPeek(0);
+
+	if (context == NULL)
 	{
 		this->State = EVMState::HALT;
 		return;
 	}
 
-	ExecutionContext * context = this->InvocationStack->Peek(0);
 	EVMOpCode opcode = context->ReadNextInstruction();
 
 	// Check PushOnly
