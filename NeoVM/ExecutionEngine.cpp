@@ -126,19 +126,17 @@ ExecuteOpCode:
 
 	if (opcode >= EVMOpCode::PUSHBYTES1 && opcode <= EVMOpCode::PUSHBYTES75)
 	{
-		const byte length = (byte)opcode;
+		byte length = (byte)opcode;
 		byte *data = new byte[length];
 
 		if (context->Read(data, length) != length)
 		{
-			this->State = EVMState::FAULT;
-
 			delete[](data);
+			this->State = EVMState::FAULT;
 			return;
 		}
 
-		ByteArrayStackItem *it = new ByteArrayStackItem(data, length, true);
-		this->EvaluationStack->Push(it);
+		this->EvaluationStack->Push(new ByteArrayStackItem(data, length, true));
 		return;
 	}
 
@@ -146,8 +144,7 @@ ExecuteOpCode:
 
 	if (opcode >= EVMOpCode::PUSH1 && opcode <= EVMOpCode::PUSH16)
 	{
-		IntegerStackItem* it = new IntegerStackItem(((byte)opcode - (byte)EVMOpCode::PUSH1) + 1);
-		this->EvaluationStack->Push(it);
+		this->EvaluationStack->Push(new IntegerStackItem(((byte)opcode - (byte)EVMOpCode::PUSH1) + 1));
 		return;
 	}
 
@@ -160,8 +157,7 @@ ExecuteOpCode:
 
 	case EVMOpCode::PUSH0:
 	{
-		ByteArrayStackItem *it = new ByteArrayStackItem(NULL, 0, false);
-		this->EvaluationStack->Push(it);
+		this->EvaluationStack->Push(new ByteArrayStackItem(NULL, 0, false));
 		return;
 	}
 	case EVMOpCode::PUSHDATA1:
@@ -174,17 +170,14 @@ ExecuteOpCode:
 		}
 
 		byte *data = new byte[length];
-
 		if (context->Read(data, length) != length)
 		{
-			this->State = EVMState::FAULT;
-
 			delete[](data);
+			this->State = EVMState::FAULT;
 			return;
 		}
 
-		ByteArrayStackItem *it = new ByteArrayStackItem(data, length, true);
-		this->EvaluationStack->Push(it);
+		this->EvaluationStack->Push(new ByteArrayStackItem(data, length, true));
 		return;
 	}
 	case EVMOpCode::PUSHDATA2:
@@ -197,24 +190,18 @@ ExecuteOpCode:
 		}
 
 		byte *data = new byte[length];
-
 		if (context->Read(data, length) != length)
 		{
-			this->State = EVMState::FAULT;
-
 			delete[](data);
+			this->State = EVMState::FAULT;
 			return;
 		}
 
-		ByteArrayStackItem *it = new ByteArrayStackItem(data, length, true);
-		this->EvaluationStack->Push(it);
+		this->EvaluationStack->Push(new ByteArrayStackItem(data, length, true));
 		return;
 	}
 	case EVMOpCode::PUSHDATA4:
 	{
-		// TODO: uint ?
-		// https://github.com/neo-project/neo-vm/blob/master/src/neo-vm/ExecutionEngine.cs#L77
-
 		int32 length = 0;
 		if (!context->ReadInt32(length) || length < 0)
 		{
@@ -223,23 +210,19 @@ ExecuteOpCode:
 		}
 
 		byte *data = new byte[length];
-
 		if (context->Read(data, length) != length)
 		{
-			this->State = EVMState::FAULT;
-
 			delete[](data);
+			this->State = EVMState::FAULT;
 			return;
 		}
 
-		ByteArrayStackItem *it = new ByteArrayStackItem(data, length, true);
-		this->EvaluationStack->Push(it);
+		this->EvaluationStack->Push(new ByteArrayStackItem(data, length, true));
 		return;
 	}
 	case EVMOpCode::PUSHM1:
 	{
-		IntegerStackItem* it = new IntegerStackItem(-1);
-		this->EvaluationStack->Push(it);
+		this->EvaluationStack->Push(new IntegerStackItem(new BigInteger(BigInteger::MinusOne), true));
 		return;
 	}
 

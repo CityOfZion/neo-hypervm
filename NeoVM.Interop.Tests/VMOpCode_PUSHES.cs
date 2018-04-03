@@ -31,7 +31,7 @@ namespace NeoVM.Interop.Tests
 
                 // Check
 
-                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == -1);
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, -1);
 
                 CheckClean(engine);
             }
@@ -67,48 +67,55 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void PUSHBYTES1_TO_PUSHBYTES75()
         {
-            using (MemoryStream script = new MemoryStream())
-            {
-                for (int x = 0; x < 75; x++)
+            for (int x = 0; x < 75; x++)
+                using (MemoryStream script = new MemoryStream())
                 {
-                    script.WriteByte((byte)((byte)EVMOpCode.PUSHBYTES1 + x));
+                    // Generate Script
 
                     byte[] data = new byte[((byte)EVMOpCode.PUSHBYTES1 + x)];
                     for (byte y = 0; y < data.Length; y++) data[y] = y;
 
+                    script.WriteByte((byte)((byte)EVMOpCode.PUSHBYTES1 + x));
                     script.Write(data, 0, data.Length);
-                }
-
-                script.WriteByte((byte)(EVMOpCode.RET));
-
-                using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
-                {
-                    // Load script
-
-                    engine.LoadScript(script.ToArray());
 
                     // Execute
 
-                    Assert.AreEqual(EVMState.HALT, engine.Execute());
-
-                    // Check
-
-                    Assert.AreEqual(75, engine.EvaluationStack.Count);
-
-                    for (int x = 74; x >= 0; x--)
+                    using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
                     {
-                        byte[] data = new byte[((byte)EVMOpCode.PUSHBYTES1 + x)];
-                        for (byte y = 0; y < data.Length; y++) data[y] = y;
+                        // Load script
+
+                        engine.LoadScript(script.ToArray());
+
+                        // Execute
+
+                        Assert.AreEqual(EVMState.HALT, engine.Execute());
+
+                        // Check
+
+                        Assert.AreEqual(1, engine.EvaluationStack.Count);
 
                         Assert.IsTrue(engine.EvaluationStack.Pop<ByteArrayStackItem>().Value.SequenceEqual(data));
-                        Assert.AreEqual(x, engine.EvaluationStack.Count);
+
+                        CheckClean(engine);
                     }
 
-                    Assert.AreEqual(0, engine.EvaluationStack.Count);
+                    // Try error
 
-                    CheckClean(engine);
+                    using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+                    {
+                        // Load wrong Script
+
+                        engine.LoadScript(script.ToArray().Take((int)script.Length - 1).ToArray());
+
+                        // Execute
+
+                        Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                        // Check
+
+                        CheckClean(engine, false);
+                    }
                 }
-            }
         }
 
         [TestMethod]
@@ -142,33 +149,21 @@ namespace NeoVM.Interop.Tests
                 for (int x = 16; x >= 1; x--)
                 {
                     Assert.AreEqual(x, engine.EvaluationStack.Count);
-                    Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == x);
+                    Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, x);
                 }
-
-                Assert.AreEqual(0, engine.EvaluationStack.Count);
 
                 CheckClean(engine);
             }
         }
 
         [TestMethod]
-        public void PUSHDATA1_PUSHDATA2_PUSHDATA4()
+        public void PUSHDATA1()
         {
             byte[] script = new byte[]
                 {
                     (byte)EVMOpCode.PUSHDATA1,
                     0x04,
-                    0x01, 0x02, 0x03, 0x02,
-
-                    (byte)EVMOpCode.PUSHDATA2,
-                    0x04, 0x00,
-                    0x01, 0x02, 0x03, 0x01,
-
-                    (byte)EVMOpCode.PUSHDATA4,
-                    0x04, 0x00, 0x00, 0x00,
-                    0x01, 0x02, 0x03, 0x00,
-
-                    (byte)EVMOpCode.RET,
+                    0x01, 0x02, 0x03, 0x04
                 };
 
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
@@ -183,15 +178,128 @@ namespace NeoVM.Interop.Tests
 
                 // Check
 
-                for (byte x = 0; x < 3; x++)
+                Assert.IsTrue(engine.EvaluationStack.Pop<ByteArrayStackItem>().Value.SequenceEqual(new byte[]
                 {
-                    Assert.IsTrue(engine.EvaluationStack.Pop<ByteArrayStackItem>().Value.SequenceEqual(new byte[]
-                    {
-                    0x01,0x02,0x03,x
-                    }));
-                }
+                    0x01,0x02,0x03,0x04
+                }));
 
                 CheckClean(engine);
+            }
+
+            // Try error
+
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load wrong Script
+
+                script[1]++;
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+        }
+
+        [TestMethod]
+        public void PUSHDATA2()
+        {
+            byte[] script = new byte[]
+                {
+                    (byte)EVMOpCode.PUSHDATA2,
+                    0x04, 0x00,
+                    0x01, 0x02, 0x03, 0x04
+                };
+
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load Script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.HALT, engine.Execute());
+
+                // Check
+
+                Assert.IsTrue(engine.EvaluationStack.Pop<ByteArrayStackItem>().Value.SequenceEqual(new byte[]
+                {
+                    0x01,0x02,0x03,0x04
+                }));
+
+                CheckClean(engine);
+            }
+
+            // Try error
+
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load wrong Script
+
+                script[1]++;
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+        }
+
+        [TestMethod]
+        public void PUSHDATA4()
+        {
+            byte[] script = new byte[]
+                {
+                    (byte)EVMOpCode.PUSHDATA4,
+                    0x04, 0x00, 0x00, 0x00,
+                    0x01, 0x02, 0x03, 0x04
+                };
+
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load Script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.HALT, engine.Execute());
+
+                // Check
+
+                Assert.IsTrue(engine.EvaluationStack.Pop<ByteArrayStackItem>().Value.SequenceEqual(new byte[]
+                {
+                    0x01,0x02,0x03,0x04
+                }));
+
+                CheckClean(engine);
+            }
+
+            // Try error
+
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load wrong Script
+
+                script[1]++;
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
             }
         }
     }
