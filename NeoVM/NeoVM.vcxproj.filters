@@ -116,6 +116,9 @@
     <ClInclude Include="Types.h">
       <Filter>Header Files\Types</Filter>
     </ClInclude>
+    <ClInclude Include="Limits.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

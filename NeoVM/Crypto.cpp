@@ -6,12 +6,12 @@
 bool Crypto::VerifySignature
 (
 	byte* data, int32 dataLength,
-	byte* signature, int32 signatureSize,
-	byte* pubKey, int32 pubKeySize
+	byte* signature, int32 signatureLength,
+	byte* pubKey, int32 pubKeyLength
 )
 {
 	int pubKeyIndex = 0;
-	if (pubKeySize == 33 && (pubKey[0] == 0x02 || pubKey[0] == 0x03))
+	if (pubKeyLength == 33 && (pubKey[0] == 0x02 || pubKey[0] == 0x03))
 	{
 		/*
 		try
@@ -24,12 +24,12 @@ bool Crypto::VerifySignature
 		}
 		*/
 	}
-	else if (pubKeySize == 65 && pubKey[0] == 0x04)
+	else if (pubKeyLength == 65 && pubKey[0] == 0x04)
 	{
 		pubKeyIndex = 1;
-		pubKeySize = 64;
+		pubKeyLength = 64;
 	}
-	else if (pubKeySize != 64)
+	else if (pubKeyLength != 64)
 	{
 		return false;
 	}
