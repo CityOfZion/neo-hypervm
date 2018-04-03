@@ -24,15 +24,8 @@ namespace NeoVM.Interop.Types.StackItems
         /// <returns>Returns the StackItem element</returns>
         public IStackItem this[int index]
         {
-            get
-            {
-                IntPtr ptr = NeoVM.ArrayStackItem_Get(Handle, index);
-                return Engine.ConvertFromNative(ptr);
-            }
-            set
-            {
-                Set(index, value);
-            }
+            get { return Engine.ConvertFromNative(NeoVM.ArrayStackItem_Get(Handle, index)); }
+            set { Set(index, value); }
         }
 
         /// <summary>
@@ -54,8 +47,10 @@ namespace NeoVM.Interop.Types.StackItems
         /// <param name="engine">Engine</param>
         /// <param name="isStruct">Is struct?</param>
         internal ArrayStackItem(ExecutionEngine engine, bool isStruct) :
-            this(engine, new List<IStackItem>(), isStruct)
-        { }
+            base(engine, isStruct ? EStackItemType.Struct : EStackItemType.Array)
+        {
+            CreateNativeItem();
+        }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -209,7 +204,7 @@ namespace NeoVM.Interop.Types.StackItems
 
         protected override byte[] GetNativeByteArray()
         {
-            return new byte[] { };
+            return null;
         }
     }
 }

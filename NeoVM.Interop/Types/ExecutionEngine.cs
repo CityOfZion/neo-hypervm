@@ -275,7 +275,6 @@ namespace NeoVM.Interop.Types
                         return new IntegerStackItem(this, item, payload ?? (new byte[] { }));
                     }
                 case EStackItemType.Bool: return new BooleanStackItem(this, item, payload ?? (new byte[] { }));
-
                 default: throw new ExternalException();
             }
         }

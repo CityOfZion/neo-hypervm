@@ -54,7 +54,7 @@ namespace NeoVM.Interop
 
         internal delegate int delExecutionContextStack_Drop(IntPtr stackHandle, int count);
 
-        internal delegate IntPtr delStackItem_Create(EStackItemType type, byte[] data, int size);
+        internal delegate IntPtr delStackItem_Create(EStackItemType type, IntPtr data, int size);
         internal delegate EStackItemType delStackItem_SerializeDetails(IntPtr item, out int size);
         internal delegate int delStackItem_SerializeData(IntPtr item, IntPtr data, int length);
         internal delegate void delStackItem_Free(ref IntPtr item);

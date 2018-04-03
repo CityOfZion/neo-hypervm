@@ -4,7 +4,7 @@ using System;
 
 namespace NeoVM.Interop.Interfaces
 {
-    public abstract class IStackItem : IEquatable<IStackItem>, IDisposable
+    unsafe public abstract class IStackItem : IEquatable<IStackItem>, IDisposable
     {
         /// <summary>
         /// Engine
@@ -68,7 +68,18 @@ namespace NeoVM.Interop.Interfaces
         protected void CreateNativeItem()
         {
             byte[] data = GetNativeByteArray();
-            Handle = NeoVM.StackItem_Create(Type, data, data.Length);
+
+            if (data == null)
+            {
+                Handle = NeoVM.StackItem_Create(Type, IntPtr.Zero, 0);
+            }
+            else
+            {
+                fixed (byte* p = data)
+                {
+                    Handle = NeoVM.StackItem_Create(Type, (IntPtr)p, data.Length);
+                }
+            }
         }
 
         #region IDisposable Support
