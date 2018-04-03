@@ -38,6 +38,27 @@ BigInteger::BigInteger(BigInteger *value)
 	// AssertValid();
 }
 
+BigInteger::BigInteger(const BigInteger &value)
+{
+	this->_sign = value._sign;
+
+	if (value._bits == NULL || value._bitsSize <= 0)
+	{
+		this->_bits = NULL;
+		this->_bitsSize = 0;
+	}
+	else
+	{
+		this->_bitsSize = value._bitsSize;
+		this->_bits = new uint32[value._bitsSize];
+
+		for (int32 x = 0; x < value._bitsSize; x++)
+			this->_bits[x] = value._bits[x];
+	}
+
+	// AssertValid();
+}
+
 BigInteger::BigInteger(uint32* value, int32 valueSize, bool negative)
 {
 	if (value == NULL)
@@ -650,15 +671,14 @@ BigInteger* BigInteger::Shl(int32 shift)
 	if (smallShift == 0)
 	{
 		for (int32 i = 0; i < xl; i++)
-		{
 			zd[i + digitShift] = xd[i];
-		}
 	}
 	else
 	{
+		int32 i;
 		int32 carryShift = kcbitUint - smallShift;
 		uint32 carry = 0;
-		int32 i;
+
 		for (i = 0; i < xl; i++)
 		{
 			uint32 rot = xd[i];
@@ -923,7 +943,7 @@ BigInteger* BigInteger::Invert()
 	BigInteger *add = new BigInteger(BigInteger::One);
 	BigInteger* ret = Add(add);
 	delete(add);
-	
+
 	// Negate
 	BigInteger* realRet = new BigInteger(-ret->_sign, ret->_bits, ret->_bitsSize);
 	delete(ret);
@@ -938,7 +958,7 @@ BigInteger* BigInteger::Abs()
 	return new BigInteger(-this->_sign, this->_bits, this->_bitsSize);
 }
 
-int32 BigInteger::CompareTo(BigInteger bi)
+int32 BigInteger::CompareTo(const BigInteger &bi)
 {
 	// AssertValid();
 	// other.AssertValid();
@@ -954,10 +974,12 @@ int32 BigInteger::CompareTo(BigInteger bi)
 	{
 		if (bi._bits == NULL)
 			return this->_sign < bi._sign ? -1 : this->_sign > bi._sign ? +1 : 0;
+
 		return -bi._sign;
 	}
+
 	int32 cuThis, cuOther;
-	if (bi._bits == NULL || (cuThis = Length(this->_bits, this->_bitsSize)) > (cuOther = Length(bi._bits, this->_bitsSize)))
+	if (bi._bits == NULL || (cuThis = Length(this->_bits, this->_bitsSize)) > (cuOther = Length(bi._bits, bi._bitsSize)))
 		return this->_sign;
 
 	if (cuThis < cuOther)
@@ -986,10 +1008,12 @@ int32 BigInteger::CompareTo(BigInteger *bi)
 	{
 		if (bi->_bits == NULL)
 			return this->_sign < bi->_sign ? -1 : this->_sign > bi->_sign ? +1 : 0;
+
 		return -bi->_sign;
 	}
+
 	int32 cuThis, cuOther;
-	if (bi->_bits == NULL || (cuThis = Length(this->_bits, this->_bitsSize)) > (cuOther = Length(bi->_bits, this->_bitsSize)))
+	if (bi->_bits == NULL || (cuThis = Length(this->_bits, this->_bitsSize)) > (cuOther = Length(bi->_bits, bi->_bitsSize)))
 		return this->_sign;
 
 	if (cuThis < cuOther)

@@ -103,13 +103,14 @@ void ExecutionEngine::StepInto()
 		return;
 	}
 
-	if (this->InvocationStack->Count() == 0)
+	ExecutionContext * context = this->InvocationStack->TryPeek(0);
+
+	if (context == NULL)
 	{
 		this->State = EVMState::HALT;
 		return;
 	}
 
-	ExecutionContext * context = this->InvocationStack->Peek(0);
 	EVMOpCode opcode = context->ReadNextInstruction();
 
 	// Check PushOnly
@@ -126,19 +127,17 @@ ExecuteOpCode:
 
 	if (opcode >= EVMOpCode::PUSHBYTES1 && opcode <= EVMOpCode::PUSHBYTES75)
 	{
-		const byte length = (byte)opcode;
+		byte length = (byte)opcode;
 		byte *data = new byte[length];
 
 		if (context->Read(data, length) != length)
 		{
-			this->State = EVMState::FAULT;
-
 			delete[](data);
+			this->State = EVMState::FAULT;
 			return;
 		}
 
-		ByteArrayStackItem *it = new ByteArrayStackItem(data, length, true);
-		this->EvaluationStack->Push(it);
+		this->EvaluationStack->Push(new ByteArrayStackItem(data, length, true));
 		return;
 	}
 
@@ -146,8 +145,7 @@ ExecuteOpCode:
 
 	if (opcode >= EVMOpCode::PUSH1 && opcode <= EVMOpCode::PUSH16)
 	{
-		IntegerStackItem* it = new IntegerStackItem(((byte)opcode - (byte)EVMOpCode::PUSH1) + 1);
-		this->EvaluationStack->Push(it);
+		this->EvaluationStack->Push(new IntegerStackItem(((byte)opcode - (byte)EVMOpCode::PUSH1) + 1));
 		return;
 	}
 
@@ -160,8 +158,7 @@ ExecuteOpCode:
 
 	case EVMOpCode::PUSH0:
 	{
-		ByteArrayStackItem *it = new ByteArrayStackItem(NULL, 0, false);
-		this->EvaluationStack->Push(it);
+		this->EvaluationStack->Push(new ByteArrayStackItem(NULL, 0, false));
 		return;
 	}
 	case EVMOpCode::PUSHDATA1:
@@ -174,17 +171,14 @@ ExecuteOpCode:
 		}
 
 		byte *data = new byte[length];
-
 		if (context->Read(data, length) != length)
 		{
-			this->State = EVMState::FAULT;
-
 			delete[](data);
+			this->State = EVMState::FAULT;
 			return;
 		}
 
-		ByteArrayStackItem *it = new ByteArrayStackItem(data, length, true);
-		this->EvaluationStack->Push(it);
+		this->EvaluationStack->Push(new ByteArrayStackItem(data, length, true));
 		return;
 	}
 	case EVMOpCode::PUSHDATA2:
@@ -197,24 +191,18 @@ ExecuteOpCode:
 		}
 
 		byte *data = new byte[length];
-
 		if (context->Read(data, length) != length)
 		{
-			this->State = EVMState::FAULT;
-
 			delete[](data);
+			this->State = EVMState::FAULT;
 			return;
 		}
 
-		ByteArrayStackItem *it = new ByteArrayStackItem(data, length, true);
-		this->EvaluationStack->Push(it);
+		this->EvaluationStack->Push(new ByteArrayStackItem(data, length, true));
 		return;
 	}
 	case EVMOpCode::PUSHDATA4:
 	{
-		// TODO: uint ?
-		// https://github.com/neo-project/neo-vm/blob/master/src/neo-vm/ExecutionEngine.cs#L77
-
 		int32 length = 0;
 		if (!context->ReadInt32(length) || length < 0)
 		{
@@ -223,23 +211,19 @@ ExecuteOpCode:
 		}
 
 		byte *data = new byte[length];
-
 		if (context->Read(data, length) != length)
 		{
-			this->State = EVMState::FAULT;
-
 			delete[](data);
+			this->State = EVMState::FAULT;
 			return;
 		}
 
-		ByteArrayStackItem *it = new ByteArrayStackItem(data, length, true);
-		this->EvaluationStack->Push(it);
+		this->EvaluationStack->Push(new ByteArrayStackItem(data, length, true));
 		return;
 	}
 	case EVMOpCode::PUSHM1:
 	{
-		IntegerStackItem* it = new IntegerStackItem(-1);
-		this->EvaluationStack->Push(it);
+		this->EvaluationStack->Push(new IntegerStackItem(new BigInteger(BigInteger::MinusOne), true));
 		return;
 	}
 
@@ -296,6 +280,12 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::CALL:
 	{
+		if (context == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
 		ExecutionContext * clone = context->Clone();
 
 		this->InvocationStack->Push(clone);
@@ -330,7 +320,6 @@ ExecuteOpCode:
 		}
 
 		byte script_hash[20];
-
 		if (context->Read(script_hash, 20) != 20)
 		{
 			this->State = EVMState::FAULT;
@@ -350,11 +339,9 @@ ExecuteOpCode:
 			}
 
 			IStackItem* item = this->EvaluationStack->Pop();
-
 			if (item->ReadByteArray(&script_hash[0], 0, 20) != 20)
 			{
 				IStackItem::Free(item);
-
 				this->State = EVMState::FAULT;
 				return;
 			}
@@ -367,14 +354,13 @@ ExecuteOpCode:
 
 		if (length <= 0)
 		{
-			State = EVMState::FAULT;
+			this->State = EVMState::FAULT;
 			return;
 		}
 
 		if (opcode == EVMOpCode::TAILCALL)
 		{
-			ExecutionContext* c = this->InvocationStack->Pop();
-			delete(c);
+			delete(this->InvocationStack->Pop());
 		}
 
 		this->LoadScript(script, length);
@@ -394,9 +380,8 @@ ExecuteOpCode:
 
 		if (context->Read((byte*)data, length) != length)
 		{
-			this->State = EVMState::FAULT;
-
 			delete[](data);
+			this->State = EVMState::FAULT;
 			return;
 		}
 
@@ -540,7 +525,6 @@ ExecuteOpCode:
 		}
 
 		IStackItem *it = this->EvaluationStack->Peek(0);
-
 		this->EvaluationStack->Push(it);
 		return;
 	}
@@ -1052,6 +1036,7 @@ ExecuteOpCode:
 
 		BigInteger *add = new BigInteger(BigInteger::One);
 		BigInteger *ret = bi->Add(add);
+		delete(add);
 		delete(bi);
 
 		if (ret == NULL)
@@ -1113,16 +1098,10 @@ ExecuteOpCode:
 			return;
 		}
 
-		BigInteger *ret = new BigInteger(bi->GetSign());
+		int ret = bi->GetSign();
 		delete(bi);
 
-		if (ret == NULL)
-		{
-			this->State = EVMState::FAULT;
-			return;
-		}
-
-		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		this->EvaluationStack->Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::NEGATE:
@@ -1219,7 +1198,6 @@ ExecuteOpCode:
 		}
 
 		IStackItem *ret = new BoolStackItem(i->CompareTo(BigInteger::Zero) != 0);
-
 		delete(i);
 
 		this->EvaluationStack->Push(ret);
@@ -1757,7 +1735,6 @@ ExecuteOpCode:
 		}
 
 		IStackItem *ret;
-
 		if (i1->CompareTo(i2) >= 0)
 		{
 			delete(i1);
@@ -1799,7 +1776,6 @@ ExecuteOpCode:
 		}
 
 		IStackItem *ret;
-
 		if (i1->CompareTo(i2) >= 0)
 		{
 			delete(i2);
@@ -1867,26 +1843,31 @@ ExecuteOpCode:
 		}
 
 		IStackItem *item = this->EvaluationStack->Pop();
-
 		int32 size = item->ReadByteArraySize();
-		byte* data = new byte[size];
 
+		if (size < 0)
+		{
+			IStackItem::Free(item);
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		byte* data = new byte[size];
 		size = item->ReadByteArray(data, 0, size);
 		IStackItem::Free(item);
 
 		if (size < 0)
 		{
 			delete[]data;
+			this->State = EVMState::FAULT;
 			return;
 		}
 
 		byte *hash = new byte[Crypto::SHA1_LENGTH];
 		Crypto::ComputeSHA1(data, size, hash);
-
 		delete[]data;
 
-		IStackItem *it = new ByteArrayStackItem(hash, Crypto::SHA1_LENGTH, true);
-		this->EvaluationStack->Push(it);
+		this->EvaluationStack->Push(new ByteArrayStackItem(hash, Crypto::SHA1_LENGTH, true));
 		return;
 	}
 	case EVMOpCode::SHA256:
@@ -1898,26 +1879,31 @@ ExecuteOpCode:
 		}
 
 		IStackItem *item = this->EvaluationStack->Pop();
-
 		int32 size = item->ReadByteArraySize();
-		byte* data = new byte[size];
 
+		if (size < 0)
+		{
+			IStackItem::Free(item);
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		byte* data = new byte[size];
 		size = item->ReadByteArray(data, 0, size);
 		IStackItem::Free(item);
 
 		if (size < 0)
 		{
 			delete[]data;
+			this->State = EVMState::FAULT;
 			return;
 		}
 
 		byte *hash = new byte[Crypto::SHA256_LENGTH];
 		Crypto::ComputeSHA256(data, size, hash);
-
 		delete[]data;
 
-		IStackItem *it = new ByteArrayStackItem(hash, Crypto::SHA256_LENGTH, true);
-		this->EvaluationStack->Push(it);
+		this->EvaluationStack->Push(new ByteArrayStackItem(hash, Crypto::SHA256_LENGTH, true));
 		return;
 	}
 	case EVMOpCode::HASH160:
@@ -1929,26 +1915,31 @@ ExecuteOpCode:
 		}
 
 		IStackItem *item = this->EvaluationStack->Pop();
-
 		int32 size = item->ReadByteArraySize();
-		byte* data = new byte[size];
 
+		if (size < 0)
+		{
+			IStackItem::Free(item);
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		byte* data = new byte[size];
 		size = item->ReadByteArray(data, 0, size);
 		IStackItem::Free(item);
 
 		if (size < 0)
 		{
 			delete[]data;
+			this->State = EVMState::FAULT;
 			return;
 		}
 
 		byte *hash = new byte[Crypto::HASH160_LENGTH];
 		Crypto::ComputeHash160(data, size, hash);
-
 		delete[]data;
 
-		IStackItem *it = new ByteArrayStackItem(hash, Crypto::HASH160_LENGTH, true);
-		this->EvaluationStack->Push(it);
+		this->EvaluationStack->Push(new ByteArrayStackItem(hash, Crypto::HASH160_LENGTH, true));
 		return;
 	}
 	case EVMOpCode::HASH256:
@@ -1960,26 +1951,31 @@ ExecuteOpCode:
 		}
 
 		IStackItem *item = this->EvaluationStack->Pop();
-
 		int32 size = item->ReadByteArraySize();
-		byte* data = new byte[size];
 
+		if (size < 0)
+		{
+			IStackItem::Free(item);
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		byte* data = new byte[size];
 		size = item->ReadByteArray(data, 0, size);
 		IStackItem::Free(item);
 
 		if (size < 0)
 		{
 			delete[]data;
+			this->State = EVMState::FAULT;
 			return;
 		}
 
 		byte *hash = new byte[Crypto::HASH256_LENGTH];
 		Crypto::ComputeHash256(data, size, hash);
-
 		delete[]data;
 
-		IStackItem *it = new ByteArrayStackItem(hash, Crypto::HASH256_LENGTH, true);
-		this->EvaluationStack->Push(it);
+		this->EvaluationStack->Push(new ByteArrayStackItem(hash, Crypto::HASH256_LENGTH, true));
 		return;
 	}
 	case EVMOpCode::CHECKSIG:
@@ -2370,6 +2366,27 @@ ExecuteOpCode:
 		}
 	}
 	case EVMOpCode::NEWARRAY:
+	{
+		if (this->EvaluationStack->Count() < 1)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		int32 count = 0;
+		IStackItem *item = this->EvaluationStack->Pop();
+
+		if (!item->GetInt32(count) || count < 0)
+		{
+			IStackItem::Free(item);
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem::Free(item);
+		this->EvaluationStack->Push(new ArrayStackItem(false, count));
+		return;
+	}
 	case EVMOpCode::NEWSTRUCT:
 	{
 		if (this->EvaluationStack->Count() < 1)
@@ -2378,25 +2395,23 @@ ExecuteOpCode:
 			return;
 		}
 
+		int32 count = 0;
 		IStackItem *item = this->EvaluationStack->Pop();
 
-		int32 count = 0;
-		if (!item->GetInt32(count))
+		if (!item->GetInt32(count) || count < 0)
 		{
 			IStackItem::Free(item);
 			this->State = EVMState::FAULT;
 			return;
 		}
-		IStackItem::Free(item);
 
-		ArrayStackItem * ar = new ArrayStackItem(opcode == EVMOpCode::NEWSTRUCT, count);
-		this->EvaluationStack->Push(ar);
+		IStackItem::Free(item);
+		this->EvaluationStack->Push(new ArrayStackItem(true, count));
 		return;
 	}
 	case EVMOpCode::NEWMAP:
 	{
-		MapStackItem *item = new MapStackItem();
-		this->EvaluationStack->Push(item);
+		this->EvaluationStack->Push(new MapStackItem());
 		return;
 	}
 	case EVMOpCode::APPEND:

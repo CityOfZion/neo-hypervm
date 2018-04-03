@@ -2,6 +2,7 @@
 using NeoVM.Interop.Enums;
 using NeoVM.Interop.Tests.Extra;
 using NeoVM.Interop.Types;
+using NeoVM.Interop.Types.StackItems;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -107,27 +108,74 @@ namespace NeoVM.Interop.Tests
         /// <param name="check">Check</param>
         protected void InternalTestBigInteger(EVMOpCode operand, Action<ExecutionEngine, BigInteger, BigInteger, CancelEventArgs> check)
         {
+            // Test without push
+
+            using (ScriptBuilder script = new ScriptBuilder(operand))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Test with wrong type
+
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                EVMOpCode.PUSH1,
+                EVMOpCode.PUSH1,
+                EVMOpCode.NEWARRAY,
+                operand
+                ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                if (operand == EVMOpCode.EQUAL)
+                {
+                    // Equal command don't FAULT here
+
+                    Assert.AreEqual(EVMState.HALT, engine.Execute());
+                    Assert.AreEqual(engine.EvaluationStack.Pop<BooleanStackItem>().Value, false);
+                }
+                else
+                {
+                    Assert.AreEqual(EVMState.FAULT, engine.Execute());
+                }
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
             Stopwatch sw = new Stopwatch();
+
+            // Test with push
 
             foreach (BigInteger bi in TestBigIntegers)
                 foreach (BigIntegerPair pair in IntPairIteration(bi))
                 {
-                    using (MemoryStream script = new MemoryStream())
+                    using (ScriptBuilder script = new ScriptBuilder())
                     using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
                     {
                         // Make the script
 
                         foreach (BigInteger bb in new BigInteger[] { pair.A, pair.B })
-                        {
-                            byte[] bba = bb.ToByteArray();
+                            script.EmitPush(bb.ToByteArray());
 
-                            script.WriteByte((byte)EVMOpCode.PUSHDATA1);
-                            script.WriteByte((byte)bba.Length);
-                            script.Write(bba, 0, bba.Length);
-                        }
-
-                        script.WriteByte((byte)operand);
-                        script.WriteByte((byte)EVMOpCode.RET);
+                        script.Emit(operand, EVMOpCode.RET);
 
                         // Load script
 
@@ -171,23 +219,60 @@ namespace NeoVM.Interop.Tests
         /// <param name="check">Check</param>
         protected void InternalTestBigInteger(EVMOpCode operand, Action<ExecutionEngine, BigInteger, CancelEventArgs> check)
         {
+            // Test without push
+
+            using (ScriptBuilder script = new ScriptBuilder(operand))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Test with wrong type
+
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                EVMOpCode.PUSH1,
+                EVMOpCode.NEWARRAY,
+                operand
+                ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Test with push
+
             Stopwatch sw = new Stopwatch();
 
             foreach (BigInteger bbi in TestBigIntegers) foreach (BigInteger bi in IntSingleIteration(bbi))
                 {
-                    using (MemoryStream script = new MemoryStream())
+                    using (ScriptBuilder script = new ScriptBuilder())
                     using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
                     {
                         // Make the script
 
-                        byte[] bba = bi.ToByteArray();
-
-                        script.WriteByte((byte)EVMOpCode.PUSHDATA1);
-                        script.WriteByte((byte)bba.Length);
-                        script.Write(bba, 0, bba.Length);
-
-                        script.WriteByte((byte)operand);
-                        script.WriteByte((byte)EVMOpCode.RET);
+                        script.EmitPush(bi.ToByteArray());
+                        script.Emit(operand, EVMOpCode.RET);
 
                         // Load script
 

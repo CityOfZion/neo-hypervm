@@ -19,12 +19,11 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void TestScriptHash()
         {
-            byte[] script = new byte[]
-                {
-                    (byte)EVMOpCode.PUSH0,
-                    (byte)EVMOpCode.RET,
-                };
-
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                EVMOpCode.PUSH0,
+                EVMOpCode.RET
+                ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -54,8 +53,7 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void TestPushOnly()
         {
-            byte[] script = new byte[] { (byte)EVMOpCode.SYSCALL };
-
+            using (ScriptBuilder script = new ScriptBuilder(EVMOpCode.SYSCALL))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -71,14 +69,13 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void TestScriptLogic()
         {
-            byte[] script = new byte[]
-                {
-                    (byte)EVMOpCode.PUSH0,
-                    (byte)EVMOpCode.NOT,
-                    (byte)EVMOpCode.NOT,
-                    (byte)EVMOpCode.DROP,
-                };
-
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                EVMOpCode.PUSH0,
+                EVMOpCode.NOT,
+                EVMOpCode.NOT,
+                EVMOpCode.DROP
+                ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 engine.LoadScript(script);

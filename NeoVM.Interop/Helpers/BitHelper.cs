@@ -12,6 +12,46 @@ namespace NeoVM.Interop.Helpers
         /// Get bytes
         /// </summary>
         /// <param name="value">Value</param>
+        public static byte[] GetBytes(int value)
+        {
+            byte[] bytes = new byte[4];
+
+            fixed (byte* b = bytes)
+                *((int*)b) = value;
+
+            if (!BitConverter.IsLittleEndian)
+            {
+                // Convert to Little Endian
+
+                Array.Reverse(bytes);
+            }
+
+            return bytes;
+        }
+        /// <summary>
+        /// Get bytes
+        /// </summary>
+        /// <param name="value">Value</param>
+        public static byte[] GetBytes(ushort value)
+        {
+            byte[] bytes = new byte[2];
+
+            fixed (byte* b = bytes)
+                *((ushort*)b) = value;
+
+            if (!BitConverter.IsLittleEndian)
+            {
+                // Convert to Little Endian
+
+                Array.Reverse(bytes);
+            }
+
+            return bytes;
+        }
+        /// <summary>
+        /// Get bytes
+        /// </summary>
+        /// <param name="value">Value</param>
         public static byte[] GetBytes(long value)
         {
             byte[] bytes = new byte[8];
