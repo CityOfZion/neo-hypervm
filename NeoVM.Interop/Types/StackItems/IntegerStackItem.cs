@@ -12,19 +12,28 @@ namespace NeoVM.Interop.Types.StackItems
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="data">Data</param>
-        internal IntegerStackItem(ExecutionEngine engine, int data) : this(engine, new BigInteger(data)) { }
+        internal IntegerStackItem(ExecutionEngine engine, int data) : base(engine, new BigInteger(data), EStackItemType.Integer)
+        {
+            CreateNativeItem();
+        }
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="data">Data</param>
-        internal IntegerStackItem(ExecutionEngine engine, long data) : this(engine, new BigInteger(data)) { }
+        internal IntegerStackItem(ExecutionEngine engine, long data) : base(engine, new BigInteger(data), EStackItemType.Integer)
+        {
+            CreateNativeItem();
+        }
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="data">Data</param>
-        internal IntegerStackItem(ExecutionEngine engine, byte[] data) : this(engine, new BigInteger(data)) { }
+        internal IntegerStackItem(ExecutionEngine engine, byte[] data) : base(engine, new BigInteger(data), EStackItemType.Integer)
+        {
+            CreateNativeItem();
+        }
         /// <summary>
         /// Constructor
         /// </summary>

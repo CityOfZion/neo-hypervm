@@ -34,8 +34,7 @@ namespace NeoVM.Interop.Types
 
                 fixed (byte* p = _ScriptHash)
                 {
-                    int size = NeoVM.ExecutionContext_GetScriptHash(Handle, (IntPtr)p, 0);
-                    if (size != ScriptHashLength)
+                    if (NeoVM.ExecutionContext_GetScriptHash(Handle, (IntPtr)p, 0) != ScriptHashLength)
                         throw (new AccessViolationException());
                 }
 

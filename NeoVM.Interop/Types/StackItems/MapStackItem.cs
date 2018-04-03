@@ -113,7 +113,7 @@ namespace NeoVM.Interop.Types.StackItems
 
         protected override byte[] GetNativeByteArray()
         {
-            return new byte[] { };
+            return null;
         }
     }
 }

@@ -1989,7 +1989,10 @@ ExecuteOpCode:
 		IStackItem *ipubKey = this->EvaluationStack->Pop();
 		IStackItem *isignature = this->EvaluationStack->Pop();
 
-		if (MessageCallback == NULL)
+		int pubKeySize = ipubKey->ReadByteArraySize();
+		int signatureSize = isignature->ReadByteArraySize();
+
+		if (MessageCallback == NULL || pubKeySize < 33 || signatureSize < 32)
 		{
 			IStackItem::Free(ipubKey);
 			IStackItem::Free(isignature);
@@ -1998,8 +2001,12 @@ ExecuteOpCode:
 			return;
 		}
 
-		byte* message;
-		int32 msgL = MessageCallback(this->Iteration, message);
+		// Read message
+
+		// TODO: dangerous way to get the message
+
+		byte* msg;
+		int32 msgL = MessageCallback(this->Iteration, msg);
 		if (msgL <= 0)
 		{
 			IStackItem::Free(ipubKey);
@@ -2009,25 +2016,25 @@ ExecuteOpCode:
 			return;
 		}
 
-		// bool ret = Crypto::VerifySignature(message, isignature, ipubKey);
+		// Read public Key
+
+		byte * pubKey = new byte[pubKeySize];
+		pubKeySize = ipubKey->ReadByteArray(pubKey, 0, pubKeySize);
+
+		// Read signature
+
+		byte * signature = new byte[signatureSize];
+		signatureSize = isignature->ReadByteArray(signature, 0, signatureSize);
+
+		bool ret = Crypto::VerifySignature(msg, msgL, signature, signatureSize, pubKey, pubKeySize);
+
+		delete[](pubKey);
+		delete[](signature);
 
 		IStackItem::Free(ipubKey);
 		IStackItem::Free(isignature);
 
-		// this->EvaluationStack->Push(new BoolStackItem(ret));
-
-		/*
-		byte[] pubkey = EvaluationStack.Pop().GetByteArray();
-		byte[] signature = EvaluationStack.Pop().GetByteArray();
-		try
-		{
-			EvaluationStack.Push(Crypto.VerifySignature(ScriptContainer.GetMessage(), signature, pubkey));
-		}
-		catch (ArgumentException)
-		{
-			EvaluationStack.Push(false);
-		}
-		*/
+		this->EvaluationStack->Push(new BoolStackItem(ret));
 		return;
 	}
 	case EVMOpCode::CHECKMULTISIG:
