@@ -46,6 +46,13 @@ IStackItem* MapStackItem::Clone()
 	return new MapStackItem();
 }
 
+bool MapStackItem::Equals(IStackItem * it)
+{
+	if (it == this) return true;
+
+	return false;
+}
+
 void MapStackItem::Set(IStackItem* key, IStackItem* value)
 {
 

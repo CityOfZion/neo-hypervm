@@ -18,6 +18,7 @@ public:
 	virtual int32 ReadByteArray(byte * output, int32 sourceIndex, int32 count) = 0;
 	virtual int32 ReadByteArraySize() = 0;
 	virtual IStackItem* Clone() = 0;
+	virtual bool Equals(IStackItem * it) = 0;
 
 	// Constructor
 

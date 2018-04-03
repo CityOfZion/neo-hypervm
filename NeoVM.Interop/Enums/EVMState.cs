@@ -13,6 +13,6 @@
         /// <summary>
         /// Virtual machine execution with errors
         /// </summary>
-        FAULT = 2,
+        FAULT = 2
     };
 }

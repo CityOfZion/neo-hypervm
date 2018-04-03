@@ -18,6 +18,7 @@ public:
 	int32 ReadByteArray(byte * output, int32 sourceIndex, int32 count);
 	IStackItem* Clone();
 	int32 ReadByteArraySize();
+	bool Equals(IStackItem * it);
 
 	// Constructor
 

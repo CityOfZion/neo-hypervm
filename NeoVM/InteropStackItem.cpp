@@ -47,6 +47,13 @@ IStackItem* InteropStackItem::Clone()
 	return new InteropStackItem(this->Payload, this->PayloadLength);
 }
 
+bool InteropStackItem::Equals(IStackItem * it)
+{
+	if (it == this) return true;
+
+	return false;
+}
+
 // Serialize
 
 int32 InteropStackItem::Serialize(byte * data, int32 length)

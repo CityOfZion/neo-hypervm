@@ -3,6 +3,6 @@
     enum EArchitecture : byte
     {
         x86 = 0,
-        x64 = 1,
+        x64 = 1
     }
 }

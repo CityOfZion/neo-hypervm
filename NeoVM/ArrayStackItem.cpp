@@ -69,6 +69,13 @@ IStackItem* ArrayStackItem::Clone()
 	return ret;
 }
 
+bool ArrayStackItem::Equals(IStackItem * it)
+{
+	if (it == this) return true;
+
+	return false;
+}
+
 int32 ArrayStackItem::Count()
 {
 	return static_cast<int>(this->List.size());

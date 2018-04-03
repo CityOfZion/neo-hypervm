@@ -1,4 +1,5 @@
 ﻿using NeoVM.Interop.Enums;
+using NeoVM.Interop.Helpers;
 using NeoVM.Interop.Interfaces;
 using NeoVM.Interop.Types.Collections;
 using NeoVM.Interop.Types.StackItems;
@@ -233,6 +234,7 @@ namespace NeoVM.Interop.Types
             EStackItemType state = NeoVM.StackItem_SerializeDetails(item, out int size);
             if (state == EStackItemType.None) return null;
 
+            int readed;
             byte[] payload;
 
             if (size > 0)
@@ -240,16 +242,12 @@ namespace NeoVM.Interop.Types
                 payload = new byte[size];
                 fixed (byte* p = payload)
                 {
-                    int s = NeoVM.StackItem_SerializeData(item, (IntPtr)p, size);
-                    if (s != size)
-                    {
-                        // TODO: Try to fix this issue with BigInteger
-                        Array.Resize(ref payload, s);
-                    }
+                    readed = NeoVM.StackItem_SerializeData(item, (IntPtr)p, size);
                 }
             }
             else
             {
+                readed = 0;
                 payload = null;
             }
 
@@ -262,11 +260,20 @@ namespace NeoVM.Interop.Types
                     {
                         // Extract object
 
-                        IntPtr ptr = new IntPtr(BitConverter.ToInt64(payload, 0));
+                        IntPtr ptr = new IntPtr(BitHelper.ToInt64(payload, 0));
                         return new InteropStackItem(this, item, Marshal.GetObjectForIUnknown(ptr), ptr);
                     }
                 case EStackItemType.ByteArray: return new ByteArrayStackItem(this, item, payload ?? (new byte[] { }));
-                case EStackItemType.Integer: return new IntegerStackItem(this, item, payload ?? (new byte[] { }));
+                case EStackItemType.Integer:
+                    {
+                        if (readed != size)
+                        {
+                            // TODO: Try to fix this issue with BigInteger
+                            Array.Resize(ref payload, readed);
+                        }
+
+                        return new IntegerStackItem(this, item, payload ?? (new byte[] { }));
+                    }
                 case EStackItemType.Bool: return new BooleanStackItem(this, item, payload ?? (new byte[] { }));
 
                 default: throw new ExternalException();
@@ -367,11 +374,6 @@ namespace NeoVM.Interop.Types
         protected virtual void Dispose(bool disposing)
         {
             if (Handle == IntPtr.Zero) return;
-
-            if (disposing)
-            {
-                // dispose managed state (managed objects).
-            }
 
             // free unmanaged resources (unmanaged objects) and override a finalizer below. set large fields to null.
             NeoVM.ExecutionEngine_Free(ref Handle);

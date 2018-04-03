@@ -18,6 +18,7 @@ public:
 	IStackItem* Clone();
 	int32 ReadByteArray(byte * output, int32 sourceIndex, int32 count);
 	int32 ReadByteArraySize();
+	bool Equals(IStackItem * it);
 
 	// Is Struct?
 

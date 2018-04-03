@@ -7,7 +7,7 @@ ExecutionContext::ExecutionContext(byte* script, int32 scriptLength, bool pushOn
 {
 	// Copy script
 
-	this->Script = new unsigned char[scriptLength];
+	this->Script = new byte[scriptLength];
 	memcpy(this->Script, script, scriptLength);
 }
 
@@ -29,7 +29,7 @@ bool ExecutionContext::ReadUInt16(uint16 &ret)
 	if (Read(data, 2) != 2)
 		return false;
 
-	ret = (uint16)((int)data[0] | (int)data[1] << 8);
+	ret = (uint16)((int32)data[0] | (int32)data[1] << 8);
 	return true;
 }
 
@@ -40,7 +40,7 @@ bool ExecutionContext::ReadInt16(int16 &ret)
 	if (Read(data, 2) != 2)
 		return false;
 
-	ret = (int16)((int)data[0] | (int)data[1] << 8);
+	ret = (int16)((int32)data[0] | (int32)data[1] << 8);
 	return true;
 }
 
@@ -51,7 +51,7 @@ bool ExecutionContext::ReadUInt32(uint32 &ret)
 	if (Read(data, 4) != 4)
 		return false;
 
-	ret = (uint32)((int)data[0] | (int)data[1] << 8 | (int)data[2] << 16 | (int)data[3] << 24);
+	ret = (uint32)((int32)data[0] | (int32)data[1] << 8 | (int32)data[2] << 16 | (int32)data[3] << 24);
 	return true;
 }
 
@@ -62,7 +62,7 @@ bool ExecutionContext::ReadInt32(int32 &ret)
 	if (Read(data, 4) != 4)
 		return false;
 
-	ret = (int32)((int)data[0] | (int)data[1] << 8 | (int)data[2] << 16 | (int)data[3] << 24);
+	ret = (int32)((int32)data[0] | (int32)data[1] << 8 | (int32)data[2] << 16 | (int32)data[3] << 24);
 	return true;
 }
 
@@ -73,8 +73,8 @@ bool ExecutionContext::ReadInt64(int64 &ret)
 	if (Read(data, 8) != 8)
 		return false;
 
-	int a = ((int32)((int)data[0] | (int)data[1] << 8 | (int)data[2] << 16 | (int)data[3] << 24));
-	int b = ((int32)((int)data[4] | (int)data[5] << 8 | (int)data[6] << 16 | (int)data[7] << 24));
+	int32 a = ((int32)((int32)data[0] | (int32)data[1] << 8 | (int32)data[2] << 16 | (int32)data[3] << 24));
+	int32 b = ((int32)((int32)data[4] | (int32)data[5] << 8 | (int32)data[6] << 16 | (int32)data[7] << 24));
 
 	ret = (int64)(b << 32 | a);
 	return true;
@@ -87,8 +87,8 @@ bool ExecutionContext::ReadUInt64(uint64 &ret)
 	if (Read(data, 8) != 8)
 		return false;
 
-	uint32 a = ((uint32)((int)data[0] | (int)data[1] << 8 | (int)data[2] << 16 | (int)data[3] << 24));
-	uint32 b = ((uint32)((int)data[4] | (int)data[5] << 8 | (int)data[6] << 16 | (int)data[7] << 24));
+	uint32 a = ((uint32)((int32)data[0] | (int32)data[1] << 8 | (int32)data[2] << 16 | (int32)data[3] << 24));
+	uint32 b = ((uint32)((int32)data[4] | (int32)data[5] << 8 | (int32)data[6] << 16 | (int32)data[7] << 24));
 
 	ret = (uint64)(b << 32 | a);
 	return true;
@@ -137,7 +137,7 @@ bool ExecutionContext::ReadVarBytes(int64 &ret, int64 max)
 	return true;
 }
 
-int32 ExecutionContext::Read(byte * data, int64 length)
+int32 ExecutionContext::Read(byte * data, int32 length)
 {
 	if (data == NULL)
 	{
