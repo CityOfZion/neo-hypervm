@@ -10,12 +10,11 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void THROW()
         {
-            byte[] script = new byte[]
-                {
-                    (byte)EVMOpCode.THROW,
-                    (byte)EVMOpCode.RET,
-                };
-
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                    EVMOpCode.THROW,
+                    EVMOpCode.RET
+                ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load Script
@@ -35,14 +34,13 @@ namespace NeoVM.Interop.Tests
         {
             // Not throw exception
 
-            byte[] script = new byte[]
-                {
-                    (byte)EVMOpCode.PUSH0,
-                    (byte)EVMOpCode.NOT,
-                    (byte)EVMOpCode.THROWIFNOT,
-                    (byte)EVMOpCode.RET,
-                };
-
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                    EVMOpCode.PUSH0,
+                    EVMOpCode.NOT,
+                    EVMOpCode.THROWIFNOT,
+                    EVMOpCode.RET
+                ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load Script
@@ -58,13 +56,12 @@ namespace NeoVM.Interop.Tests
 
             // Throw exception (with PUSH)
 
-            script = new byte[]
-                {
-                    (byte)EVMOpCode.PUSH0,
-                    (byte)EVMOpCode.THROWIFNOT,
-                    (byte)EVMOpCode.RET,
-                };
-
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                    EVMOpCode.PUSH0,
+                    EVMOpCode.THROWIFNOT,
+                    EVMOpCode.RET
+                ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load Script
@@ -80,12 +77,11 @@ namespace NeoVM.Interop.Tests
 
             // Throw exception (without PUSH - FAULT)
 
-            script = new byte[]
-                {
-                    (byte)EVMOpCode.THROWIFNOT,
-                    (byte)EVMOpCode.RET,
-                };
-
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                    EVMOpCode.THROWIFNOT,
+                    EVMOpCode.RET
+                ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load Script
