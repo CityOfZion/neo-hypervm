@@ -11,13 +11,12 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void NEWSTRUCT()
         {
-            byte[] script = new byte[]
-                {
-                    (byte)EVMOpCode.PUSH2,
-                    (byte)EVMOpCode.NEWSTRUCT,
-                    (byte)EVMOpCode.RET,
-                };
-
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                    EVMOpCode.PUSH2,
+                    EVMOpCode.NEWSTRUCT,
+                    EVMOpCode.RET
+                ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -45,18 +44,17 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void ARRAYSIZE()
         {
-            byte[] script = new byte[]
-                {
-                    (byte)EVMOpCode.PUSH3,
-                    (byte)EVMOpCode.NEWARRAY,
-                    (byte)EVMOpCode.ARRAYSIZE,
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                    EVMOpCode.PUSH3,
+                    EVMOpCode.NEWARRAY,
+                    EVMOpCode.ARRAYSIZE,
 
-                    (byte)EVMOpCode.PUSHBYTES1,0x00,
-                    (byte)EVMOpCode.ARRAYSIZE,
+                    EVMOpCode.PUSHBYTES1, 0x00,
+                    EVMOpCode.ARRAYSIZE,
 
-                    (byte)EVMOpCode.RET,
-                };
-
+                    EVMOpCode.RET
+                ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -79,13 +77,12 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void NEWARRAY()
         {
-            byte[] script = new byte[]
-                {
-                    (byte)EVMOpCode.PUSH2,
-                    (byte)EVMOpCode.NEWARRAY,
-                    (byte)EVMOpCode.RET,
-                };
-
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                EVMOpCode.PUSH2,
+                EVMOpCode.NEWARRAY,
+                EVMOpCode.RET
+            ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -113,16 +110,14 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void PACK()
         {
-            byte[] script = new byte[]
-                {
-                    (byte)EVMOpCode.PUSHBYTES1,0x01,
-                    (byte)EVMOpCode.PUSHBYTES1,0x02,
-                    (byte)EVMOpCode.PUSH2,
-                    (byte)EVMOpCode.PACK,
-
-                    (byte)EVMOpCode.RET,
-                };
-
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                    EVMOpCode.PUSH5,
+                    EVMOpCode.PUSH6,
+                    EVMOpCode.PUSH2,
+                    EVMOpCode.PACK,
+                    EVMOpCode.RET
+                ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -138,8 +133,8 @@ namespace NeoVM.Interop.Tests
                 using (ArrayStackItem arr = engine.EvaluationStack.Peek<ArrayStackItem>(0))
                 {
                     Assert.IsTrue(arr != null);
-                    Assert.IsTrue(arr[0] is ByteArrayStackItem b1 && b1.Value[0] == 0x02);
-                    Assert.IsTrue(arr[1] is ByteArrayStackItem b2 && b2.Value[0] == 0x01);
+                    Assert.IsTrue(arr[0] is IntegerStackItem b1 && b1.Value == 0x06);
+                    Assert.IsTrue(arr[1] is IntegerStackItem b2 && b2.Value == 0x05);
                 }
 
                 // Remove array and test clean
@@ -153,17 +148,15 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void UNPACK()
         {
-            byte[] script = new byte[]
-                {
-                    (byte)EVMOpCode.PUSHBYTES1,0x01,
-                    (byte)EVMOpCode.PUSHBYTES1,0x02,
-                    (byte)EVMOpCode.PUSH2,
-                    (byte)EVMOpCode.PACK,
-
-                    (byte)EVMOpCode.UNPACK,
-                    (byte)EVMOpCode.RET,
-                };
-
+            using (ScriptBuilder script = new ScriptBuilder
+                   (
+                       EVMOpCode.PUSH5,
+                       EVMOpCode.PUSH6,
+                       EVMOpCode.PUSH2,
+                       EVMOpCode.PACK,
+                       EVMOpCode.UNPACK,
+                       EVMOpCode.RET
+                   ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -177,8 +170,8 @@ namespace NeoVM.Interop.Tests
                 // Check
 
                 Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 2);
-                Assert.IsTrue(engine.EvaluationStack.Pop<ByteArrayStackItem>().Value[0] == 0x02);
-                Assert.IsTrue(engine.EvaluationStack.Pop<ByteArrayStackItem>().Value[0] == 0x01);
+                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 0x06);
+                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 0x05);
 
                 CheckClean(engine);
             }
@@ -187,18 +180,17 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void PICKITEM_ARRAY()
         {
-            byte[] script = new byte[]
-                {
-                    (byte)EVMOpCode.PUSH1,
-                    (byte)EVMOpCode.PUSH2,
-                    (byte)EVMOpCode.PUSH3,
-                    (byte)EVMOpCode.PUSH3,
-                    (byte)EVMOpCode.PACK,
-                    (byte)EVMOpCode.PUSH2,
-                    (byte)EVMOpCode.PICKITEM,
-                    (byte)EVMOpCode.RET,
-                };
-
+            using (ScriptBuilder script = new ScriptBuilder
+                   (
+                       EVMOpCode.PUSH1,
+                       EVMOpCode.PUSH2,
+                       EVMOpCode.PUSH3,
+                       EVMOpCode.PUSH3,
+                       EVMOpCode.PACK,
+                       EVMOpCode.PUSH2,
+                       EVMOpCode.PICKITEM,
+                       EVMOpCode.RET
+                   ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -220,17 +212,16 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void SETITEM_ARRAY()
         {
-            byte[] script = new byte[]
-                {
-                    (byte)EVMOpCode.PUSH1,
-                    (byte)EVMOpCode.NEWARRAY,
-                    (byte)EVMOpCode.DUP,
-                    (byte)EVMOpCode.PUSH0,
-                    (byte)EVMOpCode.PUSH5,
-                    (byte)EVMOpCode.SETITEM,
-                    (byte)EVMOpCode.RET,
-                };
-
+            using (ScriptBuilder script = new ScriptBuilder
+                   (
+                       EVMOpCode.PUSH1,
+                       EVMOpCode.NEWARRAY,
+                       EVMOpCode.DUP,
+                       EVMOpCode.PUSH0,
+                       EVMOpCode.PUSH5,
+                       EVMOpCode.SETITEM,
+                       EVMOpCode.RET
+                   ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -259,17 +250,16 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void SETITEM_STRUCT()
         {
-            byte[] script = new byte[]
-                {
-                    (byte)EVMOpCode.PUSH1,
-                    (byte)EVMOpCode.NEWSTRUCT,
-                    (byte)EVMOpCode.DUP,
-                    (byte)EVMOpCode.PUSH0,
-                    (byte)EVMOpCode.PUSH5,
-                    (byte)EVMOpCode.SETITEM,
-                    (byte)EVMOpCode.RET,
-                };
-
+            using (ScriptBuilder script = new ScriptBuilder
+                   (
+                       EVMOpCode.PUSH1,
+                       EVMOpCode.NEWSTRUCT,
+                       EVMOpCode.DUP,
+                       EVMOpCode.PUSH0,
+                       EVMOpCode.PUSH5,
+                       EVMOpCode.SETITEM,
+                       EVMOpCode.RET
+                   ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -298,12 +288,11 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void NEWMAP()
         {
-            byte[] script = new byte[]
-                {
-                    (byte)EVMOpCode.NEWMAP,
-                    (byte)EVMOpCode.RET,
-                };
-
+            using (ScriptBuilder script = new ScriptBuilder
+                   (
+                       EVMOpCode.NEWMAP,
+                       EVMOpCode.RET
+                   ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
