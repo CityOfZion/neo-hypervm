@@ -49,6 +49,15 @@ namespace NeoVM.Interop.Types
             if (rawOpCodes != null)
                 Emit(rawOpCodes, 0, rawOpCodes.Length);
         }
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="rawOpCodes">Raw OpCodes</param>
+        public ScriptBuilder(byte[] rawOpCodes) : this()
+        {
+            if (rawOpCodes != null)
+                Emit(rawOpCodes, 0, rawOpCodes.Length);
+        }
 
         #endregion
 
