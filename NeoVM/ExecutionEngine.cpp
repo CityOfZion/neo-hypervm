@@ -524,7 +524,6 @@ ExecuteOpCode:
 		}
 
 		IStackItem *it = this->EvaluationStack->Peek(0);
-
 		this->EvaluationStack->Push(it);
 		return;
 	}

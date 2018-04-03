@@ -955,7 +955,31 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void DUP()
         {
+            // Without push
+
             byte[] script = new byte[]
+                {
+                    (byte)EVMOpCode.DUP,
+                };
+
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Real Test
+
+            script = new byte[]
                 {
                     (byte)EVMOpCode.PUSH0,
                     (byte)EVMOpCode.DUP,
@@ -984,7 +1008,31 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void DROP()
         {
+            // Without push
+
             byte[] script = new byte[]
+                {
+                    (byte)EVMOpCode.DROP,
+                };
+
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Real test
+
+            script = new byte[]
                 {
                     (byte)EVMOpCode.PUSH0,
                     (byte)EVMOpCode.DROP,
