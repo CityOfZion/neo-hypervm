@@ -285,7 +285,9 @@ namespace NeoVM.Interop.Tests
         public void SYSCALL()
         {
             string strCall = "System.ExecutionEngine.GetScriptContainer";
-            byte[] str = Encoding.ASCII.GetBytes(strCall), script =
+
+            byte[] str = Encoding.ASCII.GetBytes(strCall);
+            byte[] script =
                 new byte[] { (byte)EVMOpCode.SYSCALL }
                 .Concat(new byte[] { (byte)str.Length })
                 .Concat(str)
@@ -304,9 +306,47 @@ namespace NeoVM.Interop.Tests
 
                 // Check
 
-                Assert.IsTrue(engine.EvaluationStack.Pop<InteropStackItem>().Value == Args.ScriptContainer);
+                Assert.AreEqual(engine.EvaluationStack.Pop<InteropStackItem>().Value, Args.ScriptContainer);
 
                 CheckClean(engine);
+            }
+
+            // Test FAULT (1)
+
+            script[1] += 2;
+
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Test FAULT (2)
+
+            script[1] = 253;
+
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
             }
         }
     }

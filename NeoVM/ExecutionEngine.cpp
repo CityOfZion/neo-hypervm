@@ -383,9 +383,8 @@ ExecuteOpCode:
 
 		if (context->Read((byte*)data, length) != length)
 		{
-			this->State = EVMState::FAULT;
-
 			delete[](data);
+			this->State = EVMState::FAULT;
 			return;
 		}
 
