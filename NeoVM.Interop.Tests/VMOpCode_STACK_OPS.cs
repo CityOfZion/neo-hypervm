@@ -3,6 +3,7 @@ using NeoVM.Interop.Enums;
 using NeoVM.Interop.Types;
 using NeoVM.Interop.Types.StackItems;
 using System.Linq;
+using System.Numerics;
 
 namespace NeoVM.Interop.Tests
 {
@@ -323,358 +324,172 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void NUMEQUAL()
         {
-            byte[] script = new byte[]
-                {
-                    (byte)EVMOpCode.PUSH0,
-                    (byte)EVMOpCode.PUSH0,
-                    (byte)EVMOpCode.NUMEQUAL,
-
-                    (byte)EVMOpCode.PUSH5,
-                    (byte)EVMOpCode.PUSH5,
-                    (byte)EVMOpCode.NUMEQUAL,
-
-                    (byte)EVMOpCode.PUSH1,
-                    (byte)EVMOpCode.PUSH5,
-                    (byte)EVMOpCode.NUMEQUAL,
-
-                    (byte)EVMOpCode.RET,
-                };
-
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            InternalTestBigInteger(EVMOpCode.NUMEQUAL, (engine, a, b, cancel) =>
             {
-                // Load script
+                bool res;
 
-                engine.LoadScript(script);
+                try { res = (a == b); }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
 
-                // Execute
-
-                Assert.AreEqual(EVMState.HALT, engine.Execute());
-
-                // Check
-
-                Assert.IsFalse(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
-                Assert.IsTrue(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
-                Assert.IsTrue(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
-
-                CheckClean(engine);
-            }
+                Assert.AreEqual(engine.EvaluationStack.Pop<BooleanStackItem>().Value, res);
+            });
         }
 
         [TestMethod]
         public void MAX()
         {
-            byte[] script = new byte[]
-                {
-                    (byte)EVMOpCode.PUSH2,
-                    (byte)EVMOpCode.PUSH2,
-                    (byte)EVMOpCode.MAX,
-
-                    (byte)EVMOpCode.PUSH1,
-                    (byte)EVMOpCode.PUSH5,
-                    (byte)EVMOpCode.MAX,
-
-                    (byte)EVMOpCode.PUSH4,
-                    (byte)EVMOpCode.PUSH3,
-                    (byte)EVMOpCode.MAX,
-
-                    (byte)EVMOpCode.RET,
-                };
-
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            InternalTestBigInteger(EVMOpCode.MAX, (engine, a, b, cancel) =>
             {
-                // Load script
+                BigInteger res;
 
-                engine.LoadScript(script);
+                try { res = BigInteger.Max(a, b); }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
 
-                // Execute
-
-                Assert.AreEqual(EVMState.HALT, engine.Execute());
-
-                // Check
-
-                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 4);
-                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 5);
-                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 2);
-
-                CheckClean(engine);
-            }
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
+            });
         }
 
         [TestMethod]
         public void MIN()
         {
-            byte[] script = new byte[]
-                {
-                    (byte)EVMOpCode.PUSH2,
-                    (byte)EVMOpCode.PUSH2,
-                    (byte)EVMOpCode.MIN,
-
-                    (byte)EVMOpCode.PUSH1,
-                    (byte)EVMOpCode.PUSH5,
-                    (byte)EVMOpCode.MIN,
-
-                    (byte)EVMOpCode.PUSH5,
-                    (byte)EVMOpCode.PUSH3,
-                    (byte)EVMOpCode.MIN,
-
-                    (byte)EVMOpCode.RET,
-                };
-
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            InternalTestBigInteger(EVMOpCode.MIN, (engine, a, b, cancel) =>
             {
-                // Load script
+                BigInteger res;
 
-                engine.LoadScript(script);
+                try { res = BigInteger.Min(a, b); }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
 
-                // Execute
-
-                Assert.AreEqual(EVMState.HALT, engine.Execute());
-
-                // Check
-
-                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 3);
-                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 1);
-                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 2);
-
-                CheckClean(engine);
-            }
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
+            });
         }
 
         [TestMethod]
         public void GTE()
         {
-            byte[] script = new byte[]
-                {
-                    (byte)EVMOpCode.PUSH0,
-                    (byte)EVMOpCode.PUSH0,
-                    (byte)EVMOpCode.GTE,
-
-                    (byte)EVMOpCode.PUSH1,
-                    (byte)EVMOpCode.PUSH5,
-                    (byte)EVMOpCode.GTE,
-
-                    (byte)EVMOpCode.PUSH5,
-                    (byte)EVMOpCode.PUSH1,
-                    (byte)EVMOpCode.GTE,
-
-                    (byte)EVMOpCode.RET,
-                };
-
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            InternalTestBigInteger(EVMOpCode.GTE, (engine, a, b, cancel) =>
             {
-                // Load script
+                bool res;
 
-                engine.LoadScript(script);
+                try { res = (a >= b); }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
 
-                // Execute
-
-                Assert.AreEqual(EVMState.HALT, engine.Execute());
-
-                // Check
-
-                Assert.IsTrue(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
-                Assert.IsFalse(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
-                Assert.IsTrue(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
-
-                CheckClean(engine);
-            }
+                Assert.AreEqual(engine.EvaluationStack.Pop<BooleanStackItem>().Value, res);
+            });
         }
 
         [TestMethod]
         public void LTE()
         {
-            byte[] script = new byte[]
-                {
-                    (byte)EVMOpCode.PUSH0,
-                    (byte)EVMOpCode.PUSH0,
-                    (byte)EVMOpCode.LTE,
-
-                    (byte)EVMOpCode.PUSH1,
-                    (byte)EVMOpCode.PUSH5,
-                    (byte)EVMOpCode.LTE,
-
-                    (byte)EVMOpCode.PUSH5,
-                    (byte)EVMOpCode.PUSH1,
-                    (byte)EVMOpCode.LTE,
-
-                    (byte)EVMOpCode.RET,
-                };
-
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            InternalTestBigInteger(EVMOpCode.LTE, (engine, a, b, cancel) =>
             {
-                // Load script
+                bool res;
 
-                engine.LoadScript(script);
+                try { res = (a <= b); }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
 
-                // Execute
-
-                Assert.AreEqual(EVMState.HALT, engine.Execute());
-
-                // Check
-
-                Assert.IsFalse(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
-                Assert.IsTrue(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
-                Assert.IsTrue(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
-
-                CheckClean(engine);
-            }
+                Assert.AreEqual(engine.EvaluationStack.Pop<BooleanStackItem>().Value, res);
+            });
         }
 
         [TestMethod]
         public void NZ()
         {
-            byte[] script = new byte[]
-                {
-                    (byte)EVMOpCode.PUSH0,
-                    (byte)EVMOpCode.NZ,
-
-                    (byte)EVMOpCode.PUSH1,
-                    (byte)EVMOpCode.NZ,
-
-                    (byte)EVMOpCode.PUSHBYTES1,0x00,
-                    (byte)EVMOpCode.NZ,
-
-                    (byte)EVMOpCode.RET,
-                };
-
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            InternalTestBigInteger(EVMOpCode.NZ, (engine, a, cancel) =>
             {
-                // Load script
+                bool res;
 
-                engine.LoadScript(script);
+                try { res = (a != 0); }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
 
-                // Execute
-
-                Assert.AreEqual(EVMState.HALT, engine.Execute());
-
-                // Check
-
-                Assert.IsFalse(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
-                Assert.IsTrue(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
-                Assert.IsFalse(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
-
-                CheckClean(engine);
-            }
+                Assert.AreEqual(engine.EvaluationStack.Pop<BooleanStackItem>().Value, res);
+            });
         }
 
         [TestMethod]
         public void GT()
         {
-            byte[] script = new byte[]
-                {
-                    (byte)EVMOpCode.PUSH0,
-                    (byte)EVMOpCode.PUSH0,
-                    (byte)EVMOpCode.GT,
-
-                    (byte)EVMOpCode.PUSH1,
-                    (byte)EVMOpCode.PUSH5,
-                    (byte)EVMOpCode.GT,
-
-                    (byte)EVMOpCode.PUSH5,
-                    (byte)EVMOpCode.PUSH1,
-                    (byte)EVMOpCode.GT,
-
-                    (byte)EVMOpCode.RET,
-                };
-
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            InternalTestBigInteger(EVMOpCode.GT, (engine, a, b, cancel) =>
             {
-                // Load script
+                bool res;
 
-                engine.LoadScript(script);
+                try { res = (a > b); }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
 
-                // Execute
-
-                Assert.AreEqual(EVMState.HALT, engine.Execute());
-
-                // Check
-
-                Assert.IsTrue(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
-                Assert.IsFalse(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
-                Assert.IsFalse(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
-
-                CheckClean(engine);
-            }
+                Assert.AreEqual(engine.EvaluationStack.Pop<BooleanStackItem>().Value, res);
+            });
         }
 
         [TestMethod]
         public void LT()
         {
-            byte[] script = new byte[]
-                {
-                    (byte)EVMOpCode.PUSH0,
-                    (byte)EVMOpCode.PUSH0,
-                    (byte)EVMOpCode.LT,
-
-                    (byte)EVMOpCode.PUSH1,
-                    (byte)EVMOpCode.PUSH5,
-                    (byte)EVMOpCode.LT,
-
-                    (byte)EVMOpCode.PUSH5,
-                    (byte)EVMOpCode.PUSH1,
-                    (byte)EVMOpCode.LT,
-
-                    (byte)EVMOpCode.RET,
-                };
-
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            InternalTestBigInteger(EVMOpCode.LT, (engine, a, b, cancel) =>
             {
-                // Load script
+                bool res;
 
-                engine.LoadScript(script);
+                try { res = (a < b); }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
 
-                // Execute
-
-                Assert.AreEqual(EVMState.HALT, engine.Execute());
-
-                // Check
-
-                Assert.IsFalse(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
-                Assert.IsTrue(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
-                Assert.IsFalse(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
-
-                CheckClean(engine);
-            }
+                Assert.AreEqual(engine.EvaluationStack.Pop<BooleanStackItem>().Value, res);
+            });
         }
 
         [TestMethod]
         public void NUMNOTEQUAL()
         {
-            byte[] script = new byte[]
-                {
-                    (byte)EVMOpCode.PUSH0,
-                    (byte)EVMOpCode.PUSH0,
-                    (byte)EVMOpCode.NUMNOTEQUAL,
-
-                    (byte)EVMOpCode.PUSH5,
-                    (byte)EVMOpCode.PUSH5,
-                    (byte)EVMOpCode.NUMNOTEQUAL,
-
-                    (byte)EVMOpCode.PUSH1,
-                    (byte)EVMOpCode.PUSH5,
-                    (byte)EVMOpCode.NUMNOTEQUAL,
-
-                    (byte)EVMOpCode.RET,
-                };
-
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            InternalTestBigInteger(EVMOpCode.NUMNOTEQUAL, (engine, a, b, cancel) =>
             {
-                // Load script
+                bool res;
 
-                engine.LoadScript(script);
+                try { res = (a != b); }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
 
-                // Execute
-
-                Assert.AreEqual(EVMState.HALT, engine.Execute());
-
-                // Check
-
-                Assert.IsTrue(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
-                Assert.IsFalse(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
-                Assert.IsFalse(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
-
-                CheckClean(engine);
-            }
+                Assert.AreEqual(engine.EvaluationStack.Pop<BooleanStackItem>().Value, res);
+            });
         }
 
         [TestMethod]

@@ -1198,7 +1198,6 @@ ExecuteOpCode:
 		}
 
 		IStackItem *ret = new BoolStackItem(i->CompareTo(BigInteger::Zero) != 0);
-
 		delete(i);
 
 		this->EvaluationStack->Push(ret);
@@ -1736,7 +1735,6 @@ ExecuteOpCode:
 		}
 
 		IStackItem *ret;
-
 		if (i1->CompareTo(i2) >= 0)
 		{
 			delete(i1);
@@ -1778,7 +1776,6 @@ ExecuteOpCode:
 		}
 
 		IStackItem *ret;
-
 		if (i1->CompareTo(i2) >= 0)
 		{
 			delete(i2);
