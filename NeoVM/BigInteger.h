@@ -16,6 +16,7 @@ public:
 	const static BigInteger MinusOne;
 
 	BigInteger(int32 value);
+	BigInteger(const BigInteger &value);
 	BigInteger(BigInteger *value);
 	BigInteger(uint32 value);
 	BigInteger(uint32 * value, int32 size);
@@ -44,8 +45,8 @@ public:
 	BigInteger* Shr(int32 shift);
 	int32 GetSign();
 
-	int32 CompareTo(BigInteger bi);
 	int32 CompareTo(BigInteger *bi);
+	int32 CompareTo(const BigInteger &bi);
 
 	~BigInteger();
 
@@ -68,10 +69,10 @@ private:
 	int32 _bitsSize;
 
 	static bool GetPartsForBitManipulation(BigInteger *x, uint32 * &xd, int32 &xl);
+	static void DangerousMakeTwosComplement(uint32 *d, int32 dSize);
+	static int32 Length(uint32 *rgu, int32 size);
+	static int32 GetDiffLength(uint32 *rgu1, uint32 * rgu2, int32 cu);
 
-	void DangerousMakeTwosComplement(uint32 *d, int32 dSize);
 	int32 ToUInt32Array(uint32 * &output);
-	int32 Length(uint32 *rgu, int32 size);
-	int32 GetDiffLength(uint32 *rgu1, uint32 * rgu2, int32 cu);
 	BigInteger(int32 sign, uint32 *rgu, int32 rguSize);
 };
