@@ -56,10 +56,11 @@ namespace NeoVM.Interop.Tests
         {
             byte[] script = new byte[]
                 {
-                    /*     */ (byte)EVMOpCode.PUSH0,
+                    /*     */ (byte)EVMOpCode.PUSH1,
+                    /*     */ (byte)EVMOpCode.NOT,
                     /* ┌─◄ */ (byte)EVMOpCode.CALL,
                     /* │   */ 0x05, 0x00,
-                    /* │   */ (byte)EVMOpCode.NOP,
+                    /* │   */ (byte)EVMOpCode.PUSH2,
                     /* │   */ (byte)EVMOpCode.RET,
                     /* └─► */ (byte)EVMOpCode.NOT,
                     /*     */ (byte)EVMOpCode.RET,
@@ -77,9 +78,33 @@ namespace NeoVM.Interop.Tests
 
                 // Check
 
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 2);
                 Assert.IsTrue(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
 
                 CheckClean(engine);
+            }
+
+            script = new byte[]
+                {
+                    /* ┌─◄ */ (byte)EVMOpCode.CALL,
+                    /* │   */ 0x07, 0x00,
+                    /* │   */ (byte)EVMOpCode.PUSH0,
+                    /* x   */ (byte)EVMOpCode.RET,
+                };
+
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
             }
         }
 

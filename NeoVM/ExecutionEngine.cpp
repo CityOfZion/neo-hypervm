@@ -279,6 +279,12 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::CALL:
 	{
+		if (context == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
 		ExecutionContext * clone = context->Clone();
 
 		this->InvocationStack->Push(clone);
