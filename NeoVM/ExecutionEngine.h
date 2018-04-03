@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Types.h"
+#include "Limits.h"
 #include "StackItems.h"
 #include "ExecutionContextStack.h"
 #include "EVMState.h"

@@ -15,4 +15,6 @@ public:
 	static void ComputeSHA256(byte* data, int32 length, byte *output);
 	static void ComputeHash160(byte* data, int32 length, byte *output);
 	static void ComputeHash256(byte* data, int32 length, byte *output);
+
+	static bool VerifySignature(byte* data, int32 dataSize, byte* signature, int32 signatureSize, byte* pubKey, int32 pubKeySize);
 };
