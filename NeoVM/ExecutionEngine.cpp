@@ -881,9 +881,14 @@ ExecuteOpCode:
 			return;
 		}
 
-		BigInteger *add = new BigInteger(BigInteger::One);
 		BigInteger *ret = bi->Invert();
 		delete(bi);
+
+		if (ret == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
 
 		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
 		return;
@@ -914,12 +919,18 @@ ExecuteOpCode:
 			return;
 		}
 
-		IStackItem *ret = new IntegerStackItem(i1->And(i2), true);
+		BigInteger *ret = i1->And(i2);
 
 		delete(i2);
 		delete(i1);
 
-		this->EvaluationStack->Push(ret);
+		if (ret == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
 		return;
 	}
 	case EVMOpCode::OR:
@@ -948,12 +959,18 @@ ExecuteOpCode:
 			return;
 		}
 
-		IStackItem *ret = new IntegerStackItem(i1->Or(i2), true);
+		BigInteger *ret = i1->Or(i2);
 
 		delete(i2);
 		delete(i1);
 
-		this->EvaluationStack->Push(ret);
+		if (ret == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
 		return;
 	}
 	case EVMOpCode::XOR:
@@ -982,12 +999,18 @@ ExecuteOpCode:
 			return;
 		}
 
-		IStackItem *ret = new IntegerStackItem(i1->Xor(i2), true);
+		BigInteger *ret = i1->Xor(i2);
 
 		delete(i2);
 		delete(i1);
 
-		this->EvaluationStack->Push(ret);
+		if (ret == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
 		return;
 	}
 	/*
@@ -1026,6 +1049,12 @@ ExecuteOpCode:
 		BigInteger *ret = bi->Add(add);
 		delete(bi);
 
+		if (ret == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
 		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
 		return;
 	}
@@ -1052,6 +1081,12 @@ ExecuteOpCode:
 		delete(add);
 		delete(bi);
 
+		if (ret == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
 		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
 		return;
 	}
@@ -1075,6 +1110,12 @@ ExecuteOpCode:
 
 		BigInteger *ret = new BigInteger(bi->GetSign());
 		delete(bi);
+
+		if (ret == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
 
 		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
 		return;
@@ -1100,6 +1141,12 @@ ExecuteOpCode:
 		BigInteger *ret = bi->Negate();
 		delete(bi);
 
+		if (ret == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
 		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
 		return;
 	}
@@ -1123,6 +1170,12 @@ ExecuteOpCode:
 
 		BigInteger *ret = bi->Abs();
 		delete(bi);
+
+		if (ret == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
 
 		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
 		return;
@@ -1195,6 +1248,12 @@ ExecuteOpCode:
 		delete(x2);
 		delete(x1);
 
+		if (ret == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
 		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
 		return;
 	}
@@ -1225,6 +1284,12 @@ ExecuteOpCode:
 		BigInteger *ret = x1->Sub(x2);
 		delete(x2);
 		delete(x1);
+
+		if (ret == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
 
 		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
 		return;
@@ -1257,6 +1322,12 @@ ExecuteOpCode:
 		delete(x2);
 		delete(x1);
 
+		if (ret == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
 		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
 		return;
 	}
@@ -1287,6 +1358,12 @@ ExecuteOpCode:
 		BigInteger *ret = x1->Div(x2);
 		delete(x2);
 		delete(x1);
+
+		if (ret == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
 
 		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
 		return;
@@ -1319,6 +1396,12 @@ ExecuteOpCode:
 		delete(x2);
 		delete(x1);
 
+		if (ret == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
 		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
 		return;
 	}
@@ -1350,10 +1433,16 @@ ExecuteOpCode:
 		}
 
 		delete(in);
-		IntegerStackItem *ret = new IntegerStackItem(ix->Shl(iin), true);
+		BigInteger *ret = ix->Shl(iin);
 		delete(ix);
 
-		this->EvaluationStack->Push(ret);
+		if (ret == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
 		return;
 	}
 	case EVMOpCode::SHR:
@@ -1384,10 +1473,16 @@ ExecuteOpCode:
 		}
 
 		delete(in);
-		IntegerStackItem *ret = new IntegerStackItem(ix->Shr(iin), true);
+		BigInteger *ret = ix->Shr(iin);
 		delete(ix);
 
-		this->EvaluationStack->Push(ret);
+		if (ret == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
 		return;
 	}
 	case EVMOpCode::BOOLAND:

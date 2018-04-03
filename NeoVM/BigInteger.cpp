@@ -786,6 +786,11 @@ BigInteger* BigInteger::Div(BigInteger* bi)
 	// dividend.AssertValid();
 	// divisor.AssertValid();
 
+	if (bi->_sign == 0) // IsZero
+	{
+		return NULL;
+	}
+
 	int32 sign = +1;
 	BigIntegerBuilder regNum(this->_sign, this->_bits, this->_bitsSize, sign);
 	BigIntegerBuilder regDen(bi->_sign, bi->_bits, bi->_bitsSize, sign);
@@ -821,6 +826,11 @@ BigInteger* BigInteger::Mod(BigInteger* bi)
 {
 	// dividend.AssertValid();
 	// divisor.AssertValid();
+
+	if (bi->_sign == 0) // IsZero
+	{
+		return NULL;
+	}
 
 	int32 signNum = +1;
 	int32 signDen = +1;

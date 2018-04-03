@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NeoVM.Interop.Enums;
 using NeoVM.Interop.Types.StackItems;
+using System.Numerics;
 
 namespace NeoVM.Interop.Tests
 {
@@ -12,7 +13,17 @@ namespace NeoVM.Interop.Tests
         {
             InternalTestBigInteger(EVMOpCode.INVERT, (engine, a, cancel) =>
             {
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (~a));
+                BigInteger res;
+
+                try { res = ~a; }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
             });
         }
 
@@ -21,7 +32,17 @@ namespace NeoVM.Interop.Tests
         {
             InternalTestBigInteger(EVMOpCode.AND, (engine, a, b, cancel) =>
             {
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a & b));
+                BigInteger res;
+
+                try { res = (a & b); }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
             });
         }
 
@@ -30,7 +51,17 @@ namespace NeoVM.Interop.Tests
         {
             InternalTestBigInteger(EVMOpCode.OR, (engine, a, b, cancel) =>
             {
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a | b));
+                BigInteger res;
+
+                try { res = (a | b); }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
             });
         }
 
@@ -39,7 +70,17 @@ namespace NeoVM.Interop.Tests
         {
             InternalTestBigInteger(EVMOpCode.XOR, (engine, a, b, cancel) =>
             {
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a ^ b));
+                BigInteger res;
+
+                try { res = (a ^ b); }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
             });
         }
     }

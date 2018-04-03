@@ -13,7 +13,17 @@ namespace NeoVM.Interop.Tests
         {
             InternalTestBigInteger(EVMOpCode.INC, (engine, a, cancel) =>
             {
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a + 1));
+                BigInteger res;
+
+                try { res = a + 1; }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
             });
         }
 
@@ -22,7 +32,17 @@ namespace NeoVM.Interop.Tests
         {
             InternalTestBigInteger(EVMOpCode.DEC, (engine, a, cancel) =>
             {
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a - 1));
+                BigInteger res;
+
+                try { res = a - 1; }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
             });
         }
 
@@ -31,7 +51,17 @@ namespace NeoVM.Interop.Tests
         {
             InternalTestBigInteger(EVMOpCode.SIGN, (engine, a, cancel) =>
             {
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, a.Sign);
+                int res;
+
+                try { res = a.Sign; }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
             });
         }
 
@@ -40,7 +70,17 @@ namespace NeoVM.Interop.Tests
         {
             InternalTestBigInteger(EVMOpCode.NEGATE, (engine, a, cancel) =>
             {
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, -a);
+                BigInteger res;
+
+                try { res = -a; }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
             });
         }
 
@@ -49,7 +89,17 @@ namespace NeoVM.Interop.Tests
         {
             InternalTestBigInteger(EVMOpCode.ABS, (engine, a, cancel) =>
             {
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, BigInteger.Abs(a));
+                BigInteger res;
+
+                try { res = BigInteger.Abs(a); }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
             });
         }
 
@@ -58,7 +108,17 @@ namespace NeoVM.Interop.Tests
         {
             InternalTestBigInteger(EVMOpCode.ADD, (engine, a, b, cancel) =>
             {
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a + b));
+                BigInteger res;
+
+                try { res = (a + b); }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
             });
         }
 
@@ -67,7 +127,17 @@ namespace NeoVM.Interop.Tests
         {
             InternalTestBigInteger(EVMOpCode.SUB, (engine, a, b, cancel) =>
             {
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a - b));
+                BigInteger res;
+
+                try { res = (a - b); }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
             });
         }
 
@@ -76,25 +146,55 @@ namespace NeoVM.Interop.Tests
         {
             InternalTestBigInteger(EVMOpCode.MUL, (engine, a, b, cancel) =>
             {
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a * b));
+                BigInteger res;
+
+                try { res = (a * b); }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
             });
         }
 
-        //[TestMethod]
+        [TestMethod]
         public void DIV()
         {
             InternalTestBigInteger(EVMOpCode.DIV, (engine, a, b, cancel) =>
             {
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a / b));
+                BigInteger res;
+
+                try { res = (a / b); }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
             });
         }
 
-        //[TestMethod]
+        [TestMethod]
         public void MOD()
         {
             InternalTestBigInteger(EVMOpCode.MOD, (engine, a, b, cancel) =>
             {
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (a % b));
+                BigInteger res;
+
+                try { res = (a % b); }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
             });
         }
 

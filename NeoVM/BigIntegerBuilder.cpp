@@ -1,5 +1,16 @@
 #include "BigIntegerBuilder.h"
 
+BigIntegerBuilder::BigIntegerBuilder()
+{
+	this->_fWritable = false;
+	this->_rgu = NULL;
+	this->_rguLength = 0;
+	this->_iuLast = 0;
+	this->_uSmall = 0;
+
+	// AssertValid(true);
+}
+
 BigIntegerBuilder::BigIntegerBuilder(int32 sign, uint32 * bits, int32 bitSize, int32 &outSign)
 {
 	this->_fWritable = false;
@@ -104,20 +115,39 @@ void BigIntegerBuilder::Div(BigIntegerBuilder &regDen)
 	// AssertValid(true);
 	// regDen.AssertValid(true);
 
-	if (regDen._iuLast == 0) 
+	if (regDen._iuLast == 0)
 	{
 		DivMod(regDen._uSmall);
 		return;
 	}
-	if (this->_iuLast == 0) 
+	if (this->_iuLast == 0)
 	{
 		this->_uSmall = 0;
 		return;
 	}
 
-	//BigIntegerBuilder regTmp = BigIntegerBuilder();
-	//ModDivCore(this, regDen, true, regTmp);
-	//Swap(this, regTmp);
+	BigIntegerBuilder regTmp = BigIntegerBuilder();
+	ModDivCore(this, regDen, true, regTmp);
+
+	// Swap(this, regTmp);
+
+	if (this->_fWritable && this->_rgu != NULL)
+	{
+		// Clean
+		delete[](this->_rgu);
+	}
+
+	// Swap
+
+	this->_fWritable = regTmp._fWritable;
+	this->_rguLength = regTmp._rguLength;
+	this->_rgu = regTmp._rgu;
+	this->_iuLast = regTmp._iuLast;
+	this->_uSmall = regTmp._uSmall;
+
+	// Prevent clean
+
+	regTmp._fWritable = false;
 }
 
 // Divide regNum by uDen, returning the remainder and tossing the quotient.
@@ -132,12 +162,12 @@ uint32 BigIntegerBuilder::Mod(BigIntegerBuilder *regNum, uint32 uDen)
 		return regNum->_uSmall % uDen;
 
 	uint64 uu = 0;
-	for (int iv = regNum->_iuLast; iv >= 0; iv--) 
+	for (int iv = regNum->_iuLast; iv >= 0; iv--)
 	{
 		uu = ((uint64)(uint32)uu << kcbitUint) | regNum->_rgu[iv];
 		uu %= uDen;
 	}
-	
+
 	return (uint32)uu;
 }
 
@@ -154,8 +184,8 @@ void BigIntegerBuilder::Mod(BigIntegerBuilder &regDen)
 	if (this->_iuLast == 0)
 		return;
 
-	//BigIntegerBuilder regTmp = new BigIntegerBuilder();
-	//ModDivCore(ref this, ref regDen, false, ref regTmp);
+	BigIntegerBuilder regTmp = BigIntegerBuilder();
+	ModDivCore(this, regDen, false, regTmp);
 }
 
 void BigIntegerBuilder::Mul(BigIntegerBuilder &regMul)
@@ -358,8 +388,8 @@ uint32 BigIntegerBuilder::DivMod(uint32 uDen)
 
 	if (uDen == 1)
 		return 0;
-	
-	if (this->_iuLast == 0) 
+
+	if (this->_iuLast == 0)
 	{
 		uint32 uTmp = this->_uSmall;
 		this->_uSmall = uTmp / uDen;
@@ -369,7 +399,7 @@ uint32 BigIntegerBuilder::DivMod(uint32 uDen)
 	EnsureWritable(0);
 
 	uint64 uu = 0;
-	for (int32 iv = this->_iuLast; iv >= 0; iv--) 
+	for (int32 iv = this->_iuLast; iv >= 0; iv--)
 	{
 		uu = ((uint64)(uint32)uu << kcbitUint) | this->_rgu[iv];
 		this->_rgu[iv] = (uint32)(uu / uDen);
@@ -377,8 +407,179 @@ uint32 BigIntegerBuilder::DivMod(uint32 uDen)
 	}
 
 	Trim();
-	
+
 	return (uint32)uu;
+}
+
+int32 BigIntegerBuilder::CbitHighZero(uint32 u)
+{
+	if (u == 0)
+		return 32;
+
+	int cbit = 0;
+	if ((u & 0xFFFF0000) == 0) 
+	{
+		cbit += 16;
+		u <<= 16;
+	}
+	if ((u & 0xFF000000) == 0) 
+	{
+		cbit += 8;
+		u <<= 8;
+	}
+	if ((u & 0xF0000000) == 0) 
+	{
+		cbit += 4;
+		u <<= 4;
+	}
+	if ((u & 0xC0000000) == 0) 
+	{
+		cbit += 2;
+		u <<= 2;
+	}
+	if ((u & 0x80000000) == 0)
+		cbit += 1;
+
+	return cbit;
+}
+
+int32 BigIntegerBuilder::CbitHighZero(uint64 uu)
+{
+	if ((uu & 0xFFFFFFFF00000000) == 0)
+		return 32 + CbitHighZero((uint32)uu);
+
+	return CbitHighZero((uint32)(uu >> 32));
+}
+
+void BigIntegerBuilder::ModDivCore(BigIntegerBuilder *regNum, BigIntegerBuilder &regDen, bool fQuo, BigIntegerBuilder &regQuo)
+{
+	//Contract.Assert(regNum._iuLast > 0 && regDen._iuLast > 0);
+
+	regQuo.Set((uint32)0);
+	if (regNum->_iuLast < regDen._iuLast)
+		return;
+
+	// Contract.Assert(0 < regDen._iuLast && regDen._iuLast <= regNum._iuLast);
+	int32 cuDen = regDen._iuLast + 1;
+	int32 cuDiff = regNum->_iuLast - regDen._iuLast;
+
+	// Determine whether the result will have cuDiff "digits" or cuDiff+1 "digits".
+	int32 cuQuo = cuDiff;
+	for (int iu = regNum->_iuLast; ; iu--)
+	{
+		if (iu < cuDiff)
+		{
+			cuQuo++;
+			break;
+		}
+		if (regDen._rgu[iu - cuDiff] != regNum->_rgu[iu])
+		{
+			if (regDen._rgu[iu - cuDiff] < regNum->_rgu[iu])
+				cuQuo++;
+			break;
+		}
+	}
+
+	if (cuQuo == 0)
+		return;
+
+	if (fQuo)
+		regQuo.SetSizeLazy(cuQuo);
+
+	// Get the uint to use for the trial divisions. We normalize so the high bit is set.
+	uint32 uDen = regDen._rgu[cuDen - 1];
+	uint32 uDenNext = regDen._rgu[cuDen - 2];
+	int cbitShiftLeft = CbitHighZero(uDen);
+	int cbitShiftRight = kcbitUint - cbitShiftLeft;
+	if (cbitShiftLeft > 0)
+	{
+		uDen = (uDen << cbitShiftLeft) | (uDenNext >> cbitShiftRight);
+		uDenNext <<= cbitShiftLeft;
+		if (cuDen > 2)
+			uDenNext |= regDen._rgu[cuDen - 3] >> cbitShiftRight;
+	}
+
+	// Contract.Assert((uDen & 0x80000000) != 0);
+
+	// Allocate and initialize working space.
+	// Contract.Assert(cuQuo + cuDen == regNum._iuLast + 1 || cuQuo + cuDen == regNum._iuLast + 2);
+	regNum->EnsureWritable(0);
+
+	for (int iu = cuQuo; --iu >= 0; )
+	{
+		// Get the high (normalized) bits of regNum.
+		uint32 uNumHi = (iu + cuDen <= regNum->_iuLast) ? regNum->_rgu[iu + cuDen] : 0;
+		// Contract.Assert(uNumHi <= regDen._rgu[cuDen - 1]);
+
+		uint64 uuNum = ((uint64)uNumHi << kcbitUint) | regNum->_rgu[iu + cuDen - 1];
+		uint32 uNumNext = regNum->_rgu[iu + cuDen - 2];
+		if (cbitShiftLeft > 0)
+		{
+			uuNum = (uuNum << cbitShiftLeft) | (uNumNext >> cbitShiftRight);
+			uNumNext <<= cbitShiftLeft;
+			if (iu + cuDen >= 3)
+				uNumNext |= regNum->_rgu[iu + cuDen - 3] >> cbitShiftRight;
+		}
+
+		// Divide to get the quotient digit.
+		uint64 uuQuo = uuNum / uDen;
+		uint64 uuRem = (uint32)(uuNum % uDen);
+		//Contract.Assert(uuQuo <= (uint64)UintMaxValue + 2);
+		if (uuQuo > UInt32MaxValue)
+		{
+			uuRem += uDen * (uuQuo - UInt32MaxValue);
+			uuQuo = UInt32MaxValue;
+		}
+
+		while (uuRem <= UInt32MaxValue && uuQuo * uDenNext > (((uint64)(uint32)uuRem << kcbitUint) | uNumNext))
+		{
+			uuQuo--;
+			uuRem += uDen;
+		}
+
+		// Multiply and subtract. Note that uuQuo may be 1 too large. If we have a borrow
+		// at the end, we'll add the denominator back on and decrement uuQuo.
+		if (uuQuo > 0)
+		{
+			uint64 uuBorrow = 0;
+			for (int iu2 = 0; iu2 < cuDen; iu2++)
+			{
+				uuBorrow += regDen._rgu[iu2] * uuQuo;
+				uint32 uSub = (uint32)uuBorrow;
+				uuBorrow >>= kcbitUint;
+				if (regNum->_rgu[iu + iu2] < uSub)
+					uuBorrow++;
+				regNum->_rgu[iu + iu2] -= uSub;
+			}
+
+			//Contract.Assert(uNumHi == uuBorrow || uNumHi == uuBorrow - 1);
+			if (uNumHi < uuBorrow)
+			{
+				// Add, tracking carry.
+				uint32 uCarry = 0;
+				for (int iu2 = 0; iu2 < cuDen; iu2++)
+				{
+					uCarry = AddCarry(regNum->_rgu[iu + iu2], regDen._rgu[iu2], uCarry);
+					// Contract.Assert(uCarry <= 1);
+				}
+				// Contract.Assert(uCarry == 1);
+				uuQuo--;
+			}
+			regNum->_iuLast = iu + cuDen - 1;
+		}
+
+		if (fQuo)
+		{
+			if (cuQuo == 1)
+				regQuo._uSmall = (uint32)uuQuo;
+			else
+				regQuo._rgu[iu] = (uint32)uuQuo;
+		}
+	}
+
+	// Contract.Assert(cuDen > 1 && regNum._iuLast > 0);
+	regNum->_iuLast = cuDen - 1;
+	regNum->Trim();
 }
 
 // Apply a single carry starting at iu, extending the register
