@@ -1842,26 +1842,31 @@ ExecuteOpCode:
 		}
 
 		IStackItem *item = this->EvaluationStack->Pop();
-
 		int32 size = item->ReadByteArraySize();
-		byte* data = new byte[size];
 
+		if (size < 0)
+		{
+			IStackItem::Free(item);
+			this->State = EVMState::FAULT;
+			return;
+		}
+		
+		byte* data = new byte[size];
 		size = item->ReadByteArray(data, 0, size);
 		IStackItem::Free(item);
 
 		if (size < 0)
 		{
 			delete[]data;
+			this->State = EVMState::FAULT;
 			return;
 		}
 
 		byte *hash = new byte[Crypto::SHA1_LENGTH];
 		Crypto::ComputeSHA1(data, size, hash);
-
 		delete[]data;
-
-		IStackItem *it = new ByteArrayStackItem(hash, Crypto::SHA1_LENGTH, true);
-		this->EvaluationStack->Push(it);
+		
+		this->EvaluationStack->Push(new ByteArrayStackItem(hash, Crypto::SHA1_LENGTH, true));
 		return;
 	}
 	case EVMOpCode::SHA256:
@@ -1873,26 +1878,31 @@ ExecuteOpCode:
 		}
 
 		IStackItem *item = this->EvaluationStack->Pop();
-
 		int32 size = item->ReadByteArraySize();
-		byte* data = new byte[size];
 
+		if (size < 0)
+		{
+			IStackItem::Free(item);
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		byte* data = new byte[size];
 		size = item->ReadByteArray(data, 0, size);
 		IStackItem::Free(item);
 
 		if (size < 0)
 		{
 			delete[]data;
+			this->State = EVMState::FAULT;
 			return;
 		}
 
 		byte *hash = new byte[Crypto::SHA256_LENGTH];
 		Crypto::ComputeSHA256(data, size, hash);
-
 		delete[]data;
-
-		IStackItem *it = new ByteArrayStackItem(hash, Crypto::SHA256_LENGTH, true);
-		this->EvaluationStack->Push(it);
+		
+		this->EvaluationStack->Push(new ByteArrayStackItem(hash, Crypto::SHA256_LENGTH, true));
 		return;
 	}
 	case EVMOpCode::HASH160:
@@ -1904,26 +1914,31 @@ ExecuteOpCode:
 		}
 
 		IStackItem *item = this->EvaluationStack->Pop();
-
 		int32 size = item->ReadByteArraySize();
-		byte* data = new byte[size];
 
+		if (size < 0)
+		{
+			IStackItem::Free(item);
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		byte* data = new byte[size];
 		size = item->ReadByteArray(data, 0, size);
 		IStackItem::Free(item);
 
 		if (size < 0)
 		{
 			delete[]data;
+			this->State = EVMState::FAULT;
 			return;
 		}
 
 		byte *hash = new byte[Crypto::HASH160_LENGTH];
 		Crypto::ComputeHash160(data, size, hash);
-
 		delete[]data;
 
-		IStackItem *it = new ByteArrayStackItem(hash, Crypto::HASH160_LENGTH, true);
-		this->EvaluationStack->Push(it);
+		this->EvaluationStack->Push(new ByteArrayStackItem(hash, Crypto::HASH160_LENGTH, true));
 		return;
 	}
 	case EVMOpCode::HASH256:
@@ -1935,26 +1950,31 @@ ExecuteOpCode:
 		}
 
 		IStackItem *item = this->EvaluationStack->Pop();
-
 		int32 size = item->ReadByteArraySize();
-		byte* data = new byte[size];
 
+		if (size < 0)
+		{
+			IStackItem::Free(item);
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		byte* data = new byte[size];
 		size = item->ReadByteArray(data, 0, size);
 		IStackItem::Free(item);
 
 		if (size < 0)
 		{
 			delete[]data;
+			this->State = EVMState::FAULT;
 			return;
 		}
 
 		byte *hash = new byte[Crypto::HASH256_LENGTH];
 		Crypto::ComputeHash256(data, size, hash);
-
 		delete[]data;
-
-		IStackItem *it = new ByteArrayStackItem(hash, Crypto::HASH256_LENGTH, true);
-		this->EvaluationStack->Push(it);
+		
+		this->EvaluationStack->Push(new ByteArrayStackItem(hash, Crypto::HASH256_LENGTH, true));
 		return;
 	}
 	case EVMOpCode::CHECKSIG:
@@ -2361,7 +2381,7 @@ ExecuteOpCode:
 			this->State = EVMState::FAULT;
 			return;
 		}
-		
+
 		IStackItem::Free(item);
 		this->EvaluationStack->Push(new ArrayStackItem(false, count));
 		return;
@@ -2376,14 +2396,14 @@ ExecuteOpCode:
 
 		int32 count = 0;
 		IStackItem *item = this->EvaluationStack->Pop();
-		
+
 		if (!item->GetInt32(count))
 		{
 			IStackItem::Free(item);
 			this->State = EVMState::FAULT;
 			return;
 		}
-		
+
 		IStackItem::Free(item);
 		this->EvaluationStack->Push(new ArrayStackItem(true, count));
 		return;
