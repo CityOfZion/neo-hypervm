@@ -671,15 +671,14 @@ BigInteger* BigInteger::Shl(int32 shift)
 	if (smallShift == 0)
 	{
 		for (int32 i = 0; i < xl; i++)
-		{
 			zd[i + digitShift] = xd[i];
-		}
 	}
 	else
 	{
+		int32 i;
 		int32 carryShift = kcbitUint - smallShift;
 		uint32 carry = 0;
-		int32 i;
+
 		for (i = 0; i < xl; i++)
 		{
 			uint32 rot = xd[i];
@@ -944,7 +943,7 @@ BigInteger* BigInteger::Invert()
 	BigInteger *add = new BigInteger(BigInteger::One);
 	BigInteger* ret = Add(add);
 	delete(add);
-	
+
 	// Negate
 	BigInteger* realRet = new BigInteger(-ret->_sign, ret->_bits, ret->_bitsSize);
 	delete(ret);
@@ -975,7 +974,7 @@ int32 BigInteger::CompareTo(const BigInteger &bi)
 	{
 		if (bi._bits == NULL)
 			return this->_sign < bi._sign ? -1 : this->_sign > bi._sign ? +1 : 0;
-		
+
 		return -bi._sign;
 	}
 
@@ -1009,7 +1008,7 @@ int32 BigInteger::CompareTo(BigInteger *bi)
 	{
 		if (bi->_bits == NULL)
 			return this->_sign < bi->_sign ? -1 : this->_sign > bi->_sign ? +1 : 0;
-		
+
 		return -bi->_sign;
 	}
 
