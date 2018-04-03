@@ -27,7 +27,7 @@ namespace NeoVM.Interop.Types
         /// </summary>
         public ScriptBuilder()
         {
-            this.writer = new MemoryStream();
+            writer = new MemoryStream();
         }
         /// <summary>
         /// Constructor
@@ -45,9 +45,7 @@ namespace NeoVM.Interop.Types
         public ScriptBuilder(EVMOpCode opcode, byte[] rawOpCodes) : this()
         {
             Emit(opcode);
-
-            if (rawOpCodes != null)
-                Emit(rawOpCodes, 0, rawOpCodes.Length);
+            Emit(rawOpCodes);
         }
         /// <summary>
         /// Constructor
@@ -55,8 +53,7 @@ namespace NeoVM.Interop.Types
         /// <param name="rawOpCodes">Raw OpCodes</param>
         public ScriptBuilder(byte[] rawOpCodes) : this()
         {
-            if (rawOpCodes != null)
-                Emit(rawOpCodes, 0, rawOpCodes.Length);
+            Emit(rawOpCodes);
         }
 
         #endregion
@@ -69,15 +66,26 @@ namespace NeoVM.Interop.Types
             writer.Dispose();
         }
 
+        public ScriptBuilder Emit(byte[] raw)
+        {
+            if (raw != null)
+                writer.Write(raw, 0, raw.Length);
+
+            return this;
+        }
+
         public ScriptBuilder Emit(byte[] raw, int index, int length)
         {
-            writer.Write(raw, index, length);
+            if (length > 0)
+                writer.Write(raw, index, length);
+
             return this;
         }
 
         public ScriptBuilder Emit(byte opCode)
         {
             writer.WriteByte(opCode);
+
             return this;
         }
 
