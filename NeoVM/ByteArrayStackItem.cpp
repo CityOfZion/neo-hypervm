@@ -94,6 +94,46 @@ IStackItem* ByteArrayStackItem::Clone()
 	return new ByteArrayStackItem(this->Payload, this->PayloadLength, false);
 }
 
+bool ByteArrayStackItem::Equals(IStackItem * it)
+{
+	if (it == this) return true;
+
+	switch (it->Type)
+	{
+	case EStackItemType::ByteArray:
+	{
+		ByteArrayStackItem* t = (ByteArrayStackItem*)it;
+		if (t->PayloadLength != this->PayloadLength) return false;
+
+		for (int x = t->PayloadLength - 1; x >= 0; x--)
+			if (t->Payload[x] != this->Payload[x])
+				return false;
+
+		return true;
+	}
+	default:
+	{
+		int iz = it->GetSerializedSize();
+
+		if (iz != this->PayloadLength) return false;
+		if (this->PayloadLength == 0) return true;
+
+		byte *data = new byte[iz];
+		iz = it->Serialize(data, iz);
+
+		for (int x = 0; x < iz; x++)
+			if (data[x] != this->Payload[x])
+			{
+				delete[](data);
+				return false;
+			}
+
+		delete[](data);
+		return true;
+	}
+	}
+}
+
 // Serialize
 
 int32 ByteArrayStackItem::Serialize(byte * data, int32 length)

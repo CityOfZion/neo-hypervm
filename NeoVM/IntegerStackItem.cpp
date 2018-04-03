@@ -58,6 +58,29 @@ IStackItem* IntegerStackItem::Clone()
 	return new IntegerStackItem(this->Value, false);
 }
 
+bool IntegerStackItem::Equals(IStackItem * it)
+{
+	if (it == this) return true;
+
+	switch (it->Type)
+	{
+	case EStackItemType::Integer:
+	{
+		IntegerStackItem* t = (IntegerStackItem*)it;
+		return this->Value->CompareTo(t->Value) == 0;
+	}
+	default:
+	{
+		BigInteger *bi = it->GetBigInteger();
+		if (bi == NULL) return false;
+
+		bool ret = this->Value->CompareTo(bi) == 0;
+		delete(bi);
+		return ret;
+	}
+	}
+}
+
 // Serialize
 
 int32 IntegerStackItem::Serialize(byte * data, int32 length)

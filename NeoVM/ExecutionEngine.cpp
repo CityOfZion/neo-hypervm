@@ -1013,15 +1013,20 @@ ExecuteOpCode:
 		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
 		return;
 	}
-	/*
-	case OpCode.EQUAL:
+	case EVMOpCode::EQUAL:
 	{
-	StackItem x2 = EvaluationStack.Pop();
-	StackItem x1 = EvaluationStack.Pop();
-	EvaluationStack.Push(x1.Equals(x2));
-	return;
+		if (this->EvaluationStack->Count() < 2)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem* x2 = this->EvaluationStack->Pop();
+		IStackItem* x1 = this->EvaluationStack->Pop();
+
+		this->EvaluationStack->Push(new BoolStackItem(x1->Equals(x2)));
+		return;
 	}
-	*/
 
 #pragma endregion
 
