@@ -52,13 +52,36 @@ namespace NeoVM.Interop.Tests
                 // Execute
 
                 Assert.AreEqual(EVMState.HALT, engine.Execute());
+
+                CheckClean(engine);
             }
 
-            // Throw exception
+            // Throw exception (with PUSH)
 
             script = new byte[]
                 {
                     (byte)EVMOpCode.PUSH0,
+                    (byte)EVMOpCode.THROWIFNOT,
+                    (byte)EVMOpCode.RET,
+                };
+
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load Script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                CheckClean(engine, false);
+            }
+
+            // Throw exception (without PUSH - FAULT)
+
+            script = new byte[]
+                {
                     (byte)EVMOpCode.THROWIFNOT,
                     (byte)EVMOpCode.RET,
                 };
