@@ -8,6 +8,15 @@ namespace NeoVM.Interop.Tests
     public class VMOpCode_BITWISE_LOGIC : VMOpCodeTest
     {
         [TestMethod]
+        public void INVERT()
+        {
+            InternalTestBigInteger(EVMOpCode.INVERT, (engine, a, cancel) =>
+            {
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (~a));
+            });
+        }
+
+        [TestMethod]
         public void AND()
         {
             InternalTestBigInteger(EVMOpCode.AND, (engine, a, b, cancel) =>

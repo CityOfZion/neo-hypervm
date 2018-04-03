@@ -908,6 +908,18 @@ BigInteger* BigInteger::Negate()
 	return new BigInteger(-this->_sign, this->_bits, this->_bitsSize);
 }
 
+BigInteger* BigInteger::Invert()
+{
+	BigInteger *add = new BigInteger(BigInteger::One);
+	BigInteger* ret = Add(add);
+	delete(add);
+	
+	// Negate
+	BigInteger* realRet = new BigInteger(-ret->_sign, ret->_bits, ret->_bitsSize);
+	delete(ret);
+	return realRet;
+}
+
 BigInteger* BigInteger::Abs()
 {
 	if (this->CompareTo(BigInteger::Zero) >= 0)

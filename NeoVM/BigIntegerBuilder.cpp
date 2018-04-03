@@ -99,44 +99,63 @@ void BigIntegerBuilder::GetInteger(int32 &sign, uint32 * &bits, int32 &bitSize)
 		this->_rgu = bits;
 }
 
-void BigIntegerBuilder::Div(BigIntegerBuilder &reg)
+void BigIntegerBuilder::Div(BigIntegerBuilder &regDen)
 {
 	// AssertValid(true);
 	// regDen.AssertValid(true);
 
-	/*
-	  if (regDen._iuLast == 0) {
+	if (regDen._iuLast == 0) 
+	{
 		DivMod(regDen._uSmall);
 		return;
-	  }
-	  if (_iuLast == 0) {
-		_uSmall = 0;
+	}
+	if (this->_iuLast == 0) 
+	{
+		this->_uSmall = 0;
 		return;
-	  }
+	}
 
-	  BigIntegerBuilder regTmp = new BigIntegerBuilder();
-	  ModDivCore(ref this, ref regDen, true, ref regTmp);
-	  NumericsHelpers.Swap(ref this, ref regTmp);
-	*/
+	//BigIntegerBuilder regTmp = BigIntegerBuilder();
+	//ModDivCore(this, regDen, true, regTmp);
+	//Swap(this, regTmp);
 }
 
-void BigIntegerBuilder::Mod(BigIntegerBuilder &reg)
+// Divide regNum by uDen, returning the remainder and tossing the quotient.
+uint32 BigIntegerBuilder::Mod(BigIntegerBuilder *regNum, uint32 uDen)
+{
+	// regNum.AssertValid(true);
+
+	if (uDen == 1)
+		return 0;
+
+	if (regNum->_iuLast == 0)
+		return regNum->_uSmall % uDen;
+
+	uint64 uu = 0;
+	for (int iv = regNum->_iuLast; iv >= 0; iv--) 
+	{
+		uu = ((uint64)(uint32)uu << kcbitUint) | regNum->_rgu[iv];
+		uu %= uDen;
+	}
+	
+	return (uint32)uu;
+}
+
+void BigIntegerBuilder::Mod(BigIntegerBuilder &regDen)
 {
 	// AssertValid(true);
 	// regDen.AssertValid(true);
 
-	/*
 	if (regDen._iuLast == 0)
 	{
-		Set(Mod(ref this, regDen._uSmall));
+		Set(Mod(this, regDen._uSmall));
 		return;
 	}
-	if (_iuLast == 0)
+	if (this->_iuLast == 0)
 		return;
 
-	BigIntegerBuilder regTmp = new BigIntegerBuilder();
-	ModDivCore(ref this, ref regDen, false, ref regTmp);
-	*/
+	//BigIntegerBuilder regTmp = new BigIntegerBuilder();
+	//ModDivCore(ref this, ref regDen, false, ref regTmp);
 }
 
 void BigIntegerBuilder::Mul(BigIntegerBuilder &regMul)
@@ -144,40 +163,52 @@ void BigIntegerBuilder::Mul(BigIntegerBuilder &regMul)
 	// AssertValid(true);
 	// regMul.AssertValid(true);
 
-	/*
-	  if (regMul._iuLast == 0)
+	if (regMul._iuLast == 0)
 		Mul(regMul._uSmall);
-	  else if (_iuLast == 0) {
+
+	else if (this->_iuLast == 0)
+	{
 		uint32 u = _uSmall;
 		if (u == 1)
-		  this = new BigIntegerBuilder(ref regMul);
-		else if (u != 0) {
-		  Load(ref regMul, 1);
-		  Mul(u);
+		{
+			//this = new BigIntegerBuilder(ref regMul);
+			Load(regMul, 0);
 		}
-	  }
-	  else {
-		int32 cuBase = _iuLast + 1;
+		else if (u != 0)
+		{
+			Load(regMul, 1);
+			Mul(u);
+		}
+	}
+	else
+	{
+		int32 cuBase = this->_iuLast + 1;
 		SetSizeKeep(cuBase + regMul._iuLast, 1);
 
-		for (int32 iu = cuBase; --iu >= 0; ) {
-		  uint32 uMul = _rgu[iu];
-		  _rgu[iu] = 0;
-		  uint32 uCarry = 0;
-		  for (int32 iuSrc = 0; iuSrc <= regMul._iuLast; iuSrc++)
-			uCarry = AddMulCarry(ref _rgu[iu + iuSrc], regMul._rgu[iuSrc], uMul, uCarry);
-		  if (uCarry != 0) {
-			for (int32 iuDst = iu + regMul._iuLast + 1; uCarry != 0 && iuDst <= _iuLast; iuDst++)
-			  uCarry = AddCarry(ref _rgu[iuDst], 0, uCarry);
-			if (uCarry != 0) {
-			  SetSizeKeep(_iuLast + 2, 0);
-			  _rgu[_iuLast] = uCarry;
+		for (int32 iu = cuBase; --iu >= 0; )
+		{
+			uint32 uMul = _rgu[iu];
+			this->_rgu[iu] = 0;
+			uint32 uCarry = 0;
+
+			for (int32 iuSrc = 0; iuSrc <= regMul._iuLast; iuSrc++)
+				uCarry = AddMulCarry(this->_rgu[iu + iuSrc], regMul._rgu[iuSrc], uMul, uCarry);
+
+			if (uCarry != 0)
+			{
+				for (int32 iuDst = iu + regMul._iuLast + 1; uCarry != 0 && iuDst <= this->_iuLast; iuDst++)
+					uCarry = AddCarry(this->_rgu[iuDst], 0, uCarry);
+
+				if (uCarry != 0)
+				{
+					SetSizeKeep(_iuLast + 2, 0);
+					this->_rgu[this->_iuLast] = uCarry;
+				}
 			}
-		  }
 		}
+
 		// AssertValid(true);
-	  }
-	*/
+	}
 }
 
 // Apply a single borrow starting at iu. This does NOT trim the result.
@@ -193,6 +224,7 @@ void BigIntegerBuilder::ApplyBorrow(int32 iuMin)
 		if (u > 0)
 			return;
 	}
+
 	// Borrowed off the end!
 	// Contract.Assert(false, "Invalid call to ApplyBorrow");
 }
@@ -234,15 +266,26 @@ void BigIntegerBuilder::EnsureWritable(int32 cuExtra)
 	// AssertValid(false);
 	// Contract.Assert(_iuLast > 0);
 
+	int l = _iuLast + 1 + cuExtra;
+
 	if (this->_fWritable)
 	{
-		// TODO: Check size??
-		return;
+		// Check length (Microsoft don't do it)
+
+		if (this->_rguLength >= l)
+		{
+			return;
+		}
+
+		if (this->_rgu != NULL)
+		{
+			delete[](this->_rgu);
+		}
 	}
 
-	uint32 *rgu = new uint32[_iuLast + 1 + cuExtra];
+	uint32 *rgu = new uint32[l];
 
-	for (int x = _iuLast + cuExtra; x >= 0; x--)
+	for (int x = l - 1; x >= 0; x--)
 		rgu[x] = this->_rgu[x];
 
 	this->_rgu = rgu;
@@ -285,11 +328,57 @@ uint32 BigIntegerBuilder::AddCarry(uint32 &u1, uint32 u2, uint32 uCarry)
 	return (uint32)(uu >> kcbitUint);
 }
 
+uint32 BigIntegerBuilder::AddMulCarry(uint32 &uAdd, uint32 uMul1, uint32 uMul2, uint32 uCarry)
+{
+	// This is guaranteed not to overflow.
+	uint64 uuRes = (uint64)uMul1 * uMul2 + uAdd + uCarry;
+	uAdd = (uint32)uuRes;
+	return (uint32)(uuRes >> kcbitUint);
+}
+
+uint32 BigIntegerBuilder::MulCarry(uint32 &u1, uint32 u2, uint32 uCarry)
+{
+	// This is guaranteed not to overflow.
+	uint64 uuRes = (uint64)u1 * u2 + uCarry;
+	u1 = (uint64)uuRes;
+	return (uint64)(uuRes >> kcbitUint);
+}
+
 uint32 BigIntegerBuilder::SubBorrow(uint32 &u1, uint32 u2, uint32 uBorrow)
 {
 	uint64 uu = (uint64)u1 - u2 - uBorrow;
 	u1 = (uint32)uu;
 	return (uint32)-(int)(uu >> kcbitUint);
+}
+
+// Divide 'this' by uDen, leaving the quotient in 'this' and returning the remainder.
+uint32 BigIntegerBuilder::DivMod(uint32 uDen)
+{
+	// AssertValid(true);
+
+	if (uDen == 1)
+		return 0;
+	
+	if (this->_iuLast == 0) 
+	{
+		uint32 uTmp = this->_uSmall;
+		this->_uSmall = uTmp / uDen;
+		return uTmp % uDen;
+	}
+
+	EnsureWritable(0);
+
+	uint64 uu = 0;
+	for (int32 iv = this->_iuLast; iv >= 0; iv--) 
+	{
+		uu = ((uint64)(uint32)uu << kcbitUint) | this->_rgu[iv];
+		this->_rgu[iv] = (uint32)(uu / uDen);
+		uu %= uDen;
+	}
+
+	Trim();
+	
+	return (uint32)uu;
 }
 
 // Apply a single carry starting at iu, extending the register
@@ -322,6 +411,92 @@ void BigIntegerBuilder::ApplyCarry(int32 iu)
 	}
 }
 
+void BigIntegerBuilder::Set(uint32 u)
+{
+	this->_uSmall = u;
+	this->_iuLast = 0;
+	// AssertValid(true);
+}
+
+void BigIntegerBuilder::Set(uint64 uu)
+{
+	uint32 uHi = (uint32)(uu >> kcbitUint);
+	if (uHi == 0)
+	{
+		this->_uSmall = (uint32)(uu);
+		this->_iuLast = 0;
+	}
+	else
+	{
+		SetSizeLazy(2);
+		this->_rgu[0] = (uint32)uu;
+		this->_rgu[1] = uHi;
+	}
+
+	// AssertValid(true);
+}
+
+// Sets the size to cu, makes sure the buffer is writable (if cu > 1),
+// and maintains the contents. If the buffer is reallocated, cuExtra
+// uints are also allocated.
+void BigIntegerBuilder::SetSizeKeep(int32 cu, int32 cuExtra)
+{
+	// Contract.Requires(cu > 0 && cuExtra >= 0);
+	// AssertValid(false);
+
+	if (cu <= 1)
+	{
+		if (this->_iuLast > 0)
+			this->_uSmall = this->_rgu[0];
+
+		this->_iuLast = 0;
+		return;
+	}
+	if (!this->_fWritable || this->_rguLength < cu)
+	{
+		int32 l = cu + cuExtra;
+		uint32 * rgu = new uint32[l];
+		if (this->_iuLast == 0)
+		{
+			rgu[0] = this->_uSmall;
+
+			for (int i = 1; i < l; i++)
+				rgu[i] = 0;
+		}
+		else
+		{
+			int to = cu < _iuLast + 1 ? cu : _iuLast + 1;
+
+			// Array.Copy(_rgu, rgu, to);
+			for (int i = 0; i < to; i++)
+				rgu[i] = this->_rgu[i];
+
+			// Clear rest
+			for (int i = to; i < l; i++)
+				rgu[i] = 0;
+		}
+
+		if (this->_fWritable && this->_rgu != NULL)
+			delete[](this->_rgu);
+
+		this->_rguLength = l;
+		this->_rgu = rgu;
+		this->_fWritable = true;
+	}
+	else if (_iuLast + 1 < cu)
+	{
+		// Array.Clear(_rgu, _iuLast + 1, cu - _iuLast - 1);
+		for (int i = _iuLast + 1, m = i + cu - _iuLast - 1; i < m; i++)
+			this->_rgu[i] = 0;
+
+		if (this->_iuLast == 0)
+			this->_rgu[0] = this->_uSmall;
+	}
+
+	this->_iuLast = cu - 1;
+	// AssertValid(false);
+}
+
 // Loads the value of reg into this register. If we need to allocate memory
 // to perform the load, allocate cuExtra elements.
 void BigIntegerBuilder::Load(BigIntegerBuilder &reg, int cuExtra)
@@ -339,6 +514,12 @@ void BigIntegerBuilder::Load(BigIntegerBuilder &reg, int cuExtra)
 	{
 		if (!this->_fWritable || this->_rguLength <= reg._iuLast)
 		{
+			if (this->_fWritable && this->_rgu != NULL)
+			{
+				// Free
+				delete[](this->_rgu);
+			}
+
 			this->_rgu = new uint32[reg._iuLast + 1 + cuExtra];
 			this->_rguLength = reg._iuLast + 1 + cuExtra;
 			this->_fWritable = true;
@@ -351,6 +532,35 @@ void BigIntegerBuilder::Load(BigIntegerBuilder &reg, int cuExtra)
 	}
 
 	// AssertValid(true);
+}
+
+void BigIntegerBuilder::Mul(uint32 u)
+{
+	if (u == 0)
+	{
+		Set((uint32)0);
+		return;
+	}
+	if (u == 1)
+		return;
+
+	if (this->_iuLast == 0)
+	{
+		Set((uint64)this->_uSmall * u);
+		return;
+	}
+
+	EnsureWritable(1);
+
+	uint32 uCarry = 0;
+	for (int iu = 0; iu <= this->_iuLast; iu++)
+		uCarry = MulCarry(this->_rgu[iu], u, uCarry);
+
+	if (uCarry != 0)
+	{
+		SetSizeKeep(this->_iuLast + 2, 0);
+		this->_rgu[_iuLast] = uCarry;
+	}
 }
 
 void BigIntegerBuilder::Add(uint32 u)

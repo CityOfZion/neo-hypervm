@@ -863,14 +863,31 @@ ExecuteOpCode:
 
 #pragma region Bitwise logic
 
-	/*
-	case OpCode.INVERT:
+	case EVMOpCode::INVERT:
 	{
-	BigInteger x = EvaluationStack.Pop().GetBigInteger();
-	EvaluationStack.Push(~x);
-	return;
+		if (this->EvaluationStack->Count() < 1)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem* item = this->EvaluationStack->Pop();
+		BigInteger* bi = item->GetBigInteger();
+		IStackItem::Free(item);
+
+		if (bi == NULL)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		BigInteger *add = new BigInteger(BigInteger::One);
+		BigInteger *ret = bi->Invert();
+		delete(bi);
+
+		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		return;
 	}
-	*/
 	case EVMOpCode::AND:
 	{
 		if (this->EvaluationStack->Count() < 2)

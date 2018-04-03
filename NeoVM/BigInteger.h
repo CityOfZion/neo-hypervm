@@ -37,6 +37,7 @@ public:
 	BigInteger* And(BigInteger* reg);
 	BigInteger* Or(BigInteger* reg);
 	BigInteger* Xor(BigInteger* reg);
+	BigInteger* Invert();
 	BigInteger* Negate();
 	BigInteger* Abs();
 	BigInteger* Shl(int32 shift);

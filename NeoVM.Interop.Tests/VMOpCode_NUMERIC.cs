@@ -71,7 +71,7 @@ namespace NeoVM.Interop.Tests
             });
         }
 
-        //[TestMethod]
+        [TestMethod]
         public void MUL()
         {
             InternalTestBigInteger(EVMOpCode.MUL, (engine, a, b, cancel) =>
