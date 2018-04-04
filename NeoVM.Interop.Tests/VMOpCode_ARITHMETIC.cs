@@ -309,6 +309,33 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void BOOLAND()
         {
+            // Without push
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                EVMOpCode.PUSH3,
+                EVMOpCode.BOOLAND,
+                EVMOpCode.RET
+            ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 3);
+
+                CheckClean(engine, false);
+            }
+
+            // Real test
+
             using (ScriptBuilder script = new ScriptBuilder
             (
                 EVMOpCode.PUSH0,
@@ -338,6 +365,33 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void BOOLOR()
         {
+            // Without push
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                EVMOpCode.PUSH3,
+                EVMOpCode.BOOLOR,
+                EVMOpCode.RET
+            ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 3);
+
+                CheckClean(engine, false);
+            }
+
+            // Real test
+
             using (ScriptBuilder script = new ScriptBuilder
             (
                 EVMOpCode.PUSH0,
