@@ -412,8 +412,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		IStackItem *it = this->AltStack->Peek(0);
-		this->EvaluationStack->Push(it);
+		this->EvaluationStack->Push(this->AltStack->Peek(0));
 		return;
 	}
 	case EVMOpCode::TOALTSTACK:

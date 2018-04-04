@@ -9,11 +9,35 @@ namespace NeoVM.Interop.Tests
     public class VMOpCode_STACK : VMOpCodeTest
     {
         [TestMethod]
-        public void DUP_FROMALTSTACK()
+        public void DUPFROMALTSTACK()
         {
+            // Without push
+
             using (ScriptBuilder script = new ScriptBuilder
             (
-                EVMOpCode.PUSH0,
+                EVMOpCode.DUPFROMALTSTACK,
+                EVMOpCode.RET
+            ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Real test
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                EVMOpCode.PUSH5,
                 EVMOpCode.TOALTSTACK,
                 EVMOpCode.DUPFROMALTSTACK,
                 EVMOpCode.RET
@@ -30,8 +54,8 @@ namespace NeoVM.Interop.Tests
 
                 // Check
 
-                Assert.IsTrue(engine.AltStack.Pop<ByteArrayStackItem>().Value.Length == 0);
-                Assert.IsTrue(engine.EvaluationStack.Pop<ByteArrayStackItem>().Value.Length == 0);
+                Assert.AreEqual(engine.AltStack.Pop<IntegerStackItem>().Value, 5);
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 5);
 
                 CheckClean(engine);
             }
@@ -699,6 +723,33 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void SWAP()
         {
+            // Without push
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                EVMOpCode.PUSH1,
+                EVMOpCode.SWAP,
+                EVMOpCode.RET
+            ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 0x01);
+
+                CheckClean(engine, false);
+            }
+
+            // Real test
+
             using (ScriptBuilder script = new ScriptBuilder
             (
                 EVMOpCode.PUSH2,
@@ -728,6 +779,33 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void TUCK()
         {
+            // Without push
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                EVMOpCode.PUSH1,
+                EVMOpCode.TUCK,
+                EVMOpCode.RET
+            ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 0x01);
+
+                CheckClean(engine, false);
+            }
+
+            // Real test
+
             using (ScriptBuilder script = new ScriptBuilder
             (
                 EVMOpCode.PUSH2,
