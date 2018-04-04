@@ -696,8 +696,7 @@ ExecuteOpCode:
 		IStackItem::Free(x2);
 		IStackItem::Free(x1);
 
-		ByteArrayStackItem *bi = new ByteArrayStackItem(data, size1 + size2, true);
-		this->EvaluationStack->Push(bi);
+		this->EvaluationStack->Push(new ByteArrayStackItem(data, size1 + size2, true));
 		return;
 	}
 	case EVMOpCode::SUBSTR:
@@ -708,9 +707,9 @@ ExecuteOpCode:
 			return;
 		}
 
-		IStackItem * it = this->EvaluationStack->Pop();
 		int32 count = 0;
-
+		IStackItem * it = this->EvaluationStack->Pop();
+		
 		if (!it->GetInt32(count) || count < 0)
 		{
 			IStackItem::Free(it);
@@ -735,16 +734,14 @@ ExecuteOpCode:
 		byte * data = new byte[count];
 		if (it->ReadByteArray(&data[0], index, count) != count)
 		{
-			IStackItem::Free(it);
 			delete[]data;
+			IStackItem::Free(it);
 			this->State = EVMState::FAULT;
 			return;
 		}
 
 		IStackItem::Free(it);
-
-		ByteArrayStackItem *bi = new ByteArrayStackItem(data, count, true);
-		this->EvaluationStack->Push(bi);
+		this->EvaluationStack->Push(new ByteArrayStackItem(data, count, true));
 		return;
 	}
 	case EVMOpCode::LEFT:
@@ -755,8 +752,8 @@ ExecuteOpCode:
 			return;
 		}
 
-		IStackItem * it = this->EvaluationStack->Pop();
 		int32 count = 0;
+		IStackItem * it = this->EvaluationStack->Pop();
 
 		if (!it->GetInt32(count) || count < 0)
 		{
@@ -771,16 +768,14 @@ ExecuteOpCode:
 		byte * data = new byte[count];
 		if (it->ReadByteArray(&data[0], 0, count) != count)
 		{
-			IStackItem::Free(it);
 			delete[]data;
+			IStackItem::Free(it);
 			this->State = EVMState::FAULT;
 			return;
 		}
 
 		IStackItem::Free(it);
-
-		ByteArrayStackItem *bi = new ByteArrayStackItem(data, count, true);
-		this->EvaluationStack->Push(bi);
+		this->EvaluationStack->Push(new ByteArrayStackItem(data, count, true));
 		return;
 	}
 	case EVMOpCode::RIGHT:
@@ -791,8 +786,8 @@ ExecuteOpCode:
 			return;
 		}
 
-		IStackItem * it = this->EvaluationStack->Pop();
 		int32 count = 0;
+		IStackItem * it = this->EvaluationStack->Pop();
 
 		if (!it->GetInt32(count) || count < 0)
 		{
@@ -807,16 +802,14 @@ ExecuteOpCode:
 		byte * data = new byte[count];
 		if (it->ReadByteArray(&data[0], it->ReadByteArraySize() - count, count) != count)
 		{
-			IStackItem::Free(it);
 			delete[]data;
+			IStackItem::Free(it);
 			this->State = EVMState::FAULT;
 			return;
 		}
 
 		IStackItem::Free(it);
-
-		ByteArrayStackItem *bi = new ByteArrayStackItem(data, count, true);
-		this->EvaluationStack->Push(bi);
+		this->EvaluationStack->Push(new ByteArrayStackItem(data, count, true));
 		return;
 	}
 	case EVMOpCode::SIZE:
@@ -837,8 +830,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		item = new IntegerStackItem(size);
-		this->EvaluationStack->Push(item);
+		this->EvaluationStack->Push(new IntegerStackItem(size));
 		return;
 	}
 

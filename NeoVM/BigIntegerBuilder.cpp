@@ -51,7 +51,7 @@ void BigIntegerBuilder::GetInteger(int32 &sign, uint32 * &bits, int32 &bitSize)
 	{
 		if (this->_uSmall <= Int32MaxValue)
 		{
-			sign = sign * (int)this->_uSmall;
+			sign = sign * (int32)this->_uSmall;
 			bits = NULL;
 			bitSize = 0;
 			return;
@@ -102,12 +102,13 @@ void BigIntegerBuilder::GetInteger(int32 &sign, uint32 * &bits, int32 &bitSize)
 	// Keep the bigger buffer (if it is writable), but create a smaller one for the BigInteger.
 
 	bits = this->_rgu;
-	bitSize = this->_rguLength;
-	this->_fWritable = false;
+	bitSize = this->_iuLast + 1;
 	// Array.Resize(ref bits, _iuLast + 1);
 
 	if (!this->_fWritable)
+	{
 		this->_rgu = bits;
+	}
 }
 
 void BigIntegerBuilder::Div(BigIntegerBuilder &regDen)
@@ -181,6 +182,7 @@ void BigIntegerBuilder::Mod(BigIntegerBuilder &regDen)
 		Set(Mod(this, regDen._uSmall));
 		return;
 	}
+
 	if (this->_iuLast == 0)
 		return;
 
@@ -417,22 +419,22 @@ int32 BigIntegerBuilder::CbitHighZero(uint32 u)
 		return 32;
 
 	int cbit = 0;
-	if ((u & 0xFFFF0000) == 0) 
+	if ((u & 0xFFFF0000) == 0)
 	{
 		cbit += 16;
 		u <<= 16;
 	}
-	if ((u & 0xFF000000) == 0) 
+	if ((u & 0xFF000000) == 0)
 	{
 		cbit += 8;
 		u <<= 8;
 	}
-	if ((u & 0xF0000000) == 0) 
+	if ((u & 0xF0000000) == 0)
 	{
 		cbit += 4;
 		u <<= 4;
 	}
-	if ((u & 0xC0000000) == 0) 
+	if ((u & 0xC0000000) == 0)
 	{
 		cbit += 2;
 		u <<= 2;
@@ -455,7 +457,7 @@ void BigIntegerBuilder::ModDivCore(BigIntegerBuilder *regNum, BigIntegerBuilder 
 {
 	//Contract.Assert(regNum._iuLast > 0 && regDen._iuLast > 0);
 
-	regQuo.Set((uint32)0);
+	regQuo.Set(0U);
 	if (regNum->_iuLast < regDen._iuLast)
 		return;
 
@@ -465,7 +467,7 @@ void BigIntegerBuilder::ModDivCore(BigIntegerBuilder *regNum, BigIntegerBuilder 
 
 	// Determine whether the result will have cuDiff "digits" or cuDiff+1 "digits".
 	int32 cuQuo = cuDiff;
-	for (int iu = regNum->_iuLast; ; iu--)
+	for (int32 iu = regNum->_iuLast; ; iu--)
 	{
 		if (iu < cuDiff)
 		{
@@ -489,8 +491,8 @@ void BigIntegerBuilder::ModDivCore(BigIntegerBuilder *regNum, BigIntegerBuilder 
 	// Get the uint to use for the trial divisions. We normalize so the high bit is set.
 	uint32 uDen = regDen._rgu[cuDen - 1];
 	uint32 uDenNext = regDen._rgu[cuDen - 2];
-	int cbitShiftLeft = CbitHighZero(uDen);
-	int cbitShiftRight = kcbitUint - cbitShiftLeft;
+	int32 cbitShiftLeft = CbitHighZero(uDen);
+	int32 cbitShiftRight = kcbitUint - cbitShiftLeft;
 	if (cbitShiftLeft > 0)
 	{
 		uDen = (uDen << cbitShiftLeft) | (uDenNext >> cbitShiftRight);
@@ -505,7 +507,7 @@ void BigIntegerBuilder::ModDivCore(BigIntegerBuilder *regNum, BigIntegerBuilder 
 	// Contract.Assert(cuQuo + cuDen == regNum._iuLast + 1 || cuQuo + cuDen == regNum._iuLast + 2);
 	regNum->EnsureWritable(0);
 
-	for (int iu = cuQuo; --iu >= 0; )
+	for (int32 iu = cuQuo; --iu >= 0; )
 	{
 		// Get the high (normalized) bits of regNum.
 		uint32 uNumHi = (iu + cuDen <= regNum->_iuLast) ? regNum->_rgu[iu + cuDen] : 0;
@@ -531,7 +533,7 @@ void BigIntegerBuilder::ModDivCore(BigIntegerBuilder *regNum, BigIntegerBuilder 
 			uuQuo = UInt32MaxValue;
 		}
 
-		while (uuRem <= UInt32MaxValue && uuQuo * uDenNext > (((uint64)(uint32)uuRem << kcbitUint) | uNumNext))
+		while (uuRem <= UInt32MaxValue && uuQuo * uDenNext > ((((uint64)((uint32)uuRem << kcbitUint)) | uNumNext)))
 		{
 			uuQuo--;
 			uuRem += uDen;
@@ -542,7 +544,7 @@ void BigIntegerBuilder::ModDivCore(BigIntegerBuilder *regNum, BigIntegerBuilder 
 		if (uuQuo > 0)
 		{
 			uint64 uuBorrow = 0;
-			for (int iu2 = 0; iu2 < cuDen; iu2++)
+			for (int32 iu2 = 0; iu2 < cuDen; iu2++)
 			{
 				uuBorrow += regDen._rgu[iu2] * uuQuo;
 				uint32 uSub = (uint32)uuBorrow;
@@ -557,7 +559,7 @@ void BigIntegerBuilder::ModDivCore(BigIntegerBuilder *regNum, BigIntegerBuilder 
 			{
 				// Add, tracking carry.
 				uint32 uCarry = 0;
-				for (int iu2 = 0; iu2 < cuDen; iu2++)
+				for (int32 iu2 = 0; iu2 < cuDen; iu2++)
 				{
 					uCarry = AddCarry(regNum->_rgu[iu + iu2], regDen._rgu[iu2], uCarry);
 					// Contract.Assert(uCarry <= 1);
@@ -739,7 +741,7 @@ void BigIntegerBuilder::Mul(uint32 u)
 {
 	if (u == 0)
 	{
-		Set((uint32)0);
+		Set(0U);
 		return;
 	}
 	if (u == 1)
