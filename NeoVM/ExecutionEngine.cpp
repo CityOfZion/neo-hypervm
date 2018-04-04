@@ -470,9 +470,9 @@ ExecuteOpCode:
 			return;
 		}
 
+		int32 n = 0;
 		IStackItem * it = this->EvaluationStack->Pop();
 
-		int32 n = 0;
 		if (!it->GetInt32(n) || n < 0 || ic <= n + 1)
 		{
 			IStackItem::Free(it);
@@ -481,14 +481,12 @@ ExecuteOpCode:
 		}
 
 		IStackItem::Free(it);
-
 		if (n == 0) return;
 
 		IStackItem* xn = this->EvaluationStack->Peek(n);
 
 		it = this->EvaluationStack->Remove(0);
 		this->EvaluationStack->Insert(0, xn);
-
 		this->EvaluationStack->Remove(n);
 		this->EvaluationStack->Insert(n, it);
 		return;
@@ -502,9 +500,9 @@ ExecuteOpCode:
 			return;
 		}
 
+		int32 n = 0;
 		IStackItem * it = this->EvaluationStack->Pop();
 
-		int32 n = 0;
 		if (!it->GetInt32(n) || n <= 0 || ic < n + 1)
 		{
 			IStackItem::Free(it);
@@ -513,7 +511,6 @@ ExecuteOpCode:
 		}
 
 		IStackItem::Free(it);
-
 		this->EvaluationStack->Insert(n, this->EvaluationStack->Peek(0));
 		return;
 	}
@@ -585,9 +582,9 @@ ExecuteOpCode:
 			return;
 		}
 
+		int32 n = 0;
 		IStackItem * it = this->EvaluationStack->Pop();
 
-		int32 n = 0;
 		if (!it->GetInt32(n) || n < 0)
 		{
 			IStackItem::Free(it);
