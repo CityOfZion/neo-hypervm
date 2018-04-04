@@ -573,6 +573,57 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void WITHIN()
         {
+            // Without push
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                EVMOpCode.PUSH1, EVMOpCode.PUSH5,
+                EVMOpCode.WITHIN,
+                EVMOpCode.RET
+            ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 5);
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 1);
+
+                CheckClean(engine, false);
+            }
+
+            // Without wrong types
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                EVMOpCode.PUSH1, EVMOpCode.PUSH5, EVMOpCode.NEWMAP,
+                EVMOpCode.WITHIN,
+                EVMOpCode.RET
+            ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Real test
+
             using (ScriptBuilder script = new ScriptBuilder
             (
                 EVMOpCode.PUSH1,

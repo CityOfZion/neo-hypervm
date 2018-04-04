@@ -1830,13 +1830,11 @@ ExecuteOpCode:
 			return;
 		}
 
-		IStackItem *ret = new BoolStackItem(ia->CompareTo(ix) <= 0 && ix->CompareTo(ib) < 0);
+		this->EvaluationStack->Push(new BoolStackItem(ia->CompareTo(ix) <= 0 && ix->CompareTo(ib) < 0));
 
 		delete(ib);
 		delete(ia);
 		delete(ix);
-
-		this->EvaluationStack->Push(ret);
 		return;
 	}
 
