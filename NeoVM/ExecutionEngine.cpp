@@ -612,9 +612,9 @@ ExecuteOpCode:
 			return;
 		}
 
+		int32 n = 0;
 		IStackItem * it = this->EvaluationStack->Pop();
 
-		int32 n = 0;
 		if (!it->GetInt32(n) || n < 0)
 		{
 			IStackItem::Free(it);

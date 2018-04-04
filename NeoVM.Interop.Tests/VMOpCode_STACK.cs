@@ -718,6 +718,30 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void OVER()
         {
+            // Without push
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                EVMOpCode.OVER,
+                EVMOpCode.RET
+            ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Real test
+
             using (ScriptBuilder script = new ScriptBuilder
             (
                 EVMOpCode.PUSH0,
@@ -868,6 +892,83 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void ROLL()
         {
+            // Without push
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                EVMOpCode.ROLL,
+                EVMOpCode.RET
+            ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Wrong type
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                EVMOpCode.NEWMAP,
+                EVMOpCode.ROLL,
+                EVMOpCode.RET
+            ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Real tests
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                EVMOpCode.PUSH3,
+                EVMOpCode.PUSH2,
+                EVMOpCode.PUSH1,
+                EVMOpCode.PUSH4,
+                EVMOpCode.ROLL,
+                EVMOpCode.RET
+            ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 1);
+                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 2);
+                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 3);
+
+                CheckClean(engine, false);
+            }
+
+            // Real tests
+
             using (ScriptBuilder script = new ScriptBuilder
             (
                 EVMOpCode.PUSH5,
@@ -936,6 +1037,35 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void ROT()
         {
+            // Without push
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                EVMOpCode.PUSH2,
+                EVMOpCode.PUSH1,
+                EVMOpCode.ROT,
+                EVMOpCode.RET
+            ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 0x01);
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 0x02);
+
+                CheckClean(engine, false);
+            }
+
+            // Real test
+
             using (ScriptBuilder script = new ScriptBuilder
             (
                 EVMOpCode.PUSH3,
