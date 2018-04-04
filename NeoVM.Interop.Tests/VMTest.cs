@@ -113,6 +113,8 @@ namespace NeoVM.Interop.Tests
                 Assert.AreEqual(0, engine.InvocationStack.Count);
                 Assert.AreEqual(0, engine.AltStack.Count);
                 Assert.AreEqual(0, engine.EvaluationStack.Count);
+
+                Assert.AreEqual(EVMState.HALT, engine.Execute());
             }
         }
 

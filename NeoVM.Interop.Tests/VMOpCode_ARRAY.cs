@@ -8,117 +8,6 @@ namespace NeoVM.Interop.Tests
     [TestClass]
     public class VMOpCode_ARRAY : VMOpCodeTest
     {
-        void NEWARRAY_NEWSTRUCT(bool isStruct)
-        {
-            // Without push
-
-            using (ScriptBuilder script = new ScriptBuilder
-            (
-                isStruct ? EVMOpCode.NEWSTRUCT : EVMOpCode.NEWARRAY,
-                EVMOpCode.RET
-            ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
-            {
-                // Load script
-
-                engine.LoadScript(script);
-
-                // Execute
-
-                Assert.AreEqual(EVMState.FAULT, engine.Execute());
-
-                // Check
-
-                CheckClean(engine, false);
-            }
-
-            // With push (-1)
-
-            using (ScriptBuilder script = new ScriptBuilder
-            (
-                EVMOpCode.PUSHM1,
-                isStruct ? EVMOpCode.NEWSTRUCT : EVMOpCode.NEWARRAY,
-                EVMOpCode.RET
-            ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
-            {
-                // Load script
-
-                engine.LoadScript(script);
-
-                // Execute
-
-                Assert.AreEqual(EVMState.FAULT, engine.Execute());
-
-                // Check
-
-                CheckClean(engine, false);
-            }
-
-            // Real test
-
-            using (ScriptBuilder script = new ScriptBuilder
-            (
-                EVMOpCode.PUSH2,
-                isStruct ? EVMOpCode.NEWSTRUCT : EVMOpCode.NEWARRAY,
-                EVMOpCode.RET
-            ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
-            {
-                // Load script
-
-                engine.LoadScript(script);
-
-                // Execute
-
-                Assert.AreEqual(EVMState.HALT, engine.Execute());
-
-                // Check
-
-                using (ArrayStackItem arr = engine.EvaluationStack.Pop<ArrayStackItem>())
-                {
-                    Assert.IsTrue(arr != null && arr.IsStruct == isStruct);
-                    Assert.IsTrue(arr.Count == 2);
-                    Assert.IsTrue(arr[0] is BooleanStackItem b0 && !b0.Value);
-                    Assert.IsTrue(arr[1] is BooleanStackItem b1 && !b1.Value);
-                }
-
-                CheckClean(engine);
-            }
-        }
-
-        [TestMethod]
-        public void NEWSTRUCT() { NEWARRAY_NEWSTRUCT(true); }
-
-        [TestMethod]
-        public void NEWARRAY() { NEWARRAY_NEWSTRUCT(false); }
-
-        [TestMethod]
-        public void NEWMAP()
-        {
-            using (ScriptBuilder script = new ScriptBuilder
-                   (
-                       EVMOpCode.NEWMAP,
-                       EVMOpCode.RET
-                   ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
-            {
-                // Load script
-
-                engine.LoadScript(script);
-
-                // Execute
-
-                Assert.AreEqual(EVMState.HALT, engine.Execute());
-
-                // Check
-
-                Assert.IsTrue(engine.EvaluationStack.Pop() is MapStackItem);
-
-                CheckClean(engine);
-            }
-        }
-
         [TestMethod]
         public void ARRAYSIZE()
         {
@@ -328,6 +217,153 @@ namespace NeoVM.Interop.Tests
 
                 CheckClean(engine);
             }
+        }
+
+        void NEWARRAY_NEWSTRUCT(bool isStruct)
+        {
+            // Without push
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                isStruct ? EVMOpCode.NEWSTRUCT : EVMOpCode.NEWARRAY,
+                EVMOpCode.RET
+            ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // With push (-1)
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                EVMOpCode.PUSHM1,
+                isStruct ? EVMOpCode.NEWSTRUCT : EVMOpCode.NEWARRAY,
+                EVMOpCode.RET
+            ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Real test
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                EVMOpCode.PUSH2,
+                isStruct ? EVMOpCode.NEWSTRUCT : EVMOpCode.NEWARRAY,
+                EVMOpCode.RET
+            ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.HALT, engine.Execute());
+
+                // Check
+
+                using (ArrayStackItem arr = engine.EvaluationStack.Pop<ArrayStackItem>())
+                {
+                    Assert.IsTrue(arr != null && arr.IsStruct == isStruct);
+                    Assert.IsTrue(arr.Count == 2);
+                    Assert.IsTrue(arr[0] is BooleanStackItem b0 && !b0.Value);
+                    Assert.IsTrue(arr[1] is BooleanStackItem b1 && !b1.Value);
+                }
+
+                CheckClean(engine);
+            }
+        }
+
+        [TestMethod]
+        public void NEWARRAY() { NEWARRAY_NEWSTRUCT(false); }
+
+        [TestMethod]
+        public void NEWSTRUCT() { NEWARRAY_NEWSTRUCT(true); }
+
+        [TestMethod]
+        public void NEWMAP()
+        {
+            using (ScriptBuilder script = new ScriptBuilder
+                   (
+                       EVMOpCode.NEWMAP,
+                       EVMOpCode.RET
+                   ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.HALT, engine.Execute());
+
+                // Check
+
+                Assert.IsTrue(engine.EvaluationStack.Pop() is MapStackItem);
+
+                CheckClean(engine);
+            }
+        }
+
+        [TestMethod]
+        public void APPEND()
+        {
+            Assert.IsFalse(true);
+        }
+
+        [TestMethod]
+        public void REVERSE()
+        {
+            Assert.IsFalse(true);
+        }
+
+        [TestMethod]
+        public void REMOVE()
+        {
+            Assert.IsFalse(true);
+        }
+
+        [TestMethod]
+        public void HASKEY()
+        {
+            Assert.IsFalse(true);
+        }
+
+        [TestMethod]
+        public void KEYS()
+        {
+            Assert.IsFalse(true);
+        }
+
+        [TestMethod]
+        public void VALUES()
+        {
+            Assert.IsFalse(true);
         }
     }
 }

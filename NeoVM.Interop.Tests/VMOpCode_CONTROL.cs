@@ -10,8 +10,110 @@ namespace NeoVM.Interop.Tests
     public class VMOpCode_CONTROL : VMOpCodeTest
     {
         [TestMethod]
-        public void JUMP_JUMPIF_JMPIFNOT()
+        public void NOP()
         {
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                EVMOpCode.NOP, EVMOpCode.NOP,
+                EVMOpCode.NOP, EVMOpCode.NOP,
+                EVMOpCode.NOP, EVMOpCode.RET
+                ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load Script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                for (int x = 0; x < 5; x++)
+                {
+                    Assert.AreEqual(EVMOpCode.NOP, engine.CurrentContext.NextInstruction);
+                    engine.StepInto();
+                    Assert.AreEqual(EVMState.NONE, engine.State);
+                }
+
+                Assert.AreEqual(EVMOpCode.RET, engine.CurrentContext.NextInstruction);
+                engine.StepInto();
+                Assert.AreEqual(EVMState.HALT, engine.State);
+
+                // Check
+
+                CheckClean(engine);
+            }
+        }
+
+        [TestMethod]
+        public void JMP()
+        {
+            // Jump outside (1)
+
+            using (ScriptBuilder script = new ScriptBuilder(new byte[]
+                {
+                    /* ┌─◄ */ (byte)EVMOpCode.JMP,
+                    /* x   */ 0x04 , 0x00
+                }))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Jump outside (2)
+
+            using (ScriptBuilder script = new ScriptBuilder(new byte[]
+                {
+                    /* x─◄ */ (byte)EVMOpCode.JMP,
+                    /*     */ 0xFF , 0xFF
+                }))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Without offset
+
+            using (ScriptBuilder script = new ScriptBuilder(new byte[]
+                {
+                    /* ┌─◄ */ (byte)EVMOpCode.JMP,
+                    /* x   */ 0x04
+                }))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Real Test
+
             using (ScriptBuilder script = new ScriptBuilder(new byte[]
                 {
                     /*     */ (byte)EVMOpCode.PUSH0,
@@ -19,6 +121,130 @@ namespace NeoVM.Interop.Tests
                     /* │   */ 0x04, 0x00,
                     /* │   */ (byte)EVMOpCode.RET,
                     /* └─► */ (byte)EVMOpCode.NOT,
+                    /*     */ (byte)EVMOpCode.RET,
+                }))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.HALT, engine.Execute());
+
+                // Check
+
+                Assert.IsTrue(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
+
+                CheckClean(engine);
+            }
+        }
+
+        void JMPIF_JMPIFNOT(bool isIf)
+        {
+            // Jump outside (1)
+
+            using (ScriptBuilder script = new ScriptBuilder(new byte[]
+                {
+                    /*     */ (byte) EVMOpCode.PUSH1,
+                    /* ┌─◄ */ (byte)(isIf? EVMOpCode.JMPIF : EVMOpCode.JMPIFNOT),
+                    /* x   */ 0x04 , 0x00
+                }))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 1);
+
+                CheckClean(engine, false);
+            }
+
+            // Jump outside (2)
+
+            using (ScriptBuilder script = new ScriptBuilder(new byte[]
+                {
+                    /* x   */ (byte) EVMOpCode.PUSH1,
+                    /* └─◄ */ (byte)(isIf? EVMOpCode.JMPIF : EVMOpCode.JMPIFNOT),
+                    /*     */ 0xFE , 0xFF
+                }))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 1);
+
+                CheckClean(engine, false);
+            }
+
+            // Without offset
+
+            using (ScriptBuilder script = new ScriptBuilder(new byte[]
+                {
+                    /*     */ (byte) EVMOpCode.PUSH1,
+                    /* ┌─◄ */ (byte)(isIf? EVMOpCode.JMPIF : EVMOpCode.JMPIFNOT),
+                    /* x   */ 0x04
+                }))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 1);
+
+                CheckClean(engine, false);
+            }
+
+            // Without push
+
+            using (ScriptBuilder script = new ScriptBuilder(new byte[]
+                {
+                    /* ┌─◄ */ (byte)(isIf? EVMOpCode.JMPIF : EVMOpCode.JMPIFNOT),
+                    /* x   */ 0x04 , 0x00
+                }))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Real Test
+
+            using (ScriptBuilder script = new ScriptBuilder(new byte[]
+            {
+                    /*     */ (byte)EVMOpCode.PUSH1,
                     /* ┌─◄ */ (byte)EVMOpCode.JMPIF,
                     /* │   */ 0x04, 0x00,
                     /* │   */ (byte)EVMOpCode.RET,
@@ -29,7 +255,7 @@ namespace NeoVM.Interop.Tests
                     /* │   */ (byte)EVMOpCode.RET,
                     /* └─► */ (byte)EVMOpCode.PUSH6,
                     /*     */ (byte)EVMOpCode.RET,
-                }))
+            }))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -48,6 +274,12 @@ namespace NeoVM.Interop.Tests
                 CheckClean(engine);
             }
         }
+
+        [TestMethod]
+        public void JMPIF() { JMPIF_JMPIFNOT(true); }
+
+        [TestMethod]
+        public void JMPIFNOT() { JMPIF_JMPIFNOT(false); }
 
         [TestMethod]
         public void CALL()
@@ -101,6 +333,28 @@ namespace NeoVM.Interop.Tests
                 // Check
 
                 CheckClean(engine, false);
+            }
+        }
+
+        [TestMethod]
+        public void RET()
+        {
+            using (ScriptBuilder script = new ScriptBuilder(EVMOpCode.RET))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load Script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMOpCode.RET, engine.CurrentContext.NextInstruction);
+                engine.StepInto();
+                Assert.AreEqual(EVMState.HALT, engine.State);
+
+                // Check
+
+                CheckClean(engine);
             }
         }
 
@@ -324,68 +578,6 @@ namespace NeoVM.Interop.Tests
         }
 
         [TestMethod]
-        public void TAILCALL()
-        {
-            APPCALL_AND_TAILCALL(EVMOpCode.TAILCALL);
-        }
-
-        [TestMethod]
-        public void NOP()
-        {
-            using (ScriptBuilder script = new ScriptBuilder
-                (
-                EVMOpCode.NOP, EVMOpCode.NOP,
-                EVMOpCode.NOP, EVMOpCode.NOP,
-                EVMOpCode.NOP, EVMOpCode.RET
-                ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
-            {
-                // Load Script
-
-                engine.LoadScript(script);
-
-                // Execute
-
-                for (int x = 0; x < 5; x++)
-                {
-                    Assert.AreEqual(EVMOpCode.NOP, engine.CurrentContext.NextInstruction);
-                    engine.StepInto();
-                    Assert.AreEqual(EVMState.NONE, engine.State);
-                }
-
-                Assert.AreEqual(EVMOpCode.RET, engine.CurrentContext.NextInstruction);
-                engine.StepInto();
-                Assert.AreEqual(EVMState.HALT, engine.State);
-
-                // Check
-
-                CheckClean(engine);
-            }
-        }
-
-        [TestMethod]
-        public void RET()
-        {
-            using (ScriptBuilder script = new ScriptBuilder(EVMOpCode.RET))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
-            {
-                // Load Script
-
-                engine.LoadScript(script);
-
-                // Execute
-
-                Assert.AreEqual(EVMOpCode.RET, engine.CurrentContext.NextInstruction);
-                engine.StepInto();
-                Assert.AreEqual(EVMState.HALT, engine.State);
-
-                // Check
-
-                CheckClean(engine);
-            }
-        }
-
-        [TestMethod]
         public void SYSCALL()
         {
             using (ScriptBuilder script = new ScriptBuilder())
@@ -487,6 +679,12 @@ namespace NeoVM.Interop.Tests
                     CheckClean(engine, false);
                 }
             }
+        }
+
+        [TestMethod]
+        public void TAILCALL()
+        {
+            APPCALL_AND_TAILCALL(EVMOpCode.TAILCALL);
         }
     }
 }

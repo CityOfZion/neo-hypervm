@@ -9,29 +9,6 @@ namespace NeoVM.Interop.Tests
     public class VMOpCode_BITWISE_LOGIC : VMOpCodeTest
     {
         [TestMethod]
-        public void EQUAL()
-        {
-            // TODO: More equals, conversions, and test all types
-
-            // Equal ByteArrays
-
-            InternalTestBigInteger(EVMOpCode.EQUAL, (engine, a, b, cancel) =>
-            {
-                bool res;
-
-                try { res = a == b; }
-                catch
-                {
-                    Assert.AreEqual(engine.State, EVMState.FAULT);
-                    cancel.Cancel = true;
-                    return;
-                }
-
-                Assert.AreEqual(engine.EvaluationStack.Pop<BooleanStackItem>().Value, res);
-            });
-        }
-
-        [TestMethod]
         public void INVERT()
         {
             InternalTestBigInteger(EVMOpCode.INVERT, (engine, a, cancel) =>
@@ -104,6 +81,29 @@ namespace NeoVM.Interop.Tests
                 }
 
                 Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
+            });
+        }
+
+        [TestMethod]
+        public void EQUAL()
+        {
+            // TODO: More equals, conversions, and test all types
+
+            // Equal ByteArrays
+
+            InternalTestBigInteger(EVMOpCode.EQUAL, (engine, a, b, cancel) =>
+            {
+                bool res;
+
+                try { res = a == b; }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<BooleanStackItem>().Value, res);
             });
         }
     }

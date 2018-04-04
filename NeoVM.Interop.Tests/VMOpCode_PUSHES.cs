@@ -10,32 +10,6 @@ namespace NeoVM.Interop.Tests
     public class VMOpCode_PUSHES : VMOpCodeTest
     {
         [TestMethod]
-        public void PUSHM1()
-        {
-            using (ScriptBuilder script = new ScriptBuilder
-                (
-                EVMOpCode.PUSHM1,
-                EVMOpCode.RET
-                ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
-            {
-                // Load script
-
-                engine.LoadScript(script);
-
-                // Execute
-
-                Assert.AreEqual(EVMState.HALT, engine.Execute());
-
-                // Check
-
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, -1);
-
-                CheckClean(engine);
-            }
-        }
-
-        [TestMethod]
         public void PUSH0()
         {
             using (ScriptBuilder script = new ScriptBuilder
@@ -113,43 +87,6 @@ namespace NeoVM.Interop.Tests
                         CheckClean(engine, false);
                     }
                 }
-        }
-
-        [TestMethod]
-        public void PUSH1_TO_PUSH16()
-        {
-            using (ScriptBuilder script = new ScriptBuilder
-               (
-                EVMOpCode.PUSH1, EVMOpCode.PUSH2,
-                EVMOpCode.PUSH3, EVMOpCode.PUSH4,
-                EVMOpCode.PUSH5, EVMOpCode.PUSH6,
-                EVMOpCode.PUSH7, EVMOpCode.PUSH8,
-                EVMOpCode.PUSH9, EVMOpCode.PUSH10,
-                EVMOpCode.PUSH11, EVMOpCode.PUSH12,
-                EVMOpCode.PUSH13, EVMOpCode.PUSH14,
-                EVMOpCode.PUSH15, EVMOpCode.PUSH16,
-                EVMOpCode.RET
-               ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
-            {
-                // Load Script
-
-                engine.LoadScript(script);
-
-                // Execute
-
-                Assert.AreEqual(EVMState.HALT, engine.Execute());
-
-                // Check
-
-                for (int x = 16; x >= 1; x--)
-                {
-                    Assert.AreEqual(x, engine.EvaluationStack.Count);
-                    Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, x);
-                }
-
-                CheckClean(engine);
-            }
         }
 
         [TestMethod]
@@ -302,6 +239,69 @@ namespace NeoVM.Interop.Tests
 
                     CheckClean(engine, false);
                 }
+            }
+        }
+
+        [TestMethod]
+        public void PUSHM1()
+        {
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                EVMOpCode.PUSHM1,
+                EVMOpCode.RET
+                ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.HALT, engine.Execute());
+
+                // Check
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, -1);
+
+                CheckClean(engine);
+            }
+        }
+
+        [TestMethod]
+        public void PUSH1_TO_PUSH16()
+        {
+            using (ScriptBuilder script = new ScriptBuilder
+               (
+                EVMOpCode.PUSH1, EVMOpCode.PUSH2,
+                EVMOpCode.PUSH3, EVMOpCode.PUSH4,
+                EVMOpCode.PUSH5, EVMOpCode.PUSH6,
+                EVMOpCode.PUSH7, EVMOpCode.PUSH8,
+                EVMOpCode.PUSH9, EVMOpCode.PUSH10,
+                EVMOpCode.PUSH11, EVMOpCode.PUSH12,
+                EVMOpCode.PUSH13, EVMOpCode.PUSH14,
+                EVMOpCode.PUSH15, EVMOpCode.PUSH16,
+                EVMOpCode.RET
+               ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load Script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.HALT, engine.Execute());
+
+                // Check
+
+                for (int x = 16; x >= 1; x--)
+                {
+                    Assert.AreEqual(x, engine.EvaluationStack.Count);
+                    Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, x);
+                }
+
+                CheckClean(engine);
             }
         }
     }

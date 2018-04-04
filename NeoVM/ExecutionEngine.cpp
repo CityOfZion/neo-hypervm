@@ -233,8 +233,6 @@ ExecuteOpCode:
 
 	case EVMOpCode::NOP: return;
 	case EVMOpCode::JMP:
-	case EVMOpCode::JMPIF:
-	case EVMOpCode::JMPIFNOT:
 	{
 		int16 offset = 0;
 		if (!context->ReadInt16(offset))
@@ -251,31 +249,41 @@ ExecuteOpCode:
 			return;
 		}
 
-		if (opcode > EVMOpCode::JMP)
+		context->InstructionPointer = offset;
+		return;
+	}
+	case EVMOpCode::JMPIF:
+	case EVMOpCode::JMPIFNOT:
+	{
+		int16 offset = 0;
+		if (!context->ReadInt16(offset))
 		{
-			if (this->EvaluationStack->Count() < 1)
-			{
-				this->State = EVMState::FAULT;
-				return;
-			}
+			this->State = EVMState::FAULT;
+			return;
+		}
 
-			IStackItem *bitem = this->EvaluationStack->Pop();
+		offset = context->InstructionPointer + offset - 3;
 
-			bool fValue;
-			if (opcode == EVMOpCode::JMPIFNOT)
-				fValue = !bitem->GetBoolean();
-			else
-				fValue = bitem->GetBoolean();
+		if (offset < 0 || offset > context->ScriptLength || this->EvaluationStack->Count() < 1)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
 
-			IStackItem::Free(bitem);
+		IStackItem *bitem = this->EvaluationStack->Pop();
 
-			if (fValue)
+		if (opcode == EVMOpCode::JMPIFNOT)
+		{
+			if (!bitem->GetBoolean())
 				context->InstructionPointer = offset;
 		}
 		else
 		{
-			context->InstructionPointer = offset;
+			if (bitem->GetBoolean())
+				context->InstructionPointer = offset;
 		}
+
+		IStackItem::Free(bitem);
 		return;
 	}
 	case EVMOpCode::CALL:
@@ -384,7 +392,7 @@ ExecuteOpCode:
 		}
 
 		data[length] = 0x00;
-		
+
 		if (this->InvokeInterop(data) != 0x01)
 			this->State = EVMState::FAULT;
 
@@ -538,7 +546,7 @@ ExecuteOpCode:
 		IStackItem *x2 = this->EvaluationStack->Pop();
 		IStackItem *x1 = this->EvaluationStack->Pop();
 		IStackItem::Free(x1);
-		
+
 		this->EvaluationStack->Push(x2);
 		return;
 	}
@@ -709,7 +717,7 @@ ExecuteOpCode:
 
 		int32 count = 0;
 		IStackItem * it = this->EvaluationStack->Pop();
-		
+
 		if (!it->GetInt32(count) || count < 0)
 		{
 			IStackItem::Free(it);

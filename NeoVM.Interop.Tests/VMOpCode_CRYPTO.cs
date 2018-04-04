@@ -11,6 +11,56 @@ namespace NeoVM.Interop.Tests
     public class VMOpCode_CRYPTO : VMOpCodeTest
     {
         [TestMethod]
+        public void SHA1()
+        {
+            InternalTestBigInteger(EVMOpCode.SHA1, (engine, a, cancel) =>
+            {
+                byte[] hash;
+
+                try
+                {
+                    using (SHA1 sha = System.Security.Cryptography.SHA1.Create())
+                    {
+                        hash = sha.ComputeHash(a.ToByteArray());
+                    }
+                }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
+
+                Assert.IsTrue(engine.EvaluationStack.Pop<ByteArrayStackItem>().Value.SequenceEqual(hash));
+            });
+        }
+
+        [TestMethod]
+        public void SHA256()
+        {
+            InternalTestBigInteger(EVMOpCode.SHA256, (engine, a, cancel) =>
+            {
+                byte[] hash;
+
+                try
+                {
+                    using (SHA256 sha = System.Security.Cryptography.SHA256.Create())
+                    {
+                        hash = sha.ComputeHash(a.ToByteArray());
+                    }
+                }
+                catch
+                {
+                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    cancel.Cancel = true;
+                    return;
+                }
+
+                Assert.IsTrue(engine.EvaluationStack.Pop<ByteArrayStackItem>().Value.SequenceEqual(hash));
+            });
+        }
+
+        [TestMethod]
         public void HASH160()
         {
             InternalTestBigInteger(EVMOpCode.HASH160, (engine, a, cancel) =>
@@ -64,53 +114,15 @@ namespace NeoVM.Interop.Tests
         }
 
         [TestMethod]
-        public void SHA1()
+        public void CHECKSIG()
         {
-            InternalTestBigInteger(EVMOpCode.SHA1, (engine, a, cancel) =>
-            {
-                byte[] hash;
-
-                try
-                {
-                    using (SHA1 sha = System.Security.Cryptography.SHA1.Create())
-                    {
-                        hash = sha.ComputeHash(a.ToByteArray());
-                    }
-                }
-                catch
-                {
-                    Assert.AreEqual(engine.State, EVMState.FAULT);
-                    cancel.Cancel = true;
-                    return;
-                }
-
-                Assert.IsTrue(engine.EvaluationStack.Pop<ByteArrayStackItem>().Value.SequenceEqual(hash));
-            });
+            Assert.IsFalse(true);
         }
 
         [TestMethod]
-        public void SHA256()
+        public void CHECKMULTISIG()
         {
-            InternalTestBigInteger(EVMOpCode.SHA256, (engine, a, cancel) =>
-            {
-                byte[] hash;
-
-                try
-                {
-                    using (SHA256 sha = System.Security.Cryptography.SHA256.Create())
-                    {
-                        hash = sha.ComputeHash(a.ToByteArray());
-                    }
-                }
-                catch
-                {
-                    Assert.AreEqual(engine.State, EVMState.FAULT);
-                    cancel.Cancel = true;
-                    return;
-                }
-
-                Assert.IsTrue(engine.EvaluationStack.Pop<ByteArrayStackItem>().Value.SequenceEqual(hash));
-            });
+            Assert.IsFalse(true);
         }
     }
 }
