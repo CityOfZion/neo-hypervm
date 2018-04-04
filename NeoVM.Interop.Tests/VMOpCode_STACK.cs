@@ -590,6 +590,90 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void PICK()
         {
+            // Without push
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                EVMOpCode.PICK,
+                EVMOpCode.RET
+            ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Pick outside
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                EVMOpCode.PUSH1,
+                EVMOpCode.PUSH2,
+                EVMOpCode.PUSH3,
+                EVMOpCode.PUSH4,
+                EVMOpCode.PICK,
+                EVMOpCode.RET
+            ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 3);
+                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 2);
+                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 1);
+
+                CheckClean(engine, false);
+            }
+
+            // Wrong type
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                EVMOpCode.PUSH1,
+                EVMOpCode.PUSH2,
+                EVMOpCode.PUSH3,
+                EVMOpCode.NEWMAP,
+                EVMOpCode.PICK,
+                EVMOpCode.RET
+            ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 3);
+                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 2);
+                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 1);
+
+                CheckClean(engine, false);
+            }
+
+            // Real test
+
             using (ScriptBuilder script = new ScriptBuilder
             (
                 EVMOpCode.PUSH1,
@@ -597,7 +681,6 @@ namespace NeoVM.Interop.Tests
                 EVMOpCode.PUSH3,
                 EVMOpCode.PUSH2,
                 EVMOpCode.PICK,
-
                 EVMOpCode.RET
             ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
