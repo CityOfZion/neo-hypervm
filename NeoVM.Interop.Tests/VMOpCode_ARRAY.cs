@@ -82,6 +82,53 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void UNPACK()
         {
+            // Without array
+
+            using (ScriptBuilder script = new ScriptBuilder
+                   (
+                       EVMOpCode.PUSH10,
+                       EVMOpCode.UNPACK,
+                       EVMOpCode.RET
+                   ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Without push
+
+            using (ScriptBuilder script = new ScriptBuilder
+                   (
+                       EVMOpCode.UNPACK,
+                       EVMOpCode.RET
+                   ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Real tests
+
             using (ScriptBuilder script = new ScriptBuilder
                    (
                        EVMOpCode.PUSH5,
@@ -103,7 +150,7 @@ namespace NeoVM.Interop.Tests
 
                 // Check
 
-                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 2);
+                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 0x02);
                 Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 0x06);
                 Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 0x05);
 

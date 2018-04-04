@@ -2223,20 +2223,16 @@ ExecuteOpCode:
 
 			for (int32 i = count - 1; i >= 0; i--)
 			{
-				IStackItem * v = array->Get(i);
-				this->EvaluationStack->Push(v);
+				this->EvaluationStack->Push(array->Get(i));
 				array->RemoveAt(i, false);
 			}
 
 			IStackItem::Free(item);
-
-			IntegerStackItem *itcount = new IntegerStackItem(count);
-			this->EvaluationStack->Push(itcount);
+			this->EvaluationStack->Push(new IntegerStackItem(count));
 		}
 		else
 		{
 			IStackItem::Free(item);
-
 			this->State = EVMState::FAULT;
 			return;
 		}
