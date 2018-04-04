@@ -30,6 +30,10 @@ namespace NeoVM.Interop.Types
         public readonly IScriptTable ScriptTable;
 
         /// <summary>
+        /// Logger
+        /// </summary>
+        public readonly ExecutionEngineLogger Logger;
+        /// <summary>
         /// Script containes
         /// </summary>
         public readonly IScriptContainer ScriptContainer;
@@ -80,6 +84,12 @@ namespace NeoVM.Interop.Types
                 InteropService = e.InteropService;
                 ScriptTable = e.ScriptTable;
                 ScriptContainer = e.ScriptContainer;
+                Logger = e.Logger;
+
+                if (Logger != null)
+                {
+                    // Register logs
+                }
             }
 
             InvocationStack = new ExecutionContextStack(invHandle);
