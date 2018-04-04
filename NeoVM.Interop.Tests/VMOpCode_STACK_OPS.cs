@@ -13,6 +13,60 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void XDROP()
         {
+            // Without push
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                EVMOpCode.XDROP,
+                EVMOpCode.RET
+            ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Overflow drop
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                EVMOpCode.PUSH3,
+                EVMOpCode.PUSH2,
+                EVMOpCode.PUSH1,
+                EVMOpCode.PUSH3,
+                EVMOpCode.XDROP,
+                EVMOpCode.RET
+            ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 1);
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 2);
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 3);
+
+                CheckClean(engine, false);
+            }
+
+            // Real test
+
             using (ScriptBuilder script = new ScriptBuilder
             (
                 EVMOpCode.PUSH3,
@@ -34,8 +88,8 @@ namespace NeoVM.Interop.Tests
 
                 // Check
 
-                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 1);
-                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 3);
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 1);
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 3);
 
                 CheckClean(engine);
             }
