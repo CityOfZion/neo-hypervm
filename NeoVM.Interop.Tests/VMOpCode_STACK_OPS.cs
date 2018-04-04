@@ -943,6 +943,33 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void NIP()
         {
+            // Without two stack items
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                EVMOpCode.PUSH5,
+                EVMOpCode.NIP,
+                EVMOpCode.RET
+            ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 5);
+
+                CheckClean(engine, false);
+            }
+
+            // Real test
+
             using (ScriptBuilder script = new ScriptBuilder
             (
                 EVMOpCode.PUSH0,
@@ -1073,8 +1100,7 @@ namespace NeoVM.Interop.Tests
         {
             using (ScriptBuilder script = new ScriptBuilder
             (
-                EVMOpCode.PUSH0,
-                EVMOpCode.NOT,
+                EVMOpCode.PUSH2,
                 EVMOpCode.DEPTH,
                 EVMOpCode.RET
             ))
@@ -1090,8 +1116,8 @@ namespace NeoVM.Interop.Tests
 
                 // Check
 
-                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 1);
-                Assert.IsTrue(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 1);
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 2);
 
                 CheckClean(engine);
             }

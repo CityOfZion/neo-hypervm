@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
+using System.Linq;
 using System.Numerics;
 
 namespace NeoVM.Interop.Tests
@@ -17,7 +17,8 @@ namespace NeoVM.Interop.Tests
         /// <summary>
         /// Rand
         /// </summary>
-        public readonly Random Rand = new Random();
+        public static readonly Random Rand = new Random();
+
         /// <summary>
         /// Test BigInteger array
         /// </summary>
@@ -61,45 +62,69 @@ namespace NeoVM.Interop.Tests
         /// <summary>
         /// Compute distinct BigIntegers
         /// </summary>
-        /// <param name="bi">Integer</param>
         /// <returns>BigIntegerPair</returns>
-        protected static IEnumerable<BigInteger> IntSingleIteration(BigInteger bi)
+        protected static IEnumerable<BigInteger> IntSingleIteration()
         {
-            // Equal
-            yield return bi;
-            // First less 1
-            yield return bi - 1;
-            // First add 1
-            yield return bi + 1;
-            // Last less 1
-            yield return bi * bi;
+            List<BigInteger> ret = new List<BigInteger>();
+
+            foreach (BigInteger bi in TestBigIntegers)
+            {
+                // Equal
+                ret.Add(bi);
+                // First less 1
+                ret.Add(bi - 1);
+                // First add 1
+                ret.Add(bi + 1);
+                // Plus self
+                ret.Add(bi * 1);
+
+                // Random value
+                byte[] data = new byte[Rand.Next(1, 32)];
+                Rand.NextBytes(data);
+
+                ret.Add(new BigInteger(data));
+            }
+
+            return ret.Distinct().ToArray();
         }
         /// <summary>
         /// Compute distinct pairs
         /// </summary>
-        /// <param name="bi">Integer</param>
         /// <returns>BigIntegerPair</returns>
-        protected static IEnumerable<BigIntegerPair> IntPairIteration(BigInteger bi)
+        protected static IEnumerable<BigIntegerPair> IntPairIteration()
         {
-            // Equal
-            yield return new BigIntegerPair(bi, bi);
-            // First less 1
-            yield return new BigIntegerPair(bi - 1, bi);
-            // First add 1
-            yield return new BigIntegerPair(bi + 1, bi);
-            // Last less 1
-            yield return new BigIntegerPair(bi, bi - 1);
-            // Last add 1
-            yield return new BigIntegerPair(bi, bi + 1);
-            // With Zero
-            if (bi != BigInteger.Zero && bi + 1 != BigInteger.Zero && bi - 1 != BigInteger.Zero)
-                yield return new BigIntegerPair(bi, BigInteger.Zero);
-            // With One
-            if (bi != BigInteger.One && bi + 1 != BigInteger.One && bi - 1 != BigInteger.One)
-                yield return new BigIntegerPair(bi, BigInteger.One);
-            // With MinusOne
-            if (bi != BigInteger.MinusOne && bi + 1 != BigInteger.MinusOne && bi - 1 != BigInteger.MinusOne)
-                yield return new BigIntegerPair(bi, BigInteger.MinusOne);
+            List<BigIntegerPair> ret = new List<BigIntegerPair>();
+
+            foreach (BigInteger bi in TestBigIntegers)
+            {
+                // Equal
+                ret.Add(new BigIntegerPair(bi, bi));
+                // Plus self
+                ret.Add(new BigIntegerPair(bi * bi, bi));
+                // First less 1
+                ret.Add(new BigIntegerPair(bi - 1, bi));
+                // First add 1
+                ret.Add(new BigIntegerPair(bi + 1, bi));
+                // With Zero
+                ret.Add(new BigIntegerPair(BigInteger.Zero, bi));
+                // With One
+                ret.Add(new BigIntegerPair(BigInteger.One, bi));
+                // With MinusOne
+                ret.Add(new BigIntegerPair(BigInteger.MinusOne, bi));
+                // Random value
+                byte[] data = new byte[Rand.Next(1, 32)];
+                Rand.NextBytes(data);
+
+                ret.Add(new BigIntegerPair(new BigInteger(data), bi));
+            }
+
+            // Invert all values
+            for (int x = 0, m = ret.Count; x < m; x++)
+            {
+                ret.Add(ret[x].Invert());
+            }
+
+            return ret.Distinct().ToArray();
         }
         /// <summary>
         /// Check operand with two BigIntegers
@@ -164,53 +189,52 @@ namespace NeoVM.Interop.Tests
 
             // Test with push
 
-            foreach (BigInteger bi in TestBigIntegers)
-                foreach (BigIntegerPair pair in IntPairIteration(bi))
+            foreach (BigIntegerPair pair in IntPairIteration())
+            {
+                using (ScriptBuilder script = new ScriptBuilder())
+                using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
                 {
-                    using (ScriptBuilder script = new ScriptBuilder())
-                    using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
-                    {
-                        // Make the script
+                    // Make the script
 
-                        foreach (BigInteger bb in new BigInteger[] { pair.A, pair.B })
-                            script.EmitPush(bb.ToByteArray());
+                    foreach (BigInteger bb in new BigInteger[] { pair.A, pair.B })
+                        script.EmitPush(bb.ToByteArray());
 
-                        script.Emit(operand, EVMOpCode.RET);
+                    script.Emit(operand, EVMOpCode.RET);
 
-                        // Load script
+                    // Load script
 
-                        engine.LoadScript(script.ToArray());
+                    engine.LoadScript(script.ToArray());
 
-                        // Execute
+                    // Execute
 
-                        // PUSH A
-                        engine.StepInto();
-                        Assert.AreEqual(1, engine.EvaluationStack.Count);
+                    // PUSH A
+                    engine.StepInto();
+                    Assert.AreEqual(1, engine.EvaluationStack.Count);
 
-                        // PUSH B
-                        engine.StepInto();
-                        Assert.AreEqual(2, engine.EvaluationStack.Count);
+                    // PUSH B
+                    engine.StepInto();
+                    Assert.AreEqual(2, engine.EvaluationStack.Count);
 
-                        // Operand
+                    // Operand
 
-                        CancelEventArgs cancel = new CancelEventArgs(false);
-                        sw.Restart();
-                        engine.StepInto();
-                        check(engine, pair.A, pair.B, cancel);
-                        sw.Stop();
-                        Console.WriteLine("[" + sw.Elapsed.ToString() + "] " + pair.A + " " + operand.ToString() + " " + pair.B);
+                    CancelEventArgs cancel = new CancelEventArgs(false);
+                    sw.Restart();
+                    engine.StepInto();
+                    check(engine, pair.A, pair.B, cancel);
+                    sw.Stop();
+                    Console.WriteLine("[" + sw.Elapsed.ToString() + "] " + pair.A + " " + operand.ToString() + " " + pair.B);
 
-                        if (cancel.Cancel) continue;
+                    if (cancel.Cancel) continue;
 
-                        // RET
-                        engine.StepInto();
-                        Assert.AreEqual(EVMState.HALT, engine.State);
+                    // RET
+                    engine.StepInto();
+                    Assert.AreEqual(EVMState.HALT, engine.State);
 
-                        // Check
+                    // Check
 
-                        CheckClean(engine);
-                    }
+                    CheckClean(engine);
                 }
+            }
         }
         /// <summary>
         /// Check operand with one BigIntegers
@@ -264,46 +288,46 @@ namespace NeoVM.Interop.Tests
 
             Stopwatch sw = new Stopwatch();
 
-            foreach (BigInteger bbi in TestBigIntegers) foreach (BigInteger bi in IntSingleIteration(bbi))
+            foreach (BigInteger bi in IntSingleIteration())
+            {
+                using (ScriptBuilder script = new ScriptBuilder())
+                using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
                 {
-                    using (ScriptBuilder script = new ScriptBuilder())
-                    using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
-                    {
-                        // Make the script
+                    // Make the script
 
-                        script.EmitPush(bi.ToByteArray());
-                        script.Emit(operand, EVMOpCode.RET);
+                    script.EmitPush(bi.ToByteArray());
+                    script.Emit(operand, EVMOpCode.RET);
 
-                        // Load script
+                    // Load script
 
-                        engine.LoadScript(script.ToArray());
+                    engine.LoadScript(script.ToArray());
 
-                        // Execute
+                    // Execute
 
-                        // PUSH A
-                        engine.StepInto();
-                        Assert.AreEqual(1, engine.EvaluationStack.Count);
+                    // PUSH A
+                    engine.StepInto();
+                    Assert.AreEqual(1, engine.EvaluationStack.Count);
 
-                        // Operand
+                    // Operand
 
-                        CancelEventArgs cancel = new CancelEventArgs(false);
-                        sw.Restart();
-                        engine.StepInto();
-                        check(engine, bi, cancel);
-                        sw.Stop();
-                        Console.WriteLine("[" + sw.Elapsed.ToString() + "] " + bi);
+                    CancelEventArgs cancel = new CancelEventArgs(false);
+                    sw.Restart();
+                    engine.StepInto();
+                    check(engine, bi, cancel);
+                    sw.Stop();
+                    Console.WriteLine("[" + sw.Elapsed.ToString() + "] " + bi);
 
-                        if (cancel.Cancel) continue;
+                    if (cancel.Cancel) continue;
 
-                        // RET
-                        engine.StepInto();
-                        Assert.AreEqual(EVMState.HALT, engine.State);
+                    // RET
+                    engine.StepInto();
+                    Assert.AreEqual(EVMState.HALT, engine.State);
 
-                        // Check
+                    // Check
 
-                        CheckClean(engine);
-                    }
+                    CheckClean(engine);
                 }
+            }
         }
         /// <summary>
         /// Check if the engine is clean

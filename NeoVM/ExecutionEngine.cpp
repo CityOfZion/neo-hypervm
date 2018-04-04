@@ -500,8 +500,7 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::DEPTH:
 	{
-		IntegerStackItem* item = new IntegerStackItem(this->EvaluationStack->Count());
-		this->EvaluationStack->Push(item);
+		this->EvaluationStack->Push(new IntegerStackItem(this->EvaluationStack->Count()));
 		return;
 	}
 	case EVMOpCode::DROP:
@@ -538,9 +537,9 @@ ExecuteOpCode:
 
 		IStackItem *x2 = this->EvaluationStack->Pop();
 		IStackItem *x1 = this->EvaluationStack->Pop();
-
-		this->EvaluationStack->Push(x2);
 		IStackItem::Free(x1);
+		
+		this->EvaluationStack->Push(x2);
 		return;
 	}
 	case EVMOpCode::OVER:
