@@ -418,11 +418,23 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::TOALTSTACK:
 	{
+		if (this->EvaluationStack->Count() < 1)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
 		this->AltStack->Push(this->EvaluationStack->Pop());
 		return;
 	}
 	case EVMOpCode::FROMALTSTACK:
 	{
+		if (this->AltStack->Count() < 1)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
 		this->EvaluationStack->Push(this->AltStack->Pop());
 		return;
 	}
