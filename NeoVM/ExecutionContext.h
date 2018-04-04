@@ -29,7 +29,7 @@ public:
 	bool ReadInt32(int32 &ret);
 	bool ReadUInt64(uint64 &ret);
 	bool ReadInt64(int64 &ret);
-	bool ReadVarBytes(int64 &ret, int64 max);
+	bool ReadVarBytes(uint32 &ret, uint32 max);
 
 	// Get/Read next instruction
 

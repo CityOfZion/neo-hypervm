@@ -73,10 +73,10 @@ bool ExecutionContext::ReadInt64(int64 &ret)
 	if (Read(data, 8) != 8)
 		return false;
 
-	int32 a = ((int32)((int32)data[0] | (int32)data[1] << 8 | (int32)data[2] << 16 | (int32)data[3] << 24));
-	int32 b = ((int32)((int32)data[4] | (int32)data[5] << 8 | (int32)data[6] << 16 | (int32)data[7] << 24));
+	uint32 a = ((uint32)((int32)data[0] | (int32)data[1] << 8 | (int32)data[2] << 16 | (int32)data[3] << 24));
+	uint32 b = ((uint32)((int32)data[4] | (int32)data[5] << 8 | (int32)data[6] << 16 | (int32)data[7] << 24));
 
-	ret = (int64)(b << 32 | a);
+	ret = (int64)((uint64)b << 32 | (uint64)a);
 	return true;
 }
 
@@ -90,11 +90,11 @@ bool ExecutionContext::ReadUInt64(uint64 &ret)
 	uint32 a = ((uint32)((int32)data[0] | (int32)data[1] << 8 | (int32)data[2] << 16 | (int32)data[3] << 24));
 	uint32 b = ((uint32)((int32)data[4] | (int32)data[5] << 8 | (int32)data[6] << 16 | (int32)data[7] << 24));
 
-	ret = (uint64)(b << 32 | a);
+	ret = ((uint64)b << 32 | (uint64)a);
 	return true;
 }
 
-bool ExecutionContext::ReadVarBytes(int64 &ret, int64 max)
+bool ExecutionContext::ReadVarBytes(uint32 &ret, uint32 max)
 {
 	byte fb = 0;
 
@@ -123,18 +123,19 @@ bool ExecutionContext::ReadVarBytes(int64 &ret, int64 max)
 	{
 		uint64 v = 0;
 
-		if (!this->ReadUInt64(v))
+		// Never is needed read more than an integer
+
+		if (!this->ReadUInt64(v) || v > 0xFFFFFFFF)
 			return false;
 
-		ret = v;
+		ret = (uint32)(v & 0xffffffff);
 	}
 	else
 	{
 		ret = fb;
 	}
 
-	if (ret > max) return false;
-	return true;
+	return ret <= max;
 }
 
 int32 ExecutionContext::Read(byte * data, int32 length)

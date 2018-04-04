@@ -432,7 +432,45 @@ namespace NeoVM.Interop.Tests
 
                 // Test FAULT (2)
 
-                badScript[1] = 253;
+                badScript[1] = 0xFD;
+
+                using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+                {
+                    // Load script
+
+                    engine.LoadScript(badScript);
+
+                    // Execute
+
+                    Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                    // Check
+
+                    CheckClean(engine, false);
+                }
+
+                // Test FAULT (3)
+
+                badScript[1] = 0xFE;
+
+                using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+                {
+                    // Load script
+
+                    engine.LoadScript(badScript);
+
+                    // Execute
+
+                    Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                    // Check
+
+                    CheckClean(engine, false);
+                }
+
+                // Test FAULT (4)
+
+                badScript[1] = 0xFF;
 
                 using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
                 {

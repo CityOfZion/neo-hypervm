@@ -368,16 +368,14 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::SYSCALL:
 	{
-		int64 length = 0;
-		if (!context->ReadVarBytes(length, 252) || length < 0)
+		uint32 length = 0;
+		if (!context->ReadVarBytes(length, 252) || length == 0)
 		{
 			this->State = EVMState::FAULT;
 			return;
 		}
 
 		char *data = new char[length + 1];
-		data[length] = 0x00;
-
 		if (context->Read((byte*)data, length) != length)
 		{
 			delete[](data);
@@ -385,6 +383,8 @@ ExecuteOpCode:
 			return;
 		}
 
+		data[length] = 0x00;
+		
 		if (this->InvokeInterop(data) != 0x01)
 			this->State = EVMState::FAULT;
 

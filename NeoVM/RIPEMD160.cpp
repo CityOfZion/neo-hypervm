@@ -72,8 +72,9 @@ static const uint32_t initial_h[5] = { 0x67452301u, 0xEFCDAB89u, 0x98BADCFEu, 0x
 */
 
 /* Left line */
-static const uint8_t RL[5][16] = {
-	{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },   /* Round 1: id */
+static const uint8_t RL[5][16] = 
+{
+{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },   /* Round 1: id */
 { 7, 4, 13, 1, 10, 6, 15, 3, 12, 0, 9, 5, 2, 14, 11, 8 },   /* Round 2: rho */
 { 3, 10, 14, 4, 9, 15, 8, 1, 2, 7, 0, 6, 13, 11, 5, 12 },   /* Round 3: rho^2 */
 { 1, 9, 11, 10, 0, 8, 12, 4, 13, 3, 7, 15, 14, 5, 6, 2 },   /* Round 4: rho^3 */
@@ -81,8 +82,9 @@ static const uint8_t RL[5][16] = {
 };
 
 /* Right line */
-static const uint8_t RR[5][16] = {
-	{ 5, 14, 7, 0, 9, 2, 11, 4, 13, 6, 15, 8, 1, 10, 3, 12 },   /* Round 1: pi */
+static const uint8_t RR[5][16] = 
+{
+{ 5, 14, 7, 0, 9, 2, 11, 4, 13, 6, 15, 8, 1, 10, 3, 12 },   /* Round 1: pi */
 { 6, 11, 3, 7, 0, 13, 5, 10, 14, 15, 8, 12, 4, 9, 1, 2 },   /* Round 2: rho pi */
 { 15, 5, 1, 3, 7, 14, 6, 9, 11, 8, 12, 2, 10, 0, 4, 13 },   /* Round 3: rho^2 pi */
 { 8, 6, 4, 1, 3, 11, 15, 0, 5, 12, 2, 13, 9, 7, 10, 14 },   /* Round 4: rho^3 pi */
@@ -96,8 +98,9 @@ static const uint8_t RR[5][16] = {
 */
 
 /* Shifts, left line */
-static const uint8_t SL[5][16] = {
-	{ 11, 14, 15, 12, 5, 8, 7, 9, 11, 13, 14, 15, 6, 7, 9, 8 }, /* Round 1 */
+static const uint8_t SL[5][16] = 
+{
+{ 11, 14, 15, 12, 5, 8, 7, 9, 11, 13, 14, 15, 6, 7, 9, 8 }, /* Round 1 */
 { 7, 6, 8, 13, 11, 9, 7, 15, 7, 12, 15, 9, 11, 7, 13, 12 }, /* Round 2 */
 { 11, 13, 6, 7, 14, 9, 13, 15, 14, 8, 13, 6, 5, 12, 7, 5 }, /* Round 3 */
 { 11, 12, 14, 15, 14, 15, 9, 8, 9, 14, 5, 6, 8, 6, 5, 12 }, /* Round 4 */
@@ -105,8 +108,9 @@ static const uint8_t SL[5][16] = {
 };
 
 /* Shifts, right line */
-static const uint8_t SR[5][16] = {
-	{ 8, 9, 9, 11, 13, 15, 15, 5, 7, 7, 8, 11, 14, 14, 12, 6 }, /* Round 1 */
+static const uint8_t SR[5][16] = 
+{
+{ 8, 9, 9, 11, 13, 15, 15, 5, 7, 7, 8, 11, 14, 14, 12, 6 }, /* Round 1 */
 { 9, 13, 15, 7, 12, 8, 9, 11, 7, 7, 12, 7, 6, 15, 13, 11 }, /* Round 2 */
 { 9, 7, 15, 11, 8, 6, 6, 14, 12, 13, 5, 14, 13, 13, 7, 5 }, /* Round 3 */
 { 15, 5, 8, 11, 14, 14, 6, 14, 6, 9, 12, 9, 12, 5, 15, 8 }, /* Round 4 */
@@ -122,7 +126,8 @@ static const uint8_t SR[5][16] = {
 #define F5(x, y, z) ((x) ^ ((y) | ~(z)))
 
 /* Round constants, left line */
-static const uint32_t KL[5] = {
+static const uint32_t KL[5] = 
+{
 	0x00000000u,    /* Round 1: 0 */
 	0x5A827999u,    /* Round 2: floor(2**30 * sqrt(2)) */
 	0x6ED9EBA1u,    /* Round 3: floor(2**30 * sqrt(3)) */
@@ -131,7 +136,8 @@ static const uint32_t KL[5] = {
 };
 
 /* Round constants, right line */
-static const uint32_t KR[5] = {
+static const uint32_t KR[5] = 
+{
 	0x50A28BE6u,    /* Round 1: floor(2**30 * cubert(2)) */
 	0x5C4DD124u,    /* Round 2: floor(2**30 * cubert(3)) */
 	0x6D703EF3u,    /* Round 3: floor(2**30 * cubert(5)) */
@@ -141,7 +147,6 @@ static const uint32_t KR[5] = {
 
 void ripemd160_init(ripemd160_state *self)
 {
-
 	memcpy(self->h, initial_h, RIPEMD160_DIGEST_SIZE);
 	memset(&self->buf, 0, sizeof(self->buf));
 	self->length = 0;
@@ -269,7 +274,7 @@ static void ripemd160_compress(ripemd160_state *self)
 
 void ripemd160_process(ripemd160_state *self, const byte *p, uint32 length)
 {
-	unsigned long bytes_needed;
+	uint32 bytes_needed;
 
 	/* Some assertions */
 	assert(p != NULL && length >= 0);
@@ -277,11 +282,13 @@ void ripemd160_process(ripemd160_state *self, const byte *p, uint32 length)
 	/* We never leave a full buffer */
 	assert(self->bufpos < 64);
 
-	while (length > 0) {
+	while (length > 0) 
+	{
 		/* Figure out how many bytes we need to fill the internal buffer. */
 		bytes_needed = 64 - self->bufpos;
 
-		if ((unsigned long)length >= bytes_needed) {
+		if (length >= bytes_needed) 
+		{
 			/* We have enough bytes, so copy them into the internal buffer and run
 			* the compression function. */
 			memcpy(&self->buf.b[self->bufpos], p, bytes_needed);
@@ -307,7 +314,8 @@ void ripemd160_done(ripemd160_state *self, byte *out)
 	/* Append the padding */
 	self->buf.b[self->bufpos++] = 0x80;
 
-	if (self->bufpos > 56) {
+	if (self->bufpos > 56) 
+	{
 		self->bufpos = 64;
 		ripemd160_compress(self);
 	}
