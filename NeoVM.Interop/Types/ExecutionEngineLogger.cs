@@ -56,11 +56,9 @@ namespace NeoVM.Interop.Types
         /// Raise OnOperation
         /// </summary>
         /// <param name="context">Context</param>
-        /// <param name="opcode">OpCode</param>
-        /// <param name="arguments">Argument</param>
-        public virtual void RaiseOnOperation(ExecutionContext context, EVMOpCode opcode, byte[] arguments)
+        public virtual void RaiseOnOperation(ExecutionContext context)
         {
-            OnOperation?.Invoke(context, opcode, arguments);
+            OnOperation?.Invoke(context);
         }
         /// <summary>
         /// Raise OnExecutionContextChange

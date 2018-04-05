@@ -15,14 +15,15 @@ extern "C"
 
 	DllExport int32 ExecutionContext_GetScriptHash(ExecutionContext* context, byte *output, int32 index);
 	DllExport EVMOpCode ExecutionContext_GetNextInstruction(ExecutionContext* context);
+	DllExport int32 ExecutionContext_GetInstructionPointer(ExecutionContext* context);
 
 	// ExecutionEngine
 
 	DllExport ExecutionEngine* ExecutionEngine_Create
-		(
+	(
 		InvokeInteropCallback interopCallback, GetScriptCallback getScriptCallback, GetMessageCallback getMessageCallback,
 		ExecutionContextStack* &invStack, StackItems* &evStack, StackItems* &altStack
-		);
+	);
 	DllExport void ExecutionEngine_Free(ExecutionEngine* &engine);
 	DllExport void ExecutionEngine_LoadScript(ExecutionEngine* engine, byte * script, int32 scriptLength);
 	DllExport void ExecutionEngine_LoadPushOnlyScript(ExecutionEngine* engine, byte * script, int32 scriptLength);
@@ -47,7 +48,7 @@ extern "C"
 	DllExport int32 ExecutionContextStack_Drop(ExecutionContextStack* stack, int32 count);
 	DllExport ExecutionContext* ExecutionContextStack_Peek(ExecutionContextStack* stack, int32 index);
 	DllExport void ExecutionContextStack_AddLog(ExecutionContextStack* stack, OnStackChangeCallback callback);
-	
+
 	// StackItem
 
 	DllExport IStackItem* StackItem_Create(EStackItemType type, byte *data, int32 size);

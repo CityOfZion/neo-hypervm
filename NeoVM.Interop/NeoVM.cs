@@ -74,6 +74,7 @@ namespace NeoVM.Interop
 
         internal delegate int delExecutionContext_GetScriptHash(IntPtr handle, IntPtr data, int index);
         internal delegate EVMOpCode delExecutionContext_GetNextInstruction(IntPtr handle);
+        internal delegate int delExecutionContext_GetInstructionPointer(IntPtr handle);
 
         #endregion
 
@@ -117,6 +118,7 @@ namespace NeoVM.Interop
 
         internal static delExecutionContext_GetScriptHash ExecutionContext_GetScriptHash;
         internal static delExecutionContext_GetNextInstruction ExecutionContext_GetNextInstruction;
+        internal static delExecutionContext_GetInstructionPointer ExecutionContext_GetInstructionPointer;
 
         #endregion
 
@@ -142,6 +144,7 @@ namespace NeoVM.Interop
 
             ExecutionContext_GetScriptHash = Core.GetDelegate<delExecutionContext_GetScriptHash>("ExecutionContext_GetScriptHash");
             ExecutionContext_GetNextInstruction = Core.GetDelegate<delExecutionContext_GetNextInstruction>("ExecutionContext_GetNextInstruction");
+            ExecutionContext_GetInstructionPointer = Core.GetDelegate<delExecutionContext_GetInstructionPointer>("ExecutionContext_GetInstructionPointer");
 
             // Stacks
 

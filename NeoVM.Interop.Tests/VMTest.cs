@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NeoVM.Interop.Enums;
+using NeoVM.Interop.Helpers;
 using NeoVM.Interop.Interfaces;
 using NeoVM.Interop.Tests.Crypto;
 using NeoVM.Interop.Tests.Extra;
@@ -120,10 +121,10 @@ namespace NeoVM.Interop.Tests
         }
 
         /// <summary>
-        /// This is for test stack logs
+        /// This is for test logs
         /// </summary>
         [TestMethod]
-        public void TestLogStackChanges()
+        public void TestLogs()
         {
             using (ScriptBuilder script = new ScriptBuilder
                 (
@@ -138,25 +139,33 @@ namespace NeoVM.Interop.Tests
                     (
                     ELogVerbosity.AltStackChanges |
                     ELogVerbosity.EvaluationStackChanges |
-                    ELogVerbosity.ExecutionContextStackChanges
+                    ELogVerbosity.ExecutionContextStackChanges |
+                    ELogVerbosity.Operations
                     )
             }))
             {
-                StringBuilder sb = new StringBuilder();
+                StringBuilder stackLog = new StringBuilder();
 
                 engine.Logger.OnExecutionContextChange += (stack, item, index, operation) =>
                 {
-                    sb.AppendLine("EXE:" + operation.ToString() + "[" + index + "]");
+                    stackLog.AppendLine("EXE:" + operation.ToString() + "[" + index + "]");
                 };
 
                 engine.Logger.OnEvaluationStackChange += (stack, item, index, operation) =>
                 {
-                    sb.AppendLine("EVA:" + operation.ToString() + "[" + index + "]");
+                    stackLog.AppendLine("EVA:" + operation.ToString() + "[" + index + "]");
                 };
 
                 engine.Logger.OnAltStackChange += (stack, item, index, operation) =>
                 {
-                    sb.AppendLine("ALT:" + operation.ToString() + "[" + index + "]");
+                    stackLog.AppendLine("ALT:" + operation.ToString() + "[" + index + "]");
+                };
+
+                StringBuilder stackOp = new StringBuilder();
+
+                engine.Logger.OnOperation += (context) =>
+                {
+                    stackOp.AppendLine("[" + context.ToString() + "] " + context.NextInstruction.ToString());
                 };
 
                 // Load script
@@ -169,7 +178,11 @@ namespace NeoVM.Interop.Tests
 
                 // Test
 
-                Assert.AreEqual(sb.ToString().Trim(),
+                Assert.AreEqual(stackOp.ToString().Trim(),
+@""
+);
+
+                Assert.AreEqual(stackLog.ToString().Trim(),
 @"EXE:Push[0]
 EXE:TryPeek[0]
 EVA:Push[0]

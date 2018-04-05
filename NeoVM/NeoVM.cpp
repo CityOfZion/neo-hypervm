@@ -18,6 +18,11 @@ EVMOpCode ExecutionContext_GetNextInstruction(ExecutionContext* context)
 	return context->GetNextInstruction();
 }
 
+int32 ExecutionContext_GetInstructionPointer(ExecutionContext* context)
+{
+	return context->InstructionPointer;
+}
+
 #pragma endregion
 
 #pragma region ExecutionEngine
