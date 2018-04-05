@@ -1996,8 +1996,8 @@ ExecuteOpCode:
 			return;
 		}
 
-		IStackItem *ipubKey = this->EvaluationStack->Pop();
-		IStackItem *isignature = this->EvaluationStack->Pop();
+		IStackItem* ipubKey = this->EvaluationStack->Pop();
+		IStackItem* isignature = this->EvaluationStack->Pop();
 
 		int pubKeySize = ipubKey->ReadByteArraySize();
 		int signatureSize = isignature->ReadByteArraySize();
