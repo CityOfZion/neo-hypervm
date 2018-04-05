@@ -233,7 +233,7 @@ namespace NeoVM.Interop.Tests
 
                 if (!value)
                 {
-                    signature[0] = (byte)(signature[0] == 255 ? 0 : signature[0] + 1);
+                    signature[0] = (byte)(signature[0] == 0xFF ? 0x00 : signature[0] + 0x01);
                 }
 
                 using (ScriptBuilder script = new ScriptBuilder())

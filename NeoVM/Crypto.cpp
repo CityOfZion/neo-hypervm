@@ -10,6 +10,9 @@ bool Crypto::VerifySignature
 	byte* pubKey, int32 pubKeyLength
 )
 {
+	if (signatureLength <= 0)
+		return false;
+
 	int pubKeyIndex = 0;
 	if (pubKeyLength == 33 && (pubKey[0] == 0x02 || pubKey[0] == 0x03))
 	{
