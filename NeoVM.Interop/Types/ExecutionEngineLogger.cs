@@ -31,9 +31,9 @@ namespace NeoVM.Interop.Types
         /// </summary>
         public event delOnStackItemsStackChange OnAltStackChange;
         /// <summary>
-        /// On EvaluationStackChanges
+        /// On EvaluationStackChange
         /// </summary>
-        public event delOnStackItemsStackChange OnEvaluationStackChanges;
+        public event delOnStackItemsStackChange OnEvaluationStackChange;
 
         #endregion
 
@@ -67,30 +67,33 @@ namespace NeoVM.Interop.Types
         /// </summary>
         /// <param name="stack">Stack</param>
         /// <param name="item">Item</param>
+        /// <param name="index">Index</param>
         /// <param name="operation">Operation</param>
-        public virtual void RaiseOnExecutionContextChange(ExecutionContextStack stack, ExecutionContext item, ELogStackOperation operation)
+        public virtual void RaiseOnExecutionContextChange(ExecutionContextStack stack, ExecutionContext item, int index, ELogStackOperation operation)
         {
-            OnExecutionContextChange?.Invoke(stack, item, operation);
+            OnExecutionContextChange?.Invoke(stack, item, index, operation);
         }
         /// <summary>
         /// Raise OnAltStackChange
         /// </summary>
         /// <param name="stack">Stack</param>
         /// <param name="item">Item</param>
+        /// <param name="index">Index</param>
         /// <param name="operation">Operation</param>
-        public virtual void RaiseOnAltStackChange(StackItemStack stack, IStackItem item, ELogStackOperation operation)
+        public virtual void RaiseOnAltStackChange(StackItemStack stack, IStackItem item, int index, ELogStackOperation operation)
         {
-            OnAltStackChange?.Invoke(stack, item, operation);
+            OnAltStackChange?.Invoke(stack, item, index, operation);
         }
         /// <summary>
-        /// Raise OnEvaluationStackChanges
+        /// Raise OnEvaluationStackChange
         /// </summary>
         /// <param name="stack">Stack</param>
         /// <param name="item">Item</param>
+        /// <param name="index">Index</param>
         /// <param name="operation">Operation</param>
-        public virtual void RaiseOnEvaluationStackChanges(StackItemStack stack, IStackItem item, ELogStackOperation operation)
+        public virtual void RaiseOnEvaluationStackChange(StackItemStack stack, IStackItem item, int index, ELogStackOperation operation)
         {
-            OnEvaluationStackChanges?.Invoke(stack, item, operation);
+            OnEvaluationStackChange?.Invoke(stack, item, index, operation);
         }
 
         #endregion

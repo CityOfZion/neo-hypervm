@@ -33,10 +33,6 @@
         /// <summary>
         /// Insert item to stack
         /// </summary>
-        Insert = 7,
-        /// <summary>
-        /// Clear stack
-        /// </summary>
-        Clear = 8
+        Insert = 7
     }
 }

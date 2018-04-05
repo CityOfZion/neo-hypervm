@@ -26,6 +26,9 @@ namespace NeoVM.Interop
         #region Callbacks
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate void OnStackChangeCallback(IntPtr item, int index, ELogStackOperation operation);
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate byte InvokeInteropCallback(string method);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
@@ -59,6 +62,8 @@ namespace NeoVM.Interop
         internal delegate int delStackItem_SerializeData(IntPtr item, IntPtr data, int length);
         internal delegate void delStackItem_Free(ref IntPtr item);
 
+        internal delegate void delStack_AddLog(IntPtr item, OnStackChangeCallback callback);
+
         internal delegate int delArrayStackItem_Count(IntPtr handle);
         internal delegate void delArrayStackItem_Clear(IntPtr handle);
         internal delegate IntPtr delArrayStackItem_Get(IntPtr handle, int index);
@@ -89,10 +94,12 @@ namespace NeoVM.Interop
         internal static delStackItems_Pop StackItems_Pop;
         internal static delStackItems_Peek StackItems_Peek;
         internal static delStackItems_Drop StackItems_Drop;
+        internal static delStack_AddLog StackItems_AddLog;
 
         internal static delStackItems_Count ExecutionContextStack_Count;
         internal static delExecutionContextStack_Drop ExecutionContextStack_Drop;
         internal static delStackItems_Peek ExecutionContextStack_Peek;
+        internal static delStack_AddLog ExecutionContextStack_AddLog;
 
         internal static delStackItem_Create StackItem_Create;
         internal static delStackItem_SerializeDetails StackItem_SerializeDetails;
@@ -143,10 +150,12 @@ namespace NeoVM.Interop
             StackItems_Pop = Core.GetDelegate<delStackItems_Pop>("StackItems_Pop");
             StackItems_Drop = Core.GetDelegate<delStackItems_Drop>("StackItems_Drop");
             StackItems_Peek = Core.GetDelegate<delStackItems_Peek>("StackItems_Peek");
+            StackItems_AddLog = Core.GetDelegate<delStack_AddLog>("StackItems_AddLog");
 
             ExecutionContextStack_Count = Core.GetDelegate<delStackItems_Count>("ExecutionContextStack_Count");
             ExecutionContextStack_Drop = Core.GetDelegate<delExecutionContextStack_Drop>("ExecutionContextStack_Drop");
             ExecutionContextStack_Peek = Core.GetDelegate<delStackItems_Peek>("ExecutionContextStack_Peek");
+            ExecutionContextStack_AddLog = Core.GetDelegate<delStack_AddLog>("ExecutionContextStack_AddLog");
 
             // StackItems
 

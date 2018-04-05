@@ -11,6 +11,7 @@ public:
 
 	static const int32 ScriptHashLength = 20;
 
+	int32 Claims;
 	const bool IsPushOnly;
 	const int32 ScriptLength;
 
@@ -52,6 +53,7 @@ public:
 	// Destructor
 
 	~ExecutionContext();
+	static void Free(ExecutionContext* &item);
 
 private:
 

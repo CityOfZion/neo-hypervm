@@ -17,13 +17,15 @@ namespace NeoVM.Interop.Delegates
     /// </summary>
     /// <param name="stack">Stack</param>
     /// <param name="item">ExecutionContext</param>
+    /// <param name="index">Index</param>
     /// <param name="operation">Operation</param>
-    public delegate void delOnExecutionContextStackChange(ExecutionContextStack stack, ExecutionContext item, ELogStackOperation operation);
+    public delegate void delOnExecutionContextStackChange(ExecutionContextStack stack, ExecutionContext item, int index, ELogStackOperation operation);
     /// <summary>
     /// Delegate for receive StackItemStack changes
     /// </summary>
     /// <param name="stack">Stack</param>
     /// <param name="item">StackItem</param>
+    /// <param name="index">Index</param>
     /// <param name="operation">Operation</param>
-    public delegate void delOnStackItemsStackChange(StackItemStack stack, IStackItem item, ELogStackOperation operation);
+    public delegate void delOnStackItemsStackChange(StackItemStack stack, IStackItem item, int index, ELogStackOperation operation);
 }

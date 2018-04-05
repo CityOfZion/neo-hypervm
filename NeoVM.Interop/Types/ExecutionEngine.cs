@@ -79,22 +79,65 @@ namespace NeoVM.Interop.Types
             if (Handle == IntPtr.Zero)
                 throw (new ExternalException());
 
+            InvocationStack = new ExecutionContextStack(invHandle);
+            EvaluationStack = new StackItemStack(this, evHandle);
+            AltStack = new StackItemStack(this, altHandle);
+
             if (e != null)
             {
                 InteropService = e.InteropService;
                 ScriptTable = e.ScriptTable;
                 ScriptContainer = e.ScriptContainer;
-                Logger = e.Logger;
 
-                if (Logger != null)
+                // Register logs
+
+                if (e.Logger != null)
                 {
-                    // Register logs
+                    Logger = e.Logger;
+
+                    NeoVM.ExecutionContextStack_AddLog(invHandle, new NeoVM.OnStackChangeCallback(InternalOnExecutionContextChange));
+                    NeoVM.StackItems_AddLog(altHandle, new NeoVM.OnStackChangeCallback(InternalOnAltStackChange));
+                    NeoVM.StackItems_AddLog(evHandle, new NeoVM.OnStackChangeCallback(InternalOnEvaluationStackChange));
+                }
+                else
+                {
+                    Logger = null;
                 }
             }
+        }
 
-            InvocationStack = new ExecutionContextStack(invHandle);
-            EvaluationStack = new StackItemStack(this, evHandle);
-            AltStack = new StackItemStack(this, altHandle);
+        /// <summary>
+        /// Internal callback for OnExecutionContextChange
+        /// </summary>
+        /// <param name="item">Item</param>
+        /// <param name="index">Index</param>
+        /// <param name="operation">Operation</param>
+        void InternalOnExecutionContextChange(IntPtr item, int index, ELogStackOperation operation)
+        {
+            ExecutionContext it = new ExecutionContext(item);
+            Logger.RaiseOnExecutionContextChange(InvocationStack, it, index, operation);
+        }
+        /// <summary>
+        /// Internal callback for OnAltStackChange
+        /// </summary>
+        /// <param name="item">Item</param>
+        /// <param name="index">Index</param>
+        /// <param name="operation">Operation</param>
+        void InternalOnAltStackChange(IntPtr item, int index, ELogStackOperation operation)
+        {
+            using (IStackItem it = ConvertFromNative(item))
+                Logger.RaiseOnAltStackChange(AltStack, it, index, operation);
+        }
+        /// <summary>
+        /// Internal callback for OnEvaluationStackChange
+        /// </summary>
+        /// <param name="item">Item</param>
+        /// <param name="index">Index</param>
+        /// <param name="operation">Operation</param>
+        void InternalOnEvaluationStackChange(IntPtr item, int index, ELogStackOperation operation)
+        {
+            using (IStackItem it = ConvertFromNative(item))
+                Logger.RaiseOnEvaluationStackChange(EvaluationStack, it, index, operation);
         }
         /// <summary>
         /// Get message callback

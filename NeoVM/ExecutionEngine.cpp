@@ -368,7 +368,7 @@ ExecuteOpCode:
 
 		if (opcode == EVMOpCode::TAILCALL)
 		{
-			delete(this->InvocationStack->Pop());
+			this->InvocationStack->Drop();
 		}
 
 		this->LoadScript(script, length);

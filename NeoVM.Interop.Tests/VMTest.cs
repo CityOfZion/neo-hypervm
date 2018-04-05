@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace NeoVM.Interop.Tests
 {
@@ -119,6 +120,73 @@ namespace NeoVM.Interop.Tests
         }
 
         /// <summary>
+        /// This is for test stack logs
+        /// </summary>
+        [TestMethod]
+        public void TestLogStackChanges()
+        {
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                EVMOpCode.PUSH10,
+                EVMOpCode.TOALTSTACK,
+                EVMOpCode.FROMALTSTACK,
+                EVMOpCode.RET
+                ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(new ExecutionEngineArgs()
+            {
+                Logger = new ExecutionEngineLogger
+                    (
+                    ELogVerbosity.AltStackChanges |
+                    ELogVerbosity.EvaluationStackChanges |
+                    ELogVerbosity.ExecutionContextStackChanges
+                    )
+            }))
+            {
+                StringBuilder sb = new StringBuilder();
+
+                engine.Logger.OnExecutionContextChange += (stack, item, index, operation) =>
+                {
+                    sb.AppendLine("EXE:" + operation.ToString() + "[" + index + "]");
+                };
+
+                engine.Logger.OnEvaluationStackChange += (stack, item, index, operation) =>
+                {
+                    sb.AppendLine("EVA:" + operation.ToString() + "[" + index + "]");
+                };
+
+                engine.Logger.OnAltStackChange += (stack, item, index, operation) =>
+                {
+                    sb.AppendLine("ALT:" + operation.ToString() + "[" + index + "]");
+                };
+
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.HALT, engine.Execute());
+
+                // Test
+
+                Assert.AreEqual(sb.ToString().Trim(),
+@"EXE:Push[0]
+EXE:TryPeek[0]
+EVA:Push[0]
+EXE:TryPeek[0]
+EVA:Pop[0]
+ALT:Push[0]
+EXE:TryPeek[0]
+ALT:Pop[0]
+EVA:Push[0]
+EXE:TryPeek[0]
+EXE:Drop[0]"
+);
+
+            }
+        }
+
+        /// <summary>
         /// This test try to prevent double free
         /// </summary>
         [TestMethod]
@@ -139,6 +207,7 @@ namespace NeoVM.Interop.Tests
                     ar.Add(btest);
             }
         }
+
         /// <summary>
         /// Test array type
         /// </summary>

@@ -39,13 +39,15 @@ extern "C"
 	DllExport IStackItem* StackItems_Peek(StackItems* stack, int32 index);
 	DllExport void StackItems_Push(StackItems* stack, IStackItem *item);
 	DllExport int32 StackItems_Drop(StackItems* stack, int32 count);
+	DllExport void StackItems_AddLog(StackItems* stack, OnStackChangeCallback callback);
 
 	// ExecutionContextStack
 
 	DllExport int32 ExecutionContextStack_Count(ExecutionContextStack* stack);
 	DllExport int32 ExecutionContextStack_Drop(ExecutionContextStack* stack, int32 count);
 	DllExport ExecutionContext* ExecutionContextStack_Peek(ExecutionContextStack* stack, int32 index);
-
+	DllExport void ExecutionContextStack_AddLog(ExecutionContextStack* stack, OnStackChangeCallback callback);
+	
 	// StackItem
 
 	DllExport IStackItem* StackItem_Create(EStackItemType type, byte *data, int32 size);

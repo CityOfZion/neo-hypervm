@@ -9,6 +9,8 @@ class StackItems
 	std::list<IStackItem*> Stack;
 
 public:
+
+	OnStackChangeCallback Log;
 	int32 Count();
 
 	IStackItem* Pop();
