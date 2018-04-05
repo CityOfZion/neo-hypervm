@@ -8,7 +8,7 @@ private:
 
 	static const int32 kcbitUint = 32;
 	const static int32 Int32MaxValue = 0x7FFFFFFF;
-	const static int32 UInt32MaxValue = 0xFFFFFFFF;
+	const static uint64 UInt32MaxValue = 0x00000000FFFFFFFF;
 
 	bool _fWritable;
 
@@ -33,7 +33,7 @@ private:
 	static int32 GetDiffLength(uint32 *rgu1, uint32 * rgu2, int32 cu);
 	static uint32 SubBorrow(uint32 &u1, uint32 u2, uint32 uBorrow);
 	static uint32 SubRevBorrow(uint32 &u1, uint32 u2, uint32 uBorrow);
-	
+
 	void ApplyBorrow(int32 iuMin);
 	void Add(uint32 u);
 	void Mul(uint32 u);

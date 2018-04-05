@@ -165,7 +165,7 @@ uint32 BigIntegerBuilder::Mod(BigIntegerBuilder *regNum, uint32 uDen)
 	uint64 uu = 0;
 	for (int iv = regNum->_iuLast; iv >= 0; iv--)
 	{
-		uu = ((uint64)(uint32)uu << kcbitUint) | regNum->_rgu[iv];
+		uu = (uint64)(((uint64)uu << kcbitUint) | (uint64)regNum->_rgu[iv]);
 		uu %= uDen;
 	}
 
@@ -403,7 +403,7 @@ uint32 BigIntegerBuilder::DivMod(uint32 uDen)
 	uint64 uu = 0;
 	for (int32 iv = this->_iuLast; iv >= 0; iv--)
 	{
-		uu = ((uint64)(uint32)uu << kcbitUint) | this->_rgu[iv];
+		uu = (uint64)(((uint64)uu << kcbitUint) | (uint64)this->_rgu[iv]);
 		this->_rgu[iv] = (uint32)(uu / uDen);
 		uu %= uDen;
 	}
@@ -513,7 +513,7 @@ void BigIntegerBuilder::ModDivCore(BigIntegerBuilder *regNum, BigIntegerBuilder 
 		uint32 uNumHi = (iu + cuDen <= regNum->_iuLast) ? regNum->_rgu[iu + cuDen] : 0;
 		// Contract.Assert(uNumHi <= regDen._rgu[cuDen - 1]);
 
-		uint64 uuNum = ((uint64)uNumHi << kcbitUint) | regNum->_rgu[iu + cuDen - 1];
+		uint64 uuNum = (uint64)(((uint64)uNumHi << kcbitUint) | (uint64)regNum->_rgu[iu + cuDen - 1]);
 		uint32 uNumNext = regNum->_rgu[iu + cuDen - 2];
 		if (cbitShiftLeft > 0)
 		{
@@ -533,7 +533,7 @@ void BigIntegerBuilder::ModDivCore(BigIntegerBuilder *regNum, BigIntegerBuilder 
 			uuQuo = UInt32MaxValue;
 		}
 
-		while (uuRem <= UInt32MaxValue && uuQuo * uDenNext > ((((uint64)((uint32)uuRem << kcbitUint)) | uNumNext)))
+		while (uuRem <= UInt32MaxValue && uuQuo * (uint64)uDenNext > (uint64)((((uint64)uuRem << kcbitUint) | (uint64)uNumNext)))
 		{
 			uuQuo--;
 			uuRem += uDen;
@@ -546,7 +546,7 @@ void BigIntegerBuilder::ModDivCore(BigIntegerBuilder *regNum, BigIntegerBuilder 
 			uint64 uuBorrow = 0;
 			for (int32 iu2 = 0; iu2 < cuDen; iu2++)
 			{
-				uuBorrow += regDen._rgu[iu2] * uuQuo;
+				uuBorrow += (uint64)regDen._rgu[iu2] * uuQuo;
 				uint32 uSub = (uint32)uuBorrow;
 				uuBorrow >>= kcbitUint;
 				if (regNum->_rgu[iu + iu2] < uSub)
@@ -555,7 +555,7 @@ void BigIntegerBuilder::ModDivCore(BigIntegerBuilder *regNum, BigIntegerBuilder 
 			}
 
 			//Contract.Assert(uNumHi == uuBorrow || uNumHi == uuBorrow - 1);
-			if (uNumHi < uuBorrow)
+			if ((uint64)uNumHi < uuBorrow)
 			{
 				// Add, tracking carry.
 				uint32 uCarry = 0;

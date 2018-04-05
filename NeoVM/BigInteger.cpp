@@ -107,7 +107,7 @@ BigInteger::BigInteger(uint32* value, int32 valueSize, bool negative)
 	// AssertValid();
 }
 
-BigInteger::BigInteger(uint32 * value, int32 size)
+BigInteger::BigInteger(uint32* value, int32 size)
 {
 	if (value == NULL)
 	{
@@ -233,7 +233,7 @@ BigInteger::BigInteger(uint32 * value, int32 size)
 	//AssertValid();
 }
 
-BigInteger::BigInteger(byte * value, int32 byteCount)
+BigInteger::BigInteger(byte* value, int32 byteCount)
 {
 	if (byteCount <= 0 || value == NULL)
 	{
