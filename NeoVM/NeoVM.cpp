@@ -42,7 +42,7 @@ ExecutionEngine * ExecutionEngine_Create
 	return engine;
 }
 
-void ExecutionEngine_AddLog(ExecutionEngine* engine, OnOperationCallback callback)
+void ExecutionEngine_AddLog(ExecutionEngine* engine, OnStepIntoCallback callback)
 {
 	engine->Log = callback;
 }

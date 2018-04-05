@@ -32,7 +32,7 @@ extern "C"
 	DllExport void ExecutionEngine_StepOver(ExecutionEngine* engine);
 	DllExport void ExecutionEngine_StepOut(ExecutionEngine* engine);
 	DllExport int32 ExecutionEngine_GetState(ExecutionEngine* engine);
-	DllExport void ExecutionEngine_AddLog(ExecutionEngine* engine, OnOperationCallback callback);
+	DllExport void ExecutionEngine_AddLog(ExecutionEngine* engine, OnStepIntoCallback callback);
 
 	// StackItems
 

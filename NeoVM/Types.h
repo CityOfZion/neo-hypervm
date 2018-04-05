@@ -27,4 +27,4 @@ typedef int32(__stdcall * GetScriptCallback)(const byte* scriptHash, byte* &scri
 typedef int32(__stdcall * GetMessageCallback)(uint32 iteration, byte* &message);
 
 typedef void(__stdcall * OnStackChangeCallback)(void *item, int32 index, byte operation);
-typedef void(__stdcall * OnOperationCallback)(void *item);
+typedef void(__stdcall * OnStepIntoCallback)(void *item);

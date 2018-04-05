@@ -19,9 +19,9 @@ namespace NeoVM.Interop.Types
         #region Events
 
         /// <summary>
-        /// On Operation
+        /// On StepInto
         /// </summary>
-        public event delOnOperation OnOperation;
+        public event delOnStepInto OnStepInto;
         /// <summary>
         /// On ExecutionContextChange
         /// </summary>
@@ -53,12 +53,12 @@ namespace NeoVM.Interop.Types
         #region Methods
 
         /// <summary>
-        /// Raise OnOperation
+        /// Raise OnStepInto
         /// </summary>
         /// <param name="context">Context</param>
-        public virtual void RaiseOnOperation(ExecutionContext context)
+        public virtual void RaiseOnStepInto(ExecutionContext context)
         {
-            OnOperation?.Invoke(context);
+            OnStepInto?.Invoke(context);
         }
         /// <summary>
         /// Raise OnExecutionContextChange

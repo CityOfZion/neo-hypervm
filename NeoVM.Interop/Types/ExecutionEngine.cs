@@ -95,7 +95,7 @@ namespace NeoVM.Interop.Types
                 {
                     Logger = e.Logger;
 
-                    NeoVM.ExecutionEngine_AddLog(Handle, new NeoVM.OnOperationCallback(InternalOnOperation));
+                    NeoVM.ExecutionEngine_AddLog(Handle, new NeoVM.OnStepIntoCallback(InternalOnStepInto));
 
                     NeoVM.ExecutionContextStack_AddLog(invHandle, new NeoVM.OnStackChangeCallback(InternalOnExecutionContextChange));
                     NeoVM.StackItems_AddLog(altHandle, new NeoVM.OnStackChangeCallback(InternalOnAltStackChange));
@@ -109,13 +109,13 @@ namespace NeoVM.Interop.Types
         }
 
         /// <summary>
-        /// Internal callback for OnOperation
+        /// Internal callback for OnStepInto
         /// </summary>
         /// <param name="it">Context</param>
-        void InternalOnOperation(IntPtr it)
+        void InternalOnStepInto(IntPtr it)
         {
             ExecutionContext context = new ExecutionContext(it);
-            Logger.RaiseOnOperation(context);
+            Logger.RaiseOnStepInto(context);
         }
         /// <summary>
         /// Internal callback for OnExecutionContextChange

@@ -9,7 +9,7 @@ namespace NeoVM.Interop.Delegates
     /// Delegate for receive operations
     /// </summary>
     /// <param name="context">Execution context</param>
-    public delegate void delOnOperation(ExecutionContext context);
+    public delegate void delOnStepInto(ExecutionContext context);
     /// <summary>
     /// Delegate for receive ExecutionContextStack changes
     /// </summary>

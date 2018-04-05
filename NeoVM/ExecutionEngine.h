@@ -36,7 +36,7 @@ private:
 
 public:
 
-	OnOperationCallback Log;
+	OnStepIntoCallback Log;
 
 	// Load scripts
 

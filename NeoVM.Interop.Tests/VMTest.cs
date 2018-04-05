@@ -163,7 +163,7 @@ namespace NeoVM.Interop.Tests
 
                 StringBuilder stackOp = new StringBuilder();
 
-                engine.Logger.OnOperation += (context) =>
+                engine.Logger.OnStepInto += (context) =>
                 {
                     stackOp.AppendLine("[" + context.ToString() + "] " + context.NextInstruction.ToString());
                 };

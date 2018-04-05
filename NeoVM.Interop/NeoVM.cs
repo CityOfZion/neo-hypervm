@@ -26,7 +26,7 @@ namespace NeoVM.Interop
         #region Callbacks
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate void OnOperationCallback(IntPtr item);
+        internal delegate void OnStepIntoCallback(IntPtr item);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate void OnStackChangeCallback(IntPtr item, int index, ELogStackOperation operation);
@@ -51,7 +51,7 @@ namespace NeoVM.Interop
         internal delegate EVMState delExecutionEngine_Execute(IntPtr handle);
         internal delegate void delExecutionEngine_StepInto(IntPtr handle);
         internal delegate EVMState delExecutionEngine_GetState(IntPtr handle);
-        internal delegate void delExecutionEngine_AddLog(IntPtr handle, OnOperationCallback callback);
+        internal delegate void delExecutionEngine_AddLog(IntPtr handle, OnStepIntoCallback callback);
 
         internal delegate int delStackItems_Count(IntPtr stackHandle);
         internal delegate void delStackItems_Push(IntPtr stackHandle, IntPtr item);
