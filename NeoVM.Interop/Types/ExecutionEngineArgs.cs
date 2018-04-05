@@ -16,5 +16,9 @@ namespace NeoVM.Interop.Types
         /// Script table
         /// </summary>
         public IScriptTable ScriptTable { get; set; }
+        /// <summary>
+        /// Logger
+        /// </summary>
+        public ExecutionEngineLogger Logger { get; set; }
     }
 }

@@ -9,6 +9,8 @@ class ExecutionContextStack
 	std::list<ExecutionContext*> Stack;
 
 public:
+	
+	OnStackChangeCallback Log;
 	int32 Count();
 
 	void Drop();

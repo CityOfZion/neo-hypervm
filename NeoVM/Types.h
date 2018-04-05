@@ -25,3 +25,6 @@ typedef unsigned long long      uint64;
 typedef byte(__stdcall * InvokeInteropCallback)(const char* method);
 typedef int32(__stdcall * GetScriptCallback)(const byte* scriptHash, byte* &script);
 typedef int32(__stdcall * GetMessageCallback)(uint32 iteration, byte* &message);
+
+typedef void(__stdcall * OnStackChangeCallback)(void *item, int32 index, byte operation);
+typedef void(__stdcall * OnOperationCallback)(void *item);

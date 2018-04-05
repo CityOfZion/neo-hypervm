@@ -18,6 +18,11 @@ EVMOpCode ExecutionContext_GetNextInstruction(ExecutionContext* context)
 	return context->GetNextInstruction();
 }
 
+int32 ExecutionContext_GetInstructionPointer(ExecutionContext* context)
+{
+	return context->InstructionPointer;
+}
+
 #pragma endregion
 
 #pragma region ExecutionEngine
@@ -35,6 +40,11 @@ ExecutionEngine * ExecutionEngine_Create
 	altStack = engine->GetAltStack();
 
 	return engine;
+}
+
+void ExecutionEngine_AddLog(ExecutionEngine* engine, OnOperationCallback callback)
+{
+	engine->Log = callback;
 }
 
 void ExecutionEngine_Free(ExecutionEngine * & engine)
@@ -98,9 +108,7 @@ IStackItem* StackItems_Pop(StackItems* stack)
 {
 	if (stack->Count() <= 0) return NULL;
 
-	IStackItem * ret = stack->Pop();
-	ret->Claims++;
-	return ret;
+	return stack->Pop();
 }
 
 void StackItems_Push(StackItems* stack, IStackItem * item)
@@ -110,14 +118,17 @@ void StackItems_Push(StackItems* stack, IStackItem * item)
 
 IStackItem* StackItems_Peek(StackItems* stack, int32 index)
 {
-	IStackItem * ret = stack->Count() <= index ? NULL : stack->Peek(index);
-	if (ret != NULL) ret->Claims++;
-	return ret;
+	return stack->Count() <= index ? NULL : stack->Peek(index);
 }
 
 int32 StackItems_Count(StackItems* stack)
 {
 	return stack->Count();
+}
+
+void StackItems_AddLog(StackItems* stack, OnStackChangeCallback callback)
+{
+	stack->Log = callback;
 }
 
 #pragma endregion
@@ -141,6 +152,11 @@ ExecutionContext* ExecutionContextStack_Peek(ExecutionContextStack* stack, int32
 int32 ExecutionContextStack_Count(ExecutionContextStack* stack)
 {
 	return stack->Count();
+}
+
+void ExecutionContextStack_AddLog(ExecutionContextStack* stack, OnStackChangeCallback callback)
+{
+	stack->Log = callback;
 }
 
 #pragma endregion
@@ -234,6 +250,7 @@ EStackItemType StackItem_SerializeDetails(IStackItem* item, int32 &size)
 		return EStackItemType::None;
 	}
 
+	item->Claims++;
 	size = item->GetSerializedSize();
 	return item->Type;
 }
@@ -254,9 +271,7 @@ void ArrayStackItem_Clear(ArrayStackItem* array)
 
 IStackItem* ArrayStackItem_Get(ArrayStackItem* array, int32 index)
 {
-	IStackItem* ret = array->Get(index);
-	if (ret != NULL) ret->Claims++;
-	return ret;
+	return array->Get(index);
 }
 
 void ArrayStackItem_Add(ArrayStackItem* array, IStackItem* item)

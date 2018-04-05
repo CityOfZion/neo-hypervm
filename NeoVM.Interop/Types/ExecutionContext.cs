@@ -1,4 +1,5 @@
 ﻿using NeoVM.Interop.Enums;
+using NeoVM.Interop.Helpers;
 using System;
 
 namespace NeoVM.Interop.Types
@@ -20,6 +21,10 @@ namespace NeoVM.Interop.Types
         /// Next instruction
         /// </summary>
         public EVMOpCode NextInstruction => NeoVM.ExecutionContext_GetNextInstruction(Handle);
+        /// <summary>
+        /// Get Instruction pointer
+        /// </summary>
+        public int InstructionPointer => NeoVM.ExecutionContext_GetInstructionPointer(Handle);
         /// <summary>
         /// Script
         /// </summary>
@@ -49,6 +54,14 @@ namespace NeoVM.Interop.Types
         internal ExecutionContext(IntPtr handle)
         {
             Handle = handle;
+        }
+
+        /// <summary>
+        /// String representation
+        /// </summary>
+        public override string ToString()
+        {
+            return BitHelper.ToHexString(ScriptHash) + "-" + InstructionPointer.ToString("x6");
         }
     }
 }

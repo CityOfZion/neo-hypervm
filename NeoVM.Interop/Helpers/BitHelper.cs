@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace NeoVM.Interop.Helpers
 {
@@ -8,6 +9,22 @@ namespace NeoVM.Interop.Helpers
     /// </summary>
     unsafe public class BitHelper
     {
+        /// <summary>
+        /// Convert buffer to hex string
+        /// </summary>
+        /// <param name="data">Data</param>
+        /// <returns>Return hex string</returns>
+        public static string ToHexString(byte[] data)
+        {
+            if (data == null || data.Length == 0) return "";
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append("0x");
+
+            foreach (byte b in data) sb.Append(b.ToString("x2"));
+
+            return sb.ToString();
+        }
         /// <summary>
         /// Get bytes
         /// </summary>
@@ -85,7 +102,7 @@ namespace NeoVM.Interop.Helpers
             fixed (byte* pbyte = &value[startIndex])
             {
                 if (startIndex % 8 == 0)
-                { 
+                {
                     // data is aligned 
                     return *((long*)pbyte);
                 }

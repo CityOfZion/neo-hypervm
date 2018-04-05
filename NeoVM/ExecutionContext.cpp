@@ -3,7 +3,7 @@
 #include <cstring>
 
 ExecutionContext::ExecutionContext(byte* script, int32 scriptLength, bool pushOnly, int32 instructorPointer)
-	:ScriptLength(scriptLength), IsPushOnly(pushOnly), InstructionPointer(instructorPointer), IsScriptHashCalculated(false)
+	:ScriptLength(scriptLength), IsPushOnly(pushOnly), InstructionPointer(instructorPointer), IsScriptHashCalculated(false), Claims(0)
 {
 	// Copy script
 
@@ -205,6 +205,21 @@ void ExecutionContext::Seek(int32 position)
 ExecutionContext* ExecutionContext::Clone()
 {
 	return new ExecutionContext(this->Script, this->ScriptLength, this->IsPushOnly, this->InstructionPointer);
+}
+
+void ExecutionContext::Free(ExecutionContext* &item)
+{
+	if (item == NULL) return;
+
+	if (item->Claims <= 1)
+	{
+		delete(item);
+		item = NULL;
+	}
+	else
+	{
+		item->Claims--;
+	}
 }
 
 ExecutionContext::~ExecutionContext()

@@ -26,6 +26,12 @@ namespace NeoVM.Interop
         #region Callbacks
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate void OnOperationCallback(IntPtr item);
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate void OnStackChangeCallback(IntPtr item, int index, ELogStackOperation operation);
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate byte InvokeInteropCallback(string method);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
@@ -45,6 +51,7 @@ namespace NeoVM.Interop
         internal delegate EVMState delExecutionEngine_Execute(IntPtr handle);
         internal delegate void delExecutionEngine_StepInto(IntPtr handle);
         internal delegate EVMState delExecutionEngine_GetState(IntPtr handle);
+        internal delegate void delExecutionEngine_AddLog(IntPtr handle, OnOperationCallback callback);
 
         internal delegate int delStackItems_Count(IntPtr stackHandle);
         internal delegate void delStackItems_Push(IntPtr stackHandle, IntPtr item);
@@ -59,6 +66,8 @@ namespace NeoVM.Interop
         internal delegate int delStackItem_SerializeData(IntPtr item, IntPtr data, int length);
         internal delegate void delStackItem_Free(ref IntPtr item);
 
+        internal delegate void delStack_AddLog(IntPtr item, OnStackChangeCallback callback);
+
         internal delegate int delArrayStackItem_Count(IntPtr handle);
         internal delegate void delArrayStackItem_Clear(IntPtr handle);
         internal delegate IntPtr delArrayStackItem_Get(IntPtr handle, int index);
@@ -69,6 +78,7 @@ namespace NeoVM.Interop
 
         internal delegate int delExecutionContext_GetScriptHash(IntPtr handle, IntPtr data, int index);
         internal delegate EVMOpCode delExecutionContext_GetNextInstruction(IntPtr handle);
+        internal delegate int delExecutionContext_GetInstructionPointer(IntPtr handle);
 
         #endregion
 
@@ -83,16 +93,19 @@ namespace NeoVM.Interop
         internal static delExecutionEngine_StepInto ExecutionEngine_StepOver;
         internal static delExecutionEngine_StepInto ExecutionEngine_StepOut;
         internal static delExecutionEngine_GetState ExecutionEngine_GetState;
+        internal static delExecutionEngine_AddLog ExecutionEngine_AddLog;
 
         internal static delStackItems_Count StackItems_Count;
         internal static delStackItems_Push StackItems_Push;
         internal static delStackItems_Pop StackItems_Pop;
         internal static delStackItems_Peek StackItems_Peek;
         internal static delStackItems_Drop StackItems_Drop;
+        internal static delStack_AddLog StackItems_AddLog;
 
         internal static delStackItems_Count ExecutionContextStack_Count;
         internal static delExecutionContextStack_Drop ExecutionContextStack_Drop;
         internal static delStackItems_Peek ExecutionContextStack_Peek;
+        internal static delStack_AddLog ExecutionContextStack_AddLog;
 
         internal static delStackItem_Create StackItem_Create;
         internal static delStackItem_SerializeDetails StackItem_SerializeDetails;
@@ -110,6 +123,7 @@ namespace NeoVM.Interop
 
         internal static delExecutionContext_GetScriptHash ExecutionContext_GetScriptHash;
         internal static delExecutionContext_GetNextInstruction ExecutionContext_GetNextInstruction;
+        internal static delExecutionContext_GetInstructionPointer ExecutionContext_GetInstructionPointer;
 
         #endregion
 
@@ -125,6 +139,7 @@ namespace NeoVM.Interop
             ExecutionEngine_LoadScript = Core.GetDelegate<delExecutionEngine_LoadScript>("ExecutionEngine_LoadScript");
             ExecutionEngine_LoadPushOnlyScript = Core.GetDelegate<delExecutionEngine_LoadPushOnlyScript>("ExecutionEngine_LoadPushOnlyScript");
             ExecutionEngine_GetState = Core.GetDelegate<delExecutionEngine_GetState>("ExecutionEngine_GetState");
+            ExecutionEngine_AddLog = Core.GetDelegate<delExecutionEngine_AddLog>("ExecutionEngine_AddLog");
 
             ExecutionEngine_Execute = Core.GetDelegate<delExecutionEngine_Execute>("ExecutionEngine_Execute");
             ExecutionEngine_StepInto = Core.GetDelegate<delExecutionEngine_StepInto>("ExecutionEngine_StepInto");
@@ -135,6 +150,7 @@ namespace NeoVM.Interop
 
             ExecutionContext_GetScriptHash = Core.GetDelegate<delExecutionContext_GetScriptHash>("ExecutionContext_GetScriptHash");
             ExecutionContext_GetNextInstruction = Core.GetDelegate<delExecutionContext_GetNextInstruction>("ExecutionContext_GetNextInstruction");
+            ExecutionContext_GetInstructionPointer = Core.GetDelegate<delExecutionContext_GetInstructionPointer>("ExecutionContext_GetInstructionPointer");
 
             // Stacks
 
@@ -143,10 +159,12 @@ namespace NeoVM.Interop
             StackItems_Pop = Core.GetDelegate<delStackItems_Pop>("StackItems_Pop");
             StackItems_Drop = Core.GetDelegate<delStackItems_Drop>("StackItems_Drop");
             StackItems_Peek = Core.GetDelegate<delStackItems_Peek>("StackItems_Peek");
+            StackItems_AddLog = Core.GetDelegate<delStack_AddLog>("StackItems_AddLog");
 
             ExecutionContextStack_Count = Core.GetDelegate<delStackItems_Count>("ExecutionContextStack_Count");
             ExecutionContextStack_Drop = Core.GetDelegate<delExecutionContextStack_Drop>("ExecutionContextStack_Drop");
             ExecutionContextStack_Peek = Core.GetDelegate<delStackItems_Peek>("ExecutionContextStack_Peek");
+            ExecutionContextStack_AddLog = Core.GetDelegate<delStack_AddLog>("ExecutionContextStack_AddLog");
 
             // StackItems
 

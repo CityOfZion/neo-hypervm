@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NeoVM.Interop.Enums;
+using NeoVM.Interop.Helpers;
 using NeoVM.Interop.Interfaces;
 using NeoVM.Interop.Tests.Crypto;
 using NeoVM.Interop.Tests.Extra;
@@ -10,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace NeoVM.Interop.Tests
 {
@@ -119,6 +121,88 @@ namespace NeoVM.Interop.Tests
         }
 
         /// <summary>
+        /// This is for test logs
+        /// </summary>
+        [TestMethod]
+        public void TestLogs()
+        {
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                EVMOpCode.PUSH10,
+                EVMOpCode.TOALTSTACK,
+                EVMOpCode.FROMALTSTACK,
+                EVMOpCode.RET
+                ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(new ExecutionEngineArgs()
+            {
+                Logger = new ExecutionEngineLogger
+                    (
+                    ELogVerbosity.AltStackChanges |
+                    ELogVerbosity.EvaluationStackChanges |
+                    ELogVerbosity.ExecutionContextStackChanges |
+                    ELogVerbosity.Operations
+                    )
+            }))
+            {
+                StringBuilder stackLog = new StringBuilder();
+
+                engine.Logger.OnExecutionContextChange += (stack, item, index, operation) =>
+                {
+                    stackLog.AppendLine("EXE:" + operation.ToString() + "[" + index + "]");
+                };
+
+                engine.Logger.OnEvaluationStackChange += (stack, item, index, operation) =>
+                {
+                    stackLog.AppendLine("EVA:" + operation.ToString() + "[" + index + "]");
+                };
+
+                engine.Logger.OnAltStackChange += (stack, item, index, operation) =>
+                {
+                    stackLog.AppendLine("ALT:" + operation.ToString() + "[" + index + "]");
+                };
+
+                StringBuilder stackOp = new StringBuilder();
+
+                engine.Logger.OnOperation += (context) =>
+                {
+                    stackOp.AppendLine("[" + context.ToString() + "] " + context.NextInstruction.ToString());
+                };
+
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.HALT, engine.Execute());
+
+                // Test
+
+                Assert.AreEqual(stackOp.ToString().Trim(),
+@"[0x41663051791e0cf03178508aea217ca495c24891-000000] PUSH10
+[0x41663051791e0cf03178508aea217ca495c24891-000001] TOALTSTACK
+[0x41663051791e0cf03178508aea217ca495c24891-000002] FROMALTSTACK
+[0x41663051791e0cf03178508aea217ca495c24891-000003] RET"
+);
+
+                Assert.AreEqual(stackLog.ToString().Trim(),
+@"EXE:Push[0]
+EXE:TryPeek[0]
+EVA:Push[0]
+EXE:TryPeek[0]
+EVA:Pop[0]
+ALT:Push[0]
+EXE:TryPeek[0]
+ALT:Pop[0]
+EVA:Push[0]
+EXE:TryPeek[0]
+EXE:Drop[0]"
+);
+
+            }
+        }
+
+        /// <summary>
         /// This test try to prevent double free
         /// </summary>
         [TestMethod]
@@ -139,6 +223,7 @@ namespace NeoVM.Interop.Tests
                     ar.Add(btest);
             }
         }
+
         /// <summary>
         /// Test array type
         /// </summary>
