@@ -61,7 +61,7 @@ namespace NeoVM.Interop.Types
         /// </summary>
         public override string ToString()
         {
-            return BitHelper.ToHexString(ScriptHash) + " (" + InstructionPointer.ToString("x6") + ") ";
+            return BitHelper.ToHexString(ScriptHash) + "-" + InstructionPointer.ToString("x6");
         }
     }
 }

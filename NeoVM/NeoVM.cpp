@@ -42,6 +42,11 @@ ExecutionEngine * ExecutionEngine_Create
 	return engine;
 }
 
+void ExecutionEngine_AddLog(ExecutionEngine* engine, OnOperationCallback callback)
+{
+	engine->Log = callback;
+}
+
 void ExecutionEngine_Free(ExecutionEngine * & engine)
 {
 	if (engine == NULL)

@@ -36,6 +36,8 @@ private:
 
 public:
 
+	OnOperationCallback Log;
+
 	// Load scripts
 
 	void LoadScript(byte * script, int32 scriptLength);

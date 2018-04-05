@@ -26,6 +26,9 @@ namespace NeoVM.Interop
         #region Callbacks
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        internal delegate void OnOperationCallback(IntPtr item);
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate void OnStackChangeCallback(IntPtr item, int index, ELogStackOperation operation);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
@@ -48,6 +51,7 @@ namespace NeoVM.Interop
         internal delegate EVMState delExecutionEngine_Execute(IntPtr handle);
         internal delegate void delExecutionEngine_StepInto(IntPtr handle);
         internal delegate EVMState delExecutionEngine_GetState(IntPtr handle);
+        internal delegate void delExecutionEngine_AddLog(IntPtr handle, OnOperationCallback callback);
 
         internal delegate int delStackItems_Count(IntPtr stackHandle);
         internal delegate void delStackItems_Push(IntPtr stackHandle, IntPtr item);
@@ -89,6 +93,7 @@ namespace NeoVM.Interop
         internal static delExecutionEngine_StepInto ExecutionEngine_StepOver;
         internal static delExecutionEngine_StepInto ExecutionEngine_StepOut;
         internal static delExecutionEngine_GetState ExecutionEngine_GetState;
+        internal static delExecutionEngine_AddLog ExecutionEngine_AddLog;
 
         internal static delStackItems_Count StackItems_Count;
         internal static delStackItems_Push StackItems_Push;
@@ -134,6 +139,7 @@ namespace NeoVM.Interop
             ExecutionEngine_LoadScript = Core.GetDelegate<delExecutionEngine_LoadScript>("ExecutionEngine_LoadScript");
             ExecutionEngine_LoadPushOnlyScript = Core.GetDelegate<delExecutionEngine_LoadPushOnlyScript>("ExecutionEngine_LoadPushOnlyScript");
             ExecutionEngine_GetState = Core.GetDelegate<delExecutionEngine_GetState>("ExecutionEngine_GetState");
+            ExecutionEngine_AddLog = Core.GetDelegate<delExecutionEngine_AddLog>("ExecutionEngine_AddLog");
 
             ExecutionEngine_Execute = Core.GetDelegate<delExecutionEngine_Execute>("ExecutionEngine_Execute");
             ExecutionEngine_StepInto = Core.GetDelegate<delExecutionEngine_StepInto>("ExecutionEngine_StepInto");

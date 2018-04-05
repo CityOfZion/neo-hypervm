@@ -111,6 +111,11 @@ void ExecutionEngine::StepInto()
 		return;
 	}
 
+	if (this->Log != NULL)
+	{
+		this->Log(context);
+	}
+
 	EVMOpCode opcode = context->ReadNextInstruction();
 
 	// Check PushOnly
@@ -2604,6 +2609,7 @@ ExecutionEngine::~ExecutionEngine()
 	this->ScriptCallback = NULL;
 	this->InteropCallback = NULL;
 	this->MessageCallback = NULL;
+	this->Log = NULL;
 
 	// Clean pointers
 

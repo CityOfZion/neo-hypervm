@@ -134,7 +134,7 @@ namespace NeoVM.Interop.Types
 
         public ScriptBuilder EmitPush(bool data)
         {
-            return Emit(data ? EVMOpCode.PUSHT : EVMOpCode.PUSHF);
+            return Emit(data ? EVMOpCode.PUSH1 : EVMOpCode.PUSH0);
         }
 
         public ScriptBuilder EmitPush(byte[] data)

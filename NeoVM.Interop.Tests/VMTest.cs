@@ -179,7 +179,10 @@ namespace NeoVM.Interop.Tests
                 // Test
 
                 Assert.AreEqual(stackOp.ToString().Trim(),
-@""
+@"[0x41663051791e0cf03178508aea217ca495c24891-000000] PUSH10
+[0x41663051791e0cf03178508aea217ca495c24891-000001] TOALTSTACK
+[0x41663051791e0cf03178508aea217ca495c24891-000002] FROMALTSTACK
+[0x41663051791e0cf03178508aea217ca495c24891-000003] RET"
 );
 
                 Assert.AreEqual(stackLog.ToString().Trim(),
