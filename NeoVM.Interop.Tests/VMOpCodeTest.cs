@@ -197,7 +197,7 @@ namespace NeoVM.Interop.Tests
                     // Make the script
 
                     foreach (BigInteger bb in new BigInteger[] { pair.A, pair.B })
-                        script.EmitPush(bb.ToByteArray());
+                        script.EmitPush(bb);
 
                     script.Emit(operand, EVMOpCode.RET);
 
@@ -295,7 +295,7 @@ namespace NeoVM.Interop.Tests
                 {
                     // Make the script
 
-                    script.EmitPush(bi.ToByteArray());
+                    script.EmitPush(bi);
                     script.Emit(operand, EVMOpCode.RET);
 
                     // Load script

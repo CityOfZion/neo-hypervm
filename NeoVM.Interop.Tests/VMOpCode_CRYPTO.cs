@@ -22,7 +22,7 @@ namespace NeoVM.Interop.Tests
                 {
                     using (SHA1 sha = System.Security.Cryptography.SHA1.Create())
                     {
-                        hash = sha.ComputeHash(a.ToByteArray());
+                        hash = sha.ComputeHash(a == 0 ? new byte[] { } : a.ToByteArray());
                     }
                 }
                 catch
@@ -47,7 +47,7 @@ namespace NeoVM.Interop.Tests
                 {
                     using (SHA256 sha = System.Security.Cryptography.SHA256.Create())
                     {
-                        hash = sha.ComputeHash(a.ToByteArray());
+                        hash = sha.ComputeHash(a == 0 ? new byte[] { } : a.ToByteArray());
                     }
                 }
                 catch
@@ -73,7 +73,7 @@ namespace NeoVM.Interop.Tests
                     using (SHA256 sha = System.Security.Cryptography.SHA256.Create())
                     using (RIPEMD160Managed ripe = new RIPEMD160Managed())
                     {
-                        hash = sha.ComputeHash(a.ToByteArray());
+                        hash = sha.ComputeHash(a == 0 ? new byte[] { } : a.ToByteArray());
                         hash = ripe.ComputeHash(hash);
                     }
                 }
@@ -99,7 +99,7 @@ namespace NeoVM.Interop.Tests
                 {
                     using (SHA256 sha = System.Security.Cryptography.SHA256.Create())
                     {
-                        hash = sha.ComputeHash(a.ToByteArray());
+                        hash = sha.ComputeHash(a == 0 ? new byte[] { } : a.ToByteArray());
                         hash = sha.ComputeHash(hash);
                     }
                 }
@@ -202,7 +202,7 @@ namespace NeoVM.Interop.Tests
 
             // Real test
 
-            foreach (bool value in new bool[] { true, false, true, true, false , true, true, false, false, false })
+            foreach (bool value in new bool[] { true, false, true, true, false, true, true, false, false, false })
             {
                 // Get data
 

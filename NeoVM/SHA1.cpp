@@ -118,8 +118,6 @@ void SHA1::process()
 // addBytes **********************************************************
 void SHA1::addBytes(const byte* data, int32 num)
 {
-	assert(data);
-	assert(num > 0);
 	// add these bytes to the running total
 	size += num;
 	// repeat until all data is processed
