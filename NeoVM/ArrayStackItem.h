@@ -13,6 +13,7 @@ public:
 	// Converters
 
 	bool GetBoolean();
+	void Reverse();
 	BigInteger * GetBigInteger();
 	bool GetInt32(int32 &ret);
 	IStackItem* Clone();

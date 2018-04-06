@@ -39,6 +39,11 @@ bool ArrayStackItem::GetBoolean()
 	return true;
 }
 
+void ArrayStackItem::Reverse()
+{
+	this->List.reverse();
+}
+
 BigInteger * ArrayStackItem::GetBigInteger()
 {
 	return NULL;

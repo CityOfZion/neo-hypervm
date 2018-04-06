@@ -386,7 +386,77 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void REVERSE()
         {
-            Assert.IsFalse(true);
+            // Without push
+
+            using (ScriptBuilder script = new ScriptBuilder(EVMOpCode.REVERSE))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Without Array
+
+            using (ScriptBuilder script = new ScriptBuilder
+                    (
+                        EVMOpCode.PUSH9,
+                        EVMOpCode.REVERSE
+                    ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Real test
+
+            using (ScriptBuilder script = new ScriptBuilder
+                    (
+                        EVMOpCode.PUSH9,
+                        EVMOpCode.PUSH8,
+                        EVMOpCode.PUSH2,
+                        EVMOpCode.PACK,
+                        EVMOpCode.DUP,
+                        EVMOpCode.REVERSE
+                    ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.HALT, engine.Execute());
+
+                // Check
+
+                using (ArrayStackItem ar = engine.EvaluationStack.Pop<ArrayStackItem>())
+                {
+                    Assert.IsTrue(ar[0] is IntegerStackItem i0 && i0.Value == 0x09);
+                    Assert.IsTrue(ar[1] is IntegerStackItem i1 && i1.Value == 0x08);
+                }
+
+                CheckClean(engine);
+            }
         }
 
         [TestMethod]

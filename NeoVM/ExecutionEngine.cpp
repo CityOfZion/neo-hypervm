@@ -2450,18 +2450,23 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::REVERSE:
 	{
-		/*
-	StackItem arrItem = EvaluationStack.Pop();
-	if (arrItem is VMArray array)
-	{
-	array.Reverse();
-	}
-	else
-	{
-	State |= VMState.FAULT;
-	return;
-	}
-	*/
+		if (this->EvaluationStack->Count() < 1)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem *item = this->EvaluationStack->Pop();
+		if (item->Type != EStackItemType::Array && item->Type != EStackItemType::Struct)
+		{
+			IStackItem::Free(item);
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		ArrayStackItem *arr = (ArrayStackItem*)item;
+		arr->Reverse();
+		IStackItem::Free(item);
 		return;
 	}
 	case EVMOpCode::REMOVE:
