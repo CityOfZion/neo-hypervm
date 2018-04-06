@@ -113,13 +113,22 @@ bool ByteArrayStackItem::Equals(IStackItem * it)
 	}
 	default:
 	{
-		int iz = it->GetSerializedSize();
+		int iz = it->ReadByteArraySize();
 
-		if (iz != this->PayloadLength) return false;
-		if (this->PayloadLength == 0) return true;
+		if (iz < 0)
+			return false;
+
+		if (iz == 0)
+			return this->PayloadLength == 0;
 
 		byte *data = new byte[iz];
-		iz = it->Serialize(data, iz);
+		iz = it->ReadByteArray(data, 0, iz);
+
+		if (iz != this->PayloadLength)
+		{
+			delete[](data);
+			return false;
+		}
 
 		for (int x = 0; x < iz; x++)
 			if (data[x] != this->Payload[x])

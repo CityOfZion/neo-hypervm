@@ -72,7 +72,9 @@ bool IntegerStackItem::Equals(IStackItem * it)
 	default:
 	{
 		BigInteger *bi = it->GetBigInteger();
-		if (bi == NULL) return false;
+		
+		if (bi == NULL) 
+			return false;
 
 		bool ret = this->Value->CompareTo(bi) == 0;
 		delete(bi);

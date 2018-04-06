@@ -51,7 +51,21 @@ bool InteropStackItem::Equals(IStackItem * it)
 {
 	if (it == this) return true;
 
-	return false;
+	if (it->Type != EStackItemType::Interop)
+		return false;
+
+	InteropStackItem * ii = (InteropStackItem*)it;
+
+	if (ii->PayloadLength != this->PayloadLength)
+		return false;
+
+	for (int x = this->PayloadLength - 1; x >= 0; x--)
+	{
+		if (ii->Payload[x] != this->Payload[x])
+			return false;
+	}
+
+	return true;
 }
 
 // Serialize

@@ -268,6 +268,15 @@ namespace NeoVM.Interop.Types
             NeoVM.ExecutionEngine_StepInto(Handle);
         }
         /// <summary>
+        /// Step Into
+        /// </summary>
+        /// <param name="steps">Steps</param>
+        public void StepInto(int steps)
+        {
+            for (int x = 0; x < steps; x++)
+                NeoVM.ExecutionEngine_StepInto(Handle);
+        }
+        /// <summary>
         /// Step Out
         /// </summary>
         public void StepOut()

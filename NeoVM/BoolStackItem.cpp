@@ -29,7 +29,7 @@ bool BoolStackItem::Equals(IStackItem * it)
 {
 	if (it == this) return true;
 
-	return it->GetBoolean();
+	return this->Value == it->GetBoolean();
 }
 
 int32 BoolStackItem::ReadByteArray(byte * output, int32 sourceIndex, int32 count)

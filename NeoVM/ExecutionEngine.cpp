@@ -1021,6 +1021,9 @@ ExecuteOpCode:
 		IStackItem* x1 = this->EvaluationStack->Pop();
 
 		this->EvaluationStack->Push(new BoolStackItem(x1->Equals(x2)));
+
+		IStackItem::Free(x2);
+		IStackItem::Free(x1);
 		return;
 	}
 

@@ -76,9 +76,7 @@ IStackItem* ArrayStackItem::Clone()
 
 bool ArrayStackItem::Equals(IStackItem * it)
 {
-	if (it == this) return true;
-
-	return false;
+	return (it == this);
 }
 
 int32 ArrayStackItem::Count()
