@@ -150,7 +150,7 @@ ExecuteOpCode:
 
 	if (opcode >= EVMOpCode::PUSH1 && opcode <= EVMOpCode::PUSH16)
 	{
-		this->EvaluationStack->Push(new IntegerStackItem(((byte)opcode - (byte)EVMOpCode::PUSH1) + 1));
+		this->EvaluationStack->Push(new IntegerStackItem((opcode - EVMOpCode::PUSH1) + 1));
 		return;
 	}
 

@@ -372,7 +372,7 @@ uint32 BigIntegerBuilder::MulCarry(uint32 &u1, uint32 u2, uint32 uCarry)
 {
 	// This is guaranteed not to overflow.
 	uint64 uuRes = (uint64)u1 * u2 + uCarry;
-	u1 = (uint64)uuRes;
+	u1 = (uint32)uuRes;
 	return (uint64)(uuRes >> kcbitUint);
 }
 
