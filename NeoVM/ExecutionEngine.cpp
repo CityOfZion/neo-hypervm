@@ -2181,23 +2181,17 @@ ExecuteOpCode:
 			return;
 		}
 
+		int32 size = 0;
 		IStackItem *item = this->EvaluationStack->Pop();
 
-		int32 size = 0;
-		if (!item->GetInt32(size))
+		if (!item->GetInt32(size) || size < 0 || size >(ec - 1))
 		{
 			IStackItem::Free(item);
 			this->State = EVMState::FAULT;
 			return;
 		}
+
 		IStackItem::Free(item);
-
-		if (size < 0 || size >(ec - 1))
-		{
-			this->State = EVMState::FAULT;
-			return;
-		}
-
 		ArrayStackItem *items = new ArrayStackItem(false);
 
 		for (int32 i = 0; i < size; i++)

@@ -76,8 +76,8 @@ namespace NeoVM.Interop.Tests
 
                 // Check
 
-                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 1);
-                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 3);
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 1);
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 3);
 
                 CheckClean(engine);
             }
@@ -86,6 +86,73 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void PACK()
         {
+            // Overflow
+
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                EVMOpCode.PUSH5,
+                EVMOpCode.PUSH2,
+                EVMOpCode.PACK
+                ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 5);
+
+                CheckClean(engine, false);
+            }
+
+            // Wrong type
+
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                EVMOpCode.NEWMAP,
+                EVMOpCode.PACK
+                ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Without push
+
+            using (ScriptBuilder script = new ScriptBuilder(EVMOpCode.PACK))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Real test
+
             using (ScriptBuilder script = new ScriptBuilder
                 (
                     EVMOpCode.PUSH5,
@@ -106,16 +173,12 @@ namespace NeoVM.Interop.Tests
 
                 // Check
 
-                using (ArrayStackItem arr = engine.EvaluationStack.Peek<ArrayStackItem>(0))
+                using (ArrayStackItem arr = engine.EvaluationStack.Pop<ArrayStackItem>())
                 {
                     Assert.IsTrue(arr != null);
                     Assert.IsTrue(arr[0] is IntegerStackItem b1 && b1.Value == 0x06);
                     Assert.IsTrue(arr[1] is IntegerStackItem b2 && b2.Value == 0x05);
                 }
-
-                // Remove array and test clean
-
-                engine.EvaluationStack.Pop();
 
                 CheckClean(engine);
             }
