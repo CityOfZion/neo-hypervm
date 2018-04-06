@@ -11,6 +11,48 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void ARRAYSIZE()
         {
+            // With wrong type
+
+            using (ScriptBuilder script = new ScriptBuilder())
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                script.EmitSysCall("System.ExecutionEngine.GetScriptContainer");
+                script.Emit(EVMOpCode.ARRAYSIZE);
+                script.Emit(EVMOpCode.RET);
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Without push
+
+            using (ScriptBuilder script = new ScriptBuilder(EVMOpCode.ARRAYSIZE))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Real test
+
             using (ScriptBuilder script = new ScriptBuilder
                 (
                     EVMOpCode.PUSH3,
