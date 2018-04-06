@@ -92,7 +92,7 @@ BigInteger::BigInteger(uint32* value, int32 valueSize, bool negative)
 		// Although Int32.MinValue fits in _sign, we represent this case differently for negate
 		if (this->_sign == Int32MinValue)
 		{
-			CopyInternal(Min._sign, Min._bits, Min._bitsSize);
+			CopyInternal(Min);
 		}
 	}
 	else
@@ -145,7 +145,7 @@ BigInteger::BigInteger(uint32* value, int32 size)
 		// handle the special cases where the BigInteger likely fits into _sign
 		else if (Int32MinValue == (int)value[0])
 		{
-			CopyInternal(Min._sign, Min._bits, Min._bitsSize);
+			CopyInternal(Min);
 		}
 		else
 		{
@@ -196,11 +196,11 @@ BigInteger::BigInteger(uint32* value, int32 size)
 	{
 		if (value[0] == 1 /* abs(-1) */)
 		{
-			CopyInternal(MinusOne._sign, MinusOne._bits, MinusOne._bitsSize);
+			CopyInternal(MinusOne);
 		}
 		else if (value[0] == kuMaskHighBit /* abs(Int32.MinValue) */)
 		{
-			CopyInternal(Min._sign, Min._bits, Min._bitsSize);
+			CopyInternal(Min);
 		}
 		else
 		{
@@ -404,17 +404,17 @@ BigInteger::BigInteger(byte* value, int32 byteCount)
 	// AssertValid();
 }
 
-void BigInteger::CopyInternal(int32 sign, uint32 *bits, int32 bitSize)
+void BigInteger::CopyInternal(const BigInteger &reg)
 {
-	this->_sign = sign;
-	this->_bitsSize = bitSize;
+	this->_sign = reg._sign;
+	this->_bitsSize = reg._bitsSize;
 
-	if (bitSize > 0)
+	if (this->_bitsSize > 0)
 	{
-		this->_bits = new uint32[bitSize];
+		this->_bits = new uint32[this->_bitsSize];
 
-		for (int32 x = 0; x < bitSize; x++)
-			this->_bits[x] = bits[x];
+		for (int32 x = 0; x < this->_bitsSize; x++)
+			this->_bits[x] = reg._bits[x];
 	}
 	else
 	{

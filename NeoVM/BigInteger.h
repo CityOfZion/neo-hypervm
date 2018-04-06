@@ -24,7 +24,7 @@ public:
 	BigInteger(byte * value, int32 byteCount);
 
 	BigInteger *Clone();
-	void CopyInternal(int32 sign, uint32 *bits, int32 bitSize);
+	void CopyInternal(const BigInteger &ret);
 
 	bool ToInt32(int32 &ret);
 	int32 ToByteArraySize();
@@ -55,14 +55,9 @@ private:
 	const static int32 Int32MaxValue = 0x7FFFFFFF;
 	const static int32 Int32MinValue = 0x80000000;
 	const static int32 UInt32MaxValue = 0xFFFFFFFF;
-	const static int32 UInt32MinValue = 0x00000000;
 
-	const static int32 knMaskHighBit = Int32MinValue;
 	const static uint32 kuMaskHighBit = Int32MinValue;
 	const static int32 kcbitUint = 32;
-	const static int32 kcbitUlong = 64;
-	const static int32 DecimalScaleFactorMask = 0x00FF0000;
-	const static int32 DecimalSignMask = 0x80000000;
 
 	int32 _sign;
 	uint32 * _bits;
