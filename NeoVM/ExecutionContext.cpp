@@ -3,7 +3,7 @@
 #include <cstring>
 
 ExecutionContext::ExecutionContext(byte* script, int32 scriptLength, bool pushOnly, int32 instructorPointer)
-	:ScriptLength(scriptLength), IsPushOnly(pushOnly), InstructionPointer(instructorPointer), IsScriptHashCalculated(false), Claims(0)
+	:Claims(0), IsPushOnly(pushOnly), ScriptLength(scriptLength), InstructionPointer(instructorPointer), IsScriptHashCalculated(false)
 {
 	// Copy script
 
