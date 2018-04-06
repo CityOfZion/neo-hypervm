@@ -540,12 +540,12 @@ BigInteger* BigInteger::Or(BigInteger* bi)
 {
 	if (bi == NULL || bi->_sign == 0) // IsZero
 	{
-		return new BigInteger(this);
+		return this->Clone();
 	}
 
 	if (this->_sign == 0) // IsZero
 	{
-		return new BigInteger(bi);
+		return bi->Clone();
 	}
 
 	uint32 *x, *y, *z;
@@ -581,12 +581,12 @@ BigInteger* BigInteger::Xor(BigInteger* bi)
 {
 	if (bi == NULL || bi->_sign == 0) // IsZero
 	{
-		return new BigInteger(this);
+		return this->Clone();
 	}
 
 	if (this->_sign == 0) // IsZero
 	{
-		return new BigInteger(bi);
+		return bi->Clone();
 	}
 
 	uint32 *x, *y, *z;
@@ -654,7 +654,7 @@ bool BigInteger::GetPartsForBitManipulation(BigInteger *x, uint32 * &xd, int32 &
 
 BigInteger* BigInteger::Shl(int32 shift)
 {
-	if (shift == 0) return new BigInteger(this);
+	if (shift == 0) return this->Clone();
 	else if (shift == Int32MinValue) return this->Shr(Int32MaxValue)->Shr(1);
 	else if (shift < 0) return this->Shr(-shift);
 
@@ -697,7 +697,7 @@ BigInteger* BigInteger::Shl(int32 shift)
 
 BigInteger* BigInteger::Shr(int32 shift)
 {
-	if (shift == 0) return new BigInteger(this);
+	if (shift == 0) return this->Clone();
 	else if (shift == Int32MinValue) return this->Shl(Int32MaxValue)->Shl(1);
 	else if (shift < 0) return this->Shl(-shift);
 
@@ -873,12 +873,12 @@ BigInteger* BigInteger::Add(BigInteger* bi)
 
 	if (bi->_sign == 0) // IsZero
 	{
-		return new BigInteger(this);
+		return this->Clone();
 	}
 
 	if (this->_sign == 0) // IsZero
 	{
-		return new BigInteger(bi);
+		return bi->Clone();
 	}
 
 	int32 sign1 = +1;
@@ -906,7 +906,7 @@ BigInteger* BigInteger::Sub(BigInteger* bi)
 
 	if (bi->_sign == 0) // IsZero
 	{
-		return new BigInteger(this);
+		return this->Clone();
 	}
 
 	if (this->_sign == 0) // IsZero
@@ -953,7 +953,7 @@ BigInteger* BigInteger::Invert()
 BigInteger* BigInteger::Abs()
 {
 	if (this->CompareTo(BigInteger::Zero) >= 0)
-		return new BigInteger(this);
+		return this->Clone();
 
 	return new BigInteger(-this->_sign, this->_bits, this->_bitsSize);
 }
