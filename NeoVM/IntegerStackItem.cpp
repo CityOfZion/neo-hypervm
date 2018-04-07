@@ -11,7 +11,7 @@ Value(copyPointer ? value : new BigInteger(value)) {}
 
 IntegerStackItem::~IntegerStackItem()
 {
-	if (this->Value = NULL) return;
+	if (this->Value == NULL) return;
 
 	delete(this->Value);
 	this->Value = NULL;

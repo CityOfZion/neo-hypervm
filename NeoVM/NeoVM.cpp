@@ -6,7 +6,7 @@
 #include "ArrayStackItem.h"
 #include "MapStackItem.h"
 
-#pragma region ExecutionContext
+// ExecutionContext
 
 int32 ExecutionContext_GetScriptHash(ExecutionContext* context, byte* output, int32 index)
 {
@@ -33,14 +33,12 @@ void ExecutionContext_Claim(ExecutionContext* context)
 void ExecutionContext_Free(ExecutionContext* &context)
 {
 	if (context == NULL) return;
-	
+
 	context->Claims--;
 	ExecutionContext::Free(context);
 }
 
-#pragma endregion
-
-#pragma region ExecutionEngine
+// ExecutionEngine
 
 ExecutionEngine * ExecutionEngine_Create
 (
@@ -115,9 +113,7 @@ int32 StackItems_Drop(StackItems* stack, int32 count)
 	return ret;
 }
 
-#pragma endregion
-
-#pragma region StackItems
+// StackItems
 
 IStackItem* StackItems_Pop(StackItems* stack)
 {
@@ -146,9 +142,7 @@ void StackItems_AddLog(StackItems* stack, OnStackChangeCallback callback)
 	stack->Log = callback;
 }
 
-#pragma endregion
-
-#pragma region ExecutionContextStack
+// ExecutionContextStack
 
 int32 ExecutionContextStack_Drop(ExecutionContextStack* stack, int32 count)
 {
@@ -174,9 +168,7 @@ void ExecutionContextStack_AddLog(ExecutionContextStack* stack, OnStackChangeCal
 	stack->Log = callback;
 }
 
-#pragma endregion
-
-#pragma region StackItem
+// StackItem
 
 void StackItem_Free(IStackItem*& item)
 {
@@ -275,9 +267,7 @@ EStackItemType StackItem_SerializeDetails(IStackItem* item, int32 &size)
 	return item->Type;
 }
 
-#pragma endregion
-
-#pragma region ArrayStackItem
+// ArrayStackItem
 
 int32 ArrayStackItem_Count(ArrayStackItem* array)
 {
@@ -318,5 +308,3 @@ void ArrayStackItem_RemoveAt(ArrayStackItem* array, int32 index, byte dispose)
 {
 	array->RemoveAt(index, dispose == 0x01);
 }
-
-#pragma endregion
