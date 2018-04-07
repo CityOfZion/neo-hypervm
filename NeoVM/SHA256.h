@@ -47,7 +47,7 @@ protected:
 	static const uint32 SHA224_256_BLOCK_SIZE = (512 / 8);
 
 public:
-	
+
 	void init();
 	void update(const byte *message, uint32 len);
 	void final(byte *digest);
@@ -55,7 +55,7 @@ public:
 	static const uint32 DIGEST_SIZE = (256 / 8);
 
 protected:
-	
+
 	void transform(const byte *message, uint32 block_nb);
 
 	uint32 m_tot_len;

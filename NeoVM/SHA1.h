@@ -24,13 +24,13 @@ private:
 	void process();
 
 public:
-	
+
 	SHA1();
 	~SHA1();
-	
+
 	void addBytes(const byte* data, int32 num);
 	void getDigest(byte* diggest);
-	
+
 	// utility methods
 	static uint32 lrot(uint32 x, int32 bits);
 	static void storeBigEndianUint32(byte* byte, uint32 num);
