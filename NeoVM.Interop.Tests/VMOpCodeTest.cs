@@ -77,13 +77,13 @@ namespace NeoVM.Interop.Tests
                 ret.Add(bi + 1);
                 // Plus self
                 ret.Add(bi * 1);
-
-                // Random value
-                byte[] data = new byte[Rand.Next(1, 32)];
-                Rand.NextBytes(data);
-
-                ret.Add(new BigInteger(data));
             }
+
+            // Random value
+            byte[] data = new byte[Rand.Next(1, 32)];
+            Rand.NextBytes(data);
+
+            ret.Add(new BigInteger(data));
 
             return ret.Distinct().ToArray();
         }
@@ -93,36 +93,16 @@ namespace NeoVM.Interop.Tests
         /// <returns>BigIntegerPair</returns>
         protected static IEnumerable<BigIntegerPair> IntPairIteration()
         {
+            BigInteger[] ar = IntSingleIteration().ToArray();
             List<BigIntegerPair> ret = new List<BigIntegerPair>();
 
-            foreach (BigInteger bi in TestBigIntegers)
-            {
-                // Equal
-                ret.Add(new BigIntegerPair(bi, bi));
-                // Plus self
-                ret.Add(new BigIntegerPair(bi * bi, bi));
-                // First less 1
-                ret.Add(new BigIntegerPair(bi - 1, bi));
-                // First add 1
-                ret.Add(new BigIntegerPair(bi + 1, bi));
-                // With Zero
-                ret.Add(new BigIntegerPair(BigInteger.Zero, bi));
-                // With One
-                ret.Add(new BigIntegerPair(BigInteger.One, bi));
-                // With MinusOne
-                ret.Add(new BigIntegerPair(BigInteger.MinusOne, bi));
-                // Random value
-                byte[] data = new byte[Rand.Next(1, 32)];
-                Rand.NextBytes(data);
-
-                ret.Add(new BigIntegerPair(new BigInteger(data), bi));
-            }
+            foreach (BigInteger ba in ar) foreach (BigInteger bb in ar)
+                    ret.Add(new BigIntegerPair(ba, bb));
 
             // Invert all values
+
             for (int x = 0, m = ret.Count; x < m; x++)
-            {
                 ret.Add(ret[x].Invert());
-            }
 
             return ret.Distinct().ToArray();
         }
