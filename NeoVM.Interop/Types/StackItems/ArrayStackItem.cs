@@ -104,12 +104,12 @@ namespace NeoVM.Interop.Types.StackItems
 
         public void Insert(int index, IStackItem item)
         {
-            NeoVM.ArrayStackItem_Insert(Handle, index, item.Handle);
+            NeoVM.ArrayStackItem_Insert(Handle, item.Handle, index);
         }
 
         public void Set(int index, IStackItem item)
         {
-            NeoVM.ArrayStackItem_Set(Handle, index, item.Handle);
+            NeoVM.ArrayStackItem_Set(Handle, item.Handle, index);
         }
 
         public bool Remove(IStackItem item)

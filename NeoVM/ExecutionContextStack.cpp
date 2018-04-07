@@ -15,6 +15,8 @@ void ExecutionContextStack::Push(ExecutionContext * i)
 	{
 		this->Log(i, this->Size - 1, ELogStackOperation::Push);
 	}
+
+	i->Claims++;
 }
 
 ExecutionContext* ExecutionContextStack::Peek(int32 index)
@@ -97,6 +99,7 @@ void ExecutionContextStack::Drop()
 		this->Log(it, this->Size, ELogStackOperation::Drop);
 	}
 
+	it->Claims--;
 	ExecutionContext::Free(it);
 }
 
@@ -112,6 +115,7 @@ ExecutionContext* ExecutionContextStack::Pop()
 		this->Log(it, this->Size, ELogStackOperation::Pop);
 	}
 
+	it->Claims--;
 	return it;
 }
 
@@ -130,8 +134,8 @@ ExecutionContextStack::~ExecutionContextStack()
 
 			if (ptr == NULL) continue;
 
+			ptr->Claims--;
 			ExecutionContext::Free(ptr);
-			ptr = NULL;
 		}
 	
 		this->Log = NULL;
@@ -143,8 +147,8 @@ ExecutionContextStack::~ExecutionContextStack()
 			ExecutionContext* ptr = (ExecutionContext*)*it;
 			if (ptr == NULL) continue;
 
+			ptr->Claims--;
 			ExecutionContext::Free(ptr);
-			ptr = NULL;
 		}
 	}
 

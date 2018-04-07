@@ -41,89 +41,79 @@ namespace NeoVM.Interop
         internal delegate int GetMessageCallback(uint iteration, out IntPtr script);
         #endregion
 
-        internal delegate IntPtr delExecutionEngine_Create
+        // Shared
+
+        internal delegate int delInt_Handle(IntPtr pointer);
+        internal delegate void delVoid_Handle(IntPtr pointer);
+        internal delegate byte delByte_Handle(IntPtr pointer);
+        internal delegate IntPtr delHandle_Handle(IntPtr pointer);
+        internal delegate void delVoid_RefHandle(ref IntPtr pointer);
+        internal delegate int delInt_HandleInt(IntPtr pointer, int value);
+        internal delegate int delInt_HandleHandle(IntPtr handle, IntPtr item);
+        internal delegate byte delByte_HandleRefInt(IntPtr item, out int size);
+        internal delegate IntPtr delHandle_HandleInt(IntPtr pointer, int value);
+        internal delegate void delVoid_HandleHandle(IntPtr pointer1, IntPtr pointer2);
+        internal delegate IntPtr delHandle_ByteHandleInt(byte type, IntPtr data, int size);
+        internal delegate void delVoid_HandleIntByte(IntPtr handle, int index, byte dispose);
+        internal delegate int delInt_HandleHandleInt(IntPtr pointer1, IntPtr pointer2, int value);
+        internal delegate void delVoid_HandleHandleInt(IntPtr pointer1, IntPtr pointer2, int value);
+
+        // Specific
+
+        internal delegate void delVoid_HandleOnStepIntoCallback(IntPtr handle, OnStepIntoCallback callback);
+        internal delegate void delVoid_HandleOnStackChangeCallback(IntPtr item, OnStackChangeCallback callback);
+        internal delegate IntPtr delCreateExecutionEngine
             (
             InvokeInteropCallback interopCallback, GetScriptCallback scriptCallback, GetMessageCallback getMessageCallback,
             out IntPtr invocationHandle, out IntPtr evaluationHandle, out IntPtr altStack
             );
-        internal delegate void delExecutionEngine_LoadScript(IntPtr handle, IntPtr script, int scriptLength);
-        internal delegate void delExecutionEngine_LoadPushOnlyScript(IntPtr handle, IntPtr script, int scriptLength);
-        internal delegate EVMState delExecutionEngine_Execute(IntPtr handle);
-        internal delegate void delExecutionEngine_StepInto(IntPtr handle);
-        internal delegate EVMState delExecutionEngine_GetState(IntPtr handle);
-        internal delegate void delExecutionEngine_AddLog(IntPtr handle, OnStepIntoCallback callback);
-
-        internal delegate int delStackItems_Count(IntPtr stackHandle);
-        internal delegate void delStackItems_Push(IntPtr stackHandle, IntPtr item);
-        internal delegate IntPtr delStackItems_Pop(IntPtr stackHandle);
-        internal delegate IntPtr delStackItems_Peek(IntPtr stackHandle, int index);
-        internal delegate int delStackItems_Drop(IntPtr stackHandle, int count);
-
-        internal delegate int delExecutionContextStack_Drop(IntPtr stackHandle, int count);
-
-        internal delegate IntPtr delStackItem_Create(EStackItemType type, IntPtr data, int size);
-        internal delegate EStackItemType delStackItem_SerializeDetails(IntPtr item, out int size);
-        internal delegate int delStackItem_SerializeData(IntPtr item, IntPtr data, int length);
-        internal delegate void delStackItem_Free(ref IntPtr item);
-
-        internal delegate void delStack_AddLog(IntPtr item, OnStackChangeCallback callback);
-
-        internal delegate int delArrayStackItem_Count(IntPtr handle);
-        internal delegate void delArrayStackItem_Clear(IntPtr handle);
-        internal delegate IntPtr delArrayStackItem_Get(IntPtr handle, int index);
-        internal delegate void delArrayStackItem_Set(IntPtr handle, int index, IntPtr item);
-        internal delegate void delArrayStackItem_Add(IntPtr handle, IntPtr item);
-        internal delegate int delArrayStackItem_IndexOf(IntPtr handle, IntPtr item);
-        internal delegate void delArrayStackItem_RemoveAt(IntPtr handle, int index, byte dispose);
-
-        internal delegate int delExecutionContext_GetScriptHash(IntPtr handle, IntPtr data, int index);
-        internal delegate EVMOpCode delExecutionContext_GetNextInstruction(IntPtr handle);
-        internal delegate int delExecutionContext_GetInstructionPointer(IntPtr handle);
 
         #endregion
 
         #region Cache
 
-        internal static delExecutionEngine_Create ExecutionEngine_Create;
-        internal static delStackItem_Free ExecutionEngine_Free;
-        internal static delExecutionEngine_LoadScript ExecutionEngine_LoadScript;
-        internal static delExecutionEngine_LoadPushOnlyScript ExecutionEngine_LoadPushOnlyScript;
-        internal static delExecutionEngine_Execute ExecutionEngine_Execute;
-        internal static delExecutionEngine_StepInto ExecutionEngine_StepInto;
-        internal static delExecutionEngine_StepInto ExecutionEngine_StepOver;
-        internal static delExecutionEngine_StepInto ExecutionEngine_StepOut;
-        internal static delExecutionEngine_GetState ExecutionEngine_GetState;
-        internal static delExecutionEngine_AddLog ExecutionEngine_AddLog;
+        internal static delCreateExecutionEngine ExecutionEngine_Create;
+        internal static delVoid_RefHandle ExecutionEngine_Free;
+        internal static delVoid_HandleHandleInt ExecutionEngine_LoadScript;
+        internal static delVoid_HandleHandleInt ExecutionEngine_LoadPushOnlyScript;
+        internal static delByte_Handle ExecutionEngine_Execute;
+        internal static delVoid_Handle ExecutionEngine_StepInto;
+        internal static delVoid_Handle ExecutionEngine_StepOver;
+        internal static delVoid_Handle ExecutionEngine_StepOut;
+        internal static delByte_Handle ExecutionEngine_GetState;
+        internal static delVoid_HandleOnStepIntoCallback ExecutionEngine_AddLog;
 
-        internal static delStackItems_Count StackItems_Count;
-        internal static delStackItems_Push StackItems_Push;
-        internal static delStackItems_Pop StackItems_Pop;
-        internal static delStackItems_Peek StackItems_Peek;
-        internal static delStackItems_Drop StackItems_Drop;
-        internal static delStack_AddLog StackItems_AddLog;
+        internal static delInt_Handle StackItems_Count;
+        internal static delVoid_HandleHandle StackItems_Push;
+        internal static delHandle_Handle StackItems_Pop;
+        internal static delHandle_HandleInt StackItems_Peek;
+        internal static delInt_HandleInt StackItems_Drop;
+        internal static delVoid_HandleOnStackChangeCallback StackItems_AddLog;
 
-        internal static delStackItems_Count ExecutionContextStack_Count;
-        internal static delExecutionContextStack_Drop ExecutionContextStack_Drop;
-        internal static delStackItems_Peek ExecutionContextStack_Peek;
-        internal static delStack_AddLog ExecutionContextStack_AddLog;
+        internal static delInt_Handle ExecutionContextStack_Count;
+        internal static delInt_HandleInt ExecutionContextStack_Drop;
+        internal static delHandle_HandleInt ExecutionContextStack_Peek;
+        internal static delVoid_HandleOnStackChangeCallback ExecutionContextStack_AddLog;
 
-        internal static delStackItem_Create StackItem_Create;
-        internal static delStackItem_SerializeDetails StackItem_SerializeDetails;
-        internal static delStackItem_SerializeData StackItem_SerializeData;
-        internal static delStackItem_Free StackItem_Free;
+        internal static delHandle_ByteHandleInt StackItem_Create;
+        internal static delByte_HandleRefInt StackItem_SerializeDetails;
+        internal static delInt_HandleHandleInt StackItem_SerializeData;
+        internal static delVoid_RefHandle StackItem_Free;
 
-        internal static delArrayStackItem_Count ArrayStackItem_Count;
-        internal static delArrayStackItem_Clear ArrayStackItem_Clear;
-        internal static delArrayStackItem_Get ArrayStackItem_Get;
-        internal static delArrayStackItem_Set ArrayStackItem_Set;
-        internal static delArrayStackItem_Add ArrayStackItem_Add;
-        internal static delArrayStackItem_IndexOf ArrayStackItem_IndexOf;
-        internal static delArrayStackItem_RemoveAt ArrayStackItem_RemoveAt;
-        internal static delArrayStackItem_Set ArrayStackItem_Insert;
+        internal static delInt_Handle ArrayStackItem_Count;
+        internal static delVoid_Handle ArrayStackItem_Clear;
+        internal static delHandle_HandleInt ArrayStackItem_Get;
+        internal static delVoid_HandleHandleInt ArrayStackItem_Set;
+        internal static delVoid_HandleHandle ArrayStackItem_Add;
+        internal static delInt_HandleHandle ArrayStackItem_IndexOf;
+        internal static delVoid_HandleIntByte ArrayStackItem_RemoveAt;
+        internal static delVoid_HandleHandleInt ArrayStackItem_Insert;
 
-        internal static delExecutionContext_GetScriptHash ExecutionContext_GetScriptHash;
-        internal static delExecutionContext_GetNextInstruction ExecutionContext_GetNextInstruction;
-        internal static delExecutionContext_GetInstructionPointer ExecutionContext_GetInstructionPointer;
+        internal static delInt_HandleHandleInt ExecutionContext_GetScriptHash;
+        internal static delByte_Handle ExecutionContext_GetNextInstruction;
+        internal static delInt_Handle ExecutionContext_GetInstructionPointer;
+        internal static delVoid_RefHandle ExecutionContext_Free;
+        internal static delVoid_Handle ExecutionContext_Claim;
 
         #endregion
 
@@ -134,55 +124,57 @@ namespace NeoVM.Interop
         {
             // Engine
 
-            ExecutionEngine_Create = Core.GetDelegate<delExecutionEngine_Create>("ExecutionEngine_Create");
-            ExecutionEngine_Free = Core.GetDelegate<delStackItem_Free>("ExecutionEngine_Free");
-            ExecutionEngine_LoadScript = Core.GetDelegate<delExecutionEngine_LoadScript>("ExecutionEngine_LoadScript");
-            ExecutionEngine_LoadPushOnlyScript = Core.GetDelegate<delExecutionEngine_LoadPushOnlyScript>("ExecutionEngine_LoadPushOnlyScript");
-            ExecutionEngine_GetState = Core.GetDelegate<delExecutionEngine_GetState>("ExecutionEngine_GetState");
-            ExecutionEngine_AddLog = Core.GetDelegate<delExecutionEngine_AddLog>("ExecutionEngine_AddLog");
+            ExecutionEngine_Create = Core.GetDelegate<delCreateExecutionEngine>("ExecutionEngine_Create");
+            ExecutionEngine_Free = Core.GetDelegate<delVoid_RefHandle>("ExecutionEngine_Free");
+            ExecutionEngine_LoadScript = Core.GetDelegate<delVoid_HandleHandleInt>("ExecutionEngine_LoadScript");
+            ExecutionEngine_LoadPushOnlyScript = Core.GetDelegate<delVoid_HandleHandleInt>("ExecutionEngine_LoadPushOnlyScript");
+            ExecutionEngine_GetState = Core.GetDelegate<delByte_Handle>("ExecutionEngine_GetState");
+            ExecutionEngine_AddLog = Core.GetDelegate<delVoid_HandleOnStepIntoCallback>("ExecutionEngine_AddLog");
 
-            ExecutionEngine_Execute = Core.GetDelegate<delExecutionEngine_Execute>("ExecutionEngine_Execute");
-            ExecutionEngine_StepInto = Core.GetDelegate<delExecutionEngine_StepInto>("ExecutionEngine_StepInto");
-            ExecutionEngine_StepOver = Core.GetDelegate<delExecutionEngine_StepInto>("ExecutionEngine_StepOver");
-            ExecutionEngine_StepOut = Core.GetDelegate<delExecutionEngine_StepInto>("ExecutionEngine_StepOut");
+            ExecutionEngine_Execute = Core.GetDelegate<delByte_Handle>("ExecutionEngine_Execute");
+            ExecutionEngine_StepInto = Core.GetDelegate<delVoid_Handle>("ExecutionEngine_StepInto");
+            ExecutionEngine_StepOver = Core.GetDelegate<delVoid_Handle>("ExecutionEngine_StepOver");
+            ExecutionEngine_StepOut = Core.GetDelegate<delVoid_Handle>("ExecutionEngine_StepOut");
 
             // ExecutionContext
 
-            ExecutionContext_GetScriptHash = Core.GetDelegate<delExecutionContext_GetScriptHash>("ExecutionContext_GetScriptHash");
-            ExecutionContext_GetNextInstruction = Core.GetDelegate<delExecutionContext_GetNextInstruction>("ExecutionContext_GetNextInstruction");
-            ExecutionContext_GetInstructionPointer = Core.GetDelegate<delExecutionContext_GetInstructionPointer>("ExecutionContext_GetInstructionPointer");
+            ExecutionContext_GetScriptHash = Core.GetDelegate<delInt_HandleHandleInt>("ExecutionContext_GetScriptHash");
+            ExecutionContext_GetNextInstruction = Core.GetDelegate<delByte_Handle>("ExecutionContext_GetNextInstruction");
+            ExecutionContext_GetInstructionPointer = Core.GetDelegate<delInt_Handle>("ExecutionContext_GetInstructionPointer");
+            ExecutionContext_Free = Core.GetDelegate<delVoid_RefHandle>("ExecutionContext_Free");
+            ExecutionContext_Claim = Core.GetDelegate<delVoid_Handle>("ExecutionContext_Claim");
 
             // Stacks
 
-            StackItems_Count = Core.GetDelegate<delStackItems_Count>("StackItems_Count");
-            StackItems_Push = Core.GetDelegate<delStackItems_Push>("StackItems_Push");
-            StackItems_Pop = Core.GetDelegate<delStackItems_Pop>("StackItems_Pop");
-            StackItems_Drop = Core.GetDelegate<delStackItems_Drop>("StackItems_Drop");
-            StackItems_Peek = Core.GetDelegate<delStackItems_Peek>("StackItems_Peek");
-            StackItems_AddLog = Core.GetDelegate<delStack_AddLog>("StackItems_AddLog");
+            StackItems_Count = Core.GetDelegate<delInt_Handle>("StackItems_Count");
+            StackItems_Push = Core.GetDelegate<delVoid_HandleHandle>("StackItems_Push");
+            StackItems_Pop = Core.GetDelegate<delHandle_Handle>("StackItems_Pop");
+            StackItems_Drop = Core.GetDelegate<delInt_HandleInt>("StackItems_Drop");
+            StackItems_Peek = Core.GetDelegate<delHandle_HandleInt>("StackItems_Peek");
+            StackItems_AddLog = Core.GetDelegate<delVoid_HandleOnStackChangeCallback>("StackItems_AddLog");
 
-            ExecutionContextStack_Count = Core.GetDelegate<delStackItems_Count>("ExecutionContextStack_Count");
-            ExecutionContextStack_Drop = Core.GetDelegate<delExecutionContextStack_Drop>("ExecutionContextStack_Drop");
-            ExecutionContextStack_Peek = Core.GetDelegate<delStackItems_Peek>("ExecutionContextStack_Peek");
-            ExecutionContextStack_AddLog = Core.GetDelegate<delStack_AddLog>("ExecutionContextStack_AddLog");
+            ExecutionContextStack_Count = Core.GetDelegate<delInt_Handle>("ExecutionContextStack_Count");
+            ExecutionContextStack_Drop = Core.GetDelegate<delInt_HandleInt>("ExecutionContextStack_Drop");
+            ExecutionContextStack_Peek = Core.GetDelegate<delHandle_HandleInt>("ExecutionContextStack_Peek");
+            ExecutionContextStack_AddLog = Core.GetDelegate<delVoid_HandleOnStackChangeCallback>("ExecutionContextStack_AddLog");
 
             // StackItems
 
-            StackItem_Create = Core.GetDelegate<delStackItem_Create>("StackItem_Create");
-            StackItem_SerializeData = Core.GetDelegate<delStackItem_SerializeData>("StackItem_SerializeData");
-            StackItem_SerializeDetails = Core.GetDelegate<delStackItem_SerializeDetails>("StackItem_SerializeDetails");
-            StackItem_Free = Core.GetDelegate<delStackItem_Free>("StackItem_Free");
+            StackItem_Create = Core.GetDelegate<delHandle_ByteHandleInt>("StackItem_Create");
+            StackItem_SerializeData = Core.GetDelegate<delInt_HandleHandleInt>("StackItem_SerializeData");
+            StackItem_SerializeDetails = Core.GetDelegate<delByte_HandleRefInt>("StackItem_SerializeDetails");
+            StackItem_Free = Core.GetDelegate<delVoid_RefHandle>("StackItem_Free");
 
             // ArrayStackItem
 
-            ArrayStackItem_Count = Core.GetDelegate<delArrayStackItem_Count>("ArrayStackItem_Count");
-            ArrayStackItem_Clear = Core.GetDelegate<delArrayStackItem_Clear>("ArrayStackItem_Clear");
-            ArrayStackItem_Get = Core.GetDelegate<delArrayStackItem_Get>("ArrayStackItem_Get");
-            ArrayStackItem_Set = Core.GetDelegate<delArrayStackItem_Set>("ArrayStackItem_Set");
-            ArrayStackItem_Add = Core.GetDelegate<delArrayStackItem_Add>("ArrayStackItem_Add");
-            ArrayStackItem_IndexOf = Core.GetDelegate<delArrayStackItem_IndexOf>("ArrayStackItem_IndexOf");
-            ArrayStackItem_Insert = Core.GetDelegate<delArrayStackItem_Set>("ArrayStackItem_Insert");
-            ArrayStackItem_RemoveAt = Core.GetDelegate<delArrayStackItem_RemoveAt>("ArrayStackItem_RemoveAt");
+            ArrayStackItem_Count = Core.GetDelegate<delInt_Handle>("ArrayStackItem_Count");
+            ArrayStackItem_Clear = Core.GetDelegate<delVoid_Handle>("ArrayStackItem_Clear");
+            ArrayStackItem_Get = Core.GetDelegate<delHandle_HandleInt>("ArrayStackItem_Get");
+            ArrayStackItem_Set = Core.GetDelegate<delVoid_HandleHandleInt>("ArrayStackItem_Set");
+            ArrayStackItem_Add = Core.GetDelegate<delVoid_HandleHandle>("ArrayStackItem_Add");
+            ArrayStackItem_IndexOf = Core.GetDelegate<delInt_HandleHandle>("ArrayStackItem_IndexOf");
+            ArrayStackItem_Insert = Core.GetDelegate<delVoid_HandleHandleInt>("ArrayStackItem_Insert");
+            ArrayStackItem_RemoveAt = Core.GetDelegate<delVoid_HandleIntByte>("ArrayStackItem_RemoveAt");
         }
         #endregion
 

@@ -71,13 +71,13 @@ namespace NeoVM.Interop.Interfaces
 
             if (data == null)
             {
-                Handle = NeoVM.StackItem_Create(Type, IntPtr.Zero, 0);
+                Handle = NeoVM.StackItem_Create((byte)Type, IntPtr.Zero, 0);
             }
             else
             {
                 fixed (byte* p = data)
                 {
-                    Handle = NeoVM.StackItem_Create(Type, (IntPtr)p, data.Length);
+                    Handle = NeoVM.StackItem_Create((byte)Type, (IntPtr)p, data.Length);
                 }
             }
         }

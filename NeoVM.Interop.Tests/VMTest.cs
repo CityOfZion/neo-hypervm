@@ -208,20 +208,54 @@ EXE:Drop[0]"
         [TestMethod]
         public void TestDoubleFree()
         {
+            ExecutionContext context;
+
+            byte[] realHash;
+            using (ScriptBuilder script = new ScriptBuilder(EVMOpCode.RET))
             using (ExecutionEngine engine = NeoVM.CreateEngine(null))
             {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Compute hash
+
+                using (SHA256 sha = SHA256.Create())
+                using (RIPEMD160Managed ripe = new RIPEMD160Managed())
+                {
+                    realHash = sha.ComputeHash(script);
+                    realHash = ripe.ComputeHash(realHash);
+                }
+
+                // Get Context
+
+                context = engine.CurrentContext;
+
                 // Create new array
 
                 using (ArrayStackItem ar = engine.CreateArray())
+                {
+                    // Create bool item and free
 
-                // Create bool item
+                    using (BooleanStackItem btest = engine.CreateBool(true))
+                    {
+                        // Apend item to array
 
-                using (BooleanStackItem btest = engine.CreateBool(true))
+                        ar.Add(btest);
+                    }
 
-                    // Apend item to array
+                    // Check
 
-                    ar.Add(btest);
+                    Assert.IsTrue(ar[0] is BooleanStackItem b0 && b0.Value);
+                }
             }
+
+            // Check
+
+            Assert.AreEqual(context.NextInstruction, EVMOpCode.RET);
+            Assert.IsTrue(context.ScriptHash.SequenceEqual(realHash));
+
+            context.Dispose();
         }
 
         /// <summary>

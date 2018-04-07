@@ -16,6 +16,8 @@ extern "C"
 	DllExport int32 ExecutionContext_GetScriptHash(ExecutionContext* context, byte *output, int32 index);
 	DllExport EVMOpCode ExecutionContext_GetNextInstruction(ExecutionContext* context);
 	DllExport int32 ExecutionContext_GetInstructionPointer(ExecutionContext* context);
+	DllExport void ExecutionContext_Claim(ExecutionContext* context);
+	DllExport void ExecutionContext_Free(ExecutionContext* &context);
 
 	// ExecutionEngine
 
@@ -63,9 +65,9 @@ extern "C"
 	DllExport void ArrayStackItem_Clear(ArrayStackItem* array);
 	DllExport IStackItem* ArrayStackItem_Get(ArrayStackItem* array, int32 index);
 	DllExport void ArrayStackItem_Add(ArrayStackItem* array, IStackItem* item);
-	DllExport void ArrayStackItem_Set(ArrayStackItem* array, int32 index, IStackItem* item);
+	DllExport void ArrayStackItem_Set(ArrayStackItem* array, IStackItem* item, int32 index);
 	DllExport int32 ArrayStackItem_IndexOf(ArrayStackItem* array, IStackItem* item);
-	DllExport void ArrayStackItem_Insert(ArrayStackItem* array, int32 index, IStackItem* item);
+	DllExport void ArrayStackItem_Insert(ArrayStackItem* array, IStackItem* item, int32 index);
 	DllExport void ArrayStackItem_RemoveAt(ArrayStackItem* array, int32 index, byte dispose);
 }
 

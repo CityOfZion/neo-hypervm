@@ -28,6 +28,10 @@ namespace NeoVM.Interop.Types
         /// Script table
         /// </summary>
         public readonly IScriptTable ScriptTable;
+        /// <summary>
+        /// Is Disposed
+        /// </summary>
+        public bool IsDisposed => Handle == IntPtr.Zero;
 
         /// <summary>
         /// Logger
@@ -52,7 +56,7 @@ namespace NeoVM.Interop.Types
         /// <summary>
         /// Virtual Machine State
         /// </summary>
-        public EVMState State => NeoVM.ExecutionEngine_GetState(Handle);
+        public EVMState State => (EVMState)NeoVM.ExecutionEngine_GetState(Handle);
 
         #region Shortcuts
 
@@ -258,7 +262,7 @@ namespace NeoVM.Interop.Types
         /// </summary>
         public EVMState Execute()
         {
-            return NeoVM.ExecutionEngine_Execute(Handle);
+            return (EVMState)NeoVM.ExecutionEngine_Execute(Handle);
         }
         /// <summary>
         /// Step Into
@@ -304,7 +308,7 @@ namespace NeoVM.Interop.Types
         {
             if (item == IntPtr.Zero) return null;
 
-            EStackItemType state = NeoVM.StackItem_SerializeDetails(item, out int size);
+            EStackItemType state = (EStackItemType)NeoVM.StackItem_SerializeDetails(item, out int size);
             if (state == EStackItemType.None) return null;
 
             int readed;
@@ -458,7 +462,7 @@ namespace NeoVM.Interop.Types
         }
 
         // This code added to correctly implement the disposable pattern.
-        void IDisposable.Dispose()
+        public void Dispose()
         {
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);

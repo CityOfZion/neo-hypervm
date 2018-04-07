@@ -23,6 +23,21 @@ int32 ExecutionContext_GetInstructionPointer(ExecutionContext* context)
 	return context->InstructionPointer;
 }
 
+void ExecutionContext_Claim(ExecutionContext* context)
+{
+	if (context == NULL) return;
+
+	context->Claims++;
+}
+
+void ExecutionContext_Free(ExecutionContext* &context)
+{
+	if (context == NULL) return;
+	
+	context->Claims--;
+	ExecutionContext::Free(context);
+}
+
 #pragma endregion
 
 #pragma region ExecutionEngine
@@ -166,7 +181,7 @@ void ExecutionContextStack_AddLog(ExecutionContextStack* stack, OnStackChangeCal
 void StackItem_Free(IStackItem*& item)
 {
 	if (item == NULL) return;
-	
+
 	item->Claims--;
 	IStackItem::Free(item);
 }
@@ -284,7 +299,7 @@ void ArrayStackItem_Add(ArrayStackItem* array, IStackItem* item)
 	array->Add(item);
 }
 
-void ArrayStackItem_Set(ArrayStackItem* array, int32 index, IStackItem* item)
+void ArrayStackItem_Set(ArrayStackItem* array, IStackItem* item, int32 index)
 {
 	array->Set(index, item, true);
 }
@@ -294,7 +309,7 @@ int32 ArrayStackItem_IndexOf(ArrayStackItem* array, IStackItem* item)
 	return array->IndexOf(item);
 }
 
-void ArrayStackItem_Insert(ArrayStackItem* array, int32 index, IStackItem* item)
+void ArrayStackItem_Insert(ArrayStackItem* array, IStackItem* item, int32 index)
 {
 	array->Insert(index, item);
 }

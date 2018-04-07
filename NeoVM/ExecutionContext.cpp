@@ -211,14 +211,10 @@ void ExecutionContext::Free(ExecutionContext* &item)
 {
 	if (item == NULL) return;
 
-	if (item->Claims <= 1)
+	if (item->Claims == 0)
 	{
 		delete(item);
 		item = NULL;
-	}
-	else
-	{
-		item->Claims--;
 	}
 }
 
