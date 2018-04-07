@@ -127,10 +127,10 @@ namespace NeoVM.Interop.Types
         /// <param name="it">Item</param>
         /// <param name="index">Index</param>
         /// <param name="operation">Operation</param>
-        void InternalOnExecutionContextChange(IntPtr it, int index, ELogStackOperation operation)
+        void InternalOnExecutionContextChange(IntPtr it, int index, byte operation)
         {
             using (ExecutionContext context = new ExecutionContext(it))
-                Logger.RaiseOnExecutionContextChange(InvocationStack, context, index, operation);
+                Logger.RaiseOnExecutionContextChange(InvocationStack, context, index, (ELogStackOperation)operation);
         }
         /// <summary>
         /// Internal callback for OnAltStackChange
@@ -138,10 +138,10 @@ namespace NeoVM.Interop.Types
         /// <param name="item">Item</param>
         /// <param name="index">Index</param>
         /// <param name="operation">Operation</param>
-        void InternalOnAltStackChange(IntPtr item, int index, ELogStackOperation operation)
+        void InternalOnAltStackChange(IntPtr item, int index, byte operation)
         {
             using (IStackItem it = ConvertFromNative(item))
-                Logger.RaiseOnAltStackChange(AltStack, it, index, operation);
+                Logger.RaiseOnAltStackChange(AltStack, it, index, (ELogStackOperation)operation);
         }
         /// <summary>
         /// Internal callback for OnEvaluationStackChange
@@ -149,10 +149,10 @@ namespace NeoVM.Interop.Types
         /// <param name="item">Item</param>
         /// <param name="index">Index</param>
         /// <param name="operation">Operation</param>
-        void InternalOnEvaluationStackChange(IntPtr item, int index, ELogStackOperation operation)
+        void InternalOnEvaluationStackChange(IntPtr item, int index, byte operation)
         {
             using (IStackItem it = ConvertFromNative(item))
-                Logger.RaiseOnEvaluationStackChange(EvaluationStack, it, index, operation);
+                Logger.RaiseOnEvaluationStackChange(EvaluationStack, it, index, (ELogStackOperation)operation);
         }
         /// <summary>
         /// Get message callback

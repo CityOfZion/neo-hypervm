@@ -8,9 +8,9 @@ int32 StackItems::Count()
 
 void StackItems::Push(IStackItem * it)
 {
-	it->Claims++;
 	this->Size++;
 	this->Stack.push_front(it);
+	it->Claims++;
 
 	if (this->Log != NULL)
 	{

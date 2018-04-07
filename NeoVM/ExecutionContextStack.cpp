@@ -10,13 +10,12 @@ void ExecutionContextStack::Push(ExecutionContext * i)
 {
 	this->Size++;
 	this->Stack.push_front(i);
+	i->Claims++;
 
 	if (this->Log != NULL)
 	{
 		this->Log(i, this->Size - 1, ELogStackOperation::Push);
 	}
-
-	i->Claims++;
 }
 
 ExecutionContext* ExecutionContextStack::Peek(int32 index)

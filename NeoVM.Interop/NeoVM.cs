@@ -29,7 +29,7 @@ namespace NeoVM.Interop
         internal delegate void OnStepIntoCallback(IntPtr item);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate void OnStackChangeCallback(IntPtr item, int index, ELogStackOperation operation);
+        internal delegate void OnStackChangeCallback(IntPtr item, int index, byte operation);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate byte InvokeInteropCallback(string method);

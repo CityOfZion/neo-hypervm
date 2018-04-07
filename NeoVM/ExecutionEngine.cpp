@@ -36,14 +36,12 @@ ExecutionEngine::ExecutionEngine
 
 void ExecutionEngine::LoadScript(byte * script, int32 scriptLength)
 {
-	ExecutionContext * context = new ExecutionContext(script, scriptLength, false, 0);
-	this->InvocationStack->Push(context);
+	this->InvocationStack->Push(new ExecutionContext(script, scriptLength, false, 0));
 }
 
 void ExecutionEngine::LoadPushOnlyScript(byte * script, int32 scriptLength)
 {
-	ExecutionContext * context = new ExecutionContext(script, scriptLength, true, 0);
-	this->InvocationStack->Push(context);
+	this->InvocationStack->Push(new ExecutionContext(script, scriptLength, true, 0));
 }
 
 ExecutionContext* ExecutionEngine::GetCurrentContext()
