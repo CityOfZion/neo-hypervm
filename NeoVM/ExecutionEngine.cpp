@@ -157,7 +157,7 @@ ExecuteOpCode:
 	switch (opcode)
 	{
 
-#pragma region Push value
+// Push value
 
 	case EVMOpCode::PUSH0:
 	{
@@ -230,9 +230,7 @@ ExecuteOpCode:
 		return;
 	}
 
-#pragma endregion
-
-#pragma region Control
+// Control
 
 	case EVMOpCode::NOP: return;
 	case EVMOpCode::JMP:
@@ -403,9 +401,7 @@ ExecuteOpCode:
 		return;
 	}
 
-#pragma endregion
-
-#pragma region Stack ops
+// Stack ops
 
 	case EVMOpCode::DUPFROMALTSTACK:
 	{
@@ -853,9 +849,7 @@ ExecuteOpCode:
 		return;
 	}
 
-#pragma endregion
-
-#pragma region Bitwise logic
+// Bitwise logic
 
 	case EVMOpCode::INVERT:
 	{
@@ -1025,9 +1019,7 @@ ExecuteOpCode:
 		return;
 	}
 
-#pragma endregion
-
-#pragma region Numeric
+// Numeric
 
 	case EVMOpCode::INC:
 	{
@@ -1841,9 +1833,7 @@ ExecuteOpCode:
 		return;
 	}
 
-#pragma endregion
-
-#pragma region Crypto
+// Crypto
 
 	case EVMOpCode::SHA1:
 	{
@@ -2123,9 +2113,7 @@ ExecuteOpCode:
 		return;
 	}
 
-#pragma endregion
-
-#pragma region Array
+// Array
 
 	case EVMOpCode::ARRAYSIZE:
 	{
@@ -2566,9 +2554,7 @@ ExecuteOpCode:
 		return;
 	}
 
-#pragma endregion
-
-#pragma region Exceptions
+// Exceptions
 
 	default:
 	case EVMOpCode::THROW:
@@ -2594,8 +2580,6 @@ ExecuteOpCode:
 		IStackItem::Free(item);
 		return;
 	}
-
-#pragma endregion
 
 	}
 }
