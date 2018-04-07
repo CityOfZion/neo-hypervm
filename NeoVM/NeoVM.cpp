@@ -165,6 +165,9 @@ void ExecutionContextStack_AddLog(ExecutionContextStack* stack, OnStackChangeCal
 
 void StackItem_Free(IStackItem*& item)
 {
+	if (item == NULL) return;
+	
+	item->Claims--;
 	IStackItem::Free(item);
 }
 
@@ -239,6 +242,8 @@ IStackItem* StackItem_Create(EStackItemType type, byte *data, int32 size)
 
 int32 StackItem_SerializeData(IStackItem* item, byte * output, int32 length)
 {
+	if (item == NULL) return -1;
+
 	return item->Serialize(output, length);
 }
 

@@ -14,7 +14,7 @@ ArrayStackItem::ArrayStackItem(bool isStruct, int32 count) :
 
 	// Init size
 	for (int32 i = 0; i < count; i++)
-		this->List.push_back(new BoolStackItem(false));
+		Add(new BoolStackItem(false));
 }
 
 ArrayStackItem::~ArrayStackItem()
@@ -89,7 +89,12 @@ void ArrayStackItem::Clear()
 	for (std::list<IStackItem*>::iterator it = this->List.begin(); it != this->List.end(); ++it)
 	{
 		IStackItem* ptr = (IStackItem*)*it;
-		IStackItem::Free(ptr);
+
+		if (ptr != NULL) 
+		{
+			ptr->Claims--;
+			IStackItem::Free(ptr);
+		}
 	}
 
 	this->List.clear();
@@ -125,7 +130,10 @@ void ArrayStackItem::Set(int32 index, IStackItem* item, bool disposePrev)
 	IStackItem* & s(*it);
 
 	if (s != NULL && disposePrev)
+	{
+		s->Claims--;
 		IStackItem::Free(s);
+	}
 
 	s = item;
 }
@@ -161,7 +169,10 @@ void ArrayStackItem::RemoveAt(int32 index, bool dispose)
 	IStackItem* & s(*it);
 
 	if (s != NULL && dispose)
+	{
+		s->Claims--;
 		IStackItem::Free(s);
+	}
 
 	this->List.erase(it);
 }

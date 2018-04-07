@@ -8,9 +8,7 @@ int32 StackItems::Count()
 
 void StackItems::Push(IStackItem * it)
 {
-	if (it != NULL)
-		it->Claims++;
-
+	it->Claims++;
 	this->Size++;
 	this->Stack.push_front(it);
 
@@ -22,8 +20,7 @@ void StackItems::Push(IStackItem * it)
 
 void StackItems::Insert(int32 index, IStackItem *it)
 {
-	if (it != NULL)
-		it->Claims++;
+	it->Claims++;
 
 	if (index == this->Size)
 	{
@@ -89,7 +86,7 @@ IStackItem* StackItems::Peek(int32 index)
 
 IStackItem* StackItems::Remove(int32 index)
 {
-	if (index < 0) 
+	if (index < 0)
 	{
 		if (this->Log != NULL)
 		{
@@ -112,6 +109,7 @@ IStackItem* StackItems::Remove(int32 index)
 		this->Log(itr, index, ELogStackOperation::Remove);
 	}
 
+	itr->Claims--;
 	return itr;
 }
 
@@ -127,6 +125,7 @@ void StackItems::Drop()
 		this->Log(it, this->Size, ELogStackOperation::Drop);
 	}
 
+	it->Claims--;
 	IStackItem::Free(it);
 }
 
@@ -141,6 +140,7 @@ IStackItem* StackItems::Pop()
 		this->Log(it, this->Size, ELogStackOperation::Pop);
 	}
 
+	it->Claims--;
 	return it;
 }
 
@@ -158,20 +158,23 @@ StackItems::~StackItems()
 			Log(ptr, index, ELogStackOperation::Drop);
 			index++;
 
+			ptr->Claims--;
 			IStackItem::Free(ptr);
 		}
 
 		this->Log = NULL;
 	}
-	else 
+	else
 	{
 		for (std::list<IStackItem*>::iterator it = this->Stack.begin(); it != this->Stack.end(); ++it)
 		{
 			IStackItem* ptr = (IStackItem*)*it;
+
+			ptr->Claims--;
 			IStackItem::Free(ptr);
 		}
 	}
-	
+
 	this->Size = 0;
 	this->Stack.clear();
 }
