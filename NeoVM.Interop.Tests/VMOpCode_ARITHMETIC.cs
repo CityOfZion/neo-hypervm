@@ -13,11 +13,11 @@ namespace NeoVM.Interop.Tests
         /// <summary>
         /// Max value for SHL-SHR
         /// </summary>
-        const int MAX_SHL_SHR = 255;
+        const int MAX_SHL_SHR = 65535;
         /// <summary>
         /// Min value for SHL-SHR
         /// </summary>
-        const int MIN_SHL_SHR = -255;
+        const int MIN_SHL_SHR = -32768;
 
         [TestMethod]
         public void INC()

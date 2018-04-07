@@ -5,11 +5,11 @@
 /// <summary>
 /// Max value for SHL and SHR
 /// </summary>
-const int32 MAX_SHL_SHR = 255;
+const int32 MAX_SHL_SHR = 65535;
 /// <summary>
 /// Min value for SHL and SHR
 /// </summary>
-const int32 MIN_SHL_SHR = -255;
+const int32 MIN_SHL_SHR = -32768;
 
 // TODO: Implement this limits
 
