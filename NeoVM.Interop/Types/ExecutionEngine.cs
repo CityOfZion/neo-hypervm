@@ -70,7 +70,7 @@ namespace NeoVM.Interop.Types
         /// Constructor
         /// </summary>
         /// <param name="e">Arguments</param>
-        internal ExecutionEngine(ExecutionEngineArgs e)
+        public ExecutionEngine(ExecutionEngineArgs e)
         {
             Handle = NeoVM.ExecutionEngine_Create
                 (
@@ -118,19 +118,19 @@ namespace NeoVM.Interop.Types
         /// <param name="it">Context</param>
         void InternalOnStepInto(IntPtr it)
         {
-            ExecutionContext context = new ExecutionContext(it);
-            Logger.RaiseOnStepInto(context);
+            using (ExecutionContext context = new ExecutionContext(it))
+                Logger.RaiseOnStepInto(context);
         }
         /// <summary>
         /// Internal callback for OnExecutionContextChange
         /// </summary>
-        /// <param name="item">Item</param>
+        /// <param name="it">Item</param>
         /// <param name="index">Index</param>
         /// <param name="operation">Operation</param>
-        void InternalOnExecutionContextChange(IntPtr item, int index, ELogStackOperation operation)
+        void InternalOnExecutionContextChange(IntPtr it, int index, ELogStackOperation operation)
         {
-            ExecutionContext it = new ExecutionContext(item);
-            Logger.RaiseOnExecutionContextChange(InvocationStack, it, index, operation);
+            using (ExecutionContext context = new ExecutionContext(it))
+                Logger.RaiseOnExecutionContextChange(InvocationStack, context, index, operation);
         }
         /// <summary>
         /// Internal callback for OnAltStackChange

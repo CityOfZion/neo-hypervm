@@ -176,6 +176,7 @@ namespace NeoVM.Interop
             ArrayStackItem_Insert = Core.GetDelegate<delVoid_HandleHandleInt>("ArrayStackItem_Insert");
             ArrayStackItem_RemoveAt = Core.GetDelegate<delVoid_HandleIntByte>("ArrayStackItem_RemoveAt");
         }
+
         #endregion
 
         /// <summary>
