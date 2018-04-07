@@ -753,6 +753,7 @@ BigInteger* BigInteger::Shr(int32 shift)
 			carry = rot << carryShift;
 		}
 	}
+
 	if (negx)
 	{
 		this->DangerousMakeTwosComplement(zd, zl); // mutates zd

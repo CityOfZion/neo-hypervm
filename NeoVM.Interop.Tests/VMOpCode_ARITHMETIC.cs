@@ -2,6 +2,7 @@
 using NeoVM.Interop.Enums;
 using NeoVM.Interop.Types;
 using NeoVM.Interop.Types.StackItems;
+using System;
 using System.Numerics;
 
 namespace NeoVM.Interop.Tests
@@ -9,6 +10,15 @@ namespace NeoVM.Interop.Tests
     [TestClass]
     public class VMOpCode_ARITHMETIC : VMOpCodeTest
     {
+        /// <summary>
+        /// Max value for SHL-SHR
+        /// </summary>
+        const int MAX_SHL_SHR = 255;
+        /// <summary>
+        /// Min value for SHL-SHR
+        /// </summary>
+        const int MIN_SHL_SHR = -255;
+
         [TestMethod]
         public void INC()
         {
@@ -275,7 +285,13 @@ namespace NeoVM.Interop.Tests
             {
                 int ishift;
 
-                try { ishift = (int)shift; }
+                try
+                {
+                    ishift = (int)shift;
+
+                    if (ishift > MAX_SHL_SHR || ishift < MIN_SHL_SHR)
+                        throw (new ArgumentException("Limit exceded"));
+                }
                 catch
                 {
                     Assert.AreEqual(engine.State, EVMState.FAULT);
@@ -294,7 +310,13 @@ namespace NeoVM.Interop.Tests
             {
                 int ishift;
 
-                try { ishift = (int)shift; }
+                try
+                {
+                    ishift = (int)shift;
+
+                    if (ishift > MAX_SHL_SHR || ishift < MIN_SHL_SHR)
+                        throw (new ArgumentException("Limit exceded"));
+                }
                 catch
                 {
                     Assert.AreEqual(engine.State, EVMState.FAULT);

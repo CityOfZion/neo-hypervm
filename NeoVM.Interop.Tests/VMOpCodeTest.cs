@@ -224,7 +224,11 @@ namespace NeoVM.Interop.Tests
                     sw.Stop();
                     Console.WriteLine("[" + sw.Elapsed.ToString() + "] " + pair.A + " " + operand.ToString() + " " + pair.B);
 
-                    if (cancel.Cancel) continue;
+                    if (cancel.Cancel)
+                    {
+                        CheckClean(engine, false);
+                        continue;
+                    }
 
                     // RET
                     engine.StepInto();

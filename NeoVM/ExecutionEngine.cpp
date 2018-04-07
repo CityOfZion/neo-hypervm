@@ -1420,8 +1420,8 @@ ExecuteOpCode:
 		IStackItem::Free(n);
 		IStackItem::Free(x);
 
-		int32 iin;
-		if (in == NULL || ix == NULL || !in->ToInt32(iin))
+		int32 ishift;
+		if (in == NULL || ix == NULL || !in->ToInt32(ishift) || (ishift > MAX_SHL_SHR || ishift < MIN_SHL_SHR))
 		{
 			if (ix != NULL) delete(ix);
 			if (in != NULL) delete(in);
@@ -1431,7 +1431,7 @@ ExecuteOpCode:
 		}
 
 		delete(in);
-		BigInteger *ret = ix->Shl(iin);
+		BigInteger *ret = ix->Shl(ishift);
 		delete(ix);
 
 		if (ret == NULL)
@@ -1460,8 +1460,8 @@ ExecuteOpCode:
 		IStackItem::Free(n);
 		IStackItem::Free(x);
 
-		int32 iin;
-		if (in == NULL || ix == NULL || !in->ToInt32(iin))
+		int32 ishift;
+		if (in == NULL || ix == NULL || !in->ToInt32(ishift) || (ishift > MAX_SHL_SHR || ishift < MIN_SHL_SHR))
 		{
 			if (ix != NULL) delete(ix);
 			if (in != NULL) delete(in);
@@ -1471,7 +1471,7 @@ ExecuteOpCode:
 		}
 
 		delete(in);
-		BigInteger *ret = ix->Shr(iin);
+		BigInteger *ret = ix->Shr(ishift);
 		delete(ix);
 
 		if (ret == NULL)
