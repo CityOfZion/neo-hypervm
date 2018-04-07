@@ -2,6 +2,7 @@
 #include "SHA1.h"
 #include "SHA256.h"
 #include "RIPEMD160.h"
+#include <cstring>
 
 const byte Crypto::EMPTY_SHA1[] =
 {
