@@ -17,9 +17,9 @@ namespace NeoVM.Interop.Types
         /// </summary>
         IntPtr Handle;
         /// <summary>
-        /// LastScript loaded
+        /// Last message
         /// </summary>
-        byte[] LastScript;
+        byte[] LastMessage;
         /// <summary>
         /// Interop service
         /// </summary>
@@ -163,22 +163,23 @@ namespace NeoVM.Interop.Types
         {
             if (ScriptContainer != null)
             {
-                LastScript = ScriptContainer.GetMessage(iteration);
+                // TODO: should change this, too dangerous
 
-                if (LastScript == null)
+                byte[] script = ScriptContainer.GetMessage(iteration);
+
+                if (script != null && script.Length > 0)
                 {
-                    output = IntPtr.Zero;
-                    return 0;
+                    // Prevent dispose
+
+                    LastMessage = script;
+
+                    fixed (byte* p = LastMessage)
+                    {
+                        output = (IntPtr)p;
+                    }
+
+                    return LastMessage.Length;
                 }
-
-                // Prevent dispose
-
-                fixed (byte* p = LastScript)
-                {
-                    output = (IntPtr)p;
-                }
-
-                return LastScript.Length;
             }
 
             output = IntPtr.Zero;
