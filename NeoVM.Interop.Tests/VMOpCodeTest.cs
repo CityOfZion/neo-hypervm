@@ -2,6 +2,7 @@
 using NeoVM.Interop.Enums;
 using NeoVM.Interop.Tests.Extra;
 using NeoVM.Interop.Types;
+using NeoVM.Interop.Types.Collections;
 using NeoVM.Interop.Types.StackItems;
 using System;
 using System.Collections.Generic;
@@ -323,6 +324,69 @@ namespace NeoVM.Interop.Tests
             Assert.AreEqual(0, engine.EvaluationStack.Count);
             Assert.AreEqual(0, engine.AltStack.Count);
             if (invocationStack) Assert.AreEqual(0, engine.InvocationStack.Count);
+        }
+        /// <summary>
+        /// Check Array (using peek)
+        /// </summary>
+        /// <param name="stack">Stack</param>
+        /// <param name="index">Index</param>
+        /// <param name="isStruct">Is struct</param>
+        /// <param name="count">Count</param>
+        /// <param name="values">Values</param>
+        protected void CheckArrayPeek(StackItemStack stack, int index, bool isStruct, params object[] values)
+        {
+            using (ArrayStackItem arr = stack.Peek<ArrayStackItem>(index))
+            {
+                Assert.IsTrue(arr != null);
+                Assert.AreEqual(isStruct, arr.IsStruct);
+                CheckArray(arr, values);
+            }
+        }
+        /// <summary>
+        /// Check Array (using peek)
+        /// </summary>
+        /// <param name="stack">Stack</param>
+        /// <param name="isStruct">Is struct</param>
+        /// <param name="values">Values</param>
+        protected void CheckArrayPop(StackItemStack stack, bool isStruct, params object[] values)
+        {
+            using (ArrayStackItem arr = stack.Pop<ArrayStackItem>())
+            {
+                Assert.IsTrue(arr != null);
+                Assert.AreEqual(isStruct, arr.IsStruct);
+                CheckArray(arr, values);
+            }
+        }
+        /// <summary>
+        /// Check array
+        /// </summary>
+        /// <param name="arr">Array</param>
+        /// <param name="values">Values</param>
+        void CheckArray(ArrayStackItem arr, object[] values)
+        {
+            Assert.IsTrue(arr.Count == values.Length);
+
+            for (int x = values.Length - 1; x >= 0; x--)
+            {
+                object val = values[x];
+
+                if (val is Int32)
+                {
+                    Assert.IsTrue(arr[x] is IntegerStackItem);
+                    IntegerStackItem i = arr[x] as IntegerStackItem;
+                    Assert.AreEqual(i.Value, (int)values[x]);
+                }
+                else if (val is bool)
+                {
+                    Assert.IsTrue(arr[x] is BooleanStackItem);
+                    BooleanStackItem i = arr[x] as BooleanStackItem;
+                    Assert.AreEqual(i.Value, (bool)values[x]);
+                }
+                else
+                {
+                    throw (new ArgumentException());
+                }
+            }
         }
     }
 }

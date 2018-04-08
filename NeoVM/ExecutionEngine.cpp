@@ -157,7 +157,7 @@ ExecuteOpCode:
 	switch (opcode)
 	{
 
-		// Push value
+	// Push value
 
 	case EVMOpCode::PUSH0:
 	{
@@ -538,8 +538,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		IStackItem *it = this->EvaluationStack->Peek(0);
-		this->EvaluationStack->Push(it);
+		this->EvaluationStack->Push(this->EvaluationStack->Peek(0));
 		return;
 	}
 	case EVMOpCode::NIP:
@@ -2312,9 +2311,11 @@ ExecuteOpCode:
 			IStackItem::Free(value);
 			value = clone;
 		}
-		IStackItem *key = this->EvaluationStack->Pop();
 
-		if (key->Type == EStackItemType::Map || key->Type == EStackItemType::Array)
+		IStackItem *key = this->EvaluationStack->Pop();
+		if (key->Type == EStackItemType::Map ||
+			key->Type == EStackItemType::Array ||
+			key->Type == EStackItemType::Struct)
 		{
 			IStackItem::Free(key);
 			IStackItem::Free(value);
@@ -2335,11 +2336,13 @@ ExecuteOpCode:
 			if (!key->GetInt32(index) || index < 0 || index >= arr->Count())
 			{
 				IStackItem::Free(key);
+				IStackItem::Free(item);
 				IStackItem::Free(value);
 
 				this->State = EVMState::FAULT;
 				return;
 			}
+
 			arr->Set(index, value, true);
 
 			IStackItem::Free(key);
