@@ -157,7 +157,7 @@ ExecuteOpCode:
 	switch (opcode)
 	{
 
-	// Push value
+		// Push value
 
 	case EVMOpCode::PUSH0:
 	{
@@ -2419,23 +2419,40 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::APPEND:
 	{
-		/*
-		StackItem newItem = EvaluationStack.Pop();
-	if (newItem is Types.Struct s)
-	{
-	newItem = s.Clone();
-	}
-	StackItem arrItem = EvaluationStack.Pop();
-	if (arrItem is VMArray array)
-	{
-	array.Add(newItem);
-	}
-	else
-	{
-	State |= VMState.FAULT;
-	return;
-	}
-	*/
+		if (this->EvaluationStack->Count() < 2)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem *newItem = this->EvaluationStack->Pop();
+		if (newItem->Type == EStackItemType::Struct)
+		{
+			IStackItem * clone = newItem->Clone();
+			IStackItem::Free(newItem);
+			newItem = clone;
+		}
+
+		IStackItem *item = this->EvaluationStack->Pop();
+		switch (item->Type)
+		{
+		case EStackItemType::Array:
+		case EStackItemType::Struct:
+		{
+			ArrayStackItem *arr = (ArrayStackItem*)item;
+			arr->Add(newItem);
+			IStackItem::Free(item);
+			return;
+		}
+		default:
+		{
+			IStackItem::Free(newItem);
+			IStackItem::Free(item);
+
+			this->State = EVMState::FAULT;
+			return;
+		}
+		}
 		return;
 	}
 	case EVMOpCode::REVERSE:

@@ -339,7 +339,7 @@ namespace NeoVM.Interop.Tests
             {
                 Assert.IsTrue(arr != null);
                 Assert.AreEqual(isStruct, arr.IsStruct);
-                CheckArray(arr, values);
+                CheckArray(arr, isStruct, values);
             }
         }
         /// <summary>
@@ -353,17 +353,18 @@ namespace NeoVM.Interop.Tests
             using (ArrayStackItem arr = stack.Pop<ArrayStackItem>())
             {
                 Assert.IsTrue(arr != null);
-                Assert.AreEqual(isStruct, arr.IsStruct);
-                CheckArray(arr, values);
+                CheckArray(arr, isStruct, values);
             }
         }
         /// <summary>
         /// Check array
         /// </summary>
         /// <param name="arr">Array</param>
+        /// <param name="isStruct">Is struct</param>
         /// <param name="values">Values</param>
-        void CheckArray(ArrayStackItem arr, object[] values)
+        protected void CheckArray(ArrayStackItem arr, bool isStruct, params object[] values)
         {
+            Assert.AreEqual(isStruct, arr.IsStruct);
             Assert.IsTrue(arr.Count == values.Length);
 
             for (int x = values.Length - 1; x >= 0; x--)

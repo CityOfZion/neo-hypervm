@@ -480,10 +480,7 @@ namespace NeoVM.Interop.Tests
 
             // Without push
 
-            using (ScriptBuilder script = new ScriptBuilder
-                   (
-                       EVMOpCode.SETITEM
-                   ))
+            using (ScriptBuilder script = new ScriptBuilder(EVMOpCode.SETITEM))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -594,45 +591,36 @@ namespace NeoVM.Interop.Tests
             // Clone test (2)
 
             using (ScriptBuilder script = new ScriptBuilder
-                   (
-                       // Create new array
+                    (
+                        // a = new Array[]{ false, 0x05 }
 
-                       EVMOpCode.PUSH1,
-                       isStruct ? EVMOpCode.NEWSTRUCT : EVMOpCode.NEWARRAY,
-                       EVMOpCode.DUP,
+                        EVMOpCode.PUSH1,
+                        isStruct ? EVMOpCode.NEWSTRUCT : EVMOpCode.NEWARRAY,
+                        EVMOpCode.DUP,
+                        EVMOpCode.PUSH5,
+                        EVMOpCode.APPEND,
+                        EVMOpCode.TOALTSTACK,
 
-                       // Init [0]=0x05
-                       EVMOpCode.PUSH0,
-                       EVMOpCode.PUSH5,
-                       EVMOpCode.SETITEM,
-                       EVMOpCode.TOALTSTACK,
+                        // b = new Array[] { }
 
-                       // Create new array
+                        EVMOpCode.PUSH0,
+                        isStruct ? EVMOpCode.NEWSTRUCT : EVMOpCode.NEWARRAY,
 
-                       EVMOpCode.PUSH1,
-                       isStruct ? EVMOpCode.NEWSTRUCT : EVMOpCode.NEWARRAY,
-                       EVMOpCode.DUP,
+                        // b.Append(a)
 
-                       // Init [0]=0x04
-                       EVMOpCode.PUSH0,
-                       EVMOpCode.PUSH4,
-                       EVMOpCode.SETITEM,
-                       EVMOpCode.DUPFROMALTSTACK,
-                       EVMOpCode.SWAP,
-                       EVMOpCode.DUP,
-                       EVMOpCode.TOALTSTACK,
+                        EVMOpCode.DUP,
+                        EVMOpCode.DUPFROMALTSTACK,
+                        EVMOpCode.APPEND,
 
-                       // Set [0]=0x04
+                        // a[1]=0x06
 
-                       // Clone both in both stacks
+                        //EVMOpCode.PUSH6,
+                        //EVMOpCode.PUSH0,
+                        //EVMOpCode.DUPFROMALTSTACK,
+                        //EVMOpCode.SETITEM,
 
-                       EVMOpCode.TOALTSTACK,
-                       EVMOpCode.PUSH0,
-                       EVMOpCode.FROMALTSTACK,
-
-                       EVMOpCode.SETITEM,
-                       EVMOpCode.RET
-                   ))
+                        EVMOpCode.RET
+                    ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -641,62 +629,33 @@ namespace NeoVM.Interop.Tests
 
                 // Execute
 
-                engine.StepInto(3);
-                Assert.AreEqual(engine.AltStack.Count, 0);
-                Assert.AreEqual(engine.EvaluationStack.Count, 2);
-
-                engine.StepInto(4);
-                Assert.AreEqual(engine.AltStack.Count, 1);
-                Assert.AreEqual(engine.EvaluationStack.Count, 0);
-
-                CheckArrayPeek(engine.AltStack, 0, isStruct, 0x05);
-
-                engine.StepInto(3);
-                Assert.AreEqual(engine.AltStack.Count, 1);
-                Assert.AreEqual(engine.EvaluationStack.Count, 2);
-
-                CheckArrayPeek(engine.AltStack, 0, isStruct, 0x05);
-
-                engine.StepInto(7);
-                Assert.AreEqual(engine.AltStack.Count, 2);
-                Assert.AreEqual(engine.EvaluationStack.Count, 2);
-
-                CheckArrayPeek(engine.AltStack, 0, isStruct, 0x04);
-                CheckArrayPeek(engine.AltStack, 1, isStruct, 0x05);
-
-                CheckArrayPeek(engine.EvaluationStack, 0, isStruct, 0x04);
-                CheckArrayPeek(engine.EvaluationStack, 1, isStruct, 0x05);
-
+                engine.StepInto(6);
+                CheckArrayPeek(engine.AltStack, 0, isStruct, false, 0x05);
                 engine.StepInto(5);
-                Assert.AreEqual(engine.AltStack.Count, 2);
-                Assert.AreEqual(engine.EvaluationStack.Count, 0);
+                engine.StepInto(8);
 
                 Assert.AreEqual(EVMState.HALT, engine.State);
 
-                CheckArrayPop(engine.AltStack, isStruct, 0x04);
+                // Check
+
+                CheckArrayPop(engine.AltStack, isStruct, false, 0x05);
 
                 if (isStruct)
                 {
-                    CheckArrayPop(engine.AltStack, isStruct, 0x05);
+                    using (ArrayStackItem ar = engine.EvaluationStack.Pop<ArrayStackItem>())
+                    using (ArrayStackItem ar2 = ar[0] as ArrayStackItem)
+                    {
+                        CheckArray(ar2, isStruct, false, 0x05);
+                    }
                 }
                 else
                 {
-                    using (ArrayStackItem arr = engine.AltStack.Pop<ArrayStackItem>())
+                    using (ArrayStackItem ar = engine.EvaluationStack.Pop<ArrayStackItem>())
+                    using (ArrayStackItem ar2 = ar[0] as ArrayStackItem)
                     {
-                        Assert.IsTrue(arr != null);
-                        Assert.AreEqual(isStruct, arr.IsStruct);
-                        Assert.IsTrue(arr.Count == 1);
-
-                        Assert.IsTrue(arr[0] is ArrayStackItem);
-                        ArrayStackItem i = arr[0] as ArrayStackItem;
-                        Assert.IsTrue(i.Count == 1);
-
-                        IntegerStackItem ii = i[0] as IntegerStackItem;
-                        Assert.AreEqual(ii.Value, 0x04);
+                        CheckArray(ar2, isStruct, false, 0x05);
                     }
                 }
-
-                // Check
 
                 CheckClean(engine);
             }
@@ -851,10 +810,162 @@ namespace NeoVM.Interop.Tests
             }
         }
 
-        [TestMethod]
-        public void APPEND()
+        void APPEND_ARRAY_STRUCT(bool isStruct)
         {
-            Assert.IsFalse(true);
+            // Without push
+
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                EVMOpCode.PUSH1,
+                EVMOpCode.APPEND
+                ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 0x01);
+
+                CheckClean(engine, false);
+            }
+
+            // Without array
+
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                EVMOpCode.PUSH1,
+                EVMOpCode.PUSH2,
+                EVMOpCode.APPEND
+                ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Clone test
+
+            using (ScriptBuilder script = new ScriptBuilder
+                    (
+                        // a = new Array[]{ 0x05 }
+
+                        EVMOpCode.PUSH0,
+                        isStruct ? EVMOpCode.NEWSTRUCT : EVMOpCode.NEWARRAY,
+                        EVMOpCode.DUP,
+                        EVMOpCode.PUSH5,
+                        EVMOpCode.APPEND,
+                        EVMOpCode.TOALTSTACK,
+
+                        // b = new Array[] { }
+
+                        EVMOpCode.PUSH0,
+                        isStruct ? EVMOpCode.NEWSTRUCT : EVMOpCode.NEWARRAY,
+
+                        // b.Append(a)
+
+                        EVMOpCode.DUP,
+                        EVMOpCode.DUPFROMALTSTACK,
+                        EVMOpCode.APPEND,
+
+                        // a.Append(0x06)
+
+                        EVMOpCode.DUPFROMALTSTACK,
+                        EVMOpCode.PUSH6,
+                        EVMOpCode.APPEND,
+
+                        EVMOpCode.RET
+                    ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                engine.StepInto(6);
+                CheckArrayPeek(engine.AltStack, 0, isStruct, 0x05);
+                engine.StepInto(9);
+                Assert.AreEqual(EVMState.HALT, engine.State);
+
+                // Check
+
+                CheckArrayPop(engine.AltStack, isStruct, 0x05, 0x06);
+
+                if (isStruct)
+                {
+                    using (ArrayStackItem ar = engine.EvaluationStack.Pop<ArrayStackItem>())
+                    using (ArrayStackItem ar2 = ar[0] as ArrayStackItem)
+                    {
+                        CheckArray(ar2, isStruct, 0x05);
+                    }
+                }
+                else
+                {
+                    using (ArrayStackItem ar = engine.EvaluationStack.Pop<ArrayStackItem>())
+                    using (ArrayStackItem ar2 = ar[0] as ArrayStackItem)
+                    {
+                        CheckArray(ar2, isStruct, 0x05, 0x06);
+                    }
+                }
+
+                CheckClean(engine);
+            }
+
+            // Real test
+
+            using (ScriptBuilder script = new ScriptBuilder
+                    (
+                        EVMOpCode.PUSH0,
+                        isStruct ? EVMOpCode.NEWSTRUCT : EVMOpCode.NEWARRAY,
+                        EVMOpCode.DUP,
+                        EVMOpCode.PUSH5,
+                        EVMOpCode.APPEND
+                    ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.HALT, engine.Execute());
+
+                // Check
+
+                CheckArrayPop(engine.EvaluationStack, isStruct, 0x05);
+
+                CheckClean(engine);
+            }
+        }
+
+        [TestMethod]
+        public void APPEND_ARRAY()
+        {
+            APPEND_ARRAY_STRUCT(false);
+        }
+
+        [TestMethod]
+        public void APPEND_STRUCT()
+        {
+            APPEND_ARRAY_STRUCT(true);
         }
 
         [TestMethod]
