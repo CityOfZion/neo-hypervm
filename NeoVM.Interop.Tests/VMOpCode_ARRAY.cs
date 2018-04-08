@@ -992,10 +992,10 @@ namespace NeoVM.Interop.Tests
             // Without Array
 
             using (ScriptBuilder script = new ScriptBuilder
-                    (
-                        EVMOpCode.PUSH9,
-                        EVMOpCode.REVERSE
-                    ))
+                (
+                EVMOpCode.PUSH9,
+                EVMOpCode.REVERSE
+                ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -1014,14 +1014,14 @@ namespace NeoVM.Interop.Tests
             // Real test
 
             using (ScriptBuilder script = new ScriptBuilder
-                    (
-                        EVMOpCode.PUSH9,
-                        EVMOpCode.PUSH8,
-                        EVMOpCode.PUSH2,
-                        EVMOpCode.PACK,
-                        EVMOpCode.DUP,
-                        EVMOpCode.REVERSE
-                    ))
+                (
+                EVMOpCode.PUSH9,
+                EVMOpCode.PUSH8,
+                EVMOpCode.PUSH2,
+                EVMOpCode.PACK,
+                EVMOpCode.DUP,
+                EVMOpCode.REVERSE
+                ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -1043,7 +1043,139 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void REMOVE()
         {
-            Assert.IsFalse(true);
+            // Without push
+
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                EVMOpCode.PUSH1,
+                EVMOpCode.REMOVE
+                ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 0x01);
+
+                CheckClean(engine, false);
+            }
+
+            // Without array
+
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                EVMOpCode.PUSH1,
+                EVMOpCode.PUSH2,
+                EVMOpCode.REMOVE
+                ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Wrong key
+
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                EVMOpCode.PUSH2,
+                EVMOpCode.NEWMAP,
+                EVMOpCode.REMOVE
+                ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 0x02);
+
+                CheckClean(engine, false);
+            }
+
+            // Out of bounds
+
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                EVMOpCode.PUSH6,
+                EVMOpCode.PUSH5,
+                EVMOpCode.PUSH2,
+                EVMOpCode.PACK,
+                EVMOpCode.PUSH2,
+                EVMOpCode.REMOVE
+                ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Real test
+
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                EVMOpCode.PUSH6,
+                EVMOpCode.PUSH5,
+                EVMOpCode.PUSH2,
+                EVMOpCode.PACK,
+
+                EVMOpCode.TOALTSTACK,
+                EVMOpCode.DUPFROMALTSTACK,
+
+                EVMOpCode.PUSH0,
+                EVMOpCode.REMOVE,
+                EVMOpCode.FROMALTSTACK,
+                EVMOpCode.UNPACK,
+                EVMOpCode.RET
+                ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.HALT, engine.Execute());
+
+                // Check
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 0x01);
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 0x06);
+
+                CheckClean(engine);
+            }
         }
 
         [TestMethod]

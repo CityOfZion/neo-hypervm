@@ -19,6 +19,7 @@ public:
 
 	int32 Count();
 	void Set(IStackItem* key, IStackItem* value);
+	bool Remove(IStackItem* key, bool dispose);
 
 	// Constructor
 

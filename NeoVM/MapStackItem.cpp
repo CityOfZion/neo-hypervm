@@ -25,6 +25,11 @@ BigInteger * MapStackItem::GetBigInteger()
 	return NULL;
 }
 
+bool MapStackItem::Remove(IStackItem* key, bool dispose)
+{
+	return false;
+}
+
 bool MapStackItem::GetInt32(int32 &ret)
 {
 	return false;

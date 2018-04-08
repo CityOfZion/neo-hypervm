@@ -2478,32 +2478,65 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::REMOVE:
 	{
-		/*
-		StackItem key = EvaluationStack.Pop();
-		if (key is ICollection)
+		if (this->EvaluationStack->Count() < 2)
 		{
-			State |= VMState.FAULT;
+			this->State = EVMState::FAULT;
 			return;
 		}
-		switch (EvaluationStack.Pop())
+
+		IStackItem *key = this->EvaluationStack->Pop();
+		if (key->Type == EStackItemType::Map ||
+			key->Type == EStackItemType::Array ||
+			key->Type == EStackItemType::Struct)
 		{
-		case VMArray array:
-			int32 index = (int)key.GetBigInteger();
-			if (index < 0 || index >= array.Count)
+			IStackItem::Free(key);
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem *item = this->EvaluationStack->Pop();
+		switch (item->Type)
+		{
+		case EStackItemType::Array:
+		case EStackItemType::Struct:
+		{
+			ArrayStackItem *arr = (ArrayStackItem*)item;
+
+			int32 index = 0;
+			if (!key->GetInt32(index) || index < 0 || index >= arr->Count())
 			{
-				State |= VMState.FAULT;
+				IStackItem::Free(key);
+				IStackItem::Free(item);
+
+				this->State = EVMState::FAULT;
 				return;
 			}
-			array.RemoveAt(index);
-			return;
-		case Map map :
-			map.Remove(key);
-			return;
-		default:
-			State |= VMState.FAULT;
+
+			arr->RemoveAt(index, true);
+
+			IStackItem::Free(key);
+			IStackItem::Free(item);
 			return;
 		}
-		*/
+		case EStackItemType::Map:
+		{
+			MapStackItem *arr = (MapStackItem*)item;
+
+			if (!arr->Remove(key, true))
+				IStackItem::Free(key);
+
+			IStackItem::Free(item);
+			return;
+		}
+		default:
+		{
+			IStackItem::Free(key);
+			IStackItem::Free(item);
+
+			this->State = EVMState::FAULT;
+			return;
+		}
+		}
 		return;
 	}
 	case EVMOpCode::HASKEY:
