@@ -263,16 +263,117 @@ namespace NeoVM.Interop.Tests
             }
         }
 
-        [TestMethod]
-        public void PICKITEM_ARRAY()
+        public void PICKITEM_ARRAY_STRUCT(bool isStruct)
         {
+            // Without push
+
             using (ScriptBuilder script = new ScriptBuilder
                    (
+                       EVMOpCode.PICKITEM
+                   ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Wrong key type
+
+            using (ScriptBuilder script = new ScriptBuilder
+                   (
+                       EVMOpCode.PUSH6,
+                       EVMOpCode.NEWMAP,
+                       EVMOpCode.PICKITEM,
+                       EVMOpCode.RET
+                   ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 6);
+
+                CheckClean(engine, false);
+            }
+
+            // Out of bounds
+
+            using (ScriptBuilder script = new ScriptBuilder
+                   (
+                       EVMOpCode.PUSH2,
+                       isStruct ? EVMOpCode.NEWSTRUCT : EVMOpCode.NEWARRAY,
+                       EVMOpCode.PUSH3,
+                       EVMOpCode.PICKITEM,
+                       EVMOpCode.RET
+                   ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // Real test
+
+            using (ScriptBuilder script = new ScriptBuilder
+                   (
+                       // Create array or struct
+
+                       EVMOpCode.PUSH3,
+                       isStruct ? EVMOpCode.NEWSTRUCT : EVMOpCode.NEWARRAY,
+
+                       // Make a copy
+
+                       EVMOpCode.TOALTSTACK,
+
+                       // [0]=1
+
+                       EVMOpCode.DUPFROMALTSTACK,
+                       EVMOpCode.PUSH0,
+                       EVMOpCode.PUSH1,
+                       EVMOpCode.SETITEM,
+
+                       // [1]=2
+
+                       EVMOpCode.DUPFROMALTSTACK,
                        EVMOpCode.PUSH1,
                        EVMOpCode.PUSH2,
+                       EVMOpCode.SETITEM,
+
+                       // [2]=3
+
+                       EVMOpCode.DUPFROMALTSTACK,
+                       EVMOpCode.PUSH2,
                        EVMOpCode.PUSH3,
-                       EVMOpCode.PUSH3,
-                       EVMOpCode.PACK,
+                       EVMOpCode.SETITEM,
+
+                       // Pick
+
+                       EVMOpCode.FROMALTSTACK,
                        EVMOpCode.PUSH2,
                        EVMOpCode.PICKITEM,
                        EVMOpCode.RET
@@ -289,10 +390,22 @@ namespace NeoVM.Interop.Tests
 
                 // Check
 
-                Assert.IsTrue(engine.EvaluationStack.Pop<IntegerStackItem>().Value == 1);
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 3);
 
                 CheckClean(engine);
             }
+        }
+
+        [TestMethod]
+        public void PICKITEM_ARRAY()
+        {
+            PICKITEM_ARRAY_STRUCT(false);
+        }
+
+        [TestMethod]
+        public void PICKITEM_STRUCT()
+        {
+            PICKITEM_ARRAY_STRUCT(true);
         }
 
         [TestMethod]

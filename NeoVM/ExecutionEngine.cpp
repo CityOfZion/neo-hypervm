@@ -157,7 +157,7 @@ ExecuteOpCode:
 	switch (opcode)
 	{
 
-// Push value
+		// Push value
 
 	case EVMOpCode::PUSH0:
 	{
@@ -230,7 +230,7 @@ ExecuteOpCode:
 		return;
 	}
 
-// Control
+	// Control
 
 	case EVMOpCode::NOP: return;
 	case EVMOpCode::JMP:
@@ -401,7 +401,7 @@ ExecuteOpCode:
 		return;
 	}
 
-// Stack ops
+	// Stack ops
 
 	case EVMOpCode::DUPFROMALTSTACK:
 	{
@@ -849,7 +849,7 @@ ExecuteOpCode:
 		return;
 	}
 
-// Bitwise logic
+	// Bitwise logic
 
 	case EVMOpCode::INVERT:
 	{
@@ -1019,7 +1019,7 @@ ExecuteOpCode:
 		return;
 	}
 
-// Numeric
+	// Numeric
 
 	case EVMOpCode::INC:
 	{
@@ -1833,7 +1833,7 @@ ExecuteOpCode:
 		return;
 	}
 
-// Crypto
+	// Crypto
 
 	case EVMOpCode::SHA1:
 	{
@@ -2113,7 +2113,7 @@ ExecuteOpCode:
 		return;
 	}
 
-// Array
+	// Array
 
 	case EVMOpCode::ARRAYSIZE:
 	{
@@ -2232,7 +2232,10 @@ ExecuteOpCode:
 		}
 
 		IStackItem *key = this->EvaluationStack->Pop();
-		if (key->Type == EStackItemType::Map || key->Type == EStackItemType::Array)
+
+		if (key->Type == EStackItemType::Map ||
+			key->Type == EStackItemType::Array ||
+			key->Type == EStackItemType::Struct)
 		{
 			IStackItem::Free(key);
 			this->State = EVMState::FAULT;
@@ -2251,18 +2254,19 @@ ExecuteOpCode:
 			if (!key->GetInt32(index) || index < 0 || index >= arr->Count())
 			{
 				IStackItem::Free(key);
+				IStackItem::Free(item);
 
 				this->State = EVMState::FAULT;
 				return;
 			}
-			IStackItem::Free(key);
 
+			IStackItem::Free(key);
 			IStackItem *ret = arr->Get(index);
 
 			arr->Set(index, NULL, false);
 
-			this->EvaluationStack->Push(ret);
 			IStackItem::Free(item);
+			this->EvaluationStack->Push(ret);
 			return;
 		}
 		case EStackItemType::Map:
@@ -2554,7 +2558,7 @@ ExecuteOpCode:
 		return;
 	}
 
-// Exceptions
+	// Exceptions
 
 	default:
 	case EVMOpCode::THROW:

@@ -90,7 +90,7 @@ void ArrayStackItem::Clear()
 	{
 		IStackItem* ptr = (IStackItem*)*it;
 
-		if (ptr != NULL) 
+		if (ptr != NULL)
 		{
 			ptr->Claims--;
 			IStackItem::Free(ptr);
@@ -129,10 +129,12 @@ void ArrayStackItem::Set(int32 index, IStackItem* item, bool disposePrev)
 
 	IStackItem* & s(*it);
 
-	if (s != NULL && disposePrev)
+	if (s != NULL)
 	{
 		s->Claims--;
-		IStackItem::Free(s);
+
+		if (disposePrev)
+			IStackItem::Free(s);
 	}
 
 	s = item;
