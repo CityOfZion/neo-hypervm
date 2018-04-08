@@ -75,7 +75,7 @@ namespace NeoVM.Interop.Types
             Handle = NeoVM.ExecutionEngine_Create
                 (
                 new NeoVM.InvokeInteropCallback(InternalInvokeInterop),
-                new NeoVM.GetScriptCallback(InternalGetScript),
+                new NeoVM.LoadScriptCallback(InternalLoadScript),
                 new NeoVM.GetMessageCallback(InternalGetMessage),
                 out IntPtr invHandle, out IntPtr evHandle, out IntPtr altHandle
                 );
@@ -185,35 +185,30 @@ namespace NeoVM.Interop.Types
             return 0;
         }
         /// <summary>
-        /// Get script callback
+        /// Load script callback
         /// </summary>
         /// <param name="scriptHash">Hash</param>
-        /// <param name="output">Script</param>
-        /// <returns>Length of script</returns>
-        int InternalGetScript(byte[] scriptHash, out IntPtr output)
+        /// <returns>Return 0x01 if is corrected loaded</returns>
+        byte InternalLoadScript(byte[] scriptHash)
         {
             if (ScriptTable == null)
             {
-                output = IntPtr.Zero;
-                return 0;
+                return 0x00;
             }
 
-            LastScript = ScriptTable.GetScript(scriptHash);
+            byte[] script = ScriptTable.GetScript(scriptHash);
 
-            if (LastScript == null)
+            if (script == null || script.Length <= 0)
             {
-                output = IntPtr.Zero;
-                return 0;
+                return 0x00;
             }
 
-            // Prevent dispose
-
-            fixed (byte* p = LastScript)
+            fixed (byte* p = script)
             {
-                output = (IntPtr)p;
+                NeoVM.ExecutionEngine_LoadScript(Handle, (IntPtr)p, script.Length);
             }
 
-            return LastScript.Length;
+            return 0x01;
         }
         /// <summary>
         /// Invoke Interop callback

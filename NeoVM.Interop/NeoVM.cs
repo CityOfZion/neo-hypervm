@@ -34,7 +34,7 @@ namespace NeoVM.Interop
         internal delegate byte InvokeInteropCallback(string method);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate int GetScriptCallback([MarshalAs(UnmanagedType.LPArray, SizeConst = 20)]byte[] scriptHash, out IntPtr script);
+        internal delegate byte LoadScriptCallback([MarshalAs(UnmanagedType.LPArray, SizeConst = 20)]byte[] scriptHash);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate int GetMessageCallback(uint iteration, out IntPtr script);
@@ -63,7 +63,7 @@ namespace NeoVM.Interop
         internal delegate void delVoid_HandleOnStackChangeCallback(IntPtr item, OnStackChangeCallback callback);
         internal delegate IntPtr delCreateExecutionEngine
             (
-            InvokeInteropCallback interopCallback, GetScriptCallback scriptCallback, GetMessageCallback getMessageCallback,
+            InvokeInteropCallback interopCallback, LoadScriptCallback scriptCallback, GetMessageCallback getMessageCallback,
             out IntPtr invocationHandle, out IntPtr evaluationHandle, out IntPtr altStack
             );
 

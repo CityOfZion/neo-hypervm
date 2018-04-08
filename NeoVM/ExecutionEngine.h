@@ -20,9 +20,9 @@ private:
 
 	// Callback Interoperability
 	
-	GetMessageCallback MessageCallback;
-	GetScriptCallback ScriptCallback;
-	InvokeInteropCallback InteropCallback;
+	GetMessageCallback OnGetMessage;
+	LoadScriptCallback OnLoadScript;
+	InvokeInteropCallback OnInvokeInterop;
 
 	// Stacks
 
@@ -64,7 +64,7 @@ public:
 
 	// Constructor
 
-	ExecutionEngine(InvokeInteropCallback invokeInteropCallback, GetScriptCallback getScriptCallback, GetMessageCallback getMessageCallback);
+	ExecutionEngine(InvokeInteropCallback invokeInterop, LoadScriptCallback loadScript, GetMessageCallback getMessage);
 
 	// Destructor
 

@@ -23,7 +23,7 @@ extern "C"
 
 	DllExport ExecutionEngine* ExecutionEngine_Create
 	(
-		InvokeInteropCallback interopCallback, GetScriptCallback getScriptCallback, GetMessageCallback getMessageCallback,
+		InvokeInteropCallback interopCallback, LoadScriptCallback getScriptCallback, GetMessageCallback getMessageCallback,
 		ExecutionContextStack* &invStack, StackItems* &evStack, StackItems* &altStack
 	);
 	DllExport void ExecutionEngine_Free(ExecutionEngine* &engine);

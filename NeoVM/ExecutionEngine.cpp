@@ -12,7 +12,7 @@ byte ExecutionEngine::InvokeInterop(const char* method)
 {
 	// Fill defaults interops here
 
-	return this->InteropCallback(method);
+	return this->OnInvokeInterop(method);
 }
 
 // Getters
@@ -25,9 +25,9 @@ StackItems* ExecutionEngine::GetAltStack() { return this->AltStack; }
 
 ExecutionEngine::ExecutionEngine
 (
-	InvokeInteropCallback invokeInteropCallback, GetScriptCallback getScriptCallback, GetMessageCallback getMessageCallback
+	InvokeInteropCallback invokeInterop, LoadScriptCallback loadScript, GetMessageCallback getMessage
 )
-	: InteropCallback(invokeInteropCallback), ScriptCallback(getScriptCallback), MessageCallback(getMessageCallback)
+	: OnInvokeInterop(invokeInterop), OnLoadScript(loadScript), OnGetMessage(getMessage)
 {
 	this->InvocationStack = new ExecutionContextStack();
 	this->EvaluationStack = new StackItems();
@@ -322,7 +322,7 @@ ExecuteOpCode:
 	case EVMOpCode::APPCALL:
 	case EVMOpCode::TAILCALL:
 	{
-		if (ScriptCallback == NULL)
+		if (this->OnLoadScript == NULL)
 		{
 			this->State = EVMState::FAULT;
 			return;
@@ -358,21 +358,17 @@ ExecuteOpCode:
 			IStackItem::Free(item);
 		}
 
-		byte* script = NULL;
-		int32 length = ScriptCallback(&(script_hash[0]), script);
-
-		if (length <= 0)
-		{
-			this->State = EVMState::FAULT;
-			return;
-		}
-
 		if (opcode == EVMOpCode::TAILCALL)
 		{
 			this->InvocationStack->Drop();
 		}
 
-		this->LoadScript(script, length);
+		if (this->OnLoadScript(script_hash) != 0x01)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
 		return;
 	}
 	case EVMOpCode::SYSCALL:
@@ -1992,7 +1988,7 @@ ExecuteOpCode:
 		int pubKeySize = ipubKey->ReadByteArraySize();
 		int signatureSize = isignature->ReadByteArraySize();
 
-		if (MessageCallback == NULL || pubKeySize < 33 || signatureSize < 32)
+		if (this->OnGetMessage == NULL || pubKeySize < 33 || signatureSize < 32)
 		{
 			IStackItem::Free(ipubKey);
 			IStackItem::Free(isignature);
@@ -2006,7 +2002,7 @@ ExecuteOpCode:
 		// TODO: dangerous way to get the message
 
 		byte* msg;
-		int32 msgL = MessageCallback(this->Iteration, msg);
+		int32 msgL = this->OnGetMessage(this->Iteration, msg);
 		if (msgL <= 0)
 		{
 			IStackItem::Free(ipubKey);
@@ -2647,9 +2643,9 @@ ExecutionEngine::~ExecutionEngine()
 {
 	// Clean callbacks
 
-	this->ScriptCallback = NULL;
-	this->InteropCallback = NULL;
-	this->MessageCallback = NULL;
+	this->OnLoadScript = NULL;
+	this->OnInvokeInterop = NULL;
+	this->OnGetMessage = NULL;
 	this->Log = NULL;
 
 	// Clean pointers
