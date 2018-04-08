@@ -13,10 +13,10 @@ namespace NeoVM.Interop.Tests
         public void PUSH0()
         {
             using (ScriptBuilder script = new ScriptBuilder
-                (
+            (
                 EVMOpCode.PUSH0,
                 EVMOpCode.RET
-                ))
+            ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -92,12 +92,14 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void PUSHDATA1()
         {
-            using (ScriptBuilder script = new ScriptBuilder(
+            using (ScriptBuilder script = new ScriptBuilder
+            (
                 EVMOpCode.PUSHDATA1, new byte[]
                 {
                     0x04,
                     0x01, 0x02, 0x03, 0x04
-                }))
+                }
+            ))
             {
                 using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
                 {
@@ -143,12 +145,13 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void PUSHDATA2()
         {
-            using (ScriptBuilder script = new ScriptBuilder(
+            using (ScriptBuilder script = new ScriptBuilder
+            (
                  EVMOpCode.PUSHDATA2, new byte[]
                  {
                     0x04, 0x00,
                     0x01, 0x02, 0x03, 0x04
-                 }))
+             }))
             {
                 using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
                 {
@@ -194,12 +197,14 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void PUSHDATA4()
         {
-            using (ScriptBuilder script = new ScriptBuilder(
-                 EVMOpCode.PUSHDATA4, new byte[]
-                 {
-                    0x04, 0x00, 0x00, 0x00,
-                    0x01, 0x02, 0x03, 0x04
-                 }))
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                EVMOpCode.PUSHDATA4, new byte[]
+                {
+                0x04, 0x00, 0x00, 0x00,
+                0x01, 0x02, 0x03, 0x04
+                }
+            ))
             {
                 using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
                 {
@@ -246,10 +251,10 @@ namespace NeoVM.Interop.Tests
         public void PUSHM1()
         {
             using (ScriptBuilder script = new ScriptBuilder
-                (
+            (
                 EVMOpCode.PUSHM1,
                 EVMOpCode.RET
-                ))
+            ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -272,7 +277,7 @@ namespace NeoVM.Interop.Tests
         public void PUSH1_TO_PUSH16()
         {
             using (ScriptBuilder script = new ScriptBuilder
-               (
+            (
                 EVMOpCode.PUSH1, EVMOpCode.PUSH2,
                 EVMOpCode.PUSH3, EVMOpCode.PUSH4,
                 EVMOpCode.PUSH5, EVMOpCode.PUSH6,
@@ -282,7 +287,7 @@ namespace NeoVM.Interop.Tests
                 EVMOpCode.PUSH13, EVMOpCode.PUSH14,
                 EVMOpCode.PUSH15, EVMOpCode.PUSH16,
                 EVMOpCode.RET
-               ))
+            ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load Script

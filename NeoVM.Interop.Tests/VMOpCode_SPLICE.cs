@@ -15,11 +15,11 @@ namespace NeoVM.Interop.Tests
             // Without push
 
             using (ScriptBuilder script = new ScriptBuilder
-                (
+            (
                 EVMOpCode.PUSH11,
                 EVMOpCode.LEFT,
                 EVMOpCode.RET
-                ))
+            ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -117,11 +117,11 @@ namespace NeoVM.Interop.Tests
             // Without push
 
             using (ScriptBuilder script = new ScriptBuilder
-                (
+            (
                 EVMOpCode.PUSH11,
                 EVMOpCode.RIGHT,
                 EVMOpCode.RET
-                ))
+            ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -219,11 +219,11 @@ namespace NeoVM.Interop.Tests
             // Wrong type
 
             using (ScriptBuilder script = new ScriptBuilder
-                (
+            (
                 EVMOpCode.NEWMAP,
                 EVMOpCode.SIZE,
                 EVMOpCode.RET
-                ))
+            ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -242,10 +242,10 @@ namespace NeoVM.Interop.Tests
             // Without push
 
             using (ScriptBuilder script = new ScriptBuilder
-                (
+            (
                 EVMOpCode.SIZE,
                 EVMOpCode.RET
-                ))
+            ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -428,12 +428,12 @@ namespace NeoVM.Interop.Tests
             // With wrong types
 
             using (ScriptBuilder script = new ScriptBuilder
-                (
+            (
                 EVMOpCode.PUSH0,
                 EVMOpCode.NEWMAP,
                 EVMOpCode.CAT,
                 EVMOpCode.RET
-                ))
+            ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -452,10 +452,10 @@ namespace NeoVM.Interop.Tests
             // Without push
 
             using (ScriptBuilder script = new ScriptBuilder
-                (
+            (
                 EVMOpCode.CAT,
                 EVMOpCode.RET
-                ))
+            ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script

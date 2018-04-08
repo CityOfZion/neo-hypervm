@@ -96,8 +96,7 @@ namespace NeoVM.Interop.Tests
             {
                 InteropService = new DummyInteropService(),
                 ScriptContainer = new DummyScript(),
-            }
-                ))
+            }))
             {
                 // Load script
 
@@ -136,7 +135,7 @@ namespace NeoVM.Interop.Tests
             // Equals map, array and structure (false)
 
             using (ScriptBuilder script = new ScriptBuilder
-                (
+            (
                 EVMOpCode.NEWMAP,
                 EVMOpCode.NEWMAP,
                 EVMOpCode.EQUAL,
@@ -153,7 +152,7 @@ namespace NeoVM.Interop.Tests
                 EVMOpCode.NEWSTRUCT,
                 EVMOpCode.EQUAL,
                 EVMOpCode.RET
-                ))
+            ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -179,7 +178,7 @@ namespace NeoVM.Interop.Tests
             // Equals map, array and structure (true)
 
             using (ScriptBuilder script = new ScriptBuilder
-                (
+            (
                 EVMOpCode.NEWMAP,
                 EVMOpCode.DUP,
                 EVMOpCode.EQUAL,
@@ -194,7 +193,7 @@ namespace NeoVM.Interop.Tests
                 EVMOpCode.DUP,
                 EVMOpCode.EQUAL,
                 EVMOpCode.RET
-                ))
+            ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -220,12 +219,12 @@ namespace NeoVM.Interop.Tests
             // Byte array conversion = true
 
             using (ScriptBuilder script = new ScriptBuilder
-                (
+            (
                 EVMOpCode.PUSHBYTES1, EVMOpCode.PUSHBYTES1 /*0x01*/,
                 EVMOpCode.PUSH0,
                 EVMOpCode.INC,
                 EVMOpCode.EQUAL
-                ))
+            ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -246,12 +245,12 @@ namespace NeoVM.Interop.Tests
             // Bool compare = true
 
             using (ScriptBuilder script = new ScriptBuilder
-                (
+            (
                 EVMOpCode.PUSH1,
                 EVMOpCode.NOT,
                 EVMOpCode.DUP,
                 EVMOpCode.EQUAL
-                ))
+            ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -272,12 +271,12 @@ namespace NeoVM.Interop.Tests
             // Bool compare = false
 
             using (ScriptBuilder script = new ScriptBuilder
-                (
+            (
                 EVMOpCode.PUSH1,
                 EVMOpCode.NOT,
                 EVMOpCode.PUSH1,
                 EVMOpCode.EQUAL
-                ))
+            ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -298,10 +297,10 @@ namespace NeoVM.Interop.Tests
             // Without push
 
             using (ScriptBuilder script = new ScriptBuilder
-                (
+            (
                 EVMOpCode.PUSH1,
                 EVMOpCode.EQUAL
-                ))
+            ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script

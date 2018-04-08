@@ -12,8 +12,8 @@ namespace NeoVM.Interop.Tests
         {
             using (ScriptBuilder script = new ScriptBuilder
                 (
-                    EVMOpCode.THROW,
-                    EVMOpCode.RET
+                EVMOpCode.THROW,
+                EVMOpCode.RET
                 ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
@@ -36,10 +36,10 @@ namespace NeoVM.Interop.Tests
 
             using (ScriptBuilder script = new ScriptBuilder
                 (
-                    EVMOpCode.PUSH0,
-                    EVMOpCode.NOT,
-                    EVMOpCode.THROWIFNOT,
-                    EVMOpCode.RET
+                EVMOpCode.PUSH0,
+                EVMOpCode.NOT,
+                EVMOpCode.THROWIFNOT,
+                EVMOpCode.RET
                 ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
@@ -58,9 +58,9 @@ namespace NeoVM.Interop.Tests
 
             using (ScriptBuilder script = new ScriptBuilder
                 (
-                    EVMOpCode.PUSH0,
-                    EVMOpCode.THROWIFNOT,
-                    EVMOpCode.RET
+                EVMOpCode.PUSH0,
+                EVMOpCode.THROWIFNOT,
+                EVMOpCode.RET
                 ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
@@ -79,8 +79,8 @@ namespace NeoVM.Interop.Tests
 
             using (ScriptBuilder script = new ScriptBuilder
                 (
-                    EVMOpCode.THROWIFNOT,
-                    EVMOpCode.RET
+                EVMOpCode.THROWIFNOT,
+                EVMOpCode.RET
                 ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {

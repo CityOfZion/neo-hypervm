@@ -501,15 +501,15 @@ namespace NeoVM.Interop.Tests
             }
 
             using (ScriptBuilder script = new ScriptBuilder
-                (
-                    EVMOpCode.PUSH3,
-                    EVMOpCode.PUSH2,
-                    EVMOpCode.PUSH1,
-                    EVMOpCode.PUSH4,
-                    EVMOpCode.PUSH2,
-                    EVMOpCode.XTUCK,
-                    EVMOpCode.RET
-                ))
+            (
+                EVMOpCode.PUSH3,
+                EVMOpCode.PUSH2,
+                EVMOpCode.PUSH1,
+                EVMOpCode.PUSH4,
+                EVMOpCode.PUSH2,
+                EVMOpCode.XTUCK,
+                EVMOpCode.RET
+            ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -1002,16 +1002,16 @@ namespace NeoVM.Interop.Tests
             }
 
             using (ScriptBuilder script = new ScriptBuilder
-                (
-                    EVMOpCode.PUSH5,
-                    EVMOpCode.PUSH4,
-                    EVMOpCode.PUSH3,
-                    EVMOpCode.PUSH2,
-                    EVMOpCode.PUSH1,
-                    EVMOpCode.PUSH2,
-                    EVMOpCode.ROLL,
-                    EVMOpCode.RET
-                ))
+            (
+                EVMOpCode.PUSH5,
+                EVMOpCode.PUSH4,
+                EVMOpCode.PUSH3,
+                EVMOpCode.PUSH2,
+                EVMOpCode.PUSH1,
+                EVMOpCode.PUSH2,
+                EVMOpCode.ROLL,
+                EVMOpCode.RET
+            ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script

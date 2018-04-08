@@ -22,10 +22,10 @@ namespace NeoVM.Interop.Tests
         public void TestScriptHash()
         {
             using (ScriptBuilder script = new ScriptBuilder
-                (
+            (
                 EVMOpCode.PUSH0,
                 EVMOpCode.RET
-                ))
+            ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 // Load script
@@ -72,12 +72,12 @@ namespace NeoVM.Interop.Tests
         public void TestScriptLogic()
         {
             using (ScriptBuilder script = new ScriptBuilder
-                (
+            (
                 EVMOpCode.PUSH0,
                 EVMOpCode.NOT,
                 EVMOpCode.NOT,
                 EVMOpCode.DROP
-                ))
+            ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
                 engine.LoadScript(script);
@@ -127,12 +127,12 @@ namespace NeoVM.Interop.Tests
         public void TestLogs()
         {
             using (ScriptBuilder script = new ScriptBuilder
-                (
+            (
                 EVMOpCode.PUSH10,
                 EVMOpCode.TOALTSTACK,
                 EVMOpCode.FROMALTSTACK,
                 EVMOpCode.RET
-                ))
+            ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(new ExecutionEngineArgs()
             {
                 Logger = new ExecutionEngineLogger
