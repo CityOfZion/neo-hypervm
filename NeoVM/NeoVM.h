@@ -5,9 +5,13 @@
 #include "ExecutionEngine.h"
 #include "ExecutionContextStack.h"
 
-#if _WINDOWS
-
+#if defined(_WINDOWS)
+// Windows
 #define DllExport __declspec( dllexport ) 
+#elif defined (__GNUC__)
+// GCC
+#define DllExport __attribute__((visibility("default"))) 
+#endif
 
 extern "C"
 {
@@ -70,5 +74,3 @@ extern "C"
 	DllExport void ArrayStackItem_Insert(ArrayStackItem* array, IStackItem* item, int32 index);
 	DllExport void ArrayStackItem_RemoveAt(ArrayStackItem* array, int32 index, byte dispose);
 }
-
-# endif
