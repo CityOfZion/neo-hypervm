@@ -9,7 +9,7 @@ const int32 MAX_SHL_SHR = 65535;
 /// <summary>
 /// Min value for SHL and SHR
 /// </summary>
-const int32 MIN_SHL_SHR = -32768;
+const int32 MIN_SHL_SHR = -MAX_SHL_SHR;
 
 // TODO: Implement this limits
 
