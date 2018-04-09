@@ -75,10 +75,10 @@ protected:
 #define SHA256_F4(x) (SHA2_ROTR(x, 17) ^ SHA2_ROTR(x, 19) ^ SHA2_SHFR(x, 10))
 #define SHA2_UNPACK32(x, str)                 \
 {                                             \
-    *((str) + 3) = (byte) ((x)      );       \
-    *((str) + 2) = (byte) ((x) >>  8);       \
-    *((str) + 1) = (byte) ((x) >> 16);       \
-    *((str) + 0) = (byte) ((x) >> 24);       \
+    *((str) + 3) = (byte) ((x)      );        \
+    *((str) + 2) = (byte) ((x) >>  8);        \
+    *((str) + 1) = (byte) ((x) >> 16);        \
+    *((str) + 0) = (byte) ((x) >> 24);        \
 }
 #define SHA2_PACK32(str, x)                   \
 {                                             \
