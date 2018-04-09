@@ -57,7 +57,7 @@ ExecutionEngine * ExecutionEngine_Create
 
 void ExecutionEngine_AddLog(ExecutionEngine* engine, OnStepIntoCallback callback)
 {
-	engine->Log = callback;
+	engine->SetLogCallback(callback);
 }
 
 void ExecutionEngine_Free(ExecutionEngine * & engine)

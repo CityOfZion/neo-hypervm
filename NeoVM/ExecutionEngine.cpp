@@ -21,18 +21,27 @@ ExecutionContextStack* ExecutionEngine::GetInvocationStack() { return this->Invo
 StackItems* ExecutionEngine::GetEvaluationStack() { return this->EvaluationStack; }
 StackItems* ExecutionEngine::GetAltStack() { return this->AltStack; }
 
+// Setters
+
+void ExecutionEngine::SetLogCallback(OnStepIntoCallback logCallback) { this->Log = logCallback; }
+
 // Constructor
 
 ExecutionEngine::ExecutionEngine
 (
 	InvokeInteropCallback invokeInterop, LoadScriptCallback loadScript, GetMessageCallback getMessage
-)
-	: OnInvokeInterop(invokeInterop), OnLoadScript(loadScript), OnGetMessage(getMessage)
-{
-	this->InvocationStack = new ExecutionContextStack();
-	this->EvaluationStack = new StackItems();
-	this->AltStack = new StackItems();
-}
+) :
+	Iteration(0),
+	State(EVMState::NONE),
+
+	OnGetMessage(getMessage),
+	OnLoadScript(loadScript),
+	OnInvokeInterop(invokeInterop),
+
+	AltStack(new StackItems()),
+	EvaluationStack(new StackItems()),
+	InvocationStack(new ExecutionContextStack())
+{ }
 
 void ExecutionEngine::LoadScript(byte * script, int32 scriptLength)
 {
@@ -381,7 +390,7 @@ ExecuteOpCode:
 		}
 
 		char *data = new char[length + 1];
-		if (context->Read((byte*)data, length) != length)
+		if (context->Read((byte*)data, length) != (int32)length)
 		{
 			delete[](data);
 			this->State = EVMState::FAULT;

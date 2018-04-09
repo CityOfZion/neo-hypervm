@@ -2,7 +2,7 @@
 
 // Constructor
 
-IStackItem::IStackItem(EStackItemType type) :Type(type), Claims(0) { }
+IStackItem::IStackItem(EStackItemType type) :Claims(0), Type(type) { }
 
 // Methods
 

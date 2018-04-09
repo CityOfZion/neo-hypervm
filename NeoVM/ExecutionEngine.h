@@ -11,32 +11,31 @@ class ExecutionEngine
 private:
 
 	// Used for MessageCallback
-	
-	uint32 Iteration = 0;
+
+	uint32 Iteration;
 
 	// Save the state of the execution
-	
-	EVMState State = EVMState::NONE;
+
+	EVMState State;
 
 	// Callback Interoperability
-	
+
+	OnStepIntoCallback Log;
 	GetMessageCallback OnGetMessage;
 	LoadScriptCallback OnLoadScript;
 	InvokeInteropCallback OnInvokeInterop;
 
 	// Stacks
 
-	ExecutionContextStack * InvocationStack;
-	StackItems * EvaluationStack;
 	StackItems * AltStack;
+	StackItems * EvaluationStack;
+	ExecutionContextStack * InvocationStack;
 
 	// Private methods
 
 	byte InvokeInterop(const char* method);
 
 public:
-
-	OnStepIntoCallback Log;
 
 	// Load scripts
 
@@ -54,6 +53,10 @@ public:
 	ExecutionContextStack * GetInvocationStack();
 	StackItems * GetEvaluationStack();
 	StackItems * GetAltStack();
+
+	// Setters
+
+	void SetLogCallback(OnStepIntoCallback logCallback);
 
 	// Run
 
