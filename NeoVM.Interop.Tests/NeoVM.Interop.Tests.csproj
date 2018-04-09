@@ -25,18 +25,4 @@
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
 
-  <!-- Copy NeoVM library for Windows users -->
-
-  <ItemGroup Condition="$([System.IO.File]::Exists('$(SolutionDir)/NeoVM/Win32/$(Configuration)/NeoVM.dll')) ">
-    <ContentWithTargetPath Include="$(SolutionDir)/NeoVM/Win32/$(Configuration)/NeoVM.dll" TargetPath="Windows/x86/NeoVM.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </ContentWithTargetPath>
-  </ItemGroup>
-
-  <ItemGroup Condition="$([System.IO.File]::Exists('$(SolutionDir)/NeoVM/x64/$(Configuration)/NeoVM.dll')) ">
-    <ContentWithTargetPath Include="$(SolutionDir)/NeoVM/x64/$(Configuration)/NeoVM.dll" TargetPath="Windows/x64/NeoVM.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </ContentWithTargetPath>
-  </ItemGroup>
-
 </Project>

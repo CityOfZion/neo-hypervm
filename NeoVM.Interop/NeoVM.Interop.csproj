@@ -14,7 +14,6 @@
     <Company>City of Zion</Company>
     <PackageIconUrl>https://camo.githubusercontent.com/a555bc2ad2e3ebc8f3497e2df53c50ada648d10d/687474703a2f2f7265732e636c6f7564696e6172792e636f6d2f76696473792f696d6167652f75706c6f61642f76313530333136303832302f436f5a5f49636f6e5f4441524b424c55455f3230307831373870785f6f713067786d2e706e67</PackageIconUrl>
     <RepositoryType />
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <AssemblyVersion>0.1.0.0</AssemblyVersion>
     <FileVersion>0.1.0.0</FileVersion>
     <Version>0.1.0</Version>
@@ -23,5 +22,19 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
   </PropertyGroup>
+
+  <!-- Copy NeoVM library for Windows users -->
+
+  <ItemGroup Condition="$([System.IO.File]::Exists('$(SolutionDir)/NeoVM/Win32/$(Configuration)/NeoVM.dll')) ">
+    <ContentWithTargetPath Include="$(SolutionDir)/NeoVM/Win32/$(Configuration)/NeoVM.dll" TargetPath="Windows/x86/NeoVM.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </ContentWithTargetPath>
+  </ItemGroup>
+
+  <ItemGroup Condition="$([System.IO.File]::Exists('$(SolutionDir)/NeoVM/x64/$(Configuration)/NeoVM.dll')) ">
+    <ContentWithTargetPath Include="$(SolutionDir)/NeoVM/x64/$(Configuration)/NeoVM.dll" TargetPath="Windows/x64/NeoVM.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </ContentWithTargetPath>
+  </ItemGroup>
 
 </Project>
