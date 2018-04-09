@@ -7,7 +7,10 @@
 <p align="center">      
   <a href="https://travis-ci.org/CityOfZion/neo-hypervm">
     <img src="https://travis-ci.org/CityOfZion/neo-hypervm.svg?branch=master">
-  </a>      
+  </a>
+  <a href="https://travis-ci.org/CityOfZion/neo-hypervm/master/LICENSE.md">
+    <img src="https://img.shields.io/badge/license-MIT-blue.svg">
+  </a>
 </p>
 
 <p align="center">
