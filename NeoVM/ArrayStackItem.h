@@ -21,10 +21,6 @@ public:
 	int32 ReadByteArraySize();
 	bool Equals(IStackItem * it);
 
-	// Is Struct?
-
-	const bool IsStruct;
-
 	int32 Count();
 	void Clear();
 	IStackItem* Get(int32 index);

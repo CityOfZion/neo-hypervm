@@ -2,13 +2,13 @@
 #include "BoolStackItem.h"
 
 ArrayStackItem::ArrayStackItem(bool isStruct) :
-	IStackItem(isStruct ? EStackItemType::Struct : EStackItemType::Array), IsStruct(isStruct)
+	IStackItem(isStruct ? EStackItemType::Struct : EStackItemType::Array)
 {
 	List = std::list<IStackItem*>();
 }
 
 ArrayStackItem::ArrayStackItem(bool isStruct, int32 count) :
-	IStackItem(isStruct ? EStackItemType::Struct : EStackItemType::Array), IsStruct(isStruct)
+	IStackItem(isStruct ? EStackItemType::Struct : EStackItemType::Array)
 {
 	List = std::list<IStackItem*>();
 
@@ -66,7 +66,7 @@ int32 ArrayStackItem::ReadByteArraySize()
 
 IStackItem* ArrayStackItem::Clone()
 {
-	ArrayStackItem* ret = new ArrayStackItem(this->IsStruct);
+	ArrayStackItem* ret = new ArrayStackItem(this->Type == EStackItemType::Struct);
 
 	for (int32 x = 0, m = this->Count(); x < m; x++)
 	{
