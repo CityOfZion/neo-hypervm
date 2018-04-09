@@ -54,26 +54,17 @@ ByteArrayStackItem::~ByteArrayStackItem()
 
 bool ByteArrayStackItem::GetBoolean()
 {
-	if (this->PayloadLength == 1)
-	{
-		return this->Payload[0] != 0x00;
-	}
-	else
-	{
-		if (this->PayloadLength <= 0) return false;
+	for (int32 x = 0; x < this->PayloadLength; x++)
+		if (this->Payload[x] != 0x00)
+			return true;
 
-		for (int32 x = 0; x < this->PayloadLength; x++)
-			if (this->Payload[x] != 0x00)
-				return true;
-
-		return false;
-	}
+	return false;
 }
 
 BigInteger * ByteArrayStackItem::GetBigInteger()
 {
 	if (this->PayloadLength == 0)
-		return new BigInteger(0);
+		return new BigInteger(BigInteger::Zero);
 
 	return new BigInteger(this->Payload, this->PayloadLength);
 }

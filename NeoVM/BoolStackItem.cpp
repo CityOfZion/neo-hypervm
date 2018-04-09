@@ -11,7 +11,7 @@ bool BoolStackItem::GetBoolean()
 
 BigInteger * BoolStackItem::GetBigInteger()
 {
-	return new BigInteger(this->Value ? 1 : 0);
+	return new BigInteger(this->Value ? BigInteger::One : BigInteger::Zero);
 }
 
 bool BoolStackItem::GetInt32(int32 &ret)
@@ -49,7 +49,6 @@ int32 BoolStackItem::ReadByteArray(byte * output, int32 sourceIndex, int32 count
 		if (count == 0) return 0;
 
 		output[0] = 0x01;
-
 		return 1;
 	}
 	else
@@ -60,7 +59,7 @@ int32 BoolStackItem::ReadByteArray(byte * output, int32 sourceIndex, int32 count
 
 int32 BoolStackItem::ReadByteArraySize()
 {
-	return 1;
+	return this->Value ? 1 : 0;
 }
 
 // Serialize

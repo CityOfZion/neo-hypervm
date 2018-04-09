@@ -19,13 +19,7 @@ IntegerStackItem::~IntegerStackItem()
 
 bool IntegerStackItem::GetBoolean()
 {
-	// TODO: Check this
-	// return value != BigInteger.Zero;
-
-	int32 ret = 0;
-	if (this->Value->ToInt32(ret)) return ret > 0;
-
-	return false;
+	return this->Value->CompareTo(BigInteger::Zero) != 0;
 }
 
 BigInteger* IntegerStackItem::GetBigInteger()
