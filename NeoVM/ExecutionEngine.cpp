@@ -2537,73 +2537,125 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::HASKEY:
 	{
-		/*
-		StackItem key = EvaluationStack.Pop();
-		if (key is ICollection)
+		if (this->EvaluationStack->Count() < 2)
 		{
-			State |= VMState.FAULT;
+			this->State = EVMState::FAULT;
 			return;
 		}
-		switch (EvaluationStack.Pop())
+
+		IStackItem *key = this->EvaluationStack->Pop();
+		if (key->Type == EStackItemType::Map ||
+			key->Type == EStackItemType::Array ||
+			key->Type == EStackItemType::Struct)
 		{
-		case VMArray array:
-			int32 index = (int)key.GetBigInteger();
-			if (index < 0)
+			IStackItem::Free(key);
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem *item = this->EvaluationStack->Pop();
+		switch (item->Type)
+		{
+		case EStackItemType::Array:
+		case EStackItemType::Struct:
+		{
+			ArrayStackItem *arr = (ArrayStackItem*)item;
+
+			int32 index = 0;
+			if (!key->GetInt32(index) || index < 0)
 			{
-				State |= VMState.FAULT;
+				IStackItem::Free(key);
+				IStackItem::Free(item);
+
+				this->State = EVMState::FAULT;
 				return;
 			}
-			EvaluationStack.Push(index < array.Count);
-			return;
-		case Map map :
-			EvaluationStack.Push(map.ContainsKey(key));
-			return;
-		default:
-			State |= VMState.FAULT;
+
+			this->EvaluationStack->Push(new BoolStackItem(index < arr->Count()));
+
+			IStackItem::Free(key);
+			IStackItem::Free(item);
 			return;
 		}
-		*/
+		case EStackItemType::Map:
+		{
+			MapStackItem *arr = (MapStackItem*)item;
+			//EvaluationStack.Push(map.ContainsKey(key));
+
+			IStackItem::Free(key);
+			IStackItem::Free(item);
+			return;
+		}
+		default:
+		{
+			IStackItem::Free(key);
+			IStackItem::Free(item);
+			this->State = EVMState::FAULT;
+			return;
+		}
+		}
 		return;
 	}
 	case EVMOpCode::KEYS:
 	{
-		/*
-		switch (EvaluationStack.Pop())
+		if (this->EvaluationStack->Count() < 1)
 		{
-		case Map map :
-			EvaluationStack.Push(new VMArray(map.Keys));
-			return;
-		default:
-			State |= VMState.FAULT;
+			this->State = EVMState::FAULT;
 			return;
 		}
-		*/
+
+		IStackItem *item = this->EvaluationStack->Pop();
+		switch (item->Type)
+		{
+		case EStackItemType::Map:
+		{
+			MapStackItem *arr = (MapStackItem*)item;
+			// EvaluationStack.Push(new VMArray(map.Keys));
+			IStackItem::Free(item);
+			return;
+		}
+		default:
+		{
+			IStackItem::Free(item);
+			this->State = EVMState::FAULT;
+			return;
+		}
+		}
 		return;
 	}
 	case EVMOpCode::VALUES:
 	{
-		/*
-		ICollection<StackItem> values;
-		switch (EvaluationStack.Pop())
+		if (this->EvaluationStack->Count() < 1)
 		{
-		case VMArray array:
-			values = array;
-			return;
-		case Map map :
-			values = map.Values;
-			return;
-		default:
-			State |= VMState.FAULT;
+			this->State = EVMState::FAULT;
 			return;
 		}
-		List<StackItem> newArray = new List<StackItem>(values.Count);
-		foreach(StackItem item in values)
-			if (item is Struct s)
-				newArray.Add(s.Clone());
-			else
-				newArray.Add(item);
-		EvaluationStack.Push(new VMArray(newArray));
-		*/
+
+		IStackItem *item = this->EvaluationStack->Pop();
+		switch (item->Type)
+		{
+		case EStackItemType::Array:
+		case EStackItemType::Struct:
+		{
+			ArrayStackItem *arr = (ArrayStackItem*)item;
+			this->EvaluationStack->Push(arr->Clone());
+			IStackItem::Free(item);
+			return;
+		}
+		case EStackItemType::Map:
+		{
+			MapStackItem *arr = (MapStackItem*)item;
+			// values = map.Values; with clone struct
+			IStackItem::Free(item);
+			return;
+		}
+		default:
+		{
+			IStackItem::Free(item);
+			this->State = EVMState::FAULT;
+			return;
+		}
+		}
 		return;
 	}
 

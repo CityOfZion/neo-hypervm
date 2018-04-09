@@ -69,7 +69,14 @@ IStackItem* ArrayStackItem::Clone()
 	ArrayStackItem* ret = new ArrayStackItem(this->IsStruct);
 
 	for (int32 x = 0, m = this->Count(); x < m; x++)
-		ret->Add(this->Get(x)->Clone());
+	{
+		IStackItem* i = this->Get(x);
+		
+		if (i->Type == EStackItemType::Struct)
+			ret->Add(i->Clone());
+		else
+			ret->Add(i);
+	}
 
 	return ret;
 }
