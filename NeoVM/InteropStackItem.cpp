@@ -51,10 +51,14 @@ bool InteropStackItem::Equals(IStackItem * it)
 {
 	if (it == this) return true;
 
+	// Different type
+
 	if (it->Type != EStackItemType::Interop)
 		return false;
 
 	InteropStackItem * ii = (InteropStackItem*)it;
+
+	// Check content of the raw data
 
 	if (ii->PayloadLength != this->PayloadLength)
 		return false;

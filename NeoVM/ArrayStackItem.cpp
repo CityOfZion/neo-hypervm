@@ -71,7 +71,7 @@ IStackItem* ArrayStackItem::Clone()
 	for (int32 x = 0, m = this->Count(); x < m; x++)
 	{
 		IStackItem* i = this->Get(x);
-		
+
 		if (i->Type == EStackItemType::Struct)
 			ret->Add(i->Clone());
 		else
@@ -83,7 +83,41 @@ IStackItem* ArrayStackItem::Clone()
 
 bool ArrayStackItem::Equals(IStackItem * it)
 {
-	return (it == this);
+	if (it == this) return true;
+
+	// Array must be equal
+
+	if (this->Type == EStackItemType::Array)
+	{
+		return false;
+	}
+
+	// Different type
+
+	if (it->Type != EStackItemType::Struct)
+	{
+		return false;
+	}
+
+	// Different size
+
+	int c = this->Count();
+	ArrayStackItem* arr = (ArrayStackItem*)it;
+
+	if (arr->Count() != c)
+	{
+		return false;
+	}
+
+	// Check sequence
+
+	for (int32 x = 0; x < c; x++)
+	{
+		if (!this->Get(x)->Equals(arr->Get(x)))
+			return false;
+	}
+
+	return true;
 }
 
 int32 ArrayStackItem::Count()

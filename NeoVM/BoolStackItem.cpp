@@ -29,7 +29,41 @@ bool BoolStackItem::Equals(IStackItem * it)
 {
 	if (it == this) return true;
 
-	return this->Value == it->GetBoolean();
+	switch (it->Type)
+	{
+	case EStackItemType::Bool:
+	{
+		BoolStackItem* t = (BoolStackItem*)it;
+		return this->Value == t->Value;
+	}
+	default:
+	{
+		switch (it->ReadByteArraySize())
+		{
+		case 1:
+		{
+			byte *data = new byte[1];
+			int iz = it->ReadByteArray(data, 0, 1);
+
+			// Current true
+
+			if (this->Value)
+			{
+				bool ret = (data[0] == 0x01);
+				delete[](data);
+				return ret;
+			}
+
+			// Current false
+
+			delete[](data);
+			return iz == 0;
+		}
+		case 0: return !this->Value;
+		default: return false;
+		}
+	}
+	}
 }
 
 int32 BoolStackItem::ReadByteArray(byte * output, int32 sourceIndex, int32 count)

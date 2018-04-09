@@ -132,7 +132,7 @@ namespace NeoVM.Interop.Tests
                 CheckClean(engine);
             }
 
-            // Equals map, array and structure (false)
+            // Equals map, array and structure (false,false,true)
 
             using (ScriptBuilder script = new ScriptBuilder
             (
@@ -166,7 +166,7 @@ namespace NeoVM.Interop.Tests
                 engine.StepInto(5);
                 Assert.IsFalse(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
                 engine.StepInto(6);
-                Assert.IsFalse(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
+                Assert.IsTrue(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
 
                 Assert.AreEqual(EVMState.HALT, engine.State);
 
@@ -216,13 +216,23 @@ namespace NeoVM.Interop.Tests
                 CheckClean(engine);
             }
 
-            // Byte array conversion = true
+            // Byte array conversions
 
             using (ScriptBuilder script = new ScriptBuilder
             (
                 EVMOpCode.PUSHBYTES1, EVMOpCode.PUSHBYTES1 /*0x01*/,
                 EVMOpCode.PUSH0,
                 EVMOpCode.INC,
+                EVMOpCode.EQUAL,
+
+                EVMOpCode.PUSH0,
+                EVMOpCode.NOT,
+                EVMOpCode.PUSHBYTES1, EVMOpCode.PUSHBYTES1 /*0x01*/,
+                EVMOpCode.EQUAL,
+
+                EVMOpCode.PUSH1,
+                EVMOpCode.NOT,
+                EVMOpCode.PUSHBYTES1, EVMOpCode.PUSHBYTES1 /*0x00*/,
                 EVMOpCode.EQUAL
             ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
@@ -237,6 +247,8 @@ namespace NeoVM.Interop.Tests
 
                 // Check
 
+                Assert.IsFalse(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
+                Assert.IsTrue(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
                 Assert.IsTrue(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
 
                 CheckClean(engine);
