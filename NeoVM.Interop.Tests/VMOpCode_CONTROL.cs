@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NeoVM.Interop.Enums;
 using NeoVM.Interop.Types;
+using NeoVM.Interop.Types.Arguments;
 using NeoVM.Interop.Types.StackItems;
 using System.Linq;
 

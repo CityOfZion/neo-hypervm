@@ -2,6 +2,7 @@
 using NeoVM.Interop.Enums;
 using NeoVM.Interop.Tests.Extra;
 using NeoVM.Interop.Types;
+using NeoVM.Interop.Types.Arguments;
 using NeoVM.Interop.Types.Collections;
 using NeoVM.Interop.Types.StackItems;
 using System;
@@ -55,7 +56,7 @@ namespace NeoVM.Interop.Tests
         /// </summary>
         protected readonly static ExecutionEngineArgs Args = new ExecutionEngineArgs()
         {
-            ScriptContainer = new DummyScript(),
+            ScriptContainer = new DummyScriptContainer(),
             InteropService = new InteropService(),
             ScriptTable = new DummyScriptTable()
         };

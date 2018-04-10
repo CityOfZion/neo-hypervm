@@ -1,6 +1,7 @@
 ﻿using NeoVM.Interop.Interfaces;
 using NeoVM.Interop.Native;
 using NeoVM.Interop.Types;
+using NeoVM.Interop.Types.Arguments;
 using System;
 using System.IO;
 using System.Runtime.InteropServices;

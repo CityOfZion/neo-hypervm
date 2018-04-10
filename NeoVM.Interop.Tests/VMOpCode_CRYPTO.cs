@@ -2,6 +2,7 @@
 using NeoVM.Interop.Enums;
 using NeoVM.Interop.Tests.Crypto;
 using NeoVM.Interop.Types;
+using NeoVM.Interop.Types.Arguments;
 using NeoVM.Interop.Types.StackItems;
 using System.Linq;
 using System.Security.Cryptography;

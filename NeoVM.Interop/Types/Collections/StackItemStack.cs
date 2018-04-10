@@ -116,6 +116,33 @@ namespace NeoVM.Interop.Types.Collections
             throw (new FormatException());
         }
         /// <summary>
+        /// Try Pop object casting to this type
+        /// </summary>
+        /// <typeparam name="TStackItem">Object type</typeparam>
+        /// <param name="item">Item</param>
+        /// <returns>Return false if it is something wrong</returns>
+        public bool TryPop<TStackItem>(out TStackItem item) where TStackItem : IStackItem
+        {
+            IntPtr ptr = NeoVM.StackItems_Pop(Handle);
+
+            if (ptr == IntPtr.Zero)
+            {
+                item = default(TStackItem);
+                return false;
+            }
+
+            IStackItem ret = Engine.ConvertFromNative(ptr);
+
+            if (ret is TStackItem ts)
+            {
+                item = (TStackItem)ret;
+                return true;
+            }
+
+            item = default(TStackItem);
+            return false;
+        }
+        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="engine">Engine</param>

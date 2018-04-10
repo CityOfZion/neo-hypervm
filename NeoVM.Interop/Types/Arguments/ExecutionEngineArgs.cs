@@ -1,9 +1,14 @@
-﻿using NeoVM.Interop.Interfaces;
+﻿using NeoVM.Interop.Enums;
+using NeoVM.Interop.Interfaces;
 
-namespace NeoVM.Interop.Types
+namespace NeoVM.Interop.Types.Arguments
 {
     public class ExecutionEngineArgs
     {
+        /// <summary>
+        /// Trigger
+        /// </summary>
+        public ETriggerType Trigger { get; set; } = ETriggerType.Application;
         /// <summary>
         /// Script container
         /// </summary>

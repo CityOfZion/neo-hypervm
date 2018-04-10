@@ -5,7 +5,11 @@
         /// <summary>
         /// None
         /// </summary>
-        None= 0,
+        None = 0,
+        /// <summary>
+        /// All
+        /// </summary>
+        All = Operations | ExecutionContextStackChanges | EvaluationStackChanges | AltStackChanges,
 
         /// <summary>
         /// Enable operations logs

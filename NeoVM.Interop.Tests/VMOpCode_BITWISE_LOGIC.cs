@@ -2,6 +2,7 @@
 using NeoVM.Interop.Enums;
 using NeoVM.Interop.Tests.Extra;
 using NeoVM.Interop.Types;
+using NeoVM.Interop.Types.Arguments;
 using NeoVM.Interop.Types.StackItems;
 using System.Numerics;
 
@@ -95,7 +96,7 @@ namespace NeoVM.Interop.Tests
             using (ExecutionEngine engine = NeoVM.CreateEngine(new ExecutionEngineArgs()
             {
                 InteropService = new DummyInteropService(),
-                ScriptContainer = new DummyScript(),
+                ScriptContainer = new DummyScriptContainer(),
             }))
             {
                 // Load script

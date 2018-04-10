@@ -1,6 +1,7 @@
 ﻿using NeoVM.Interop.Enums;
 using NeoVM.Interop.Helpers;
 using NeoVM.Interop.Interfaces;
+using NeoVM.Interop.Types.Arguments;
 using NeoVM.Interop.Types.Collections;
 using NeoVM.Interop.Types.StackItems;
 using System;
@@ -20,6 +21,10 @@ namespace NeoVM.Interop.Types
         /// Last message
         /// </summary>
         byte[] LastMessage;
+        /// <summary>
+        /// Trigger
+        /// </summary>
+        public readonly ETriggerType Trigger;
         /// <summary>
         /// Interop service
         /// </summary>
@@ -92,6 +97,7 @@ namespace NeoVM.Interop.Types
                 InteropService = e.InteropService;
                 ScriptTable = e.ScriptTable;
                 ScriptContainer = e.ScriptContainer;
+                Trigger = e.Trigger;
 
                 // Register logs
 

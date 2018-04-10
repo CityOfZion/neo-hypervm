@@ -5,6 +5,7 @@ using NeoVM.Interop.Interfaces;
 using NeoVM.Interop.Tests.Crypto;
 using NeoVM.Interop.Tests.Extra;
 using NeoVM.Interop.Types;
+using NeoVM.Interop.Types.Arguments;
 using NeoVM.Interop.Types.StackItems;
 using System;
 using System.Collections.Generic;
