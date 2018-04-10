@@ -2098,76 +2098,171 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::CHECKMULTISIG:
 	{
-		/*
-		int32 n;
-		byte[][] pubkeys;
-		StackItem item = EvaluationStack.Pop();
-		if (item is VMArray array1)
+		int ic = this->EvaluationStack->Count();
+
+		if (ic < 2)
 		{
-			pubkeys = array1.Select(p = > p.GetByteArray()).ToArray();
-			n = pubkeys.Length;
-			if (n == 0)
-			{
-				State |= VMState.FAULT;
-				return;
-			}
+			this->State = EVMState::FAULT;
+			return;
 		}
-		else
+
+		byte ** pubKeys;
+		byte ** signatures;
+		int * pubKeysL;
+		int * signaturesL;
+		int pubKeysCount, signaturesCount;
+
+		for (byte x = 0; x < 2; x++)
 		{
-			n = (int)item.GetBigInteger();
-			if (n < 1 || n > EvaluationStack.Count)
+			IStackItem* item = this->EvaluationStack->Pop();
+			ic--;
+
+			if (item->Type == EStackItemType::Array || item->Type == EStackItemType::Struct)
 			{
-				State |= VMState.FAULT;
-				return;
+				ArrayStackItem* arr = (ArrayStackItem*)item;
+				int32 v = arr->Count();
+
+				if (v <= 0)
+				{
+					this->State = EVMState::FAULT;
+				}
+				else
+				{
+					byte **data = new byte*[v];
+					int32 *dataL = new int32[v];
+
+					for (int32 i = 0; i < v; i++)
+					{
+						IStackItem* ret = arr->Get(i);
+
+						int32 c = ret->ReadByteArraySize();
+						if (c < 0)
+						{
+							data[i] = NULL;
+							dataL[i] = c;
+							continue;
+						}
+
+						data[i] = new byte[c];
+						dataL[i] = ret->ReadByteArray(data[i], 0, c);
+					}
+
+					// Equal
+
+					if (x == 0)
+					{
+						pubKeys = data;
+						pubKeysL = dataL;
+						pubKeysCount = v;
+					}
+					else
+					{
+						signatures = data;
+						signaturesL = dataL;
+						signaturesCount = v;
+					}
+				}
 			}
-			pubkeys = new byte[n][];
-			for (int32 i = 0; i < n; i++)
-				pubkeys[i] = EvaluationStack.Pop().GetByteArray();
+			else
+			{
+				int32 v = 0;
+				if (!item->GetInt32(v) || v < 1 || v > ic)
+				{
+					this->State = EVMState::FAULT;
+				}
+				else
+				{
+					byte **data = new byte*[v];
+					int32 *dataL = new int32[v];
+
+					for (int32 i = 0; i < v; i++)
+					{
+						IStackItem* ret = this->EvaluationStack->Pop();
+						ic--;
+
+						int32 c = ret->ReadByteArraySize();
+						if (c < 0)
+						{
+							data[i] = NULL;
+							dataL[i] = c;
+							continue;
+						}
+
+						data[i] = new byte[c];
+						dataL[i] = ret->ReadByteArray(data[i], 0, c);
+						IStackItem::Free(ret);
+					}
+
+					// Equal
+
+					if (x == 0)
+					{
+						pubKeys = data;
+						pubKeysL = dataL;
+						pubKeysCount = v;
+					}
+					else
+					{
+						signatures = data;
+						signaturesL = dataL;
+						signaturesCount = v;
+					}
+				}
+			}
+
+			IStackItem::Free(item);
 		}
-		int32 m;
-		byte[][] signatures;
-		item = EvaluationStack.Pop();
-		if (item is VMArray array2)
+
+		if (this->State == EVMState::FAULT || this->OnGetMessage == NULL ||
+			pubKeysCount <= 0 || signaturesCount <= 0 || signaturesCount > pubKeysCount)
 		{
-			signatures = array2.Select(p = > p.GetByteArray()).ToArray();
-			m = signatures.Length;
-			if (m == 0 || m > n)
-			{
-				State |= VMState.FAULT;
-				return;
-			}
+			if (pubKeys != NULL)	delete[](pubKeys);
+			if (signatures != NULL) delete[](signatures);
+			if (pubKeysL != NULL)	delete[](pubKeysL);
+			if (signaturesL != NULL)delete[](signaturesL);
+
+			this->EvaluationStack->Push(new BoolStackItem(false));
+			return;
 		}
-		else
+
+		// Read message
+
+		// TODO: dangerous way to get the message
+
+		byte* msg;
+		int32 msgL = this->OnGetMessage(this->Iteration, msg);
+		if (msgL <= 0)
 		{
-			m = (int)item.GetBigInteger();
-			if (m < 1 || m > n || m > EvaluationStack.Count)
-			{
-				State |= VMState.FAULT;
-				return;
-			}
-			signatures = new byte[m][];
-			for (int32 i = 0; i < m; i++)
-				signatures[i] = EvaluationStack.Pop().GetByteArray();
+			if (pubKeys != NULL)	delete[](pubKeys);
+			if (signatures != NULL) delete[](signatures);
+			if (pubKeysL != NULL)	delete[](pubKeysL);
+			if (signaturesL != NULL)delete[](signaturesL);
+
+			this->EvaluationStack->Push(new BoolStackItem(false));
+			return;
 		}
-		byte[] message = ScriptContainer.GetMessage();
+
 		bool fSuccess = true;
-		try
+		for (int32 i = 0, j = 0; fSuccess && i < signaturesCount && j < pubKeysCount;)
 		{
-			for (int32 i = 0, j = 0; fSuccess && i < m && j < n;)
+			if (Crypto::VerifySignature(msg, msgL, signatures[i], signaturesL[i], pubKeys[j], pubKeysL[j]))
+				i++;
+
+			j++;
+
+			if (signaturesCount - i > pubKeysCount - j)
 			{
-				if (Crypto.VerifySignature(message, signatures[i], pubkeys[j]))
-					i++;
-				j++;
-				if (m - i > n - j)
-					fSuccess = false;
+				fSuccess = false;
+				break;
 			}
 		}
-		catch (ArgumentException)
-		{
-			fSuccess = false;
-		}
-		EvaluationStack.Push(fSuccess);
-		*/
+
+		if (pubKeys != NULL)	delete[](pubKeys);
+		if (signatures != NULL) delete[](signatures);
+		if (pubKeysL != NULL)	delete[](pubKeysL);
+		if (signaturesL != NULL)delete[](signaturesL);
+
+		this->EvaluationStack->Push(new BoolStackItem(fSuccess));
 		return;
 	}
 
