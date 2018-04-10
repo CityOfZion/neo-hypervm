@@ -52,6 +52,11 @@ ExecutionEngine * ExecutionEngine_Create
 	return engine;
 }
 
+void ExecutionEngine_Clean(ExecutionEngine* engine, uint32 iteration)
+{
+	engine->Clean(iteration);
+}
+
 void ExecutionEngine_AddLog(ExecutionEngine* engine, OnStepIntoCallback callback)
 {
 	engine->SetLogCallback(callback);

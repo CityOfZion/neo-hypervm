@@ -15,6 +15,7 @@ public:
 
 	IStackItem* Pop();
 	void Drop();
+	void Clear();
 	void Push(IStackItem * it);
 	IStackItem* Peek(int32 index);
 	IStackItem* Remove(int32 index);

@@ -57,6 +57,7 @@ public:
 	// Setters
 
 	void SetLogCallback(OnStepIntoCallback logCallback);
+	void Clean(uint32 iteration);
 
 	// Run
 

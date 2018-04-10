@@ -31,6 +31,7 @@ extern "C"
 		ExecutionContextStack* &invStack, StackItems* &evStack, StackItems* &altStack
 	);
 	DllExport void ExecutionEngine_Free(ExecutionEngine* &engine);
+	DllExport void ExecutionEngine_Clean(ExecutionEngine* engine, uint32 iteration);
 	DllExport void ExecutionEngine_LoadScript(ExecutionEngine* engine, byte * script, int32 scriptLength);
 	DllExport void ExecutionEngine_LoadPushOnlyScript(ExecutionEngine* engine, byte * script, int32 scriptLength);
 	DllExport byte ExecutionEngine_Execute(ExecutionEngine* engine);

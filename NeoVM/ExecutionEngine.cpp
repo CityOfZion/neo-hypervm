@@ -25,6 +25,16 @@ StackItems* ExecutionEngine::GetAltStack() { return this->AltStack; }
 
 void ExecutionEngine::SetLogCallback(OnStepIntoCallback logCallback) { this->Log = logCallback; }
 
+void ExecutionEngine::Clean(uint32 iteration)
+{
+	this->Iteration = iteration;
+	this->State = EVMState::NONE;
+
+	this->InvocationStack->Clear();
+	this->EvaluationStack->Clear();
+	this->AltStack->Clear();
+}
+
 // Constructor
 
 ExecutionEngine::ExecutionEngine

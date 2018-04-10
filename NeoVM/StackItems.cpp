@@ -133,7 +133,7 @@ IStackItem* StackItems::Pop()
 	return it;
 }
 
-StackItems::~StackItems()
+void StackItems::Clear()
 {
 	if (this->Log != NULL)
 	{
@@ -149,8 +149,6 @@ StackItems::~StackItems()
 
 			IStackItem::UnclaimAndFree(ptr);
 		}
-
-		this->Log = NULL;
 	}
 	else
 	{
@@ -163,4 +161,10 @@ StackItems::~StackItems()
 
 	this->Size = 0;
 	this->Stack.clear();
+}
+
+StackItems::~StackItems()
+{
+	this->Clear();
+	this->Log = NULL;
 }

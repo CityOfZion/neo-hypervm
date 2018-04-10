@@ -117,7 +117,7 @@ ExecutionContext* ExecutionContextStack::Pop()
 	return it;
 }
 
-ExecutionContextStack::~ExecutionContextStack()
+void ExecutionContextStack::Clear()
 {
 	if (this->Log != NULL)
 	{
@@ -132,10 +132,8 @@ ExecutionContextStack::~ExecutionContextStack()
 
 			ExecutionContext::UnclaimAndFree(ptr);
 		}
-	
-		this->Log = NULL;
 	}
-	else 
+	else
 	{
 		for (std::list<ExecutionContext*>::iterator it = this->Stack.begin(); it != this->Stack.end(); ++it)
 		{
@@ -146,4 +144,10 @@ ExecutionContextStack::~ExecutionContextStack()
 
 	this->Size = 0;
 	this->Stack.clear();
+}
+
+ExecutionContextStack::~ExecutionContextStack()
+{
+	this->Clear();
+	this->Log = NULL;
 }

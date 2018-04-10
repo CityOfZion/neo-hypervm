@@ -264,6 +264,14 @@ namespace NeoVM.Interop.Types
         #region Execution
 
         /// <summary>
+        /// Clean Execution engine state
+        /// </summary>
+        /// <param name="iteration">Iteration</param>
+        public void Clean(uint iteration)
+        {
+            NeoVM.ExecutionEngine_Clean(Handle, iteration);
+        }
+        /// <summary>
         /// Execute
         /// </summary>
         public EVMState Execute()

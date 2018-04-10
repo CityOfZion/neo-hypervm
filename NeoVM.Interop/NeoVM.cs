@@ -48,7 +48,9 @@ namespace NeoVM.Interop
         internal delegate byte delByte_Handle(IntPtr pointer);
         internal delegate IntPtr delHandle_Handle(IntPtr pointer);
         internal delegate void delVoid_RefHandle(ref IntPtr pointer);
+
         internal delegate int delInt_HandleInt(IntPtr pointer, int value);
+        internal delegate void delVoid_HandleUInt(IntPtr pointer, uint value);
         internal delegate void delVoid_HandleInt(IntPtr pointer, int value);
         internal delegate int delInt_HandleHandle(IntPtr handle, IntPtr item);
         internal delegate byte delByte_HandleRefInt(IntPtr item, out int size);
@@ -82,6 +84,7 @@ namespace NeoVM.Interop
         internal static delVoid_Handle ExecutionEngine_StepOver;
         internal static delVoid_Handle ExecutionEngine_StepOut;
         internal static delByte_Handle ExecutionEngine_GetState;
+        internal static delVoid_HandleUInt ExecutionEngine_Clean;
         internal static delVoid_HandleOnStepIntoCallback ExecutionEngine_AddLog;
 
         internal static delInt_Handle StackItems_Count;
@@ -131,6 +134,7 @@ namespace NeoVM.Interop
             ExecutionEngine_LoadPushOnlyScript = Core.GetDelegate<delVoid_HandleHandleInt>("ExecutionEngine_LoadPushOnlyScript");
             ExecutionEngine_GetState = Core.GetDelegate<delByte_Handle>("ExecutionEngine_GetState");
             ExecutionEngine_AddLog = Core.GetDelegate<delVoid_HandleOnStepIntoCallback>("ExecutionEngine_AddLog");
+            ExecutionEngine_Clean = Core.GetDelegate<delVoid_HandleUInt>("ExecutionEngine_Clean");
 
             ExecutionEngine_Execute = Core.GetDelegate<delByte_Handle>("ExecutionEngine_Execute");
             ExecutionEngine_StepInto = Core.GetDelegate<delVoid_Handle>("ExecutionEngine_StepInto");
