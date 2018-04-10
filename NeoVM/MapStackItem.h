@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IStackItem.h"
+#include "ArrayStackItem.h"
 #include <map>
 
 class MapStackItem : public IStackItem
@@ -27,6 +28,8 @@ public:
 	void Set(IStackItem* key, IStackItem* value);
 	IStackItem* Get(IStackItem* key);
 	bool Remove(IStackItem* key, bool dispose);
+	void FillKeys(ArrayStackItem* arr);
+	void FillValues(ArrayStackItem* arr);
 
 	// Constructor
 

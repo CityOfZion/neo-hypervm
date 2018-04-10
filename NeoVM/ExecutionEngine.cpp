@@ -2329,20 +2329,22 @@ ExecuteOpCode:
 		}
 		case EStackItemType::Map:
 		{
+			MapStackItem* map = (MapStackItem*)item;
+
+			IStackItem* val = map->Get(key);
+
 			IStackItem::Free(key);
 			IStackItem::Free(item);
 
-			/*
-			if (map.TryGetValue(key, out StackItem value))
+			if (val != NULL)
 			{
-				EvaluationStack.Push(value);
+				this->EvaluationStack->Push(val);
 			}
 			else
-			}*/
-			// {
-			this->State = EVMState::FAULT;
+			{
+				this->State = EVMState::FAULT;
+			}
 			return;
-			// }
 		}
 		default:
 		{
@@ -2411,8 +2413,11 @@ ExecuteOpCode:
 		case EStackItemType::Map:
 		{
 			MapStackItem *arr = (MapStackItem*)item;
+
 			arr->Set(key, value);
 
+			IStackItem::Free(key);
+			IStackItem::Free(value);
 			IStackItem::Free(item);
 			return;
 		}
@@ -2581,9 +2586,9 @@ ExecuteOpCode:
 		{
 			MapStackItem *arr = (MapStackItem*)item;
 
-			if (!arr->Remove(key, true))
-				IStackItem::Free(key);
+			arr->Remove(key, true);
 
+			IStackItem::Free(key);
 			IStackItem::Free(item);
 			return;
 		}
@@ -2643,7 +2648,8 @@ ExecuteOpCode:
 		case EStackItemType::Map:
 		{
 			MapStackItem *arr = (MapStackItem*)item;
-			//EvaluationStack.Push(map.ContainsKey(key));
+
+			this->EvaluationStack->Push(new BoolStackItem(arr->Get(key) != NULL));
 
 			IStackItem::Free(key);
 			IStackItem::Free(item);
@@ -2673,7 +2679,11 @@ ExecuteOpCode:
 		case EStackItemType::Map:
 		{
 			MapStackItem *arr = (MapStackItem*)item;
-			// EvaluationStack.Push(new VMArray(map.Keys));
+			
+			ArrayStackItem *ap = new ArrayStackItem(false);
+			arr->FillKeys(ap);
+			this->EvaluationStack->Push(ap);
+			
 			IStackItem::Free(item);
 			return;
 		}
@@ -2708,7 +2718,11 @@ ExecuteOpCode:
 		case EStackItemType::Map:
 		{
 			MapStackItem *arr = (MapStackItem*)item;
-			// values = map.Values; with clone struct
+
+			ArrayStackItem *ap = new ArrayStackItem(false);
+			arr->FillValues(ap);
+			this->EvaluationStack->Push(ap);
+
 			IStackItem::Free(item);
 			return;
 		}

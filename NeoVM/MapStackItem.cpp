@@ -82,6 +82,36 @@ IStackItem* MapStackItem::Get(IStackItem* key)
 	return NULL;
 }
 
+void MapStackItem::FillKeys(ArrayStackItem* arr)
+{
+	for (std::map<IStackItem*, IStackItem*>::iterator it = this->Dictionary.begin(); it != this->Dictionary.end(); ++it)
+	{
+		if (it->first->Type == EStackItemType::Struct)
+		{
+			arr->Add(((ArrayStackItem*)it->first)->Clone());
+		}
+		else
+		{
+			arr->Add(it->first);
+		}
+	}
+}
+
+void MapStackItem::FillValues(ArrayStackItem* arr)
+{
+	for (std::map<IStackItem*, IStackItem*>::iterator it = this->Dictionary.begin(); it != this->Dictionary.end(); ++it)
+	{
+		if (it->second->Type == EStackItemType::Struct)
+		{
+			arr->Add(((ArrayStackItem*)it->second)->Clone());
+		}
+		else
+		{
+			arr->Add(it->second);
+		}
+	}
+}
+
 void MapStackItem::Set(IStackItem* key, IStackItem* value)
 {
 	for (std::map<IStackItem*, IStackItem*>::iterator it = this->Dictionary.begin(); it != this->Dictionary.end(); ++it)
