@@ -31,10 +31,6 @@ private:
 	StackItems * EvaluationStack;
 	ExecutionContextStack * InvocationStack;
 
-	// Private methods
-
-	byte InvokeInterop(const char* method);
-
 public:
 
 	// Load scripts

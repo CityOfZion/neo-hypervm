@@ -32,7 +32,7 @@ namespace NeoVM.Interop
         internal delegate void OnStackChangeCallback(IntPtr item, int index, byte operation);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate byte InvokeInteropCallback(string method);
+        internal delegate byte InvokeInteropCallback(IntPtr ptr, int size);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate byte LoadScriptCallback([MarshalAs(UnmanagedType.LPArray, SizeConst = 20)]byte[] scriptHash);

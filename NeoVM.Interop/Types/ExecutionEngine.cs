@@ -224,11 +224,16 @@ namespace NeoVM.Interop.Types
         /// <summary>
         /// Invoke Interop callback
         /// </summary>
-        /// <param name="method">Method</param>
+        /// <param name="ptr">Method</param>
+        /// <param name="size">Size</param>
         /// <returns>Return Interop result</returns>
-        byte InternalInvokeInterop(string method)
+        byte InternalInvokeInterop(IntPtr ptr, int size)
         {
-            if (InteropService != null && InteropService.Invoke(method, this))
+            if (InteropService == null)
+                return 0x00;
+
+            string method = Marshal.PtrToStringUTF8(ptr, size);
+            if (InteropService.Invoke(method, this))
                 return 0x01;
 
             return 0x00;

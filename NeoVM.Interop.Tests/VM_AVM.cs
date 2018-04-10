@@ -179,7 +179,7 @@ namespace NeoVM.Interop.Tests
                 ScriptTable = new DummyScriptTable(),
                 Trigger = ETriggerType.Application,
                 ScriptContainer = new DummyScriptContainer(),
-                Logger = new ExecutionEngineLogger(ELogVerbosity.None)
+                Logger = new ExecutionEngineLogger(ELogVerbosity.StepInto)
             };
 
             args.Logger.OnStepInto += Logger_OnStepInto;

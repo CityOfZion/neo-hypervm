@@ -6,15 +6,6 @@
 #include "ArrayStackItem.h"
 #include "Crypto.h"
 
-// Methods
-
-byte ExecutionEngine::InvokeInterop(const char* method)
-{
-	// Fill defaults interops here
-
-	return this->OnInvokeInterop(method);
-}
-
 // Getters
 
 ExecutionContextStack* ExecutionEngine::GetInvocationStack() { return this->InvocationStack; }
@@ -393,13 +384,13 @@ ExecuteOpCode:
 	case EVMOpCode::SYSCALL:
 	{
 		uint32 length = 0;
-		if (!context->ReadVarBytes(length, 252) || length == 0)
+		if (this->OnInvokeInterop == NULL || !context->ReadVarBytes(length, 252) || length == 0)
 		{
 			this->State = EVMState::FAULT;
 			return;
 		}
 
-		char *data = new char[length + 1];
+		byte *data = new byte[length + 1];
 		if (context->Read((byte*)data, length) != (int32)length)
 		{
 			delete[](data);
@@ -409,7 +400,7 @@ ExecuteOpCode:
 
 		data[length] = 0x00;
 
-		if (this->InvokeInterop(data) != 0x01)
+		if (this->OnInvokeInterop(data, (int32)length) != 0x01)
 			this->State = EVMState::FAULT;
 
 		delete[](data);
