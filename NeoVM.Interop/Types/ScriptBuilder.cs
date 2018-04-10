@@ -173,6 +173,32 @@ namespace NeoVM.Interop.Types
             return EmitPush(Encoding.UTF8.GetBytes(data));
         }
 
+        public ScriptBuilder EmitPush(object[] data)
+        {
+            int size = data.Length;
+
+            for (int x = size - 1; x >= 0; x--)
+            {
+                switch (data[x])
+                {
+                    case string v: EmitPush(v); break;
+                    case int v: EmitPush(v); break;
+                    case long v: EmitPush(v); break;
+                    case BigInteger v: EmitPush(v); break;
+                    case bool v: EmitPush(v); break;
+                    case Byte[] v: EmitPush(v); break;
+                    case Object[] v: EmitPush(v); break;
+
+                    default: throw (new ArgumentException());
+                }
+            }
+
+            EmitPush(size);
+            Emit(EVMOpCode.PACK);
+
+            return this;
+        }
+
         public ScriptBuilder EmitSysCall(string api)
         {
             if (api == null)

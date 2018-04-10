@@ -69,7 +69,7 @@ namespace NeoVM.Interop.Tests.Extra
             //engine.EvaluationStack.Push(item?.Value ?? new byte[0]);
             //return true;
 
-            return false;
+            return true;
         }
 
         bool Storage_Delete(ExecutionEngine engine)
@@ -88,7 +88,7 @@ namespace NeoVM.Interop.Tests.Extra
             //}
             //return false;
 
-            return false;
+            return true;
         }
 
         bool Storage_Put(ExecutionEngine engine)
@@ -107,7 +107,7 @@ namespace NeoVM.Interop.Tests.Extra
             //}, () => new StorageItem()).Value = value;
             //return true;
 
-            return false;
+            return true;
         }
 
         bool TestMethod(ExecutionEngine engine)

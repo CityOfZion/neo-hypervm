@@ -107,12 +107,17 @@ void MapStackItem::Set(IStackItem* key, IStackItem* value)
 		if (key != key) continue;
 
 		IStackItem* v = it->second;
+		if (v == value) return;
+
 		IStackItem::UnclaimAndFree(v);
 
 		value->Claim();
 		it->second = value;
 		return;
 	}
+
+	key->Claim();
+	value->Claim();
 
 	this->Dictionary.emplace(key, value);
 }

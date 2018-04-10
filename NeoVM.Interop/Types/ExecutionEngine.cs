@@ -105,11 +105,15 @@ namespace NeoVM.Interop.Types
                 {
                     Logger = e.Logger;
 
-                    NeoVM.ExecutionEngine_AddLog(Handle, new NeoVM.OnStepIntoCallback(InternalOnStepInto));
+                    if (Logger.Verbosity.HasFlag(ELogVerbosity.StepInto))
+                        NeoVM.ExecutionEngine_AddLog(Handle, new NeoVM.OnStepIntoCallback(InternalOnStepInto));
 
-                    NeoVM.ExecutionContextStack_AddLog(invHandle, new NeoVM.OnStackChangeCallback(InternalOnExecutionContextChange));
-                    NeoVM.StackItems_AddLog(altHandle, new NeoVM.OnStackChangeCallback(InternalOnAltStackChange));
-                    NeoVM.StackItems_AddLog(evHandle, new NeoVM.OnStackChangeCallback(InternalOnEvaluationStackChange));
+                    if (Logger.Verbosity.HasFlag(ELogVerbosity.ExecutionContextStackChanges))
+                        NeoVM.ExecutionContextStack_AddLog(invHandle, new NeoVM.OnStackChangeCallback(InternalOnExecutionContextChange));
+                    if (Logger.Verbosity.HasFlag(ELogVerbosity.AltStackChanges))
+                        NeoVM.StackItems_AddLog(altHandle, new NeoVM.OnStackChangeCallback(InternalOnAltStackChange));
+                    if (Logger.Verbosity.HasFlag(ELogVerbosity.EvaluationStackChanges))
+                        NeoVM.StackItems_AddLog(evHandle, new NeoVM.OnStackChangeCallback(InternalOnEvaluationStackChange));
                 }
                 else
                 {

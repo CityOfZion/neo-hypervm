@@ -3,6 +3,7 @@ using NeoVM.Interop.Enums;
 using NeoVM.Interop.Tests.Extra;
 using NeoVM.Interop.Types;
 using NeoVM.Interop.Types.Arguments;
+using NeoVM.Interop.Types.StackItems;
 using System;
 
 namespace NeoVM.Interop.Tests
@@ -176,10 +177,12 @@ namespace NeoVM.Interop.Tests
                 ScriptTable = new DummyScriptTable(),
                 Trigger = ETriggerType.Application,
                 ScriptContainer = new DummyScriptContainer(),
-                Logger = new ExecutionEngineLogger(ELogVerbosity.StepInto)
+                Logger = new ExecutionEngineLogger(ELogVerbosity.None)
             };
 
             args.Logger.OnStepInto += Logger_OnStepInto;
+            args.InteropService.OnLog += InteropService_OnLog;
+            args.InteropService.OnNotify += InteropService_OnNotify;
 
             // Vote
 
@@ -188,15 +191,28 @@ namespace NeoVM.Interop.Tests
             {
                 // Load script
 
-                arguments.EmitPush("vote");
+                arguments.EmitPush(new object[] { "q01" });
+                arguments.EmitPush("count");
 
                 engine.LoadScript(script);
-                engine.LoadPushOnlyScript(arguments);
+                engine.LoadScript(arguments);
 
                 // Execute
 
-                Assert.AreEqual(engine.Execute(), EVMState.FAULT);
+                Assert.AreEqual(engine.Execute(), EVMState.HALT);
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 0x01);
+                CheckClean(engine);
             }
+        }
+
+        void InteropService_OnNotify(object sender, NotifyEventArgs e)
+        {
+            Console.WriteLine("NOT: " + e.State.ToString());
+        }
+
+        void InteropService_OnLog(object sender, LogEventArgs e)
+        {
+            Console.WriteLine("LOG: " + e.Message);
         }
 
         void Logger_OnStepInto(ExecutionContext context)

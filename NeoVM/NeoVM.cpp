@@ -26,16 +26,13 @@ int32 ExecutionContext_GetInstructionPointer(ExecutionContext* context)
 void ExecutionContext_Claim(ExecutionContext* context)
 {
 	if (context == NULL) return;
-
-	context->Claims++;
+	context->Claim();
 }
 
 void ExecutionContext_Free(ExecutionContext* &context)
 {
 	if (context == NULL) return;
-
-	context->Claims--;
-	ExecutionContext::Free(context);
+	ExecutionContext::UnclaimAndFree(context);
 }
 
 // ExecutionEngine

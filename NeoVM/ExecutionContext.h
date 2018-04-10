@@ -5,13 +5,16 @@
 
 class ExecutionContext
 {
+private:
+
+	int32 Claims;
+
 public:
 
 	// Constants
 
 	static const int32 ScriptHashLength = 20;
 
-	int32 Claims;
 	const bool IsPushOnly;
 	const int32 ScriptLength;
 
@@ -53,7 +56,14 @@ public:
 	// Destructor
 
 	~ExecutionContext();
+	
+	// Claims
+
+	void Claim();
+	void UnClaim();
+
 	static void Free(ExecutionContext* &item);
+	static void UnclaimAndFree(ExecutionContext* &item);
 
 private:
 

@@ -10,7 +10,7 @@ void ExecutionContextStack::Push(ExecutionContext * i)
 {
 	this->Size++;
 	this->Stack.push_front(i);
-	i->Claims++;
+	i->Claim();
 
 	if (this->Log != NULL)
 	{
@@ -98,8 +98,7 @@ void ExecutionContextStack::Drop()
 		this->Log(it, this->Size, ELogStackOperation::Drop);
 	}
 
-	it->Claims--;
-	ExecutionContext::Free(it);
+	ExecutionContext::UnclaimAndFree(it);
 }
 
 ExecutionContext* ExecutionContextStack::Pop()
@@ -114,7 +113,7 @@ ExecutionContext* ExecutionContextStack::Pop()
 		this->Log(it, this->Size, ELogStackOperation::Pop);
 	}
 
-	it->Claims--;
+	it->UnClaim();
 	return it;
 }
 
@@ -131,10 +130,7 @@ ExecutionContextStack::~ExecutionContextStack()
 			this->Log(ptr, index, ELogStackOperation::Drop);
 			index++;
 
-			if (ptr == NULL) continue;
-
-			ptr->Claims--;
-			ExecutionContext::Free(ptr);
+			ExecutionContext::UnclaimAndFree(ptr);
 		}
 	
 		this->Log = NULL;
@@ -144,10 +140,7 @@ ExecutionContextStack::~ExecutionContextStack()
 		for (std::list<ExecutionContext*>::iterator it = this->Stack.begin(); it != this->Stack.end(); ++it)
 		{
 			ExecutionContext* ptr = (ExecutionContext*)*it;
-			if (ptr == NULL) continue;
-
-			ptr->Claims--;
-			ExecutionContext::Free(ptr);
+			ExecutionContext::UnclaimAndFree(ptr);
 		}
 	}
 
