@@ -136,13 +136,7 @@ namespace NeoVM.Interop.Tests
             ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(new ExecutionEngineArgs()
             {
-                Logger = new ExecutionEngineLogger
-                    (
-                    ELogVerbosity.AltStackChanges |
-                    ELogVerbosity.EvaluationStackChanges |
-                    ELogVerbosity.ExecutionContextStackChanges |
-                    ELogVerbosity.Operations
-                    )
+                Logger = new ExecutionEngineLogger(ELogVerbosity.All)
             }))
             {
                 StringBuilder stackLog = new StringBuilder();
@@ -166,7 +160,7 @@ namespace NeoVM.Interop.Tests
 
                 engine.Logger.OnStepInto += (context) =>
                 {
-                    stackOp.AppendLine("[" + context.ToString() + "] " + context.NextInstruction.ToString());
+                    stackOp.AppendLine(context.ToString());
                 };
 
                 // Load script

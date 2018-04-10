@@ -9,12 +9,12 @@
         /// <summary>
         /// All
         /// </summary>
-        All = Operations | ExecutionContextStackChanges | EvaluationStackChanges | AltStackChanges,
+        All = StepInto | ExecutionContextStackChanges | EvaluationStackChanges | AltStackChanges,
 
         /// <summary>
-        /// Enable operations logs
+        /// Enable step into logs
         /// </summary>
-        Operations = 1 << 0,
+        StepInto = 1 << 0,
 
         /// <summary>
         /// ExecutionContextStack changes

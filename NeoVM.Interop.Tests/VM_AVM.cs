@@ -3,6 +3,7 @@ using NeoVM.Interop.Enums;
 using NeoVM.Interop.Tests.Extra;
 using NeoVM.Interop.Types;
 using NeoVM.Interop.Types.Arguments;
+using System;
 
 namespace NeoVM.Interop.Tests
 {
@@ -175,8 +176,10 @@ namespace NeoVM.Interop.Tests
                 ScriptTable = new DummyScriptTable(),
                 Trigger = ETriggerType.Application,
                 ScriptContainer = new DummyScriptContainer(),
-                Logger = new ExecutionEngineLogger(ELogVerbosity.All)
+                Logger = new ExecutionEngineLogger(ELogVerbosity.StepInto)
             };
+
+            args.Logger.OnStepInto += Logger_OnStepInto;
 
             // Vote
 
@@ -185,13 +188,20 @@ namespace NeoVM.Interop.Tests
             {
                 // Load script
 
+                arguments.EmitPush("vote");
+
                 engine.LoadScript(script);
                 engine.LoadPushOnlyScript(arguments);
 
                 // Execute
 
-                // Assert.AreEqual(engine.Execute(), EVMState.HALT);
+                Assert.AreEqual(engine.Execute(), EVMState.FAULT);
             }
+        }
+
+        void Logger_OnStepInto(ExecutionContext context)
+        {
+            Console.WriteLine(context.ToString());
         }
     }
 }
