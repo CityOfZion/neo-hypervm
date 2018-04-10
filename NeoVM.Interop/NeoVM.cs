@@ -205,10 +205,12 @@ namespace NeoVM.Interop
             // Check Environment path
             if (!File.Exists(file))
             {
-                file = Environment.GetEnvironmentVariable("NEOVM_PATH");
-                if (!string.IsNullOrEmpty(file))
-                    file = Path.Combine(file, LibraryName + Core.LibraryExtension);
+                string nfile = Environment.GetEnvironmentVariable("NEOVM_PATH");
 
+                if (string.IsNullOrEmpty(nfile))
+                    throw (new FileNotFoundException(file));
+
+                file = nfile;
                 if (!File.Exists(file))
                     throw (new FileNotFoundException(file));
             }
