@@ -58,16 +58,21 @@ namespace NeoVM.Interop.Tests.Extra
                 !(inter.Value is DummyStorageContext context))
                 return false;
 
-            //byte[] key = engine.EvaluationStack.Pop().GetByteArray();
+            if (!engine.EvaluationStack.TryPop(out IStackItem it) || !it.CanConvertToByteArray)
+                return false;
 
-            //StorageItem item = Storages.TryGet(new StorageKey
-            //{
-            //    ScriptHash = context.ScriptHash,
-            //    Key = key
-            //});
+            byte[] key = it.ToByteArray();
 
-            //engine.EvaluationStack.Push(item?.Value ?? new byte[0]);
-            //return true;
+            if (context.Storage.TryGetValue(BitHelper.ToHexString(key), out byte[] value))
+            {
+                using (IStackItem ret = engine.CreateByteArray(value))
+                    engine.EvaluationStack.Push(ret);
+            }
+            else
+            {
+                using (IStackItem ret = engine.CreateByteArray(new byte[] { }))
+                    engine.EvaluationStack.Push(ret);
+            }
 
             return true;
         }
@@ -78,16 +83,11 @@ namespace NeoVM.Interop.Tests.Extra
                 !(inter.Value is DummyStorageContext context))
                 return false;
 
-            //    byte[] key = engine.EvaluationStack.Pop().GetByteArray();
-            //    storages.Delete(new StorageKey
-            //    {
-            //        ScriptHash = context.ScriptHash,
-            //        Key = key
-            //    });
-            //    return true;
-            //}
-            //return false;
+            if (!engine.EvaluationStack.TryPop(out IStackItem it) || !it.CanConvertToByteArray)
+                return false;
 
+            byte[] key = it.ToByteArray();
+            context.Storage.Remove(BitHelper.ToHexString(key));
             return true;
         }
 
@@ -97,16 +97,18 @@ namespace NeoVM.Interop.Tests.Extra
                 !(inter.Value is DummyStorageContext context))
                 return false;
 
-            //byte[] key = engine.EvaluationStack.Pop().GetByteArray();
-            //if (key.Length > 1024) return false;
-            //byte[] value = engine.EvaluationStack.Pop().GetByteArray();
-            //storages.GetAndChange(new StorageKey
-            //{
-            //    ScriptHash = context.ScriptHash,
-            //    Key = key
-            //}, () => new StorageItem()).Value = value;
-            //return true;
+            if (!engine.EvaluationStack.TryPop(out IStackItem it) || !it.CanConvertToByteArray)
+                return false;
 
+            byte[] key = it.ToByteArray();
+            if (key.Length > 1024) return false;
+
+            if (!engine.EvaluationStack.TryPop(out it) || !it.CanConvertToByteArray)
+                return false;
+
+            byte[] value = it.ToByteArray();
+
+            context.Storage[BitHelper.ToHexString(key)] = value;
             return true;
         }
 

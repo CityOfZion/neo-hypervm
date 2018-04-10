@@ -7,6 +7,10 @@ namespace NeoVM.Interop.Interfaces
     unsafe public abstract class IStackItem : IEquatable<IStackItem>, IDisposable
     {
         /// <summary>
+        /// Can convert to byte array
+        /// </summary>
+        public abstract bool CanConvertToByteArray { get; }
+        /// <summary>
         /// Engine
         /// </summary>
         internal readonly ExecutionEngine Engine;
@@ -50,6 +54,11 @@ namespace NeoVM.Interop.Interfaces
         /// Get native byte array
         /// </summary>
         protected abstract byte[] GetNativeByteArray();
+
+        /// <summary>
+        /// Convert to Byte array
+        /// </summary>
+        public abstract byte[] ToByteArray();
 
         /// <summary>
         /// Equals

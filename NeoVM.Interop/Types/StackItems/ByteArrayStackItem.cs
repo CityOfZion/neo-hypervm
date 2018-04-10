@@ -1,4 +1,5 @@
 ﻿using NeoVM.Interop.Enums;
+using NeoVM.Interop.Helpers;
 using NeoVM.Interop.Interfaces;
 using System;
 using System.Linq;
@@ -37,9 +38,20 @@ namespace NeoVM.Interop.Types.StackItems
             return false;
         }
 
+        public override bool CanConvertToByteArray => true;
+        public override byte[] ToByteArray()
+        {
+            return Value;
+        }
+
         protected override byte[] GetNativeByteArray()
         {
             return Value;
+        }
+
+        public override string ToString()
+        {
+            return BitHelper.ToHexString(Value);
         }
     }
 }

@@ -66,6 +66,12 @@ namespace NeoVM.Interop.Types.StackItems
             return false;
         }
 
+        public override bool CanConvertToByteArray => true;
+        public override byte[] ToByteArray()
+        {
+            return Value.ToByteArray();
+        }
+
         protected override byte[] GetNativeByteArray()
         {
             return Value.ToByteArray();

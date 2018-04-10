@@ -169,6 +169,8 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void SmartVote()
         {
+            const string VoteId = "q01";
+
             // Create arguments
 
             ExecutionEngineArgs args = new ExecutionEngineArgs()
@@ -177,22 +179,22 @@ namespace NeoVM.Interop.Tests
                 ScriptTable = new DummyScriptTable(),
                 Trigger = ETriggerType.Application,
                 ScriptContainer = new DummyScriptContainer(),
-                Logger = new ExecutionEngineLogger(ELogVerbosity.StepInto)
+                Logger = new ExecutionEngineLogger(ELogVerbosity.None)
             };
 
             args.Logger.OnStepInto += Logger_OnStepInto;
             args.InteropService.OnLog += InteropService_OnLog;
             args.InteropService.OnNotify += InteropService_OnNotify;
 
-            // Vote
+            // Register proposal
 
             using (ScriptBuilder arguments = new ScriptBuilder())
             using (ExecutionEngine engine = NeoVM.CreateEngine(args))
             {
                 // Load script
 
-                arguments.EmitPush(new object[] { "q01" });
-                arguments.EmitPush("count");
+                arguments.EmitPush(new object[] { VoteId, "My proposal", new byte[20], new byte[20] });
+                arguments.EmitPush("register_proposal");
 
                 engine.LoadScript(script);
                 engine.LoadScript(arguments);
@@ -201,6 +203,46 @@ namespace NeoVM.Interop.Tests
 
                 Assert.AreEqual(engine.Execute(), EVMState.HALT);
                 Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 0x01);
+                CheckClean(engine);
+            }
+
+            // Vote
+
+            using (ScriptBuilder arguments = new ScriptBuilder())
+            using (ExecutionEngine engine = NeoVM.CreateEngine(args))
+            {
+                // Load script
+
+                arguments.EmitPush(new object[] { VoteId, new byte[20], 1 });
+                arguments.EmitPush("vote");
+
+                engine.LoadScript(script);
+                engine.LoadScript(arguments);
+
+                // Execute
+
+                Assert.AreEqual(engine.Execute(), EVMState.HALT);
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 0x01);
+                CheckClean(engine);
+            }
+
+            // Count
+
+            using (ScriptBuilder arguments = new ScriptBuilder())
+            using (ExecutionEngine engine = NeoVM.CreateEngine(args))
+            {
+                // Load script
+
+                arguments.EmitPush(new object[] { VoteId });
+                arguments.EmitPush("count");
+
+                engine.LoadScript(script);
+                engine.LoadScript(arguments);
+
+                // Execute
+
+                Assert.AreEqual(engine.Execute(), EVMState.HALT);
+                Assert.AreEqual(engine.EvaluationStack.Pop<ByteArrayStackItem>().Value.Length, 0x00);
                 CheckClean(engine);
             }
         }

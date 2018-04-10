@@ -8,6 +8,9 @@ namespace NeoVM.Interop.Types.StackItems
 {
     public class MapStackItem : IStackItem, ICollection, IDictionary<IStackItem, IStackItem>
     {
+        public override bool CanConvertToByteArray => false;
+        public override byte[] ToByteArray() { throw new NotImplementedException(); }
+
         readonly Dictionary<IStackItem, IStackItem> Value;
 
         public IStackItem this[IStackItem key]

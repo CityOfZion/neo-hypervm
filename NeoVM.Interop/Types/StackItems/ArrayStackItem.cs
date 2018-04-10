@@ -4,11 +4,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace NeoVM.Interop.Types.StackItems
 {
     public class ArrayStackItem : IStackItem, ICollection, IList<IStackItem>, IEquatable<ArrayStackItem>, IEquatable<IStackItem>
     {
+        public override bool CanConvertToByteArray => false;
+        public override byte[] ToByteArray() { throw new NotImplementedException(); }
+
         /// <summary>
         /// Count
         /// </summary>
@@ -205,6 +209,26 @@ namespace NeoVM.Interop.Types.StackItems
         protected override byte[] GetNativeByteArray()
         {
             return null;
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("[");
+
+            bool first = true;
+            foreach (IStackItem it in this)
+            {
+                if (first) first = false;
+                else sb.Append(",");
+
+                sb.Append(it.ToString());
+                it.Dispose();
+            }
+
+            sb.Append("]");
+
+            return sb.ToString();
         }
     }
 }

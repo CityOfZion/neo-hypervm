@@ -6,6 +6,10 @@ namespace NeoVM.Interop.Types.StackItems
 {
     public class BooleanStackItem : IStackItem<bool>, IEquatable<BooleanStackItem>
     {
+        static readonly byte[] TRUE = { 1 };
+        static readonly byte[] FALSE = new byte[0];
+        static readonly byte[] FALSE_0 = { 0 };
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -36,9 +40,15 @@ namespace NeoVM.Interop.Types.StackItems
             return false;
         }
 
+        public override bool CanConvertToByteArray => true;
+        public override byte[] ToByteArray()
+        {
+            return Value ? TRUE : FALSE;
+        }
+
         protected override byte[] GetNativeByteArray()
         {
-            return Value ? new byte[] { 0x01 } : new byte[] { 0x00 };
+            return Value ? TRUE : FALSE_0;
         }
     }
 }

@@ -60,6 +60,9 @@ namespace NeoVM.Interop.Types.StackItems
             return false;
         }
 
+        public override bool CanConvertToByteArray => false;
+        public override byte[] ToByteArray() { throw new NotImplementedException(); }
+
         protected override byte[] GetNativeByteArray()
         {
             IntPtr ptr = Marshal.GetIUnknownForObject(Value);
