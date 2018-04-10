@@ -507,7 +507,7 @@ ExecuteOpCode:
 		int32 n = 0;
 		IStackItem * it = this->EvaluationStack->Pop();
 
-		if (!it->GetInt32(n) || n <= 0 || n >= ic - 1)
+		if (!it->GetInt32(n) || n <= 0 || n > ic - 1)
 		{
 			IStackItem::Free(it);
 			this->State = EVMState::FAULT;
