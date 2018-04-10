@@ -205,7 +205,7 @@ namespace NeoVM.Interop
             // Check Environment path
             if (!File.Exists(file))
             {
-                string nfile = Environment.GetEnvironmentVariable("NEOVM_PATH");
+                string nfile = Environment.GetEnvironmentVariable("NEO_HYPERVM_PATH");
 
                 if (string.IsNullOrEmpty(nfile))
                     throw (new FileNotFoundException(file));
@@ -217,7 +217,7 @@ namespace NeoVM.Interop
 
             if (!Core.LoadLibrary(file))
             {
-                throw (new FileNotFoundException(file));
+                throw (new ArgumentException("Wrong library file: " + file));
             }
 
             // Static destructor
