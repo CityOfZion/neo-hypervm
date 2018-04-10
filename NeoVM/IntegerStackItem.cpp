@@ -47,11 +47,6 @@ int32 IntegerStackItem::ReadByteArraySize()
 	return this->Value->ToByteArraySize();
 }
 
-IStackItem* IntegerStackItem::Clone()
-{
-	return new IntegerStackItem(this->Value, false);
-}
-
 bool IntegerStackItem::Equals(IStackItem * it)
 {
 	if (it == this) return true;

@@ -80,11 +80,6 @@ bool ByteArrayStackItem::GetInt32(int32 &ret)
 	return bret;
 }
 
-IStackItem* ByteArrayStackItem::Clone()
-{
-	return new ByteArrayStackItem(this->Payload, this->PayloadLength, false);
-}
-
 bool ByteArrayStackItem::Equals(IStackItem * it)
 {
 	if (it == this) return true;

@@ -2366,7 +2366,7 @@ ExecuteOpCode:
 		IStackItem *value = this->EvaluationStack->Pop();
 		if (value->Type == EStackItemType::Struct)
 		{
-			IStackItem * clone = value->Clone();
+			IStackItem * clone = ((ArrayStackItem*)value)->Clone();
 			IStackItem::Free(value);
 			value = clone;
 		}
@@ -2487,7 +2487,7 @@ ExecuteOpCode:
 		IStackItem *newItem = this->EvaluationStack->Pop();
 		if (newItem->Type == EStackItemType::Struct)
 		{
-			IStackItem * clone = newItem->Clone();
+			IStackItem * clone = ((ArrayStackItem*)newItem)->Clone();
 			IStackItem::Free(newItem);
 			newItem = clone;
 		}

@@ -22,30 +22,13 @@ bool InteropStackItem::GetBoolean()
 	return this->PayloadLength > 0;
 }
 
-BigInteger * InteropStackItem::GetBigInteger()
-{
-	return NULL;
-}
+BigInteger * InteropStackItem::GetBigInteger() { return NULL; }
 
-bool InteropStackItem::GetInt32(int32 &ret)
-{
-	return false;
-}
+bool InteropStackItem::GetInt32(int32 &ret) { return false; }
 
-int32 InteropStackItem::ReadByteArray(byte * output, int32 sourceIndex, int32 count)
-{
-	return -1;
-}
+int32 InteropStackItem::ReadByteArray(byte * output, int32 sourceIndex, int32 count) { return -1; }
 
-int32 InteropStackItem::ReadByteArraySize()
-{
-	return -1;
-}
-
-IStackItem* InteropStackItem::Clone()
-{
-	return new InteropStackItem(this->Payload, this->PayloadLength);
-}
+int32 InteropStackItem::ReadByteArraySize() { return -1; }
 
 bool InteropStackItem::Equals(IStackItem * it)
 {

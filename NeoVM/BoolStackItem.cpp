@@ -20,11 +20,6 @@ bool BoolStackItem::GetInt32(int32 &ret)
 	return true;
 }
 
-IStackItem* BoolStackItem::Clone()
-{
-	return new BoolStackItem(Value);
-}
-
 bool BoolStackItem::Equals(IStackItem * it)
 {
 	if (it == this) return true;

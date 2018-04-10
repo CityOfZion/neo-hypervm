@@ -73,7 +73,7 @@ IStackItem* ArrayStackItem::Clone()
 		IStackItem* i = this->Get(x);
 
 		if (i->Type == EStackItemType::Struct)
-			ret->Add(i->Clone());
+			ret->Add(((ArrayStackItem*)i)->Clone());
 		else
 			ret->Add(i);
 	}

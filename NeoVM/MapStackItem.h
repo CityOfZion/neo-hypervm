@@ -1,8 +1,14 @@
 #pragma once
+
 #include "IStackItem.h"
+#include <map>
 
 class MapStackItem : public IStackItem
 {
+private:
+
+	std::map<IStackItem*, IStackItem*> Dictionary;
+
 public:
 
 	// Converters
@@ -10,15 +16,16 @@ public:
 	bool GetBoolean();
 	BigInteger * GetBigInteger();
 	bool GetInt32(int32 &ret);
-	IStackItem* Clone();
 	int32 ReadByteArray(byte * output, int32 sourceIndex, int32 count);
 	int32 ReadByteArraySize();
+	void Clear();
 	bool Equals(IStackItem * it);
 
 	// Map Methods
 
 	int32 Count();
 	void Set(IStackItem* key, IStackItem* value);
+	IStackItem* Get(IStackItem* key);
 	bool Remove(IStackItem* key, bool dispose);
 
 	// Constructor
