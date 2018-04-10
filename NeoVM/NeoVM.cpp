@@ -33,6 +33,7 @@ void ExecutionContext_Free(ExecutionContext* &context)
 {
 	if (context == NULL) return;
 	ExecutionContext::UnclaimAndFree(context);
+	context = NULL;
 }
 
 // ExecutionEngine
@@ -175,6 +176,7 @@ void ExecutionContextStack_AddLog(ExecutionContextStack* stack, OnStackChangeCal
 void StackItem_Free(IStackItem*& item)
 {
 	IStackItem::UnclaimAndFree(item);
+	item = NULL;
 }
 
 IStackItem* StackItem_Create(EStackItemType type, byte *data, int32 size)

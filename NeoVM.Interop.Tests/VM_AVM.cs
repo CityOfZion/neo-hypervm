@@ -5,6 +5,7 @@ using NeoVM.Interop.Types;
 using NeoVM.Interop.Types.Arguments;
 using NeoVM.Interop.Types.StackItems;
 using System;
+using System.Collections.Generic;
 
 namespace NeoVM.Interop.Tests
 {
@@ -182,9 +183,9 @@ namespace NeoVM.Interop.Tests
                 Logger = new ExecutionEngineLogger(ELogVerbosity.StepInto)
             };
 
-            args.Logger.OnStepInto += Logger_OnStepInto;
-            args.InteropService.OnLog += InteropService_OnLog;
-            args.InteropService.OnNotify += InteropService_OnNotify;
+            args.Logger.OnStepInto += (context) => { Console.WriteLine(context.ToString()); };
+            args.InteropService.OnLog += (sender, e) => { Console.WriteLine("Log: " + e.Message); };
+            args.InteropService.OnNotify += (sender, e) => { Console.WriteLine("Notification: " + e.State.ToString()); };
 
             using (ScriptBuilder arguments = new ScriptBuilder())
             using (ExecutionEngine engine = NeoVM.CreateEngine(args))
@@ -236,21 +237,6 @@ namespace NeoVM.Interop.Tests
                 Assert.AreEqual(engine.EvaluationStack.Pop<ByteArrayStackItem>().Value.Length, 0x00);
                 CheckClean(engine);
             }
-        }
-
-        void InteropService_OnNotify(object sender, NotifyEventArgs e)
-        {
-            Console.WriteLine("NOT: " + e.State.ToString());
-        }
-
-        void InteropService_OnLog(object sender, LogEventArgs e)
-        {
-            Console.WriteLine("LOG: " + e.Message);
-        }
-
-        void Logger_OnStepInto(ExecutionContext context)
-        {
-            Console.WriteLine(context.ToString());
         }
     }
 }

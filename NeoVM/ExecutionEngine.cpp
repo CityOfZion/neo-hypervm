@@ -400,7 +400,7 @@ ExecuteOpCode:
 
 		data[length] = 0x00;
 
-		if (this->OnInvokeInterop(data, (int32)length) != 0x01)
+		if (this->OnInvokeInterop(data, (byte)length) != 0x01)
 			this->State = EVMState::FAULT;
 
 		delete[](data);

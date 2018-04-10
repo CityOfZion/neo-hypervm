@@ -227,7 +227,7 @@ namespace NeoVM.Interop.Types
         /// <param name="ptr">Method</param>
         /// <param name="size">Size</param>
         /// <returns>Return Interop result</returns>
-        byte InternalInvokeInterop(IntPtr ptr, int size)
+        byte InternalInvokeInterop(IntPtr ptr, byte size)
         {
             if (InteropService == null)
                 return 0x00;
