@@ -2042,6 +2042,60 @@ ExecuteOpCode:
 		this->EvaluationStack->Push(new BoolStackItem(ret));
 		return;
 	}
+	case EVMOpCode::VERIFY:
+	{
+		if (this->EvaluationStack->Count() < 3)
+		{
+			this->State = EVMState::FAULT;
+			return;
+		}
+
+		IStackItem* ipubKey = this->EvaluationStack->Pop();
+		IStackItem* isignature = this->EvaluationStack->Pop();
+		IStackItem* imsg = this->EvaluationStack->Pop();
+
+		int pubKeySize = ipubKey->ReadByteArraySize();
+		int signatureSize = isignature->ReadByteArraySize();
+		int msgSize = imsg->ReadByteArraySize();
+
+		if (pubKeySize < 33 || signatureSize < 32 || msgSize < 0)
+		{
+			IStackItem::Free(ipubKey);
+			IStackItem::Free(isignature);
+			IStackItem::Free(imsg);
+
+			this->EvaluationStack->Push(new BoolStackItem(false));
+			return;
+		}
+
+		// Read message
+
+		byte * msg = new byte[msgSize];
+		msgSize = imsg->ReadByteArray(msg, 0, msgSize);
+
+		// Read public Key
+
+		byte * pubKey = new byte[pubKeySize];
+		pubKeySize = ipubKey->ReadByteArray(pubKey, 0, pubKeySize);
+
+		// Read signature
+
+		byte * signature = new byte[signatureSize];
+		signatureSize = isignature->ReadByteArray(signature, 0, signatureSize);
+
+		bool ret = Crypto::VerifySignature(msg, msgSize, signature, signatureSize, pubKey, pubKeySize);
+
+		delete[](msg);
+		delete[](pubKey);
+		delete[](signature);
+
+		IStackItem::Free(imsg);
+		IStackItem::Free(ipubKey);
+		IStackItem::Free(isignature);
+
+		this->EvaluationStack->Push(new BoolStackItem(ret));
+		return;
+	}
 	case EVMOpCode::CHECKMULTISIG:
 	{
 		/*

@@ -261,6 +261,120 @@ namespace NeoVM.Interop.Tests
         }
 
         [TestMethod]
+        public void VERIFY()
+        {
+            // Without push
+
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                EVMOpCode.PUSH5,
+                EVMOpCode.VERIFY
+                ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 0x05);
+
+                CheckClean(engine, false);
+            }
+
+            // Without valid push
+
+            using (ScriptBuilder script = new ScriptBuilder
+                (
+                EVMOpCode.PUSH5,
+                EVMOpCode.PUSH6,
+                EVMOpCode.PUSH6,
+                EVMOpCode.VERIFY
+                ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.HALT, engine.Execute());
+
+                // Check
+
+                Assert.IsFalse(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
+
+                CheckClean(engine, false);
+            }
+
+            // Real test
+
+            foreach (bool value in new bool[] { true, false, true, true, false, true, true, false, false, false })
+            {
+                // Get data
+
+                byte[] message = Args.ScriptContainer.GetMessage(0);
+
+                // Create Ecdsa
+
+                byte[] publicKey, signature;
+
+                using (CngKey hkey = CngKey.Create(CngAlgorithm.ECDsaP256, null, new CngKeyCreationParameters()
+                {
+                    KeyCreationOptions = CngKeyCreationOptions.None,
+                    KeyUsage = CngKeyUsages.AllUsages,
+                    ExportPolicy = CngExportPolicies.AllowExport | CngExportPolicies.AllowArchiving | CngExportPolicies.AllowPlaintextArchiving | CngExportPolicies.AllowPlaintextExport,
+                    Provider = CngProvider.MicrosoftSoftwareKeyStorageProvider,
+                    UIPolicy = new CngUIPolicy(CngUIProtectionLevels.None),
+                }))
+                using (ECDsaCng sign = new ECDsaCng(hkey)
+                {
+                    HashAlgorithm = CngAlgorithm.Sha256
+                })
+                {
+                    publicKey = hkey.Export(CngKeyBlobFormat.EccPublicBlob);
+                    signature = sign.SignData(message);
+                }
+
+                // Fake results
+
+                if (!value)
+                {
+                    signature[0] = (byte)(signature[0] == 0xFF ? 0x00 : signature[0] + 0x01);
+                }
+
+                using (ScriptBuilder script = new ScriptBuilder())
+                using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+                {
+                    // Load script
+
+                    script.EmitPush(message);
+                    script.EmitPush(signature);
+                    script.EmitPush(publicKey);
+                    script.Emit(EVMOpCode.VERIFY);
+
+                    engine.LoadScript(script);
+
+                    // Execute
+
+                    Assert.AreEqual(EVMState.HALT, engine.Execute());
+
+                    // Check
+
+                    Assert.AreEqual(engine.EvaluationStack.Pop<BooleanStackItem>().Value, value);
+
+                    CheckClean(engine);
+                }
+            }
+        }
+
+        [TestMethod]
         public void CHECKMULTISIG()
         {
             Assert.IsFalse(true);
