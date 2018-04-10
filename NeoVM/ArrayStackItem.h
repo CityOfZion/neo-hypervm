@@ -25,9 +25,9 @@ public:
 	void Clear();
 	IStackItem* Get(int32 index);
 	void Add(IStackItem* item);
-	void Set(int32 index, IStackItem* item, bool disposePrev);
+	void Set(int32 index, IStackItem* item);
 	void Insert(int32 index, IStackItem* item);
-	void RemoveAt(int32 index, bool dispose);
+	void RemoveAt(int32 index);
 	int32 IndexOf(IStackItem* item);
 
 	// Constructor

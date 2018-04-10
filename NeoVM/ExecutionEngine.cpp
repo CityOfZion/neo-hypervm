@@ -2267,7 +2267,6 @@ ExecuteOpCode:
 			for (int32 i = count - 1; i >= 0; i--)
 			{
 				this->EvaluationStack->Push(array->Get(i));
-				array->RemoveAt(i, false);
 			}
 
 			IStackItem::Free(item);
@@ -2320,11 +2319,8 @@ ExecuteOpCode:
 
 			IStackItem::Free(key);
 			IStackItem *ret = arr->Get(index);
-
-			arr->Set(index, NULL, false);
-
-			IStackItem::Free(item);
 			this->EvaluationStack->Push(ret);
+			IStackItem::Free(item);
 			return;
 		}
 		case EStackItemType::Map:
@@ -2404,7 +2400,7 @@ ExecuteOpCode:
 				return;
 			}
 
-			arr->Set(index, value, true);
+			arr->Set(index, value);
 
 			IStackItem::Free(key);
 			IStackItem::Free(item);
@@ -2576,7 +2572,7 @@ ExecuteOpCode:
 				return;
 			}
 
-			arr->RemoveAt(index, true);
+			arr->RemoveAt(index);
 
 			IStackItem::Free(key);
 			IStackItem::Free(item);
@@ -2679,11 +2675,11 @@ ExecuteOpCode:
 		case EStackItemType::Map:
 		{
 			MapStackItem *arr = (MapStackItem*)item;
-			
+
 			ArrayStackItem *ap = new ArrayStackItem(false);
 			arr->FillKeys(ap);
 			this->EvaluationStack->Push(ap);
-			
+
 			IStackItem::Free(item);
 			return;
 		}

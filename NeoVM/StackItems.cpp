@@ -86,16 +86,6 @@ IStackItem* StackItems::Peek(int32 index)
 
 IStackItem* StackItems::Remove(int32 index)
 {
-	if (index < 0)
-	{
-		if (this->Log != NULL)
-		{
-			this->Log(NULL, index, ELogStackOperation::Remove);
-		}
-
-		return NULL;
-	}
-
 	std::list<IStackItem*>::iterator it = this->Stack.begin();
 	if (index > 0) std::advance(it, index);
 

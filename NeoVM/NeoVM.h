@@ -72,5 +72,5 @@ extern "C"
 	DllExport void ArrayStackItem_Set(ArrayStackItem* array, IStackItem* item, int32 index);
 	DllExport int32 ArrayStackItem_IndexOf(ArrayStackItem* array, IStackItem* item);
 	DllExport void ArrayStackItem_Insert(ArrayStackItem* array, IStackItem* item, int32 index);
-	DllExport void ArrayStackItem_RemoveAt(ArrayStackItem* array, int32 index, byte dispose);
+	DllExport void ArrayStackItem_RemoveAt(ArrayStackItem* array, int32 index);
 }

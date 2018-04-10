@@ -2,19 +2,15 @@
 #include "BoolStackItem.h"
 
 ArrayStackItem::ArrayStackItem(bool isStruct) :
-	IStackItem(isStruct ? EStackItemType::Struct : EStackItemType::Array)
-{
-	List = std::list<IStackItem*>();
-}
+	IStackItem(isStruct ? EStackItemType::Struct : EStackItemType::Array), List(std::list<IStackItem*>())
+{ }
 
 ArrayStackItem::ArrayStackItem(bool isStruct, int32 count) :
-	IStackItem(isStruct ? EStackItemType::Struct : EStackItemType::Array)
+	IStackItem(isStruct ? EStackItemType::Struct : EStackItemType::Array), List(std::list<IStackItem*>())
 {
-	List = std::list<IStackItem*>();
-
 	// Init size
 	for (int32 i = 0; i < count; i++)
-		Add(new BoolStackItem(false));
+		this->Add(new BoolStackItem(false));
 }
 
 ArrayStackItem::~ArrayStackItem()
@@ -22,47 +18,16 @@ ArrayStackItem::~ArrayStackItem()
 	this->Clear();
 }
 
-// Serialize
-
-int32 ArrayStackItem::Serialize(byte * data, int32 length)
-{
-	return 0;
-}
-
-int32 ArrayStackItem::GetSerializedSize()
-{
-	return 0;
-}
-
-bool ArrayStackItem::GetBoolean()
-{
-	return true;
-}
-
 void ArrayStackItem::Reverse()
 {
 	this->List.reverse();
 }
 
-BigInteger * ArrayStackItem::GetBigInteger()
-{
-	return NULL;
-}
-
-bool ArrayStackItem::GetInt32(int32 &ret)
-{
-	return false;
-}
-
-int32 ArrayStackItem::ReadByteArray(byte * output, int32 sourceIndex, int32 count)
-{
-	return -1;
-}
-
-int32 ArrayStackItem::ReadByteArraySize()
-{
-	return -1;
-}
+bool ArrayStackItem::GetBoolean() { return true; }
+BigInteger * ArrayStackItem::GetBigInteger() { return NULL; }
+bool ArrayStackItem::GetInt32(int32 &ret) { return false; }
+int32 ArrayStackItem::ReadByteArray(byte * output, int32 sourceIndex, int32 count) { return -1; }
+int32 ArrayStackItem::ReadByteArraySize() { return -1; }
 
 IStackItem* ArrayStackItem::Clone()
 {
@@ -155,7 +120,7 @@ void ArrayStackItem::Add(IStackItem* item)
 	this->List.push_back(item);
 }
 
-void ArrayStackItem::Set(int32 index, IStackItem* item, bool disposePrev)
+void ArrayStackItem::Set(int32 index, IStackItem* item)
 {
 	if (item != NULL)
 		item->Claim();
@@ -164,15 +129,7 @@ void ArrayStackItem::Set(int32 index, IStackItem* item, bool disposePrev)
 	if (index > 0) std::advance(it, index);
 
 	IStackItem* & s(*it);
-
-	if (s != NULL)
-	{
-		if (disposePrev)
-			IStackItem::UnclaimAndFree(s);
-		else
-			s->UnClaim();
-	}
-
+	IStackItem::UnclaimAndFree(s);
 	s = item;
 }
 
@@ -184,7 +141,6 @@ int32 ArrayStackItem::IndexOf(IStackItem* item)
 		if ((IStackItem*)*it == item) return index;
 		index++;
 	}
-
 	return -1;
 }
 
@@ -199,17 +155,18 @@ void ArrayStackItem::Insert(int32 index, IStackItem* item)
 	this->List.insert(it, item);
 }
 
-void ArrayStackItem::RemoveAt(int32 index, bool dispose)
+void ArrayStackItem::RemoveAt(int32 index)
 {
 	std::list<IStackItem*>::iterator it = this->List.begin();
 	if (index > 0) std::advance(it, index);
 
 	IStackItem* & s(*it);
-
-	if (dispose)
-	{
-		IStackItem::UnclaimAndFree(s);
-	}
+	IStackItem::UnclaimAndFree(s);
 
 	this->List.erase(it);
 }
+
+// Serialize
+
+int32 ArrayStackItem::Serialize(byte * data, int32 length) { return 0; }
+int32 ArrayStackItem::GetSerializedSize() { return 0; }

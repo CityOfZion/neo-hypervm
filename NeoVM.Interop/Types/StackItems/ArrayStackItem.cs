@@ -123,7 +123,7 @@ namespace NeoVM.Interop.Types.StackItems
 
         public void RemoveAt(int index)
         {
-            NeoVM.ArrayStackItem_RemoveAt(Handle, index, 0x01);
+            NeoVM.ArrayStackItem_RemoveAt(Handle, index);
         }
 
         #endregion

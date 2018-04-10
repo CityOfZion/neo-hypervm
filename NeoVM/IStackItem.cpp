@@ -19,15 +19,9 @@ void IStackItem::Free(IStackItem* &item)
 	}
 }
 
-void IStackItem::UnClaim()
-{
-	this->Claims--;
-}
+void IStackItem::UnClaim() { this->Claims--; }
 
-void IStackItem::Claim()
-{
-	this->Claims++;
-}
+void IStackItem::Claim() { this->Claims++; }
 
 void IStackItem::UnclaimAndFree(IStackItem* &item)
 {

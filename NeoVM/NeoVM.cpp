@@ -268,7 +268,7 @@ void ArrayStackItem_Add(ArrayStackItem* array, IStackItem* item)
 
 void ArrayStackItem_Set(ArrayStackItem* array, IStackItem* item, int32 index)
 {
-	array->Set(index, item, true);
+	array->Set(index, item);
 }
 
 int32 ArrayStackItem_IndexOf(ArrayStackItem* array, IStackItem* item)
@@ -281,7 +281,7 @@ void ArrayStackItem_Insert(ArrayStackItem* array, IStackItem* item, int32 index)
 	array->Insert(index, item);
 }
 
-void ArrayStackItem_RemoveAt(ArrayStackItem* array, int32 index, byte dispose)
+void ArrayStackItem_RemoveAt(ArrayStackItem* array, int32 index)
 {
-	array->RemoveAt(index, dispose == 0x01);
+	array->RemoveAt(index);
 }

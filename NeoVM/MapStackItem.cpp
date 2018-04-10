@@ -119,12 +119,6 @@ void MapStackItem::Set(IStackItem* key, IStackItem* value)
 
 // Serialize
 
-int32 MapStackItem::Serialize(byte * data, int32 length)
-{
-	return 0;
-}
+int32 MapStackItem::Serialize(byte * data, int32 length) { return 0; }
 
-int32 MapStackItem::GetSerializedSize()
-{
-	return 0;
-}
+int32 MapStackItem::GetSerializedSize() { return 0; }

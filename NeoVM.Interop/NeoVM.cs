@@ -48,6 +48,7 @@ namespace NeoVM.Interop
         internal delegate IntPtr delHandle_Handle(IntPtr pointer);
         internal delegate void delVoid_RefHandle(ref IntPtr pointer);
         internal delegate int delInt_HandleInt(IntPtr pointer, int value);
+        internal delegate void delVoid_HandleInt(IntPtr pointer, int value);
         internal delegate int delInt_HandleHandle(IntPtr handle, IntPtr item);
         internal delegate byte delByte_HandleRefInt(IntPtr item, out int size);
         internal delegate IntPtr delHandle_HandleInt(IntPtr pointer, int value);
@@ -105,7 +106,7 @@ namespace NeoVM.Interop
         internal static delVoid_HandleHandleInt ArrayStackItem_Set;
         internal static delVoid_HandleHandle ArrayStackItem_Add;
         internal static delInt_HandleHandle ArrayStackItem_IndexOf;
-        internal static delVoid_HandleIntByte ArrayStackItem_RemoveAt;
+        internal static delVoid_HandleInt ArrayStackItem_RemoveAt;
         internal static delVoid_HandleHandleInt ArrayStackItem_Insert;
 
         internal static delInt_HandleHandleInt ExecutionContext_GetScriptHash;
@@ -173,7 +174,7 @@ namespace NeoVM.Interop
             ArrayStackItem_Add = Core.GetDelegate<delVoid_HandleHandle>("ArrayStackItem_Add");
             ArrayStackItem_IndexOf = Core.GetDelegate<delInt_HandleHandle>("ArrayStackItem_IndexOf");
             ArrayStackItem_Insert = Core.GetDelegate<delVoid_HandleHandleInt>("ArrayStackItem_Insert");
-            ArrayStackItem_RemoveAt = Core.GetDelegate<delVoid_HandleIntByte>("ArrayStackItem_RemoveAt");
+            ArrayStackItem_RemoveAt = Core.GetDelegate<delVoid_HandleInt>("ArrayStackItem_RemoveAt");
         }
 
         #endregion
