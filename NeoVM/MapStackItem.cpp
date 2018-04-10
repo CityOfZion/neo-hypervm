@@ -24,15 +24,10 @@ bool MapStackItem::Remove(IStackItem* key, bool dispose)
 
 		IStackItem* value = it->second;
 
-		if (key != NULL && dispose)
+		if (dispose)
 		{
-			key->Claims--;
-			IStackItem::Free(key);
-		}
-		if (value != NULL && dispose)
-		{
-			value->Claims--;
-			IStackItem::Free(value);
+			IStackItem::UnclaimAndFree(key);
+			IStackItem::UnclaimAndFree(value);
 		}
 
 		this->Dictionary.erase(key);
@@ -49,16 +44,8 @@ void MapStackItem::Clear()
 		IStackItem* key = it->first;
 		IStackItem* value = it->second;
 
-		if (key != NULL)
-		{
-			key->Claims--;
-			IStackItem::Free(key);
-		}
-		if (value != NULL)
-		{
-			value->Claims--;
-			IStackItem::Free(value);
-		}
+		IStackItem::UnclaimAndFree(key);
+		IStackItem::UnclaimAndFree(value);
 	}
 
 	this->Dictionary.clear();
@@ -120,14 +107,9 @@ void MapStackItem::Set(IStackItem* key, IStackItem* value)
 		if (key != key) continue;
 
 		IStackItem* v = it->second;
+		IStackItem::UnclaimAndFree(v);
 
-		if (v != NULL)
-		{
-			v->Claims--;
-			IStackItem::Free(v);
-		}
-
-		value->Claims++;
+		value->Claim();
 		it->second = value;
 		return;
 	}

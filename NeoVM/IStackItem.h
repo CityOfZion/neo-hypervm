@@ -5,9 +5,12 @@
 
 class IStackItem
 {
-public:
+private:
 
 	int32 Claims;
+
+public:
+
 	EStackItemType Type;
 
 	// Converters
@@ -27,6 +30,9 @@ public:
 
 	virtual ~IStackItem() { };
 	static void Free(IStackItem* &item);
+	static void UnclaimAndFree(IStackItem* &item);
+	void UnClaim();
+	void Claim();
 
 	// Serialize
 

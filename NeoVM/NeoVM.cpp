@@ -172,14 +172,12 @@ void ExecutionContextStack_AddLog(ExecutionContextStack* stack, OnStackChangeCal
 
 void StackItem_Free(IStackItem*& item)
 {
-	if (item == NULL) return;
-
-	item->Claims--;
-	IStackItem::Free(item);
+	IStackItem::UnclaimAndFree(item);
 }
 
 IStackItem* StackItem_Create(EStackItemType type, byte *data, int32 size)
 {
+	IStackItem * it = NULL;
 	switch (type)
 	{
 	default:
@@ -191,13 +189,15 @@ IStackItem* StackItem_Create(EStackItemType type, byte *data, int32 size)
 
 		if (size == 1)
 		{
-			IStackItem* it = new BoolStackItem(data[0] != 0x00);
-			it->Claims++;
-			return it;
+			it = new BoolStackItem(data[0] != 0x00);
+			break;
 		}
 		else
 		{
-			if (size <= 0) return NULL;
+			if (size <= 0)
+			{
+				return NULL;
+			}
 
 			bool ret = false;
 
@@ -208,43 +208,20 @@ IStackItem* StackItem_Create(EStackItemType type, byte *data, int32 size)
 					break;
 				}
 
-			BoolStackItem * it = new BoolStackItem(ret);
-			it->Claims++;
-			return it;
+			it = new BoolStackItem(ret);
+			break;
 		}
 	}
-	case EStackItemType::Integer:
-	{
-		IntegerStackItem *it = new IntegerStackItem(data, size);
-		it->Claims++;
-		return it;
-	}
-	case EStackItemType::ByteArray:
-	{
-		ByteArrayStackItem *it = new ByteArrayStackItem(data, size, false);
-		it->Claims++;
-		return it;
-	}
-	case EStackItemType::Interop:
-	{
-		InteropStackItem *it = new InteropStackItem(data, size);
-		it->Claims++;
-		return it;
-	}
+	case EStackItemType::Integer: { it = new IntegerStackItem(data, size); break; }
+	case EStackItemType::ByteArray: { it = new ByteArrayStackItem(data, size, false); break; }
+	case EStackItemType::Interop: { it = new InteropStackItem(data, size); break; }
 	case EStackItemType::Array:
-	case EStackItemType::Struct:
-	{
-		ArrayStackItem *it = new ArrayStackItem(type == EStackItemType::Struct);
-		it->Claims++;
-		return it;
+	case EStackItemType::Struct: { it = new ArrayStackItem(type == EStackItemType::Struct); break; }
+	case EStackItemType::Map: { it = new MapStackItem(); break; }
 	}
-	case EStackItemType::Map:
-	{
-		MapStackItem *it = new MapStackItem();
-		it->Claims++;
-		return it;
-	}
-	}
+
+	if (it != NULL) it->Claim();
+	return it;
 }
 
 int32 StackItem_SerializeData(IStackItem* item, byte * output, int32 length)
@@ -262,7 +239,7 @@ EStackItemType StackItem_SerializeDetails(IStackItem* item, int32 &size)
 		return EStackItemType::None;
 	}
 
-	item->Claims++;
+	item->Claim();
 	size = item->GetSerializedSize();
 	return item->Type;
 }

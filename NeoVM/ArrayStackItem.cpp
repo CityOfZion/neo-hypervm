@@ -130,12 +130,7 @@ void ArrayStackItem::Clear()
 	for (std::list<IStackItem*>::iterator it = this->List.begin(); it != this->List.end(); ++it)
 	{
 		IStackItem* ptr = (IStackItem*)*it;
-
-		if (ptr != NULL)
-		{
-			ptr->Claims--;
-			IStackItem::Free(ptr);
-		}
+		IStackItem::UnclaimAndFree(ptr);
 	}
 
 	this->List.clear();
@@ -155,7 +150,7 @@ IStackItem* ArrayStackItem::Get(int32 index)
 void ArrayStackItem::Add(IStackItem* item)
 {
 	if (item != NULL)
-		item->Claims++;
+		item->Claim();
 
 	this->List.push_back(item);
 }
@@ -163,7 +158,7 @@ void ArrayStackItem::Add(IStackItem* item)
 void ArrayStackItem::Set(int32 index, IStackItem* item, bool disposePrev)
 {
 	if (item != NULL)
-		item->Claims++;
+		item->Claim();
 
 	std::list<IStackItem*>::iterator it = this->List.begin();
 	if (index > 0) std::advance(it, index);
@@ -172,10 +167,10 @@ void ArrayStackItem::Set(int32 index, IStackItem* item, bool disposePrev)
 
 	if (s != NULL)
 	{
-		s->Claims--;
-
 		if (disposePrev)
-			IStackItem::Free(s);
+			IStackItem::UnclaimAndFree(s);
+		else
+			s->UnClaim();
 	}
 
 	s = item;
@@ -196,7 +191,7 @@ int32 ArrayStackItem::IndexOf(IStackItem* item)
 void ArrayStackItem::Insert(int32 index, IStackItem* item)
 {
 	if (item != NULL)
-		item->Claims++;
+		item->Claim();
 
 	std::list<IStackItem*>::iterator it = this->List.begin();
 	if (index > 0) std::advance(it, index);
@@ -211,10 +206,9 @@ void ArrayStackItem::RemoveAt(int32 index, bool dispose)
 
 	IStackItem* & s(*it);
 
-	if (s != NULL && dispose)
+	if (dispose)
 	{
-		s->Claims--;
-		IStackItem::Free(s);
+		IStackItem::UnclaimAndFree(s);
 	}
 
 	this->List.erase(it);
