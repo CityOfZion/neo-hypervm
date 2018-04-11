@@ -50,6 +50,40 @@ void StackItems::Insert(int32 index, IStackItem *it)
 	}
 }
 
+IStackItem* StackItems::TryPeek(int32 index)
+{
+	if (this->Size <= index || index < 0)
+	{
+		if (this->Log != NULL)
+		{
+			this->Log(NULL, index, ELogStackOperation::TryPeek);
+		}
+
+		return NULL;
+	}
+	if (index == 0)
+	{
+		IStackItem *ret = this->Stack.front();
+
+		if (this->Log != NULL)
+		{
+			this->Log(ret, index, ELogStackOperation::TryPeek);
+		}
+
+		return ret;
+	}
+
+	std::list<IStackItem*>::iterator it = this->Stack.begin();
+	std::advance(it, index);
+
+	if (this->Log != NULL)
+	{
+		this->Log((IStackItem*)*it, index, ELogStackOperation::TryPeek);
+	}
+
+	return (IStackItem*)*it;
+}
+
 IStackItem* StackItems::Peek(int32 index)
 {
 	if (index == 0)

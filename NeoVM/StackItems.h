@@ -18,6 +18,7 @@ public:
 	void Clear();
 	void Push(IStackItem * it);
 	IStackItem* Peek(int32 index);
+	IStackItem* TryPeek(int32 index);
 	IStackItem* Remove(int32 index);
 	void Insert(int32 index, IStackItem *it);
 

@@ -1,32 +1,40 @@
-﻿namespace NeoVM.Interop.Enums
+﻿using System;
+
+namespace NeoVM.Interop.Enums
 {
+    [Flags]
     public enum ELogVerbosity : byte
     {
         /// <summary>
         /// None
         /// </summary>
         None = 0,
-        /// <summary>
-        /// All
-        /// </summary>
-        All = StepInto | ExecutionContextStackChanges | EvaluationStackChanges | AltStackChanges,
 
         /// <summary>
         /// Enable step into logs
         /// </summary>
-        StepInto = 1 << 0,
+        StepInto = 1,
 
         /// <summary>
         /// ExecutionContextStack changes
         /// </summary>
-        ExecutionContextStackChanges = 2 << 0,
+        ExecutionContextStackChanges = 2,
         /// <summary>
         /// EvaluationStack changes
         /// </summary>
-        EvaluationStackChanges = 3 << 0,
+        EvaluationStackChanges = 4,
         /// <summary>
         /// AltStack changes
         /// </summary>
-        AltStackChanges = 4 << 0,
+        AltStackChanges = 8,
+
+        /// <summary>
+        /// All
+        /// </summary>
+        All = StepInto | ExecutionContextStackChanges | EvaluationStackChanges | AltStackChanges,
+        /// <summary>
+        /// Stack changes
+        /// </summary>
+        StackChanges = ExecutionContextStackChanges | EvaluationStackChanges | AltStackChanges,
     }
 }

@@ -16,14 +16,25 @@ namespace NeoVM.Interop.Helpers
         /// <returns>Return hex string</returns>
         public static string ToHexString(byte[] data)
         {
-            if (data == null || data.Length == 0) return "";
+            if (data == null) return "";
 
-            StringBuilder sb = new StringBuilder();
-            sb.Append("0x");
+            int m = data.Length;
+            if (m == 0) return "";
 
-            foreach (byte b in data) sb.Append(b.ToString("x2"));
+            char[] sb = new char[(m * 2) + 2];
 
-            return sb.ToString();
+            sb[0] = '0';
+            sb[1] = 'x';
+
+            for (int x = 0, y = 2; x < m; x++, y += 2)
+            {
+                string hex = data[x].ToString("x2");
+
+                sb[y] = hex[0];
+                sb[y + 1] = hex[1];
+            }
+
+            return new string(sb);
         }
         /// <summary>
         /// Get bytes

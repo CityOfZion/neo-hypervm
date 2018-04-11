@@ -132,7 +132,7 @@ void StackItems_Push(StackItems* stack, IStackItem * item)
 
 IStackItem* StackItems_Peek(StackItems* stack, int32 index)
 {
-	return stack->Count() <= index ? NULL : stack->Peek(index);
+	return stack->TryPeek(index);
 }
 
 int32 StackItems_Count(StackItems* stack)
@@ -158,7 +158,7 @@ int32 ExecutionContextStack_Drop(ExecutionContextStack* stack, int32 count)
 
 ExecutionContext* ExecutionContextStack_Peek(ExecutionContextStack* stack, int32 index)
 {
-	return stack->Count() <= index ? NULL : stack->Peek(index);
+	return stack->TryPeek(index);
 }
 
 int32 ExecutionContextStack_Count(ExecutionContextStack* stack)
