@@ -25,7 +25,6 @@
 
 * NeoVM - C++ Native Virtual Machine
 * NeoVM.Interop - Interoperability for C# calls
-* NeoVM.Interop.Benchmarks - Benchmarks
 * NeoVM.Interop.Tests - Unit Tests
 
 # Installation
