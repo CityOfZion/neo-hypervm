@@ -96,7 +96,7 @@ namespace NeoVM.Interop.Tests
             using (ExecutionEngine engine = NeoVM.CreateEngine(new ExecutionEngineArgs()
             {
                 InteropService = new DummyInteropService(),
-                ScriptContainer = new DummyScriptContainer(),
+                MessageProvider = new DummyMessageProvider(),
             }))
             {
                 // Load script

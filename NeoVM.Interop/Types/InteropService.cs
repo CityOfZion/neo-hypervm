@@ -142,7 +142,7 @@ namespace NeoVM.Interop.Types
             }
 
             ExecutionContext ctx = engine.CurrentContext;
-            OnLog.Invoke(this, new LogEventArgs(engine.ScriptContainer, ctx?.ScriptHash, message ?? ""));
+            OnLog.Invoke(this, new LogEventArgs(engine.MessageProvider, ctx?.ScriptHash, message ?? ""));
             return true;
         }
 
@@ -162,16 +162,16 @@ namespace NeoVM.Interop.Types
             }
 
             ExecutionContext ctx = engine.CurrentContext;
-            OnNotify.Invoke(this, new NotifyEventArgs(engine.ScriptContainer, ctx?.ScriptHash, it));
+            OnNotify.Invoke(this, new NotifyEventArgs(engine.MessageProvider, ctx?.ScriptHash, it));
             return true;
         }
 
         static bool GetScriptContainer(ExecutionEngine engine)
         {
-            if (engine.ScriptContainer == null)
+            if (engine.MessageProvider == null)
                 return false;
 
-            using (IStackItem item = engine.CreateInterop(engine.ScriptContainer))
+            using (IStackItem item = engine.CreateInterop(engine.MessageProvider))
                 engine.EvaluationStack.Push(item);
 
             return true;

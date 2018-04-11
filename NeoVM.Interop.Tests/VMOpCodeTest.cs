@@ -56,7 +56,7 @@ namespace NeoVM.Interop.Tests
         /// </summary>
         protected readonly static ExecutionEngineArgs Args = new ExecutionEngineArgs()
         {
-            ScriptContainer = new DummyScriptContainer(),
+            MessageProvider = new DummyMessageProvider(),
             InteropService = new InteropService(),
             ScriptTable = new DummyScriptTable()
         };

@@ -179,7 +179,7 @@ namespace NeoVM.Interop.Tests
                 InteropService = new DummyInteropService(),
                 ScriptTable = new DummyScriptTable(),
                 Trigger = ETriggerType.Application,
-                ScriptContainer = new DummyScriptContainer(),
+                MessageProvider = new DummyMessageProvider(),
                 Logger = new ExecutionEngineLogger(ELogVerbosity.StepInto)
             };
 

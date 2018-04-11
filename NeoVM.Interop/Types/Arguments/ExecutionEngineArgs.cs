@@ -10,9 +10,9 @@ namespace NeoVM.Interop.Types.Arguments
         /// </summary>
         public ETriggerType Trigger { get; set; } = ETriggerType.Application;
         /// <summary>
-        /// Script container
+        /// Message Provider
         /// </summary>
-        public IScriptContainer ScriptContainer { get; set; }
+        public IMessageProvider MessageProvider { get; set; }
         /// <summary>
         /// Interop service
         /// </summary>

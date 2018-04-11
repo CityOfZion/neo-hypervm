@@ -43,9 +43,9 @@ namespace NeoVM.Interop.Types
         /// </summary>
         public readonly ExecutionEngineLogger Logger;
         /// <summary>
-        /// Script containes
+        /// Message Provider
         /// </summary>
-        public readonly IScriptContainer ScriptContainer;
+        public readonly IMessageProvider MessageProvider;
         /// <summary>
         /// Invocation Stack
         /// </summary>
@@ -96,7 +96,7 @@ namespace NeoVM.Interop.Types
             {
                 InteropService = e.InteropService;
                 ScriptTable = e.ScriptTable;
-                ScriptContainer = e.ScriptContainer;
+                MessageProvider = e.MessageProvider;
                 Trigger = e.Trigger;
 
                 // Register logs
@@ -171,11 +171,11 @@ namespace NeoVM.Interop.Types
         /// <param name="output">Message</param>
         int InternalGetMessage(uint iteration, out IntPtr output)
         {
-            if (ScriptContainer != null)
+            if (MessageProvider != null)
             {
                 // TODO: should change this, too dangerous
 
-                byte[] script = ScriptContainer.GetMessage(iteration);
+                byte[] script = MessageProvider.GetMessage(iteration);
 
                 if (script != null && script.Length > 0)
                 {
@@ -327,7 +327,7 @@ namespace NeoVM.Interop.Types
         {
             if (item == IntPtr.Zero) return null;
 
-            EStackItemType state = (EStackItemType)NeoVM.StackItem_SerializeDetails(item, out int size);
+            EStackItemType state = (EStackItemType)NeoVM.StackItem_SerializeInfo(item, out int size);
             if (state == EStackItemType.None) return null;
 
             int readed;
@@ -338,7 +338,7 @@ namespace NeoVM.Interop.Types
                 payload = new byte[size];
                 fixed (byte* p = payload)
                 {
-                    readed = NeoVM.StackItem_SerializeData(item, (IntPtr)p, size);
+                    readed = NeoVM.StackItem_Serialize(item, (IntPtr)p, size);
                 }
             }
             else

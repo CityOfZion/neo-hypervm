@@ -602,7 +602,7 @@ namespace NeoVM.Interop.Tests
 
                     // Check
 
-                    Assert.AreEqual(engine.EvaluationStack.Pop<InteropStackItem>().Value, Args.ScriptContainer);
+                    Assert.AreEqual(engine.EvaluationStack.Pop<InteropStackItem>().Value, Args.MessageProvider);
 
                     CheckClean(engine);
                 }

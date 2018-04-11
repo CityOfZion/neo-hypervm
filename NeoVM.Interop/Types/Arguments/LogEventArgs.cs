@@ -6,9 +6,9 @@ namespace NeoVM.Interop.Types.Arguments
     public class LogEventArgs : EventArgs
     {
         /// <summary>
-        /// Script container
+        /// Message Provider
         /// </summary>
-        public readonly IScriptContainer ScriptContainer;
+        public readonly IMessageProvider MessageProvider;
         /// <summary>
         /// Script Hash
         /// </summary>
@@ -21,12 +21,12 @@ namespace NeoVM.Interop.Types.Arguments
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="container">Script container</param>
+        /// <param name="messageProvider">Message Provider</param>
         /// <param name="scriptHash">Script hash</param>
         /// <param name="message">Message</param>
-        public LogEventArgs(IScriptContainer container, byte[] scriptHash, string message)
+        public LogEventArgs(IMessageProvider messageProvider, byte[] scriptHash, string message)
         {
-            ScriptContainer = container;
+            MessageProvider = messageProvider;
             ScriptHash = scriptHash;
             Message = message;
         }

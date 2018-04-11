@@ -60,8 +60,8 @@ extern "C"
 	// StackItem
 
 	DllExport IStackItem* StackItem_Create(EStackItemType type, byte *data, int32 size);
-	DllExport EStackItemType StackItem_SerializeDetails(IStackItem* item, int32 &size);
-	DllExport int32 StackItem_SerializeData(IStackItem* item, byte * output, int32 length);
+	DllExport EStackItemType StackItem_SerializeInfo(IStackItem* item, int32 &size);
+	DllExport int32 StackItem_Serialize(IStackItem* item, byte * output, int32 length);
 	DllExport void StackItem_Free(IStackItem* &item);
 
 	// ArrayStackItem

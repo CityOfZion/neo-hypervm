@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace NeoVM.Interop.Tests.Extra
 {
-    internal class DummyScriptContainer : IScriptContainer
+    internal class DummyMessageProvider : IMessageProvider
     {
         public byte[] GetMessage(uint iteration)
         {

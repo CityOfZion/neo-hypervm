@@ -110,7 +110,7 @@ namespace NeoVM.Interop.Tests
                 Assert.IsNull(engine.CallingContext);
 
                 Assert.AreEqual(Args.InteropService, engine.InteropService);
-                Assert.AreEqual(Args.ScriptContainer, engine.ScriptContainer);
+                Assert.AreEqual(Args.MessageProvider, engine.MessageProvider);
                 Assert.AreEqual(Args.ScriptTable, engine.ScriptTable);
 
                 Assert.AreEqual(0, engine.InvocationStack.Count);

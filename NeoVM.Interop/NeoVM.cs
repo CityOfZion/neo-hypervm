@@ -100,8 +100,8 @@ namespace NeoVM.Interop
         internal static delVoid_HandleOnStackChangeCallback ExecutionContextStack_AddLog;
 
         internal static delHandle_ByteHandleInt StackItem_Create;
-        internal static delByte_HandleRefInt StackItem_SerializeDetails;
-        internal static delInt_HandleHandleInt StackItem_SerializeData;
+        internal static delByte_HandleRefInt StackItem_SerializeInfo;
+        internal static delInt_HandleHandleInt StackItem_Serialize;
         internal static delVoid_RefHandle StackItem_Free;
 
         internal static delInt_Handle ArrayStackItem_Count;
@@ -166,8 +166,8 @@ namespace NeoVM.Interop
             // StackItems
 
             StackItem_Create = Core.GetDelegate<delHandle_ByteHandleInt>("StackItem_Create");
-            StackItem_SerializeData = Core.GetDelegate<delInt_HandleHandleInt>("StackItem_SerializeData");
-            StackItem_SerializeDetails = Core.GetDelegate<delByte_HandleRefInt>("StackItem_SerializeDetails");
+            StackItem_Serialize = Core.GetDelegate<delInt_HandleHandleInt>("StackItem_Serialize");
+            StackItem_SerializeInfo = Core.GetDelegate<delByte_HandleRefInt>("StackItem_SerializeInfo");
             StackItem_Free = Core.GetDelegate<delVoid_RefHandle>("StackItem_Free");
 
             // ArrayStackItem

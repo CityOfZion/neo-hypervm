@@ -6,9 +6,9 @@ namespace NeoVM.Interop.Types.Arguments
     public class NotifyEventArgs : EventArgs
     {
         /// <summary>
-        /// Script container
+        /// Message Provider
         /// </summary>
-        public readonly IScriptContainer ScriptContainer;
+        public readonly IMessageProvider MessageProvider;
         /// <summary>
         /// Script Hash
         /// </summary>
@@ -21,12 +21,12 @@ namespace NeoVM.Interop.Types.Arguments
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="container">Script container</param>
+        /// <param name="messageProvider">Message Provider</param>
         /// <param name="scriptHash">Script hash</param>
         /// <param name="state">State</param>
-        public NotifyEventArgs(IScriptContainer container, byte[] scriptHash, IStackItem state)
+        public NotifyEventArgs(IMessageProvider messageProvider, byte[] scriptHash, IStackItem state)
         {
-            ScriptContainer = container;
+            MessageProvider = messageProvider;
             ScriptHash = scriptHash;
             State = state;
         }

@@ -228,14 +228,12 @@ IStackItem* StackItem_Create(EStackItemType type, byte *data, int32 size)
 	return it;
 }
 
-int32 StackItem_SerializeData(IStackItem* item, byte * output, int32 length)
+int32 StackItem_Serialize(IStackItem* item, byte * output, int32 length)
 {
-	if (item == NULL) return -1;
-
-	return item->Serialize(output, length);
+	return item == NULL ? -1 : item->Serialize(output, length);
 }
 
-EStackItemType StackItem_SerializeDetails(IStackItem* item, int32 &size)
+EStackItemType StackItem_SerializeInfo(IStackItem* item, int32 &size)
 {
 	if (item == NULL)
 	{

@@ -1,6 +1,6 @@
 ﻿namespace NeoVM.Interop.Interfaces
 {
-    public interface IScriptContainer
+    public interface IMessageProvider
     {
         /// <summary>
         /// Get message for check signatures

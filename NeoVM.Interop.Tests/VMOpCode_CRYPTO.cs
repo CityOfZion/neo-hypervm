@@ -207,7 +207,7 @@ namespace NeoVM.Interop.Tests
             {
                 // Get data
 
-                byte[] message = Args.ScriptContainer.GetMessage(0);
+                byte[] message = Args.MessageProvider.GetMessage(0);
 
                 // Create Ecdsa
 
@@ -320,7 +320,7 @@ namespace NeoVM.Interop.Tests
             {
                 // Get data
 
-                byte[] message = Args.ScriptContainer.GetMessage(0);
+                byte[] message = Args.MessageProvider.GetMessage(0);
 
                 // Create Ecdsa
 
