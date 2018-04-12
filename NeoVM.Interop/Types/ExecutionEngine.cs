@@ -13,6 +13,19 @@ namespace NeoVM.Interop.Types
 {
     public unsafe class ExecutionEngine : IDisposable
     {
+        #region Delegates
+
+        NeoVM.OnStepIntoCallback _InternalOnStepInto;
+        NeoVM.OnStackChangeCallback _InternalOnExecutionContextChange;
+        NeoVM.OnStackChangeCallback _InternalOnAltStackChange;
+        NeoVM.OnStackChangeCallback _InternalOnEvaluationStackChange;
+
+        NeoVM.InvokeInteropCallback _InternalInvokeInterop;
+        NeoVM.LoadScriptCallback _InternalLoadScript;
+        NeoVM.GetMessageCallback _InternalGetMessage;
+
+        #endregion
+
         /// <summary>
         /// Native handle
         /// </summary>
@@ -77,11 +90,13 @@ namespace NeoVM.Interop.Types
         /// <param name="e">Arguments</param>
         public ExecutionEngine(ExecutionEngineArgs e)
         {
+            _InternalInvokeInterop = new NeoVM.InvokeInteropCallback(InternalInvokeInterop);
+            _InternalLoadScript = new NeoVM.LoadScriptCallback(InternalLoadScript);
+            _InternalGetMessage = new NeoVM.GetMessageCallback(InternalGetMessage);
+
             Handle = NeoVM.ExecutionEngine_Create
                 (
-                new NeoVM.InvokeInteropCallback(InternalInvokeInterop),
-                new NeoVM.LoadScriptCallback(InternalLoadScript),
-                new NeoVM.GetMessageCallback(InternalGetMessage),
+                _InternalInvokeInterop, _InternalLoadScript, _InternalGetMessage,
                 out IntPtr invHandle, out IntPtr evHandle, out IntPtr altHandle
                 );
 
@@ -106,14 +121,28 @@ namespace NeoVM.Interop.Types
                     Logger = e.Logger;
 
                     if (Logger.Verbosity.HasFlag(ELogVerbosity.StepInto))
-                        NeoVM.ExecutionEngine_AddLog(Handle, new NeoVM.OnStepIntoCallback(InternalOnStepInto));
+                    {
+                        _InternalOnStepInto = new NeoVM.OnStepIntoCallback(InternalOnStepInto);
+                        NeoVM.ExecutionEngine_AddLog(Handle, _InternalOnStepInto);
+                    }
 
                     if (Logger.Verbosity.HasFlag(ELogVerbosity.ExecutionContextStackChanges))
-                        NeoVM.ExecutionContextStack_AddLog(invHandle, new NeoVM.OnStackChangeCallback(InternalOnExecutionContextChange));
+                    {
+                        _InternalOnExecutionContextChange = new NeoVM.OnStackChangeCallback(InternalOnExecutionContextChange);
+                        NeoVM.ExecutionContextStack_AddLog(invHandle, _InternalOnExecutionContextChange);
+                    }
+
                     if (Logger.Verbosity.HasFlag(ELogVerbosity.AltStackChanges))
-                        NeoVM.StackItems_AddLog(altHandle, new NeoVM.OnStackChangeCallback(InternalOnAltStackChange));
+                    {
+                        _InternalOnAltStackChange = new NeoVM.OnStackChangeCallback(InternalOnAltStackChange);
+                        NeoVM.StackItems_AddLog(altHandle, _InternalOnAltStackChange);
+                    }
+
                     if (Logger.Verbosity.HasFlag(ELogVerbosity.EvaluationStackChanges))
-                        NeoVM.StackItems_AddLog(evHandle, new NeoVM.OnStackChangeCallback(InternalOnEvaluationStackChange));
+                    {
+                        _InternalOnEvaluationStackChange = new NeoVM.OnStackChangeCallback(InternalOnEvaluationStackChange);
+                        NeoVM.StackItems_AddLog(evHandle, _InternalOnEvaluationStackChange);
+                    }
                 }
                 else
                 {

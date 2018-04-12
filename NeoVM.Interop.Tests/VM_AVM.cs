@@ -183,14 +183,17 @@ namespace NeoVM.Interop.Tests
                 Logger = new ExecutionEngineLogger(ELogVerbosity.None)
             };
 
-            args.Logger.OnStepInto += (context)
-                => { Console.WriteLine(context.ToString()); };
-            args.Logger.OnAltStackChange += (stack, item, index, oper) 
-                => { Console.WriteLine("AltStack: " + index.ToString() + "-" + oper.ToString()); };
-            args.Logger.OnEvaluationStackChange += (stack, item, index, oper)
-                => { Console.WriteLine("EvStack: " + index.ToString() + "-" + oper.ToString()); };
-            args.Logger.OnExecutionContextChange += (stack, item, index, oper) 
-                => { Console.WriteLine("ExeStack: " + index.ToString() + "-" + oper.ToString()); };
+            args.Logger.OnStepInto += (context) =>
+            { Console.WriteLine(context.ToString()); };
+
+            args.Logger.OnAltStackChange += (stack, item, index, oper) =>
+            { Console.WriteLine("AltStack: " + index.ToString() + "-" + oper.ToString()); };
+
+            args.Logger.OnEvaluationStackChange += (stack, item, index, oper) =>
+            { Console.WriteLine("EvStack: " + index.ToString() + "-" + oper.ToString()); };
+
+            args.Logger.OnExecutionContextChange += (stack, item, index, oper) =>
+            { Console.WriteLine("ExeStack: " + index.ToString() + "-" + oper.ToString()); };
 
             args.InteropService.OnLog += (sender, e) => { Console.WriteLine("Log: " + e.Message); };
             args.InteropService.OnNotify += (sender, e) => { Console.WriteLine("Notification: " + e.State.ToString()); };
@@ -200,8 +203,7 @@ namespace NeoVM.Interop.Tests
             {
                 // Register proposal
 
-                arguments.EmitPush(new object[] { VoteId, "My proposal", new byte[20], new byte[20] });
-                arguments.EmitPush("register_proposal");
+                arguments.EmitMainPush("register_proposal", new object[] { VoteId, "My proposal", new byte[20], new byte[20] });
 
                 engine.Clean(0);
                 engine.LoadScript(script);
@@ -216,8 +218,7 @@ namespace NeoVM.Interop.Tests
                 // Vote
 
                 arguments.Clear();
-                arguments.EmitPush(new object[] { VoteId, new byte[20], 1 });
-                arguments.EmitPush("vote");
+                arguments.EmitMainPush("vote", new object[] { VoteId, new byte[20], 1 });
 
                 engine.Clean(1);
                 engine.LoadScript(script);
@@ -225,15 +226,14 @@ namespace NeoVM.Interop.Tests
 
                 // Execute
 
-                //Assert.AreEqual(engine.Execute(), EVMState.HALT);
-                //Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 0x01);
-                //CheckClean(engine);
+                Assert.AreEqual(engine.Execute(), EVMState.HALT);
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 0x01);
+                CheckClean(engine);
 
                 // Count
 
                 arguments.Clear();
-                arguments.EmitPush(new object[] { VoteId });
-                arguments.EmitPush("count");
+                arguments.EmitMainPush("count", new object[] { VoteId });
 
                 engine.Clean(2);
                 engine.LoadScript(script);

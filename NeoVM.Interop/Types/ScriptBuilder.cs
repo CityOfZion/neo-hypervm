@@ -206,6 +206,14 @@ namespace NeoVM.Interop.Types
             return this;
         }
 
+        public ScriptBuilder EmitMainPush(string operation, object[] pars)
+        {
+            EmitPush(pars);
+            EmitPush(operation);
+
+            return this;
+        }
+
         public ScriptBuilder EmitSysCall(string api)
         {
             if (api == null)

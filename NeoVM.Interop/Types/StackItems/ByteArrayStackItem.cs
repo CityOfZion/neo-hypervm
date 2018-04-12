@@ -3,6 +3,7 @@ using NeoVM.Interop.Helpers;
 using NeoVM.Interop.Interfaces;
 using System;
 using System.Linq;
+using System.Text;
 
 namespace NeoVM.Interop.Types.StackItems
 {
@@ -51,7 +52,19 @@ namespace NeoVM.Interop.Types.StackItems
 
         public override string ToString()
         {
-            return BitHelper.ToHexString(Value);
+            if (Value == null) return "NULL";
+
+            // Check printable characters
+
+            bool allOk = true;
+            foreach (byte c in Value)
+                if (c < 32 || c > 126)
+                {
+                    allOk = false;
+                    break;
+                }
+
+            return allOk ? "'" + Encoding.ASCII.GetString(Value) + "'" : BitHelper.ToHexString(Value);
         }
     }
 }
