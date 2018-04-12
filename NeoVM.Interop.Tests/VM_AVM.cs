@@ -179,7 +179,7 @@ namespace NeoVM.Interop.Tests
                 ScriptTable = new DummyScriptTable(),
                 Trigger = ETriggerType.Application,
                 MessageProvider = new DummyMessageProvider(),
-                Logger = new ExecutionEngineLogger(ELogVerbosity.All)
+                Logger = new ExecutionEngineLogger(ELogVerbosity.None)
             };
 
             args.Logger.OnStepInto += (context) =>
@@ -199,9 +199,11 @@ namespace NeoVM.Interop.Tests
 
             using (ScriptBuilder arguments = new ScriptBuilder())
             using (ExecutionEngine engine = NeoVM.CreateEngine(args))
+            // for (int x = 0; x < 5000; x++) // Benchmark
             {
                 // Register proposal
 
+                arguments.Clear();
                 arguments.EmitMainPush("register_proposal", new object[] { VoteId, "My proposal", new byte[20], new byte[20] });
 
                 engine.Clean(0);
