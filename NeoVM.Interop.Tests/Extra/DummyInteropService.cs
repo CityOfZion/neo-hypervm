@@ -26,11 +26,25 @@ namespace NeoVM.Interop.Tests.Extra
             Register("Neo.Storage.Get", Storage_Get);
             Register("Neo.Storage.Put", Storage_Put);
             Register("Neo.Storage.Delete", Storage_Delete);
+            Register("Neo.Runtime.CheckWitness", CheckWitness);
 
             //Register("Neo.Storage.Find", Storage_Find);
             //Register("Neo.Iterator.Next", Iterator_Next);
             //Register("Neo.Iterator.Key", Iterator_Key);
             //Register("Neo.Iterator.Value", Iterator_Value);
+        }
+
+        bool CheckWitness(ExecutionEngine engine)
+        {
+            // Fake CheckWitness
+
+            if (!engine.EvaluationStack.TryPop(out IStackItem it) || !it.CanConvertToByteArray)
+                return false;
+
+            using (IStackItem itb = engine.CreateBool(true))
+                engine.EvaluationStack.Push(itb);
+
+            return true;
         }
 
         bool Storage_GetContext(ExecutionEngine engine)

@@ -203,6 +203,8 @@ namespace NeoVM.Interop.Tests
             {
                 // Register proposal
 
+                Console.WriteLine("** Register proposal **" + Environment.NewLine);
+
                 arguments.Clear();
                 arguments.EmitMainPush("register_proposal", new object[] { VoteId, "My proposal", new byte[20], new byte[20] });
 
@@ -217,6 +219,8 @@ namespace NeoVM.Interop.Tests
                 CheckClean(engine);
 
                 // Vote
+
+                Console.WriteLine(Environment.NewLine + "** Vote **" + Environment.NewLine);
 
                 arguments.Clear();
                 arguments.EmitMainPush("vote", new object[] { VoteId, new byte[20], 1 });
@@ -233,6 +237,8 @@ namespace NeoVM.Interop.Tests
 
                 // Count
 
+                Console.WriteLine(Environment.NewLine + "** Count **" + Environment.NewLine);
+
                 arguments.Clear();
                 arguments.EmitMainPush("count", new object[] { VoteId });
 
@@ -243,7 +249,7 @@ namespace NeoVM.Interop.Tests
                 // Execute
 
                 Assert.AreEqual(engine.Execute(), EVMState.HALT);
-                Assert.AreEqual(engine.EvaluationStack.Pop<ByteArrayStackItem>().Value.Length, 0x00);
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 0x01);
                 CheckClean(engine);
             }
         }

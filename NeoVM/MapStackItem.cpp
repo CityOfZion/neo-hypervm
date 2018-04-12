@@ -19,15 +19,20 @@ bool MapStackItem::Remove(IStackItem* key, bool dispose)
 {
 	for (std::map<IStackItem*, IStackItem*>::iterator it = this->Dictionary.begin(); it != this->Dictionary.end(); ++it)
 	{
-		IStackItem* key = it->first;
-		if (key != key) continue;
+		if (!it->first->Equals(key)) continue;
 
 		IStackItem* value = it->second;
 
 		if (dispose)
 		{
-			IStackItem::UnclaimAndFree(key);
+			if (it->first == key)
+				IStackItem::UnclaimAndFree(key);
+
 			IStackItem::UnclaimAndFree(value);
+		}
+		else 
+		{
+			value->UnClaim();
 		}
 
 		this->Dictionary.erase(key);
@@ -60,9 +65,7 @@ IStackItem* MapStackItem::Get(IStackItem* key)
 {
 	for (std::map<IStackItem*, IStackItem*>::iterator it = this->Dictionary.begin(); it != this->Dictionary.end(); ++it)
 	{
-		IStackItem* key = it->first;
-		if (key != key) continue;
-
+		if (!it->first->Equals(key)) continue;
 		return it->second;
 	}
 
@@ -103,8 +106,7 @@ void MapStackItem::Set(IStackItem* key, IStackItem* value)
 {
 	for (std::map<IStackItem*, IStackItem*>::iterator it = this->Dictionary.begin(); it != this->Dictionary.end(); ++it)
 	{
-		IStackItem* key = it->first;
-		if (key != key) continue;
+		if (!it->first->Equals(key)) continue;
 
 		IStackItem* v = it->second;
 		if (v == value) return;
