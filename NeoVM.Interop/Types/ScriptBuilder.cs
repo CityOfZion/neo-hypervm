@@ -68,9 +68,11 @@ namespace NeoVM.Interop.Types
         /// <summary>
         /// Clear buffer
         /// </summary>
-        public void Clear()
+        public ScriptBuilder Clear()
         {
             writer.SetLength(0);
+
+            return this;
         }
 
         public ScriptBuilder Emit(byte[] raw)

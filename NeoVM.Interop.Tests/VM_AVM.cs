@@ -5,7 +5,6 @@ using NeoVM.Interop.Types;
 using NeoVM.Interop.Types.Arguments;
 using NeoVM.Interop.Types.StackItems;
 using System;
-using System.Collections.Generic;
 
 namespace NeoVM.Interop.Tests
 {
@@ -180,7 +179,7 @@ namespace NeoVM.Interop.Tests
                 ScriptTable = new DummyScriptTable(),
                 Trigger = ETriggerType.Application,
                 MessageProvider = new DummyMessageProvider(),
-                Logger = new ExecutionEngineLogger(ELogVerbosity.None)
+                Logger = new ExecutionEngineLogger(ELogVerbosity.All)
             };
 
             args.Logger.OnStepInto += (context) =>
