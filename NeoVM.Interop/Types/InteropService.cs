@@ -126,19 +126,7 @@ namespace NeoVM.Interop.Types
 
                 // Get string
 
-                switch (it.Type)
-                {
-                    case EStackItemType.ByteArray:
-                        {
-                            message = Encoding.UTF8.GetString(((ByteArrayStackItem)it).Value);
-                            break;
-                        }
-                    default:
-                        {
-                            message = it.ToString();
-                            break;
-                        }
-                }
+                message = it.ToString();
             }
 
             ExecutionContext ctx = engine.CurrentContext;

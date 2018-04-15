@@ -194,8 +194,10 @@ namespace NeoVM.Interop.Tests
             args.Logger.OnExecutionContextChange += (stack, item, index, oper) =>
             { Console.WriteLine("ExeStack: " + index.ToString() + "-" + oper.ToString()); };
 
-            args.InteropService.OnLog += (sender, e) => { Console.WriteLine("Log: " + e.Message); };
-            args.InteropService.OnNotify += (sender, e) => { Console.WriteLine("Notification: " + e.State.ToString()); };
+            args.InteropService.OnLog += (sender, e) => 
+            { Console.WriteLine("Log: " + e.Message); };
+            args.InteropService.OnNotify += (sender, e) => 
+            { Console.WriteLine("Notification: " + e.State.ToString()); };
 
             using (ScriptBuilder arguments = new ScriptBuilder())
             using (ExecutionEngine engine = NeoVM.CreateEngine(args))
