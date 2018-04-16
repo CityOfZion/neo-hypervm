@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NeoVM.Interop\NeoVM.Interop.csproj" />
+    <ProjectReference Include="..\..\interop\NeoVM.Interop\NeoVM.Interop.csproj" />
   </ItemGroup>
 
   <ItemGroup>
