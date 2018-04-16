@@ -228,15 +228,16 @@ namespace NeoVM.Interop.Types
         /// Load script callback
         /// </summary>
         /// <param name="scriptHash">Hash</param>
+        /// <param name="isDynamicInvoke">Is dynamic invoke</param>
         /// <returns>Return 0x01 if is corrected loaded</returns>
-        byte InternalLoadScript(byte[] scriptHash)
+        byte InternalLoadScript(byte[] scriptHash, byte isDynamicInvoke)
         {
             if (ScriptTable == null)
             {
                 return 0x00;
             }
 
-            byte[] script = ScriptTable.GetScript(scriptHash);
+            byte[] script = ScriptTable.GetScript(scriptHash, isDynamicInvoke == 0x01);
 
             if (script == null || script.Length <= 0)
             {

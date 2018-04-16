@@ -35,7 +35,7 @@ namespace NeoVM.Interop
         internal delegate byte InvokeInteropCallback(IntPtr ptr, byte size);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate byte LoadScriptCallback([MarshalAs(UnmanagedType.LPArray, SizeConst = 20)]byte[] scriptHash);
+        internal delegate byte LoadScriptCallback([MarshalAs(UnmanagedType.LPArray, SizeConst = 20)]byte[] scriptHash, byte isDynamicInvoke);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate int GetMessageCallback(uint iteration, out IntPtr script);

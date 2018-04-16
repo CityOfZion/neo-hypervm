@@ -482,7 +482,7 @@ namespace NeoVM.Interop.Tests
                 CheckClean(engine, false);
             }
 
-            // Check empty with wight push
+            // Check empty with with push
 
             using (ScriptBuilder script = new ScriptBuilder
             (
@@ -570,7 +570,7 @@ namespace NeoVM.Interop.Tests
 
                 // Check
 
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 0x05);
+                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 0x06);
 
                 CheckClean(engine);
             }

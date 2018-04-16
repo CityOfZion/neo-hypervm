@@ -345,11 +345,11 @@ ExecuteOpCode:
 			return;
 		}
 
-		bool isEmpty = true;
+		bool isDynamicInvoke = true;
 		for (int32 x = 0; x < 20; x++)
-			if (script_hash[x] != 0x00) { isEmpty = false; break; }
+			if (script_hash[x] != 0x00) { isDynamicInvoke = false; break; }
 
-		if (isEmpty)
+		if (isDynamicInvoke)
 		{
 			if (this->EvaluationStack->Count() < 1)
 			{
@@ -373,7 +373,7 @@ ExecuteOpCode:
 			this->InvocationStack->Drop();
 		}
 
-		if (this->OnLoadScript(script_hash) != 0x01)
+		if (this->OnLoadScript(script_hash, isDynamicInvoke ? 0x01 : 0x00) != 0x01)
 		{
 			this->State = EVMState::FAULT;
 			return;

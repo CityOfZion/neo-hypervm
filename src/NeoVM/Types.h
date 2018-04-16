@@ -23,7 +23,7 @@ typedef unsigned long long      uint64;
 #endif
 
 typedef byte(__stdcall * InvokeInteropCallback)(void* method, byte length);
-typedef byte(__stdcall * LoadScriptCallback)(const byte* scriptHash);
+typedef byte(__stdcall * LoadScriptCallback)(const byte* scriptHash, byte isDynamicInvoke);
 typedef int32(__stdcall * GetMessageCallback)(uint32 iteration, byte* &message);
 
 typedef void(__stdcall * OnStackChangeCallback)(void *item, int32 index, byte operation);
