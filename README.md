@@ -39,11 +39,12 @@ Copy binaries or create a symbolic link, also you can set `NEO_HYPERVM_PATH`envi
 
 ```
 cd \
-cd C:\neo-hypervm\tests\NeoVM.Interop.Tests\bin\Debug\netcoreapp2.0\]
+cd C:\neo-hypervm\tests\NeoVM.Interop.Tests\bin\Debug\netcoreapp2.0
 mkdir Windows
 cd Windows
 mkdir x86
 mkdir x64
+
 cd x86
 cmd /c mklink NeoVM.dll C:\neo-hypervm\src\NeoVM\Win32\Debug\NeoVM.dll
 cd ../x64
