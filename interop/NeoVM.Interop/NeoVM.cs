@@ -215,7 +215,7 @@ namespace NeoVM.Interop
                 string nfile = Environment.GetEnvironmentVariable("NEO_HYPERVM_PATH");
 
                 if (string.IsNullOrEmpty(nfile))
-                    throw (new FileNotFoundException());
+                    throw (new FileNotFoundException(file));
 
                 file = nfile;
                 if (!File.Exists(file))
