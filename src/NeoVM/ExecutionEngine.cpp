@@ -299,7 +299,7 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::CALL:
 	{
-		if (context == NULL)
+		if (context == NULL || this->InvocationStack->Count() >= MAX_INVOCATION_STACK_SIZE)
 		{
 			this->State = EVMState::FAULT;
 			return;
@@ -371,6 +371,14 @@ ExecuteOpCode:
 		if (opcode == EVMOpCode::TAILCALL)
 		{
 			this->InvocationStack->Drop();
+		}
+		else
+		{
+			if (this->InvocationStack->Count() >= MAX_INVOCATION_STACK_SIZE)
+			{
+				this->State = EVMState::FAULT;
+				return;
+			}
 		}
 
 		if (this->OnLoadScript(script_hash, isDynamicInvoke ? 0x01 : 0x00) != 0x01)

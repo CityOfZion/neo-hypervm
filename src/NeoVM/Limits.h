@@ -14,6 +14,10 @@ const int32 MIN_SHL_SHR = -MAX_SHL_SHR;
 /// Set max item lenght
 /// </summary>
 const uint32 MAX_ITEM_LENGTH = 1024 * 1024;
+/// <summary>
+/// Set max invocation stack size
+/// </summary>
+const uint32 MAX_INVOCATION_STACK_SIZE = 1024;
 
 // TODO: Implement this limits
 
@@ -25,10 +29,6 @@ const uint32 MAX_ITEM_LENGTH = 1024 * 1024;
 ///// Set the max Stack Size
 ///// </summary>
 //const uint32 MaxStackSize = 2 * 1024;
-///// <summary>
-///// Set Max Invocation Stack Size
-///// </summary>
-//const uint32 MaxInvocationStackSize = 1024;
 ///// <summary>
 ///// Set Max Array Size
 ///// </summary>
