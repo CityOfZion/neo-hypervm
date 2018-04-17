@@ -11,7 +11,7 @@ const int32 MAX_SHL_SHR = 65535;
 /// </summary>
 const int32 MIN_SHL_SHR = -MAX_SHL_SHR;
 /// <summary>
-/// Set max item lenght
+/// Set max item length
 /// </summary>
 const uint32 MAX_ITEM_LENGTH = 1024 * 1024;
 /// <summary>
