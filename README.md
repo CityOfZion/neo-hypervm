@@ -38,7 +38,6 @@ For debugging the native source make sure to append the following line in `**/Pr
 Copy binaries or create a symbolic link, also you can set `NEO_HYPERVM_PATH`environment variable with the path of the native library
 
 ```
-cd \
 cd C:\neo-hypervm\tests\NeoVM.Interop.Tests\bin\Debug\netcoreapp2.0
 mkdir Windows
 cd Windows
