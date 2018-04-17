@@ -102,26 +102,27 @@ void MapStackItem::FillValues(ArrayStackItem* arr)
 	}
 }
 
-void MapStackItem::Set(IStackItem* key, IStackItem* value)
+bool MapStackItem::Set(IStackItem* key, IStackItem* value)
 {
 	for (std::map<IStackItem*, IStackItem*>::iterator it = this->Dictionary.begin(); it != this->Dictionary.end(); ++it)
 	{
 		if (!it->first->Equals(key)) continue;
 
 		IStackItem* v = it->second;
-		if (v == value) return;
+		if (v == value) return false;
 
 		IStackItem::UnclaimAndFree(v);
 
 		value->Claim();
 		it->second = value;
-		return;
+		return false;
 	}
 
 	key->Claim();
 	value->Claim();
 
 	this->Dictionary.emplace(key, value);
+	return true;
 }
 
 // Serialize

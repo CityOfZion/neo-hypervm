@@ -18,6 +18,10 @@ const uint32 MAX_ITEM_LENGTH = 1024 * 1024;
 /// Set max invocation stack size
 /// </summary>
 const uint32 MAX_INVOCATION_STACK_SIZE = 1024;
+/// <summary>
+/// Set max array size
+/// </summary>
+const uint32 MAX_ARRAY_SIZE = 1024;
 
 // TODO: Implement this limits
 
@@ -29,7 +33,3 @@ const uint32 MAX_INVOCATION_STACK_SIZE = 1024;
 ///// Set the max Stack Size
 ///// </summary>
 //const uint32 MaxStackSize = 2 * 1024;
-///// <summary>
-///// Set Max Array Size
-///// </summary>
-//const uint32 MaxArraySize = 1024;

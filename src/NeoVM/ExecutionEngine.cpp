@@ -2337,7 +2337,7 @@ ExecuteOpCode:
 		int32 size = 0;
 		IStackItem *item = this->EvaluationStack->Pop();
 
-		if (!item->GetInt32(size) || size < 0 || size >(ec - 1))
+		if (!item->GetInt32(size) || size < 0 || size >(ec - 1) || size > MAX_ARRAY_SIZE)
 		{
 			IStackItem::Free(item);
 			this->State = EVMState::FAULT;
@@ -2516,7 +2516,12 @@ ExecuteOpCode:
 		{
 			MapStackItem *arr = (MapStackItem*)item;
 
-			arr->Set(key, value);
+			if (arr->Set(key, value) && arr->Count() > MAX_ARRAY_SIZE)
+			{
+				// Overflow in one the MAX_ARRAY_SIZE, but is more optimized than check if exists before
+
+				this->State = EVMState::FAULT;
+			}
 
 			IStackItem::Free(key);
 			IStackItem::Free(value);
@@ -2545,7 +2550,7 @@ ExecuteOpCode:
 		int32 count = 0;
 		IStackItem *item = this->EvaluationStack->Pop();
 
-		if (!item->GetInt32(count) || count < 0)
+		if (!item->GetInt32(count) || count < 0 || count > MAX_ARRAY_SIZE)
 		{
 			IStackItem::Free(item);
 			this->State = EVMState::FAULT;
@@ -2567,7 +2572,7 @@ ExecuteOpCode:
 		int32 count = 0;
 		IStackItem *item = this->EvaluationStack->Pop();
 
-		if (!item->GetInt32(count) || count < 0)
+		if (!item->GetInt32(count) || count < 0 || count > MAX_ARRAY_SIZE)
 		{
 			IStackItem::Free(item);
 			this->State = EVMState::FAULT;
@@ -2606,7 +2611,16 @@ ExecuteOpCode:
 		case EStackItemType::Struct:
 		{
 			ArrayStackItem *arr = (ArrayStackItem*)item;
-			arr->Add(newItem);
+
+			if ((arr->Count() + 1) > MAX_ARRAY_SIZE)
+			{
+				this->State = EVMState::FAULT;
+			}
+			else
+			{
+				arr->Add(newItem);
+			}
+
 			IStackItem::Free(item);
 			return;
 		}

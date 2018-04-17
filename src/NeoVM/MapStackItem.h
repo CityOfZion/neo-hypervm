@@ -25,7 +25,7 @@ public:
 	// Map Methods
 
 	int32 Count();
-	void Set(IStackItem* key, IStackItem* value);
+	bool Set(IStackItem* key, IStackItem* value);
 	IStackItem* Get(IStackItem* key);
 	bool Remove(IStackItem* key, bool dispose);
 	void FillKeys(ArrayStackItem* arr);
