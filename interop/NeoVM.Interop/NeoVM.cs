@@ -1,4 +1,5 @@
-﻿using NeoVM.Interop.Interfaces;
+﻿using NeoVM.Interop.Enums;
+using NeoVM.Interop.Interfaces;
 using NeoVM.Interop.Native;
 using NeoVM.Interop.Types;
 using NeoVM.Interop.Types.Arguments;
@@ -214,7 +215,7 @@ namespace NeoVM.Interop
                 string nfile = Environment.GetEnvironmentVariable("NEO_HYPERVM_PATH");
 
                 if (string.IsNullOrEmpty(nfile))
-                    throw (new FileNotFoundException(file));
+                    throw (new FileNotFoundException());
 
                 file = nfile;
                 if (!File.Exists(file))

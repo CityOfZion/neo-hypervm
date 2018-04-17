@@ -425,6 +425,28 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void CAT()
         {
+            // Max limit
+
+            using (ScriptBuilder script = new ScriptBuilder())
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load script
+
+                script.Emit(EVMOpCode.PUSH1);
+                script.EmitPush(new byte[1024 * 1024]);
+                script.Emit(EVMOpCode.CAT, EVMOpCode.RET);
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
             // With wrong types
 
             using (ScriptBuilder script = new ScriptBuilder

@@ -10,6 +10,10 @@ const int32 MAX_SHL_SHR = 65535;
 /// Min value for SHL and SHR
 /// </summary>
 const int32 MIN_SHL_SHR = -MAX_SHL_SHR;
+/// <summary>
+/// Set max item lenght
+/// </summary>
+const uint32 MAX_ITEM_LENGTH = 1024 * 1024;
 
 // TODO: Implement this limits
 
@@ -21,10 +25,6 @@ const int32 MIN_SHL_SHR = -MAX_SHL_SHR;
 ///// Set the max Stack Size
 ///// </summary>
 //const uint32 MaxStackSize = 2 * 1024;
-///// <summary>
-///// Set Max Item Size
-///// </summary>
-//const uint32 MaxItemSize = 1024 * 1024;
 ///// <summary>
 ///// Set Max Invocation Stack Size
 ///// </summary>

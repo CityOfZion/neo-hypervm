@@ -217,7 +217,7 @@ ExecuteOpCode:
 	case EVMOpCode::PUSHDATA4:
 	{
 		int32 length = 0;
-		if (!context->ReadInt32(length) || length < 0)
+		if (!context->ReadInt32(length) || length < 0 || length > MAX_ITEM_LENGTH)
 		{
 			this->State = EVMState::FAULT;
 			return;
@@ -700,7 +700,7 @@ ExecuteOpCode:
 		int32 size2 = x2->ReadByteArraySize();
 		int32 size1 = x1->ReadByteArraySize();
 
-		if (size2 < 0 || size1 < 0)
+		if (size2 < 0 || size1 < 0 || size1 + size2 > MAX_ITEM_LENGTH)
 		{
 			IStackItem::Free(x2);
 			IStackItem::Free(x1);
@@ -2107,6 +2107,7 @@ ExecuteOpCode:
 			return;
 		}
 
+		/*
 		byte ** pubKeys;
 		byte ** signatures;
 		int * pubKeysL;
@@ -2264,6 +2265,7 @@ ExecuteOpCode:
 		if (signaturesL != NULL)delete[](signaturesL);
 
 		this->EvaluationStack->Push(new BoolStackItem(fSuccess));
+		*/
 		return;
 	}
 

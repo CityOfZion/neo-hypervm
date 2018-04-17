@@ -1,6 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NeoVM.Interop.Enums;
-using NeoVM.Interop.Helpers;
 using NeoVM.Interop.Interfaces;
 using NeoVM.Interop.Tests.Crypto;
 using NeoVM.Interop.Tests.Extra;

@@ -23,18 +23,4 @@
     <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
   </PropertyGroup>
 
-  <!-- Copy NeoVM library for Windows users -->
-
-  <ItemGroup Condition="$([System.IO.File]::Exists('$(SolutionDir)/src/NeoVM/Win32/$(Configuration)/NeoVM.dll')) ">
-    <ContentWithTargetPath Include="$(SolutionDir)/src/NeoVM/Win32/$(Configuration)/NeoVM.dll" TargetPath="Windows/x86/NeoVM.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </ContentWithTargetPath>
-  </ItemGroup>
-
-  <ItemGroup Condition="$([System.IO.File]::Exists('$(SolutionDir)/src/NeoVM/x64/$(Configuration)/NeoVM.dll')) ">
-    <ContentWithTargetPath Include="$(SolutionDir)/src/NeoVM/x64/$(Configuration)/NeoVM.dll" TargetPath="Windows/x64/NeoVM.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </ContentWithTargetPath>
-  </ItemGroup>
-
 </Project>

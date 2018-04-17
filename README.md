@@ -29,11 +29,25 @@
 
 # Installation
 
-### Visual studio
+### Visual studio (Windows Users)
 For debugging the native source make sure to append the following line in `**/Properties/launchSettings.json` 
 
 ```
 "nativeDebugging": true
+```
+Copy binaries or create a symbolic link, also you can set `NEO_HYPERVM_PATH`environment variable with the path of the native library
+
+```
+cd \
+cd C:\neo-hypervm\tests\NeoVM.Interop.Tests\bin\Debug\netcoreapp2.0\]
+mkdir Windows
+cd Windows
+mkdir x86
+mkdir x64
+cd x86
+cmd /c mklink NeoVM.dll C:\neo-hypervm\src\NeoVM\Win32\Debug\NeoVM.dll
+cd ../x64
+cmd /c mklink NeoVM.dll C:\neo-hypervm\src\NeoVM\x64\Debug\NeoVM.dll
 ```
 
 ### Other

@@ -197,6 +197,33 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void PUSHDATA4()
         {
+            // Test limit
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                EVMOpCode.PUSHDATA4, new byte[]
+                {
+                0x01, 0xFF, 0x0F, 0x00,
+                0x01, 0x02, 0x03, 0x04
+                }
+            ))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            {
+                // Load Script
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+
+                // Check
+
+                CheckClean(engine, false);
+            }
+
+            // More tests
+
             using (ScriptBuilder script = new ScriptBuilder
             (
                 EVMOpCode.PUSHDATA4, new byte[]
