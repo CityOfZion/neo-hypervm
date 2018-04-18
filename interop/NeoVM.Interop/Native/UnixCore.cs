@@ -26,15 +26,15 @@ namespace NeoVM.Interop.Native
         const int RTLD_GLOBAL = 8;
 
         [DllImport(NativeLibrary)]
-        private static extern IntPtr dlopen([MarshalAs(UnmanagedType.LPTStr)] string fileName, int flags);
+        private static extern IntPtr dlopen(string fileName, int flags);
 
-        [DllImport(NativeLibrary)]
-        private static extern IntPtr dlsym(IntPtr handle, [MarshalAs(UnmanagedType.LPTStr)] string symbol);
+        [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        private static extern IntPtr dlsym(IntPtr handle, string symbol);
 
-        [DllImport(NativeLibrary)]
+        [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         private static extern int dlclose(IntPtr handle);
 
-        [DllImport(NativeLibrary)]
+        [DllImport(NativeLibrary, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         private static extern IntPtr dlerror();
 
         #endregion
@@ -51,19 +51,25 @@ namespace NeoVM.Interop.Native
             // clear previous errors if any
 
             dlerror();
-            IntPtr res = dlsym(NativeHandle, name);
-            IntPtr errPtr = dlerror();
 
+            IntPtr res = dlsym(NativeHandle, name);
+
+            if (res != IntPtr.Zero)
+                return res;
+
+            IntPtr errPtr = dlerror();
             if (errPtr != IntPtr.Zero)
                 throw new Exception("dlsym: " + Marshal.PtrToStringAnsi(errPtr));
 
-            return res;
+            return IntPtr.Zero;
         }
 
         protected override bool InternalLoadLibrary(string fileName, out IntPtr handle)
         {
             // clear previous errors if any
+
             dlerror();
+
             handle = dlopen(fileName, RTLD_NOW);
 
             if (handle != IntPtr.Zero)
