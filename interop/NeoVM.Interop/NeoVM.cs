@@ -87,6 +87,7 @@ namespace NeoVM.Interop
 
         #region Cache
 
+#pragma warning disable CS0649
         internal static delVoid_OutIntOutIntOutIntOutInt GetVersion;
 
         internal static delCreateExecutionEngine ExecutionEngine_Create;
@@ -132,6 +133,7 @@ namespace NeoVM.Interop
         internal static delInt_Handle ExecutionContext_GetInstructionPointer;
         internal static delVoid_RefHandle ExecutionContext_Free;
         internal static delVoid_Handle ExecutionContext_Claim;
+#pragma warning restore CS0649
 
         #endregion
 

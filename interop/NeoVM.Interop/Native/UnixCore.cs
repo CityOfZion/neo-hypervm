@@ -19,10 +19,10 @@ namespace NeoVM.Interop.Native
         const int RTLD_GLOBAL = 8;
 
         [DllImport("libdl.so")]
-        private static extern IntPtr dlopen(string fileName, int flags);
+        private static extern IntPtr dlopen([MarshalAs(UnmanagedType.LPTStr)] string fileName, int flags);
 
         [DllImport("libdl.so")]
-        private static extern IntPtr dlsym(IntPtr handle, string symbol);
+        private static extern IntPtr dlsym(IntPtr handle, [MarshalAs(UnmanagedType.LPTStr)] string symbol);
 
         [DllImport("libdl.so")]
         private static extern int dlclose(IntPtr handle);
@@ -57,17 +57,15 @@ namespace NeoVM.Interop.Native
         {
             handle = dlopen(fileName, RTLD_NOW);
 
-            if (handle == IntPtr.Zero)
-            {
-                IntPtr errPtr = dlerror();
+            if (handle != IntPtr.Zero)
+                return true;
 
-                if (errPtr != IntPtr.Zero)
-                    throw new Exception("dlsym: " + Marshal.PtrToStringAnsi(errPtr));
+            IntPtr errPtr = dlerror();
 
-                return false;
-            }
+            if (errPtr != IntPtr.Zero)
+                throw new Exception("dlsym: " + Marshal.PtrToStringAnsi(errPtr));
 
-            return true;
+            return false;
         }
 
         #endregion
