@@ -26,7 +26,7 @@ namespace NeoVM.Interop.Tests
                 EVMOpCode.PUSH0,
                 EVMOpCode.RET
             ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(null))
             {
                 // Load script
 
@@ -56,15 +56,16 @@ namespace NeoVM.Interop.Tests
         public void TestPushOnly()
         {
             using (ScriptBuilder script = new ScriptBuilder(EVMOpCode.SYSCALL))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
-                // Load script
+                using (ExecutionEngine engine = NeoVM.CreateEngine(null))
+                {
+                    // Load script
 
-                engine.LoadPushOnlyScript(script);
+                    engine.LoadPushOnlyScript(script);
 
-                // Call
-
-                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+                    // Call
+                    Assert.AreEqual(EVMState.FAULT, engine.Execute());
+                }
             }
         }
 
@@ -78,7 +79,7 @@ namespace NeoVM.Interop.Tests
                 EVMOpCode.NOT,
                 EVMOpCode.DROP
             ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(null))
             {
                 engine.LoadScript(script);
 
@@ -172,14 +173,13 @@ namespace NeoVM.Interop.Tests
 
                 // Test
 
-                Assert.AreEqual(stackOp.ToString().Trim(),
+                Assert.AreEqual(stackOp.ToString().Trim().Replace("\r", ""),
 @"[0x41663051791e0cf03178508aea217ca495c24891-000000] PUSH10
 [0x41663051791e0cf03178508aea217ca495c24891-000001] TOALTSTACK
 [0x41663051791e0cf03178508aea217ca495c24891-000002] FROMALTSTACK
-[0x41663051791e0cf03178508aea217ca495c24891-000003] RET"
-);
+[0x41663051791e0cf03178508aea217ca495c24891-000003] RET".Replace("\r", ""));
 
-                Assert.AreEqual(stackLog.ToString().Trim(),
+                Assert.AreEqual(stackLog.ToString().Trim().Replace("\r", ""),
 @"EXE:Push[0]
 EXE:TryPeek[0]
 EVA:Push[0]
@@ -190,8 +190,7 @@ EXE:TryPeek[0]
 ALT:Pop[0]
 EVA:Push[0]
 EXE:TryPeek[0]
-EXE:Drop[0]"
-);
+EXE:Drop[0]".Replace("\r", ""));
 
             }
         }
