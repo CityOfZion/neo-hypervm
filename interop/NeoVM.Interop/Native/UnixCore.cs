@@ -16,6 +16,7 @@ namespace NeoVM.Interop.Native
 
         const int RTLD_LAZY = 1;
         const int RTLD_NOW = 2;
+        const int RTLD_GLOBAL = 8;
 
         [DllImport("libdl.so")]
         private static extern IntPtr dlopen(string fileName, int flags);

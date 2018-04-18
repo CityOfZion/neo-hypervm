@@ -4,6 +4,8 @@ using NeoVM.Interop.Types;
 using NeoVM.Interop.Types.Arguments;
 using System;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace NeoVM.Interop
@@ -133,71 +135,6 @@ namespace NeoVM.Interop
 
         #endregion
 
-        /// <summary>
-        /// Cache calls
-        /// </summary>
-        static void CacheCalls()
-        {
-            // Library Info
-
-            GetVersion = Core.GetDelegate<delVoid_OutIntOutIntOutIntOutInt>("GetVersion");
-
-            // Engine
-
-            ExecutionEngine_Create = Core.GetDelegate<delCreateExecutionEngine>("ExecutionEngine_Create");
-            ExecutionEngine_Free = Core.GetDelegate<delVoid_RefHandle>("ExecutionEngine_Free");
-            ExecutionEngine_LoadScript = Core.GetDelegate<delVoid_HandleHandleInt>("ExecutionEngine_LoadScript");
-            ExecutionEngine_LoadPushOnlyScript = Core.GetDelegate<delVoid_HandleHandleInt>("ExecutionEngine_LoadPushOnlyScript");
-            ExecutionEngine_GetState = Core.GetDelegate<delByte_Handle>("ExecutionEngine_GetState");
-            ExecutionEngine_AddLog = Core.GetDelegate<delVoid_HandleOnStepIntoCallback>("ExecutionEngine_AddLog");
-            ExecutionEngine_Clean = Core.GetDelegate<delVoid_HandleUInt>("ExecutionEngine_Clean");
-
-            ExecutionEngine_Execute = Core.GetDelegate<delByte_Handle>("ExecutionEngine_Execute");
-            ExecutionEngine_StepInto = Core.GetDelegate<delVoid_Handle>("ExecutionEngine_StepInto");
-            ExecutionEngine_StepOver = Core.GetDelegate<delVoid_Handle>("ExecutionEngine_StepOver");
-            ExecutionEngine_StepOut = Core.GetDelegate<delVoid_Handle>("ExecutionEngine_StepOut");
-
-            // ExecutionContext
-
-            ExecutionContext_GetScriptHash = Core.GetDelegate<delInt_HandleHandleInt>("ExecutionContext_GetScriptHash");
-            ExecutionContext_GetNextInstruction = Core.GetDelegate<delByte_Handle>("ExecutionContext_GetNextInstruction");
-            ExecutionContext_GetInstructionPointer = Core.GetDelegate<delInt_Handle>("ExecutionContext_GetInstructionPointer");
-            ExecutionContext_Free = Core.GetDelegate<delVoid_RefHandle>("ExecutionContext_Free");
-            ExecutionContext_Claim = Core.GetDelegate<delVoid_Handle>("ExecutionContext_Claim");
-
-            // Stacks
-
-            StackItems_Count = Core.GetDelegate<delInt_Handle>("StackItems_Count");
-            StackItems_Push = Core.GetDelegate<delVoid_HandleHandle>("StackItems_Push");
-            StackItems_Pop = Core.GetDelegate<delHandle_Handle>("StackItems_Pop");
-            StackItems_Drop = Core.GetDelegate<delInt_HandleInt>("StackItems_Drop");
-            StackItems_Peek = Core.GetDelegate<delHandle_HandleInt>("StackItems_Peek");
-            StackItems_AddLog = Core.GetDelegate<delVoid_HandleOnStackChangeCallback>("StackItems_AddLog");
-
-            ExecutionContextStack_Count = Core.GetDelegate<delInt_Handle>("ExecutionContextStack_Count");
-            ExecutionContextStack_Drop = Core.GetDelegate<delInt_HandleInt>("ExecutionContextStack_Drop");
-            ExecutionContextStack_Peek = Core.GetDelegate<delHandle_HandleInt>("ExecutionContextStack_Peek");
-            ExecutionContextStack_AddLog = Core.GetDelegate<delVoid_HandleOnStackChangeCallback>("ExecutionContextStack_AddLog");
-
-            // StackItems
-
-            StackItem_Create = Core.GetDelegate<delHandle_ByteHandleInt>("StackItem_Create");
-            StackItem_Serialize = Core.GetDelegate<delInt_HandleHandleInt>("StackItem_Serialize");
-            StackItem_SerializeInfo = Core.GetDelegate<delByte_HandleRefInt>("StackItem_SerializeInfo");
-            StackItem_Free = Core.GetDelegate<delVoid_RefHandle>("StackItem_Free");
-
-            // ArrayStackItem
-
-            ArrayStackItem_Count = Core.GetDelegate<delInt_Handle>("ArrayStackItem_Count");
-            ArrayStackItem_Clear = Core.GetDelegate<delVoid_Handle>("ArrayStackItem_Clear");
-            ArrayStackItem_Get = Core.GetDelegate<delHandle_HandleInt>("ArrayStackItem_Get");
-            ArrayStackItem_Set = Core.GetDelegate<delVoid_HandleHandleInt>("ArrayStackItem_Set");
-            ArrayStackItem_Add = Core.GetDelegate<delVoid_HandleHandle>("ArrayStackItem_Add");
-            ArrayStackItem_IndexOf = Core.GetDelegate<delInt_HandleHandle>("ArrayStackItem_IndexOf");
-            ArrayStackItem_Insert = Core.GetDelegate<delVoid_HandleHandleInt>("ArrayStackItem_Insert");
-            ArrayStackItem_RemoveAt = Core.GetDelegate<delVoid_HandleInt>("ArrayStackItem_RemoveAt");
-        }
-
         #endregion
 
         /// <summary>
@@ -251,7 +188,20 @@ namespace NeoVM.Interop
                 }
             };
 
-            CacheCalls();
+            // Cache delegates using reflection
+
+            Type delegateType = typeof(MulticastDelegate);
+
+            foreach (FieldInfo fi in typeof(NeoVM).GetFields(BindingFlags.NonPublic | BindingFlags.Static)
+                .Where(fi => fi.FieldType.BaseType == delegateType))
+            {
+                Delegate del = Core.GetDelegate(fi.Name, fi.FieldType);
+
+                if (del == null)
+                    throw (new NotImplementedException(fi.Name));
+
+                fi.SetValue(null, del);
+            }
 
             // Get version
 
