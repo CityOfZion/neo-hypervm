@@ -16,15 +16,24 @@ namespace NeoVM.Interop.Tests
 {
     public class VMOpCodeTest
     {
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            Console.WriteLine("Native Library Info");
+            Console.WriteLine("  Path: " + NeoVM.LibraryPath);
+            Console.WriteLine("  Version: " + NeoVM.LibraryVersion);
+            Console.WriteLine("");
+        }
+
         /// <summary>
         /// Rand
         /// </summary>
-        public static readonly Random Rand = new Random();
+        public readonly Random Rand = new Random();
 
         /// <summary>
         /// Test BigInteger array
         /// </summary>
-        public static readonly BigInteger[] TestBigIntegers = new BigInteger[]
+        public readonly BigInteger[] TestBigIntegers = new BigInteger[]
         {
             new BigInteger(long.MinValue)*new BigInteger(long.MinValue)*new BigInteger(long.MinValue),
             new BigInteger(ulong.MaxValue)*new BigInteger(ulong.MaxValue)*new BigInteger(ulong.MaxValue),
@@ -54,7 +63,7 @@ namespace NeoVM.Interop.Tests
         /// <summary>
         /// Regular arguments
         /// </summary>
-        protected readonly static ExecutionEngineArgs Args = new ExecutionEngineArgs()
+        protected readonly ExecutionEngineArgs Args = new ExecutionEngineArgs()
         {
             MessageProvider = new DummyMessageProvider(),
             InteropService = new InteropService(),
@@ -65,7 +74,7 @@ namespace NeoVM.Interop.Tests
         /// Compute distinct BigIntegers
         /// </summary>
         /// <returns>BigIntegerPair</returns>
-        protected static IEnumerable<BigInteger> IntSingleIteration()
+        protected IEnumerable<BigInteger> IntSingleIteration()
         {
             List<BigInteger> ret = new List<BigInteger>();
 
@@ -93,7 +102,7 @@ namespace NeoVM.Interop.Tests
         /// Compute distinct pairs
         /// </summary>
         /// <returns>BigIntegerPair</returns>
-        protected static IEnumerable<BigIntegerPair> IntPairIteration()
+        protected IEnumerable<BigIntegerPair> IntPairIteration()
         {
             BigInteger[] ar = IntSingleIteration().ToArray();
             List<BigIntegerPair> ret = new List<BigIntegerPair>();

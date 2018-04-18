@@ -1,5 +1,4 @@
-﻿using NeoVM.Interop.Enums;
-using NeoVM.Interop.Interfaces;
+﻿using NeoVM.Interop.Interfaces;
 using NeoVM.Interop.Native;
 using NeoVM.Interop.Types;
 using NeoVM.Interop.Types.Arguments;
@@ -17,6 +16,14 @@ namespace NeoVM.Interop
         /// Library core
         /// </summary>
         readonly static CrossPlatformLibrary Core;
+        /// <summary>
+        /// Library path
+        /// </summary>
+        public readonly static string LibraryPath;
+        /// <summary>
+        /// Version
+        /// </summary>
+        public readonly static Version LibraryVersion;
 
         #region Core cache
 
@@ -50,6 +57,8 @@ namespace NeoVM.Interop
         internal delegate IntPtr delHandle_Handle(IntPtr pointer);
         internal delegate void delVoid_RefHandle(ref IntPtr pointer);
 
+        internal delegate void delVoid_OutIntOutIntOutIntOutInt(out int i1, out int i2, out int i3, out int i4);
+
         internal delegate int delInt_HandleInt(IntPtr pointer, int value);
         internal delegate void delVoid_HandleUInt(IntPtr pointer, uint value);
         internal delegate void delVoid_HandleInt(IntPtr pointer, int value);
@@ -75,6 +84,8 @@ namespace NeoVM.Interop
         #endregion
 
         #region Cache
+
+        internal static delVoid_OutIntOutIntOutIntOutInt GetVersion;
 
         internal static delCreateExecutionEngine ExecutionEngine_Create;
         internal static delVoid_RefHandle ExecutionEngine_Free;
@@ -127,6 +138,10 @@ namespace NeoVM.Interop
         /// </summary>
         static void CacheCalls()
         {
+            // Library Info
+
+            GetVersion = Core.GetDelegate<delVoid_OutIntOutIntOutIntOutInt>("GetVersion");
+
             // Engine
 
             ExecutionEngine_Create = Core.GetDelegate<delCreateExecutionEngine>("ExecutionEngine_Create");
@@ -206,25 +221,25 @@ namespace NeoVM.Interop
                 throw (new NotSupportedException("Native library not found"));
 
             // Load library
-            string file = Path.Combine(AppContext.BaseDirectory, Core.Platform.ToString(),
+            LibraryPath = Path.Combine(AppContext.BaseDirectory, Core.Platform.ToString(),
                 Core.Architecture.ToString(), LibraryName + Core.LibraryExtension);
 
             // Check Environment path
-            if (!File.Exists(file))
+            if (!File.Exists(LibraryPath))
             {
                 string nfile = Environment.GetEnvironmentVariable("NEO_HYPERVM_PATH");
 
                 if (string.IsNullOrEmpty(nfile))
-                    throw (new FileNotFoundException(file));
+                    throw (new FileNotFoundException(LibraryPath));
 
-                file = nfile;
-                if (!File.Exists(file))
-                    throw (new FileNotFoundException(file));
+                LibraryPath = nfile;
+                if (!File.Exists(LibraryPath))
+                    throw (new FileNotFoundException(LibraryPath));
             }
 
-            if (!Core.LoadLibrary(file))
+            if (!Core.LoadLibrary(LibraryPath))
             {
-                throw (new ArgumentException("Wrong library file: " + file));
+                throw (new ArgumentException("Wrong library file: " + LibraryPath));
             }
 
             // Static destructor
@@ -237,6 +252,11 @@ namespace NeoVM.Interop
             };
 
             CacheCalls();
+
+            // Get version
+
+            GetVersion(out int major, out int minor, out int build, out int revision);
+            LibraryVersion = new Version(major, minor, build, revision);
         }
 
         /// <summary>

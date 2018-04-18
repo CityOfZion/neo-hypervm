@@ -14,6 +14,7 @@ namespace NeoVM.Interop.Native
         // https://stackoverflow.com/questions/13461989/p-invoke-to-dynamically-loaded-library-on-mono
         // http://dimitry-i.blogspot.com.es/2013/01/mononet-how-to-dynamically-load-native.html
 
+        const int RTLD_LAZY = 1;
         const int RTLD_NOW = 2;
 
         [DllImport("libdl.so")]
@@ -54,7 +55,18 @@ namespace NeoVM.Interop.Native
         protected override bool InternalLoadLibrary(string fileName, out IntPtr handle)
         {
             handle = dlopen(fileName, RTLD_NOW);
-            return handle != IntPtr.Zero;
+
+            if (handle == IntPtr.Zero)
+            {
+                IntPtr errPtr = dlerror();
+
+                if (errPtr != IntPtr.Zero)
+                    throw new Exception("dlsym: " + Marshal.PtrToStringAnsi(errPtr));
+
+                return false;
+            }
+
+            return true;
         }
 
         #endregion

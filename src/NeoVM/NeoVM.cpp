@@ -6,6 +6,18 @@
 #include "ArrayStackItem.h"
 #include "MapStackItem.h"
 
+// Library
+
+void GetVersion(int32 &major, int32 &minor, int32 &build, int32 &revision)
+{
+	// TODO: Extract version from file
+
+	major = 0;
+	minor = 1;
+	build = 0;
+	revision = 0;
+}
+
 // ExecutionContext
 
 int32 ExecutionContext_GetScriptHash(ExecutionContext* context, byte* output, int32 index)

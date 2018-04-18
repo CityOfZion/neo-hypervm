@@ -15,6 +15,10 @@
 
 extern "C"
 {
+	// Get version
+
+	DllExport void GetVersion(int32 &major, int32 &minor, int32 &build, int32 &revision);
+
 	// ExecutionContext
 
 	DllExport int32 ExecutionContext_GetScriptHash(ExecutionContext* context, byte *output, int32 index);
