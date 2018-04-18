@@ -7,17 +7,19 @@ namespace NeoVM.Interop.Native
 {
     internal class WindowsCore : CrossPlatformLibrary
     {
+        const string NativeLibrary = "kernel32.dll";
+
         public WindowsCore() : base(EPlatform.Windows, ".dll") { }
 
         #region Windows
 
-        [DllImport("kernel32", EntryPoint = "LoadLibrary")]
+        [DllImport(NativeLibrary, EntryPoint = "LoadLibrary")]
         static extern IntPtr _LoadLibrary(string fileName);
 
-        [DllImport("kernel32.dll", EntryPoint = "FreeLibrary")]
+        [DllImport(NativeLibrary, EntryPoint = "FreeLibrary")]
         static extern bool _FreeLibrary(IntPtr hModule);
 
-        [DllImport("kernel32.dll", EntryPoint = "GetProcAddress")]
+        [DllImport(NativeLibrary, EntryPoint = "GetProcAddress")]
         static extern IntPtr _GetProcAddress(IntPtr handle, string procedureName);
 
         #endregion

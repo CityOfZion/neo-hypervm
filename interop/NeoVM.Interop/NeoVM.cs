@@ -150,9 +150,22 @@ namespace NeoVM.Interop
                 case PlatformID.Win32NT:
                 case PlatformID.Win32S:
                 case PlatformID.Win32Windows:
-                case PlatformID.WinCE: Core = new WindowsCore(); break;
-                case PlatformID.Unix: Core = new UnixCore(); break;
-                case PlatformID.MacOSX: Core = new MacCore(); break;
+                case PlatformID.WinCE:
+                    {
+                        Core = new WindowsCore();
+                        break;
+                    }
+                case PlatformID.Unix:
+                case (PlatformID)128:
+                    {
+                        Core = new UnixCore();
+                        break;
+                    }
+                case PlatformID.MacOSX:
+                    {
+                        Core = new MacCore();
+                        break;
+                    }
             }
 
             // Check core

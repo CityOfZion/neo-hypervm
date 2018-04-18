@@ -7,7 +7,14 @@ namespace NeoVM.Interop.Native
 {
     internal class UnixCore : CrossPlatformLibrary
     {
+        const string NativeLibrary = "libdl.so";
+
+        #region Constructors
+
         public UnixCore() : base(EPlatform.Unix, ".so") { }
+        protected UnixCore(EPlatform platform, string extension) : base(platform, extension) { }
+
+        #endregion
 
         #region Unix
 
@@ -18,16 +25,16 @@ namespace NeoVM.Interop.Native
         const int RTLD_NOW = 2;
         const int RTLD_GLOBAL = 8;
 
-        [DllImport("libdl.so")]
+        [DllImport(NativeLibrary)]
         private static extern IntPtr dlopen([MarshalAs(UnmanagedType.LPTStr)] string fileName, int flags);
 
-        [DllImport("libdl.so")]
+        [DllImport(NativeLibrary)]
         private static extern IntPtr dlsym(IntPtr handle, [MarshalAs(UnmanagedType.LPTStr)] string symbol);
 
-        [DllImport("libdl.so")]
+        [DllImport(NativeLibrary)]
         private static extern int dlclose(IntPtr handle);
 
-        [DllImport("libdl.so")]
+        [DllImport(NativeLibrary)]
         private static extern IntPtr dlerror();
 
         #endregion
@@ -55,6 +62,8 @@ namespace NeoVM.Interop.Native
 
         protected override bool InternalLoadLibrary(string fileName, out IntPtr handle)
         {
+            // clear previous errors if any
+            dlerror();
             handle = dlopen(fileName, RTLD_NOW);
 
             if (handle != IntPtr.Zero)
