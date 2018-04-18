@@ -1,4 +1,4 @@
-TARGET_EXEC ?= hypervm
+TARGET_EXEC ?= NeoVM.so
 
 BUILD_DIR ?= ./bin
 SRC_DIRS ?= ./NeoVM
@@ -10,10 +10,10 @@ DEPS := $(OBJS:.o=.d)
 INC_DIRS := $(shell find $(SRC_DIRS) -type d)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
-CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -Wall --std=c++11
+CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -Wall -fPIC --std=c++11
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
-	$(CXX) -c $(OBJS) -o $@ $(LDFLAGS)
+	$(CXX) -fPIC -shared $(OBJS) -o $@ $(LDFLAGS)
 
 # assembly
 $(BUILD_DIR)/%.s.o: %.s
