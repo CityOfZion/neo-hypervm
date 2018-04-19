@@ -34,6 +34,7 @@ ExecutionEngine::ExecutionEngine
 ) :
 	Iteration(0),
 	State(EVMState::NONE),
+	Log(NULL),
 
 	OnGetMessage(getMessage),
 	OnLoadScript(loadScript),
