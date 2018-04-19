@@ -56,16 +56,24 @@ namespace NeoVM.Interop.Tests
         public void TestPushOnly()
         {
             using (ScriptBuilder script = new ScriptBuilder(EVMOpCode.SYSCALL))
+            using (ExecutionEngine engine = NeoVM.CreateEngine(null))
             {
-                using (ExecutionEngine engine = NeoVM.CreateEngine(null))
+                // Load script
+
+                Assert.AreEqual(engine.InvocationStack.Count, 0);
+                engine.LoadPushOnlyScript(script);
+                Assert.AreEqual(engine.InvocationStack.Count, 1);
+
+                using (ExecutionContext ct = engine.InvocationStack.Peek())
                 {
-                    // Load script
-
-                    engine.LoadPushOnlyScript(script);
-
-                    // Call
-                    Assert.AreEqual(EVMState.FAULT, engine.Execute());
+                    Assert.AreEqual(ct.InstructionPointer, 0);
+                    Assert.AreEqual(ct.IsDisposed, false);
+                    Assert.AreEqual(ct.NextInstruction, EVMOpCode.SYSCALL);
                 }
+
+                // Call
+
+                Assert.AreEqual(EVMState.FAULT, engine.Execute());
             }
         }
 
