@@ -96,6 +96,31 @@ namespace NeoVM.Interop.Helpers
             return bytes;
         }
         /// <summary>
+        /// To Int32
+        /// </summary>
+        /// <param name="value">Value</param>
+        /// <param name="startIndex">index</param>
+        public static int ToInt32(byte[] value, int startIndex)
+        {
+            if (!BitConverter.IsLittleEndian)
+            {
+                // Convert to Little Endian
+
+                Array.Reverse(value, startIndex, 4);
+            }
+
+            fixed (byte* pbyte = &value[startIndex])
+            {
+                if (startIndex % 4 == 0)
+                {
+                    // data is aligned 
+                    return *((int*)pbyte);
+                }
+
+                return (*pbyte) | (*(pbyte + 1) << 8) | (*(pbyte + 2) << 16) | (*(pbyte + 3) << 24);
+            }
+        }
+        /// <summary>
         /// To Int64
         /// </summary>
         /// <param name="value">Value</param>
