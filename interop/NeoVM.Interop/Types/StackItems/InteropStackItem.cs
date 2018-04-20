@@ -2,13 +2,12 @@
 using NeoVM.Interop.Helpers;
 using NeoVM.Interop.Interfaces;
 using System;
-using System.Runtime.InteropServices;
 
 namespace NeoVM.Interop.Types.StackItems
 {
     public class InteropStackItem : IStackItem<object>, IEquatable<InteropStackItem>
     {
-        IntPtr ObjectPointer;
+        int ObjKey;
 
         /// <summary>
         /// Constructor
@@ -17,6 +16,20 @@ namespace NeoVM.Interop.Types.StackItems
         /// <param name="data">Data</param>
         internal InteropStackItem(ExecutionEngine engine, object data) : base(engine, data, EStackItemType.Interop)
         {
+            // Search
+
+            ObjKey = engine.InteropCache.IndexOf(data);
+
+            // New
+
+            if (ObjKey == -1)
+            {
+                ObjKey = engine.InteropCache.Count;
+                engine.InteropCache.Add(data);
+            }
+
+            // Create native item
+
             CreateNativeItem();
         }
         /// <summary>
@@ -24,27 +37,11 @@ namespace NeoVM.Interop.Types.StackItems
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="handle">Handle</param>
-        /// <param name="data">Data</param>
-        /// <param name="ptr">Object pointer</param>
-        internal InteropStackItem(ExecutionEngine engine, IntPtr handle, object data, IntPtr ptr) :
-            base(engine, data, EStackItemType.Interop, handle)
+        /// <param name="objKey">Object key</param>
+        internal InteropStackItem(ExecutionEngine engine, IntPtr handle, int objKey) :
+            base(engine, engine.InteropCache[objKey], EStackItemType.Interop, handle)
         {
-            ObjectPointer = ptr;
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-
-            if (ObjectPointer == IntPtr.Zero) return;
-
-            Marshal.Release(ObjectPointer);
-            ObjectPointer = IntPtr.Zero;
-
-            if (disposing && Value is IDisposable dsp)
-            {
-                dsp.Dispose();
-            }
+            ObjKey = objKey;
         }
 
         public bool Equals(InteropStackItem other)
@@ -65,8 +62,7 @@ namespace NeoVM.Interop.Types.StackItems
 
         protected override byte[] GetNativeByteArray()
         {
-            IntPtr ptr = Marshal.GetIUnknownForObject(Value);
-            return BitHelper.GetBytes(ptr.ToInt64());
+            return BitHelper.GetBytes(ObjKey);
         }
     }
 }

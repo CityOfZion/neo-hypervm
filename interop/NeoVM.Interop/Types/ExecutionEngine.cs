@@ -75,7 +75,10 @@ namespace NeoVM.Interop.Types
         /// Virtual Machine State
         /// </summary>
         public EVMState State => (EVMState)NeoVM.ExecutionEngine_GetState(Handle);
-
+        /// <summary>
+        /// Interop Cache
+        /// </summary>
+        internal readonly List<object> InteropCache;
         #region Shortcuts
 
         public ExecutionContext CurrentContext => InvocationStack.TryPeek(0, out ExecutionContext i) ? i : null;
@@ -93,6 +96,7 @@ namespace NeoVM.Interop.Types
             _InternalInvokeInterop = new NeoVM.InvokeInteropCallback(InternalInvokeInterop);
             _InternalLoadScript = new NeoVM.LoadScriptCallback(InternalLoadScript);
             _InternalGetMessage = new NeoVM.GetMessageCallback(InternalGetMessage);
+            InteropCache = new List<object>();
 
             Handle = NeoVM.ExecutionEngine_Create
                 (
@@ -386,8 +390,7 @@ namespace NeoVM.Interop.Types
                     {
                         // Extract object
 
-                        IntPtr ptr = new IntPtr(BitHelper.ToInt64(payload, 0));
-                        return new InteropStackItem(this, item, Marshal.GetObjectForIUnknown(ptr), ptr);
+                        return new InteropStackItem(this, item, BitHelper.ToInt32(payload, 0));
                     }
                 case EStackItemType.ByteArray: return new ByteArrayStackItem(this, item, payload ?? (new byte[] { }));
                 case EStackItemType.Integer:
@@ -499,6 +502,17 @@ namespace NeoVM.Interop.Types
         protected virtual void Dispose(bool disposing)
         {
             if (Handle == IntPtr.Zero) return;
+
+            if (disposing)
+            {
+                // Clear interop cache
+
+                foreach (object v in InteropCache)
+                    if (v is IDisposable dsp)
+                        dsp.Dispose();
+
+                InteropCache.Clear();
+            }
 
             // free unmanaged resources (unmanaged objects) and override a finalizer below. set large fields to null.
             NeoVM.ExecutionEngine_Free(ref Handle);

@@ -46,7 +46,7 @@ bool InteropStackItem::Equals(IStackItem * it)
 	if (ii->PayloadLength != this->PayloadLength)
 		return false;
 
-	for (int x = this->PayloadLength - 1; x >= 0; x--)
+	for (int32 x = this->PayloadLength - 1; x >= 0; x--)
 	{
 		if (ii->Payload[x] != this->Payload[x])
 			return false;
