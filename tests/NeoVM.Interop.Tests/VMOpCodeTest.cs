@@ -16,6 +16,8 @@ namespace NeoVM.Interop.Tests
 {
     public class VMOpCodeTest
     {
+        const bool CalculateNumericalTimes = false;
+
         [TestInitialize]
         public void TestInitialize()
         {
@@ -209,11 +211,24 @@ namespace NeoVM.Interop.Tests
                     // Operand
 
                     CancelEventArgs cancel = new CancelEventArgs(false);
-                    sw.Restart();
+
+#pragma warning disable CS0162
+                    if (CalculateNumericalTimes)
+                    {
+                        sw.Restart();
+                    }
+#pragma warning restore
+
                     engine.StepInto();
                     check(engine, pair.A, pair.B, cancel);
-                    sw.Stop();
-                    Console.WriteLine("[" + sw.Elapsed.ToString() + "] " + pair.A + " " + operand.ToString() + " " + pair.B);
+
+#pragma warning disable CS0162
+                    if (CalculateNumericalTimes)
+                    {
+                        sw.Stop();
+                        Console.WriteLine("[" + sw.Elapsed.ToString() + "] " + pair.A + " " + operand.ToString() + " " + pair.B);
+                    }
+#pragma warning restore
 
                     if (cancel.Cancel)
                     {
@@ -306,11 +321,24 @@ namespace NeoVM.Interop.Tests
                     // Operand
 
                     CancelEventArgs cancel = new CancelEventArgs(false);
-                    sw.Restart();
+
+#pragma warning disable CS0162
+                    if (CalculateNumericalTimes)
+                    {
+                        sw.Restart();
+                    }
+#pragma warning restore
+
                     engine.StepInto();
                     check(engine, bi, cancel);
-                    sw.Stop();
-                    Console.WriteLine("[" + sw.Elapsed.ToString() + "] " + bi);
+
+#pragma warning disable CS0162
+                    if (CalculateNumericalTimes)
+                    {
+                        sw.Stop();
+                        Console.WriteLine("[" + sw.Elapsed.ToString() + "] " + bi);
+                    }
+#pragma warning restore
 
                     if (cancel.Cancel) continue;
 
