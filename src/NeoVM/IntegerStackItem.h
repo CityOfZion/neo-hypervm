@@ -6,7 +6,7 @@ class IntegerStackItem : public IStackItem
 {
 private:
 
-	BigInteger * Value;
+	BigInteger Value;
 
 public:
 
@@ -22,7 +22,7 @@ public:
 	// Constructor
 
 	IntegerStackItem(int32 value);
-	IntegerStackItem(BigInteger *value, bool copyPointer);
+	IntegerStackItem(BigInteger * &value);
 	IntegerStackItem(byte* data, int32 length);
 
 	// Destructor

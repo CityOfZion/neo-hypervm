@@ -237,7 +237,7 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::PUSHM1:
 	{
-		this->EvaluationStack->Push(new IntegerStackItem(new BigInteger(BigInteger::MinusOne), true));
+		this->EvaluationStack->Push(new IntegerStackItem(new BigInteger(BigInteger::MinusOne)));
 		return;
 	}
 
@@ -892,7 +892,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		this->EvaluationStack->Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::AND:
@@ -932,7 +932,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		this->EvaluationStack->Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::OR:
@@ -972,7 +972,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		this->EvaluationStack->Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::XOR:
@@ -1012,7 +1012,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		this->EvaluationStack->Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::EQUAL:
@@ -1064,7 +1064,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		this->EvaluationStack->Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::DEC:
@@ -1096,7 +1096,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		this->EvaluationStack->Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::SIGN:
@@ -1150,7 +1150,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		this->EvaluationStack->Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::ABS:
@@ -1180,7 +1180,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		this->EvaluationStack->Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::NOT:
@@ -1256,7 +1256,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		this->EvaluationStack->Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::SUB:
@@ -1293,7 +1293,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		this->EvaluationStack->Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::MUL:
@@ -1330,7 +1330,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		this->EvaluationStack->Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::DIV:
@@ -1367,7 +1367,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		this->EvaluationStack->Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::MOD:
@@ -1404,7 +1404,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		this->EvaluationStack->Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::SHL:
@@ -1444,7 +1444,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		this->EvaluationStack->Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::SHR:
@@ -1484,7 +1484,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		this->EvaluationStack->Push(new IntegerStackItem(ret, true));
+		this->EvaluationStack->Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::BOOLAND:
@@ -1757,12 +1757,12 @@ ExecuteOpCode:
 		if (i1->CompareTo(i2) >= 0)
 		{
 			delete(i1);
-			ret = new IntegerStackItem(i2, true);
+			ret = new IntegerStackItem(i2);
 		}
 		else
 		{
 			delete(i2);
-			ret = new IntegerStackItem(i1, true);
+			ret = new IntegerStackItem(i1);
 		}
 
 		this->EvaluationStack->Push(ret);
@@ -1798,12 +1798,12 @@ ExecuteOpCode:
 		if (i1->CompareTo(i2) >= 0)
 		{
 			delete(i2);
-			ret = new IntegerStackItem(i1, true);
+			ret = new IntegerStackItem(i1);
 		}
 		else
 		{
 			delete(i1);
-			ret = new IntegerStackItem(i2, true);
+			ret = new IntegerStackItem(i2);
 		}
 
 		this->EvaluationStack->Push(ret);
