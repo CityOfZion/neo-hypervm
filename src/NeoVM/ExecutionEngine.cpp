@@ -237,7 +237,8 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::PUSHM1:
 	{
-		this->EvaluationStack->Push(new IntegerStackItem(new BigInteger(BigInteger::MinusOne)));
+		BigInteger* bi = new BigInteger(BigInteger::MinusOne);
+		this->EvaluationStack->Push(new IntegerStackItem(bi));
 		return;
 	}
 

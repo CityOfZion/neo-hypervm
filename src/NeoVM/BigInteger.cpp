@@ -8,19 +8,15 @@ const BigInteger BigInteger::One = BigInteger(1);
 const BigInteger BigInteger::Zero = BigInteger(0);
 const BigInteger BigInteger::MinusOne = BigInteger(-1);
 
-BigInteger::BigInteger(int32 value)
+BigInteger::BigInteger(int32 value) :
+	_sign(value), _bits(NULL), _bitsSize(0)
 {
-	this->_sign = value;
-	this->_bits = NULL;
-	this->_bitsSize = 0;
-
 	// AssertValid();
 }
 
-BigInteger::BigInteger(BigInteger *value)
+BigInteger::BigInteger(BigInteger *value) :
+	_sign(value->_sign)
 {
-	this->_sign = value->_sign;
-
 	if (value->_bits == NULL || value->_bitsSize <= 0)
 	{
 		this->_bits = NULL;
@@ -38,10 +34,9 @@ BigInteger::BigInteger(BigInteger *value)
 	// AssertValid();
 }
 
-BigInteger::BigInteger(const BigInteger &value)
+BigInteger::BigInteger(const BigInteger &value) :
+	_sign(value._sign)
 {
-	this->_sign = value._sign;
-
 	if (value._bits == NULL || value._bitsSize <= 0)
 	{
 		this->_bits = NULL;
@@ -59,13 +54,12 @@ BigInteger::BigInteger(const BigInteger &value)
 	// AssertValid();
 }
 
-BigInteger::BigInteger(uint32* value, int32 valueSize, bool negative)
+BigInteger::BigInteger(uint32* value, int32 valueSize, bool negative) :_bits(NULL)
 {
 	if (value == NULL)
 	{
 		this->_sign = 0;
 		this->_bitsSize = 0;
-		this->_bits = NULL;
 		return;
 	}
 
@@ -81,14 +75,13 @@ BigInteger::BigInteger(uint32* value, int32 valueSize, bool negative)
 	{
 		this->_sign = 0;
 		this->_bitsSize = 0;
-		this->_bits = NULL;
 	}
 	// values like (Int32.MaxValue+1) are stored as "0x80000000" and as such cannot be packed into _sign
 	else if (len == 1 && value[0] < kuMaskHighBit)
 	{
 		this->_sign = (negative ? -(int)value[0] : (int)value[0]);
 		this->_bitsSize = 0;
-		this->_bits = NULL;
+
 		// Although Int32.MinValue fits in _sign, we represent this case differently for negate
 		if (this->_sign == Int32MinValue)
 		{
@@ -107,13 +100,12 @@ BigInteger::BigInteger(uint32* value, int32 valueSize, bool negative)
 	// AssertValid();
 }
 
-BigInteger::BigInteger(uint32* value, int32 size)
+BigInteger::BigInteger(uint32* value, int32 size) :_bits(NULL)
 {
 	if (value == NULL)
 	{
 		this->_sign = 0;
 		this->_bitsSize = 0;
-		this->_bits = NULL;
 		return;
 	}
 
@@ -129,11 +121,11 @@ BigInteger::BigInteger(uint32* value, int32 size)
 
 		this->_sign = 0;
 		this->_bitsSize = 0;
-		this->_bits = NULL;
 
 		// AssertValid();
 		return;
 	}
+
 	if (dwordCount == 1)
 	{
 		if ((int)value[0] < 0 && !isNegative)
@@ -151,7 +143,6 @@ BigInteger::BigInteger(uint32* value, int32 size)
 		{
 			this->_sign = (int)value[0];
 			this->_bitsSize = 0;
-			this->_bits = NULL;
 		}
 
 		//AssertValid();
@@ -206,7 +197,6 @@ BigInteger::BigInteger(uint32* value, int32 size)
 		{
 			this->_sign = (-1) * ((int)value[0]);
 			this->_bitsSize = 0;
-			this->_bits = NULL;
 		}
 	}
 	// the number is represented by multiple dwords
@@ -233,14 +223,13 @@ BigInteger::BigInteger(uint32* value, int32 size)
 	//AssertValid();
 }
 
-BigInteger::BigInteger(byte* value, int32 byteCount)
+BigInteger::BigInteger(byte* value, int32 byteCount) :_bits(NULL)
 {
 	if (byteCount <= 0 || value == NULL)
 	{
 		// BigInteger.Zero
 		this->_sign = 0;
 		this->_bitsSize = 0;
-		this->_bits = NULL;
 		return;
 	}
 
@@ -254,7 +243,6 @@ BigInteger::BigInteger(byte* value, int32 byteCount)
 		// BigInteger.Zero
 		this->_sign = 0;
 		this->_bitsSize = 0;
-		this->_bits = NULL;
 		// AssertValid();
 		return;
 	}
@@ -295,8 +283,6 @@ BigInteger::BigInteger(byte* value, int32 byteCount)
 			// AssertValid();
 			return;
 		}
-
-		this->_bits = NULL;
 	}
 	else
 	{
@@ -340,7 +326,6 @@ BigInteger::BigInteger(byte* value, int32 byteCount)
 		{
 			this->_sign = 0;
 			this->_bitsSize = 0;
-			this->_bits = NULL;
 		}
 		else if (isNegative)
 		{
@@ -356,7 +341,6 @@ BigInteger::BigInteger(byte* value, int32 byteCount)
 				if (val[0] == 1) // abs(-1)
 				{
 					this->_sign = -1;
-					this->_bits = NULL;
 					this->_bitsSize = 0;
 				}
 				else if (val[0] == kuMaskHighBit) // abs(Int32.MinValue)
@@ -368,7 +352,6 @@ BigInteger::BigInteger(byte* value, int32 byteCount)
 				else
 				{
 					this->_sign = (-1) * ((int)val[0]);
-					this->_bits = NULL;
 					this->_bitsSize = 0;
 				}
 			}
