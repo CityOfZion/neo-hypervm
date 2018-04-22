@@ -371,22 +371,23 @@ EXE:Drop[0]".Replace("\r", ""));
                         Assert.AreEqual(2, ar.Count);
                         
                         // Check values 1 and 3
+
                         using (IntegerStackItem iau = (IntegerStackItem)ar[0])
                             Assert.AreEqual(iau.Value, 1);
                         using (IntegerStackItem iau = (IntegerStackItem)ar[1])
                             Assert.AreEqual(iau.Value, 3);
 
-                        // Insert 2 again
+                        // Insert bool
 
-                        using (IntegerStackItem inte = engine.CreateInteger(2))
+                        using (BooleanStackItem inte = engine.CreateBool(true))
                             ar.Insert(1, inte);
 
                         // Check values
 
                         using (IntegerStackItem iau = (IntegerStackItem)ar[0])
                             Assert.AreEqual(iau.Value, 1);
-                        using (IntegerStackItem iau = (IntegerStackItem)ar[1])
-                            Assert.AreEqual(iau.Value, 2);
+                        using (BooleanStackItem iau = (BooleanStackItem)ar[1])
+                            Assert.IsTrue(iau.Value);
                         using (IntegerStackItem iau = (IntegerStackItem)ar[2])
                             Assert.AreEqual(iau.Value, 3);
                     }
