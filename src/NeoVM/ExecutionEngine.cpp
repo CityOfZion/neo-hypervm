@@ -712,8 +712,7 @@ ExecuteOpCode:
 
 		if (size2 < 0 || size1 < 0 || size1 + size2 > MAX_ITEM_LENGTH)
 		{
-			IStackItem::Free(x2);
-			IStackItem::Free(x1);
+			IStackItem::Free(x2, x1);
 
 			this->State = EVMState::FAULT;
 			return;
@@ -723,8 +722,7 @@ ExecuteOpCode:
 		x1->ReadByteArray(&data[0], 0, size1);
 		x2->ReadByteArray(&data[size1], 0, size2);
 
-		IStackItem::Free(x2);
-		IStackItem::Free(x1);
+		IStackItem::Free(x2, x1);
 
 		this->EvaluationStack->Push(new ByteArrayStackItem(data, size1 + size2, true));
 		return;
@@ -910,8 +908,7 @@ ExecuteOpCode:
 		BigInteger *i2 = x2->GetBigInteger();
 		BigInteger *i1 = x1->GetBigInteger();
 
-		IStackItem::Free(x1);
-		IStackItem::Free(x2);
+		IStackItem::Free(x1, x2);
 
 		if (i2 == NULL || i1 == NULL)
 		{
@@ -950,8 +947,7 @@ ExecuteOpCode:
 		BigInteger *i2 = x2->GetBigInteger();
 		BigInteger *i1 = x1->GetBigInteger();
 
-		IStackItem::Free(x1);
-		IStackItem::Free(x2);
+		IStackItem::Free(x1, x2);
 
 		if (i2 == NULL || i1 == NULL)
 		{
@@ -990,8 +986,7 @@ ExecuteOpCode:
 		BigInteger *i2 = x2->GetBigInteger();
 		BigInteger *i1 = x1->GetBigInteger();
 
-		IStackItem::Free(x1);
-		IStackItem::Free(x2);
+		IStackItem::Free(x1, x2);
 
 		if (i2 == NULL || i1 == NULL)
 		{
@@ -1029,8 +1024,7 @@ ExecuteOpCode:
 
 		this->EvaluationStack->Push(new BoolStackItem(x1->Equals(x2)));
 
-		IStackItem::Free(x2);
-		IStackItem::Free(x1);
+		IStackItem::Free(x2, x1);
 		return;
 	}
 
@@ -1235,8 +1229,7 @@ ExecuteOpCode:
 		IStackItem* i1 = this->EvaluationStack->Pop();
 		BigInteger* x2 = i2->GetBigInteger();
 		BigInteger* x1 = i1->GetBigInteger();
-		IStackItem::Free(i2);
-		IStackItem::Free(i1);
+		IStackItem::Free(i2, i1);
 
 		if (x2 == NULL || x1 == NULL)
 		{
@@ -1272,8 +1265,7 @@ ExecuteOpCode:
 		IStackItem* i1 = this->EvaluationStack->Pop();
 		BigInteger* x2 = i2->GetBigInteger();
 		BigInteger* x1 = i1->GetBigInteger();
-		IStackItem::Free(i2);
-		IStackItem::Free(i1);
+		IStackItem::Free(i2, i1);
 
 		if (x2 == NULL || x1 == NULL)
 		{
@@ -1309,8 +1301,7 @@ ExecuteOpCode:
 		IStackItem* i1 = this->EvaluationStack->Pop();
 		BigInteger* x2 = i2->GetBigInteger();
 		BigInteger* x1 = i1->GetBigInteger();
-		IStackItem::Free(i2);
-		IStackItem::Free(i1);
+		IStackItem::Free(i2, i1);
 
 		if (x2 == NULL || x1 == NULL)
 		{
@@ -1346,8 +1337,7 @@ ExecuteOpCode:
 		IStackItem* i1 = this->EvaluationStack->Pop();
 		BigInteger* x2 = i2->GetBigInteger();
 		BigInteger* x1 = i1->GetBigInteger();
-		IStackItem::Free(i2);
-		IStackItem::Free(i1);
+		IStackItem::Free(i2, i1);
 
 		if (x2 == NULL || x1 == NULL)
 		{
@@ -1383,8 +1373,7 @@ ExecuteOpCode:
 		IStackItem* i1 = this->EvaluationStack->Pop();
 		BigInteger* x2 = i2->GetBigInteger();
 		BigInteger* x1 = i1->GetBigInteger();
-		IStackItem::Free(i2);
-		IStackItem::Free(i1);
+		IStackItem::Free(i2, i1);
 
 		if (x2 == NULL || x1 == NULL)
 		{
@@ -1422,8 +1411,7 @@ ExecuteOpCode:
 		BigInteger *in = n->GetBigInteger();
 		BigInteger *ix = x->GetBigInteger();
 
-		IStackItem::Free(n);
-		IStackItem::Free(x);
+		IStackItem::Free(n, x);
 
 		int32 ishift;
 		if (in == NULL || ix == NULL || !in->ToInt32(ishift) || (ishift > MAX_SHL_SHR || ishift < MIN_SHL_SHR))
@@ -1462,8 +1450,7 @@ ExecuteOpCode:
 		BigInteger *in = n->GetBigInteger();
 		BigInteger *ix = x->GetBigInteger();
 
-		IStackItem::Free(n);
-		IStackItem::Free(x);
+		IStackItem::Free(n, x);
 
 		int32 ishift;
 		if (in == NULL || ix == NULL || !in->ToInt32(ishift) || (ishift > MAX_SHL_SHR || ishift < MIN_SHL_SHR))
@@ -1500,8 +1487,7 @@ ExecuteOpCode:
 		IStackItem* x1 = this->EvaluationStack->Pop();
 
 		BoolStackItem * ret = new BoolStackItem(x1->GetBoolean() && x2->GetBoolean());
-		IStackItem::Free(x2);
-		IStackItem::Free(x1);
+		IStackItem::Free(x2, x1);
 
 		this->EvaluationStack->Push(ret);
 		return;
@@ -1518,8 +1504,7 @@ ExecuteOpCode:
 		IStackItem* x1 = this->EvaluationStack->Pop();
 
 		BoolStackItem * ret = new BoolStackItem(x1->GetBoolean() || x2->GetBoolean());
-		IStackItem::Free(x2);
-		IStackItem::Free(x1);
+		IStackItem::Free(x2, x1);
 
 		this->EvaluationStack->Push(ret);
 		return;
@@ -1538,8 +1523,7 @@ ExecuteOpCode:
 		BigInteger *i2 = x2->GetBigInteger();
 		BigInteger *i1 = x1->GetBigInteger();
 
-		IStackItem::Free(x1);
-		IStackItem::Free(x2);
+		IStackItem::Free(x1, x2);
 
 		if (i2 == NULL || i1 == NULL)
 		{
@@ -1572,8 +1556,7 @@ ExecuteOpCode:
 		BigInteger *i2 = x2->GetBigInteger();
 		BigInteger *i1 = x1->GetBigInteger();
 
-		IStackItem::Free(x1);
-		IStackItem::Free(x2);
+		IStackItem::Free(x1, x2);
 
 		if (i2 == NULL || i1 == NULL)
 		{
@@ -1606,8 +1589,7 @@ ExecuteOpCode:
 		BigInteger *i2 = x2->GetBigInteger();
 		BigInteger *i1 = x1->GetBigInteger();
 
-		IStackItem::Free(x1);
-		IStackItem::Free(x2);
+		IStackItem::Free(x1, x2);
 
 		if (i2 == NULL || i1 == NULL)
 		{
@@ -1640,8 +1622,7 @@ ExecuteOpCode:
 		BigInteger *i2 = x2->GetBigInteger();
 		BigInteger *i1 = x1->GetBigInteger();
 
-		IStackItem::Free(x1);
-		IStackItem::Free(x2);
+		IStackItem::Free(x1, x2);
 
 		if (i2 == NULL || i1 == NULL)
 		{
@@ -1674,8 +1655,7 @@ ExecuteOpCode:
 		BigInteger *i2 = x2->GetBigInteger();
 		BigInteger *i1 = x1->GetBigInteger();
 
-		IStackItem::Free(x1);
-		IStackItem::Free(x2);
+		IStackItem::Free(x1, x2);
 
 		if (i2 == NULL || i1 == NULL)
 		{
@@ -1708,8 +1688,7 @@ ExecuteOpCode:
 		BigInteger *i2 = x2->GetBigInteger();
 		BigInteger *i1 = x1->GetBigInteger();
 
-		IStackItem::Free(x1);
-		IStackItem::Free(x2);
+		IStackItem::Free(x1, x2);
 
 		if (i2 == NULL || i1 == NULL)
 		{
@@ -1742,8 +1721,7 @@ ExecuteOpCode:
 		BigInteger *i2 = x2->GetBigInteger();
 		BigInteger *i1 = x1->GetBigInteger();
 
-		IStackItem::Free(x1);
-		IStackItem::Free(x2);
+		IStackItem::Free(x1, x2);
 
 		if (i2 == NULL || i1 == NULL)
 		{
@@ -1783,8 +1761,7 @@ ExecuteOpCode:
 		BigInteger *i2 = x2->GetBigInteger();
 		BigInteger *i1 = x1->GetBigInteger();
 
-		IStackItem::Free(x1);
-		IStackItem::Free(x2);
+		IStackItem::Free(x1, x2);
 
 		if (i2 == NULL || i1 == NULL)
 		{
@@ -1826,9 +1803,7 @@ ExecuteOpCode:
 		BigInteger *ia = a->GetBigInteger();
 		BigInteger *ix = x->GetBigInteger();
 
-		IStackItem::Free(b);
-		IStackItem::Free(a);
-		IStackItem::Free(x);
+		IStackItem::Free(b, a, x);
 
 		if (ib == NULL || ia == NULL || ix == NULL)
 		{
@@ -2010,8 +1985,7 @@ ExecuteOpCode:
 
 		if (this->OnGetMessage == NULL || pubKeySize < 33 || signatureSize < 32)
 		{
-			IStackItem::Free(ipubKey);
-			IStackItem::Free(isignature);
+			IStackItem::Free(ipubKey, isignature);
 
 			this->EvaluationStack->Push(new BoolStackItem(false));
 			return;
@@ -2025,8 +1999,7 @@ ExecuteOpCode:
 		int32 msgL = this->OnGetMessage(this->Iteration, msg);
 		if (msgL <= 0)
 		{
-			IStackItem::Free(ipubKey);
-			IStackItem::Free(isignature);
+			IStackItem::Free(ipubKey, isignature);
 
 			this->EvaluationStack->Push(new BoolStackItem(false));
 			return;
@@ -2047,8 +2020,7 @@ ExecuteOpCode:
 		delete[](pubKey);
 		delete[](signature);
 
-		IStackItem::Free(ipubKey);
-		IStackItem::Free(isignature);
+		IStackItem::Free(ipubKey, isignature);
 
 		this->EvaluationStack->Push(new BoolStackItem(ret));
 		return;
@@ -2071,9 +2043,7 @@ ExecuteOpCode:
 
 		if (pubKeySize < 33 || signatureSize < 32 || msgSize < 0)
 		{
-			IStackItem::Free(ipubKey);
-			IStackItem::Free(isignature);
-			IStackItem::Free(imsg);
+			IStackItem::Free(ipubKey, isignature, imsg);
 
 			this->EvaluationStack->Push(new BoolStackItem(false));
 			return;
@@ -2100,9 +2070,7 @@ ExecuteOpCode:
 		delete[](pubKey);
 		delete[](signature);
 
-		IStackItem::Free(imsg);
-		IStackItem::Free(ipubKey);
-		IStackItem::Free(isignature);
+		IStackItem::Free(imsg, ipubKey, isignature);
 
 		this->EvaluationStack->Push(new BoolStackItem(ret));
 		return;
@@ -2418,17 +2386,15 @@ ExecuteOpCode:
 			int32 index = 0;
 			if (!key->GetInt32(index) || index < 0 || index >= arr->Count())
 			{
-				IStackItem::Free(key);
-				IStackItem::Free(item);
+				IStackItem::Free(key, item);
 
 				this->State = EVMState::FAULT;
 				return;
 			}
 
-			IStackItem::Free(key);
 			IStackItem *ret = arr->Get(index);
 			this->EvaluationStack->Push(ret);
-			IStackItem::Free(item);
+			IStackItem::Free(key, item);
 			return;
 		}
 		case EStackItemType::Map:
@@ -2437,8 +2403,7 @@ ExecuteOpCode:
 
 			IStackItem* val = map->Get(key);
 
-			IStackItem::Free(key);
-			IStackItem::Free(item);
+			IStackItem::Free(key, item);
 
 			if (val != NULL)
 			{
@@ -2452,8 +2417,7 @@ ExecuteOpCode:
 		}
 		default:
 		{
-			IStackItem::Free(key);
-			IStackItem::Free(item);
+			IStackItem::Free(key, item);
 
 			this->State = EVMState::FAULT;
 			return;
@@ -2482,8 +2446,7 @@ ExecuteOpCode:
 			key->Type == EStackItemType::Array ||
 			key->Type == EStackItemType::Struct)
 		{
-			IStackItem::Free(key);
-			IStackItem::Free(value);
+			IStackItem::Free(key, value);
 
 			this->State = EVMState::FAULT;
 			return;
@@ -2500,9 +2463,7 @@ ExecuteOpCode:
 			int32 index = 0;
 			if (!key->GetInt32(index) || index < 0 || index >= arr->Count())
 			{
-				IStackItem::Free(key);
-				IStackItem::Free(item);
-				IStackItem::Free(value);
+				IStackItem::Free(key, item, value);
 
 				this->State = EVMState::FAULT;
 				return;
@@ -2510,8 +2471,7 @@ ExecuteOpCode:
 
 			arr->Set(index, value);
 
-			IStackItem::Free(key);
-			IStackItem::Free(item);
+			IStackItem::Free(key, item);
 			return;
 		}
 		case EStackItemType::Map:
@@ -2525,16 +2485,12 @@ ExecuteOpCode:
 				this->State = EVMState::FAULT;
 			}
 
-			IStackItem::Free(key);
-			IStackItem::Free(value);
-			IStackItem::Free(item);
+			IStackItem::Free(key, value, item);
 			return;
 		}
 		default:
 		{
-			IStackItem::Free(key);
-			IStackItem::Free(value);
-			IStackItem::Free(item);
+			IStackItem::Free(key, value, item);
 
 			this->State = EVMState::FAULT;
 			return;
@@ -2628,8 +2584,7 @@ ExecuteOpCode:
 		}
 		default:
 		{
-			IStackItem::Free(newItem);
-			IStackItem::Free(item);
+			IStackItem::Free(newItem, item);
 
 			this->State = EVMState::FAULT;
 			return;
@@ -2687,8 +2642,7 @@ ExecuteOpCode:
 			int32 index = 0;
 			if (!key->GetInt32(index) || index < 0 || index >= arr->Count())
 			{
-				IStackItem::Free(key);
-				IStackItem::Free(item);
+				IStackItem::Free(key, item);
 
 				this->State = EVMState::FAULT;
 				return;
@@ -2696,8 +2650,7 @@ ExecuteOpCode:
 
 			arr->RemoveAt(index);
 
-			IStackItem::Free(key);
-			IStackItem::Free(item);
+			IStackItem::Free(key, item);
 			return;
 		}
 		case EStackItemType::Map:
@@ -2706,14 +2659,12 @@ ExecuteOpCode:
 
 			arr->Remove(key, true);
 
-			IStackItem::Free(key);
-			IStackItem::Free(item);
+			IStackItem::Free(key, item);
 			return;
 		}
 		default:
 		{
-			IStackItem::Free(key);
-			IStackItem::Free(item);
+			IStackItem::Free(key, item);
 
 			this->State = EVMState::FAULT;
 			return;
@@ -2750,8 +2701,7 @@ ExecuteOpCode:
 			int32 index = 0;
 			if (!key->GetInt32(index) || index < 0)
 			{
-				IStackItem::Free(key);
-				IStackItem::Free(item);
+				IStackItem::Free(key, item);
 
 				this->State = EVMState::FAULT;
 				return;
@@ -2759,8 +2709,7 @@ ExecuteOpCode:
 
 			this->EvaluationStack->Push(new BoolStackItem(index < arr->Count()));
 
-			IStackItem::Free(key);
-			IStackItem::Free(item);
+			IStackItem::Free(key, item);
 			return;
 		}
 		case EStackItemType::Map:
@@ -2769,14 +2718,12 @@ ExecuteOpCode:
 
 			this->EvaluationStack->Push(new BoolStackItem(arr->Get(key) != NULL));
 
-			IStackItem::Free(key);
-			IStackItem::Free(item);
+			IStackItem::Free(key, item);
 			return;
 		}
 		default:
 		{
-			IStackItem::Free(key);
-			IStackItem::Free(item);
+			IStackItem::Free(key, item);
 			this->State = EVMState::FAULT;
 			return;
 		}

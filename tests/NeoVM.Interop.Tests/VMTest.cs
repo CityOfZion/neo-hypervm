@@ -369,11 +369,12 @@ EXE:Drop[0]".Replace("\r", ""));
                         // Check count
 
                         Assert.AreEqual(2, ar.Count);
-                        
+
                         // Check values 1 and 3
 
                         using (IntegerStackItem iau = (IntegerStackItem)ar[0])
                             Assert.AreEqual(iau.Value, 1);
+
                         using (IntegerStackItem iau = (IntegerStackItem)ar[1])
                             Assert.AreEqual(iau.Value, 3);
 
@@ -449,45 +450,57 @@ EXE:Drop[0]".Replace("\r", ""));
                 Assert.AreEqual(engine.AltStack.Count, 0);
                 Assert.IsFalse(engine.AltStack.TryPeek(0, out IStackItem obj));
 
+                // Check integer
+
                 foreach (BigInteger bi in TestBigIntegers)
                 {
-                    CheckItem(engine, engine.CreateInteger(bi));
+                    using (IntegerStackItem it = engine.CreateInteger(bi))
+                        CheckItem(engine, it);
                 }
 
-                // Push bool
+                // Check bool
 
-                CheckItem(engine, engine.CreateBool(true));
-                CheckItem(engine, engine.CreateBool(false));
+                using (BooleanStackItem it = engine.CreateBool(true))
+                    CheckItem(engine, it);
 
-                // Push integer and ByteArray
+                using (BooleanStackItem it = engine.CreateBool(false))
+                    CheckItem(engine, it);
+
+
+                // Check ByteArray
 
                 for (int x = 0; x < 100; x++)
                 {
-                    CheckItem(engine, engine.CreateInteger(Rand.Next()));
-                    CheckItem(engine, engine.CreateByteArray(new BigInteger(Rand.Next()).ToByteArray()));
+                    using (ByteArrayStackItem it = engine.CreateByteArray(new BigInteger(Rand.Next()).ToByteArray()))
+                        CheckItem(engine, it);
                 }
 
-                // Interop
+                // Check Interops
+
                 Dictionary<string, string> dic = new Dictionary<string, string>()
                     {
                         {"key","value" }
                     };
 
-                CheckItem(engine, engine.CreateInterop(dic));
+                using (InteropStackItem it = engine.CreateInterop(dic))
+                    CheckItem(engine, it);
 
                 // Check disposed object
 
                 {
                     DisposableDummy dis = new DisposableDummy();
-                    CheckItem(engine, engine.CreateInterop(dis));
-                    engine.AltStack.Push(engine.CreateInterop(dis));
+                    using (InteropStackItem it = engine.CreateInterop(dis))
+                        CheckItem(engine, it);
+
+                    using (InteropStackItem it = engine.CreateInterop(dis))
+                        engine.AltStack.Push(it);
                 }
 
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
 
-                InteropStackItem id = engine.AltStack.Pop<InteropStackItem>();
-                Assert.IsTrue(id != null && id.Value is DisposableDummy dd && !dd.IsDisposed);
+                using (InteropStackItem id = engine.AltStack.Pop<InteropStackItem>())
+                    Assert.IsTrue(id != null && id.Value is DisposableDummy dd && !dd.IsDisposed);
             }
         }
 
