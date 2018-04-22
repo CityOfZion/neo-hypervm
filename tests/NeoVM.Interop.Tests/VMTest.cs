@@ -288,7 +288,6 @@ EXE:Drop[0]".Replace("\r", ""));
                                 // Check empty
 
                                 Assert.AreEqual(0, ar.Count);
-
                                 // Add and check count
 
                                 ar.Add(btest);
@@ -297,7 +296,8 @@ EXE:Drop[0]".Replace("\r", ""));
 
                                 // Check item by position
 
-                                Assert.AreEqual(((IntegerStackItem)ar[0]).Value, btest.Value);
+                                using (IntegerStackItem iau = (IntegerStackItem)ar[0])
+                                    Assert.AreEqual(iau.Value, btest.Value);
 
                                 // Remove
 
@@ -369,11 +369,12 @@ EXE:Drop[0]".Replace("\r", ""));
                         // Check count
 
                         Assert.AreEqual(2, ar.Count);
-
+                        
                         // Check values 1 and 3
-
-                        Assert.AreEqual(((IntegerStackItem)ar[0]).Value, 1);
-                        Assert.AreEqual(((IntegerStackItem)ar[1]).Value, 3);
+                        using (IntegerStackItem iau = (IntegerStackItem)ar[0])
+                            Assert.AreEqual(iau.Value, 1);
+                        using (IntegerStackItem iau = (IntegerStackItem)ar[1])
+                            Assert.AreEqual(iau.Value, 3);
 
                         // Insert 2 again
 
@@ -382,9 +383,12 @@ EXE:Drop[0]".Replace("\r", ""));
 
                         // Check values
 
-                        Assert.AreEqual(((IntegerStackItem)ar[0]).Value, 1);
-                        Assert.AreEqual(((IntegerStackItem)ar[1]).Value, 2);
-                        Assert.AreEqual(((IntegerStackItem)ar[2]).Value, 3);
+                        using (IntegerStackItem iau = (IntegerStackItem)ar[0])
+                            Assert.AreEqual(iau.Value, 1);
+                        using (IntegerStackItem iau = (IntegerStackItem)ar[1])
+                            Assert.AreEqual(iau.Value, 2);
+                        using (IntegerStackItem iau = (IntegerStackItem)ar[2])
+                            Assert.AreEqual(iau.Value, 3);
                     }
                 }
         }

@@ -85,20 +85,11 @@ bool ArrayStackItem::Equals(IStackItem * it)
 	return true;
 }
 
+// Read
+
 int32 ArrayStackItem::Count()
 {
 	return static_cast<int>(this->List.size());
-}
-
-void ArrayStackItem::Clear()
-{
-	for (std::list<IStackItem*>::iterator it = this->List.begin(); it != this->List.end(); ++it)
-	{
-		IStackItem* ptr = (IStackItem*)*it;
-		IStackItem::UnclaimAndFree(ptr);
-	}
-
-	this->List.clear();
 }
 
 IStackItem* ArrayStackItem::Get(int32 index)
@@ -112,6 +103,50 @@ IStackItem* ArrayStackItem::Get(int32 index)
 	return (IStackItem*)*it;
 }
 
+int32 ArrayStackItem::IndexOf(IStackItem* item)
+{
+	int index = 0;
+	for (std::list<IStackItem*>::iterator it = this->List.begin(); it != this->List.end(); ++it)
+	{
+		if ((IStackItem*)*it == item)
+			return index;
+
+		index++;
+	}
+	return -1;
+}
+
+// Write
+
+void ArrayStackItem::Clear()
+{
+	for (std::list<IStackItem*>::iterator it = this->List.begin(); it != this->List.end(); ++it)
+	{
+		IStackItem* ptr = (IStackItem*)*it;
+		IStackItem::UnclaimAndFree(ptr);
+	}
+
+	this->List.clear();
+}
+
+void ArrayStackItem::Insert(int32 index, IStackItem* item)
+{
+	if (item != NULL)
+		item->Claim();
+
+	if (index == 0)
+	{
+		this->List.push_front(item);
+	}
+	else
+	{
+		std::list<IStackItem*>::iterator it = this->List.begin();
+		std::advance(it, index);
+
+		this->List.insert(it, item);
+	}
+}
+
 void ArrayStackItem::Add(IStackItem* item)
 {
 	if (item != NULL)
@@ -120,50 +155,47 @@ void ArrayStackItem::Add(IStackItem* item)
 	this->List.push_back(item);
 }
 
+void ArrayStackItem::RemoveAt(int32 index)
+{
+	if (index == 0)
+	{
+		IStackItem *it = this->List.front();
+		this->List.pop_front();
+		IStackItem::UnclaimAndFree(it);
+	}
+	else
+	{
+		std::list<IStackItem*>::iterator it = this->List.begin();
+		std::advance(it, index);
+
+		IStackItem* s = (IStackItem*)*it;
+		this->List.erase(it);
+		IStackItem::UnclaimAndFree(s);
+	}
+}
+
 void ArrayStackItem::Set(int32 index, IStackItem* item)
 {
 	if (item != NULL)
 		item->Claim();
 
-	std::list<IStackItem*>::iterator it = this->List.begin();
-	if (index > 0) std::advance(it, index);
-
-	IStackItem* & s(*it);
-	IStackItem::UnclaimAndFree(s);
-	s = item;
-}
-
-int32 ArrayStackItem::IndexOf(IStackItem* item)
-{
-	int index = 0;
-	for (std::list<IStackItem*>::iterator it = this->List.begin(); it != this->List.end(); ++it)
+	if (index == 0)
 	{
-		if ((IStackItem*)*it == item) return index;
-		index++;
+		IStackItem *it = this->List.front();
+		this->List.pop_front();
+		IStackItem::UnclaimAndFree(it);
+		this->List.push_front(item);
 	}
-	return -1;
-}
+	else
+	{
+		std::list<IStackItem*>::iterator it = this->List.begin();
+		std::advance(it, index);
 
-void ArrayStackItem::Insert(int32 index, IStackItem* item)
-{
-	if (item != NULL)
-		item->Claim();
+		IStackItem* s = (IStackItem*)*it;
+		IStackItem::UnclaimAndFree(s);
 
-	std::list<IStackItem*>::iterator it = this->List.begin();
-	if (index > 0) std::advance(it, index);
-
-	this->List.insert(it, item);
-}
-
-void ArrayStackItem::RemoveAt(int32 index)
-{
-	std::list<IStackItem*>::iterator it = this->List.begin();
-	if (index > 0) std::advance(it, index);
-
-	IStackItem* & s(*it);
-	IStackItem::UnclaimAndFree(s);
-
-	this->List.erase(it);
+		*it = item;
+	}
 }
 
 // Serialize
