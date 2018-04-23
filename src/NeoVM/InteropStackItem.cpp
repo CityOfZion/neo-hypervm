@@ -1,10 +1,9 @@
 #include "InteropStackItem.h"
 #include <cstring>
 
-InteropStackItem::InteropStackItem(byte * data, int32 size) :IStackItem(EStackItemType::Interop)
+InteropStackItem::InteropStackItem(byte * data, int32 size) :IStackItem(EStackItemType::Interop), PayloadLength(size)
 {
 	this->Payload = new byte[size];
-	this->PayloadLength = size;
 
 	memcpy(this->Payload, data, size);
 }
