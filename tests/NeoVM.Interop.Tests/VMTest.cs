@@ -514,6 +514,7 @@ EXE:Drop[0]".Replace("\r", ""));
 
             // PEEK
 
+            obj.Dispose();
             obj = engine.AltStack.Peek(0);
             Assert.IsNotNull(obj);
 
@@ -522,6 +523,7 @@ EXE:Drop[0]".Replace("\r", ""));
 
             // POP
 
+            obj.Dispose();
             obj = engine.AltStack.Pop();
             Assert.AreEqual(engine.AltStack.Count, c);
 
@@ -529,6 +531,7 @@ EXE:Drop[0]".Replace("\r", ""));
 
             Assert.AreEqual(obj.Type, item.Type);
             Assert.IsTrue(obj.Equals(item));
+            obj.Dispose();
         }
     }
 }

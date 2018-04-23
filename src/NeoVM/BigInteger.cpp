@@ -8,14 +8,12 @@ const BigInteger BigInteger::One = BigInteger(1);
 const BigInteger BigInteger::Zero = BigInteger(0);
 const BigInteger BigInteger::MinusOne = BigInteger(-1);
 
-BigInteger::BigInteger(int32 value) :
-	_sign(value), _bits(NULL), _bitsSize(0)
+BigInteger::BigInteger(int32 value) : _sign(value), _bits(NULL), _bitsSize(0)
 {
 	// AssertValid();
 }
 
-BigInteger::BigInteger(BigInteger *value) :
-	_sign(value->_sign)
+BigInteger::BigInteger(BigInteger *value) : _sign(value->_sign)
 {
 	if (value->_bits == NULL || value->_bitsSize <= 0)
 	{
@@ -34,8 +32,7 @@ BigInteger::BigInteger(BigInteger *value) :
 	// AssertValid();
 }
 
-BigInteger::BigInteger(const BigInteger &value) :
-	_sign(value._sign)
+BigInteger::BigInteger(const BigInteger &value) : _sign(value._sign)
 {
 	if (value._bits == NULL || value._bitsSize <= 0)
 	{
@@ -54,12 +51,10 @@ BigInteger::BigInteger(const BigInteger &value) :
 	// AssertValid();
 }
 
-BigInteger::BigInteger(uint32* value, int32 valueSize, bool negative) :_bits(NULL)
+BigInteger::BigInteger(uint32* value, int32 valueSize, bool negative) :_sign(0), _bits(NULL), _bitsSize(0)
 {
 	if (value == NULL)
 	{
-		this->_sign = 0;
-		this->_bitsSize = 0;
 		return;
 	}
 
@@ -71,41 +66,36 @@ BigInteger::BigInteger(uint32* value, int32 valueSize, bool negative) :_bits(NUL
 	// sometimes the uint[] has leading zeros from bit manipulation operations & and ^
 	for (len = valueSize; len > 0 && value[len - 1] == 0; len--);
 
-	if (len == 0)
+	if (len != 0)
 	{
-		this->_sign = 0;
-		this->_bitsSize = 0;
-	}
-	// values like (Int32.MaxValue+1) are stored as "0x80000000" and as such cannot be packed into _sign
-	else if (len == 1 && value[0] < kuMaskHighBit)
-	{
-		this->_sign = (negative ? -(int)value[0] : (int)value[0]);
-		this->_bitsSize = 0;
-
-		// Although Int32.MinValue fits in _sign, we represent this case differently for negate
-		if (this->_sign == Int32MinValue)
+		// values like (Int32.MaxValue+1) are stored as "0x80000000" and as such cannot be packed into _sign
+		if (len == 1 && value[0] < kuMaskHighBit)
 		{
-			CopyInternal(Min);
+			this->_sign = (negative ? -(int)value[0] : (int)value[0]);
+
+			// Although Int32.MinValue fits in _sign, we represent this case differently for negate
+			if (this->_sign == Int32MinValue)
+			{
+				CopyInternal(Min);
+			}
 		}
-	}
-	else
-	{
-		this->_bitsSize = len;
-		this->_sign = negative ? -1 : +1;
-		this->_bits = new uint32[len];
-		for (int32 x = 0; x < len; x++)
-			this->_bits[x] = value[x];
+		else
+		{
+			this->_bitsSize = len;
+			this->_sign = negative ? -1 : +1;
+			this->_bits = new uint32[len];
+			for (int32 x = 0; x < len; x++)
+				this->_bits[x] = value[x];
+		}
 	}
 
 	// AssertValid();
 }
 
-BigInteger::BigInteger(uint32* value, int32 size) :_bits(NULL)
+BigInteger::BigInteger(uint32* value, int32 size) :_sign(0), _bits(NULL), _bitsSize(0)
 {
 	if (value == NULL)
 	{
-		this->_sign = 0;
-		this->_bitsSize = 0;
 		return;
 	}
 
@@ -118,10 +108,6 @@ BigInteger::BigInteger(uint32* value, int32 size) :_bits(NULL)
 	if (dwordCount == 0)
 	{
 		// BigInteger.Zero
-
-		this->_sign = 0;
-		this->_bitsSize = 0;
-
 		// AssertValid();
 		return;
 	}
@@ -142,7 +128,6 @@ BigInteger::BigInteger(uint32* value, int32 size) :_bits(NULL)
 		else
 		{
 			this->_sign = (int)value[0];
-			this->_bitsSize = 0;
 		}
 
 		//AssertValid();
@@ -196,7 +181,6 @@ BigInteger::BigInteger(uint32* value, int32 size) :_bits(NULL)
 		else
 		{
 			this->_sign = (-1) * ((int)value[0]);
-			this->_bitsSize = 0;
 		}
 	}
 	// the number is represented by multiple dwords
@@ -223,13 +207,11 @@ BigInteger::BigInteger(uint32* value, int32 size) :_bits(NULL)
 	//AssertValid();
 }
 
-BigInteger::BigInteger(byte* value, int32 byteCount) :_bits(NULL)
+BigInteger::BigInteger(byte* value, int32 byteCount) : _sign(0), _bits(NULL), _bitsSize(0)
 {
 	if (byteCount <= 0 || value == NULL)
 	{
 		// BigInteger.Zero
-		this->_sign = 0;
-		this->_bitsSize = 0;
 		return;
 	}
 
@@ -241,8 +223,6 @@ BigInteger::BigInteger(byte* value, int32 byteCount) :_bits(NULL)
 	if (byteCount == 0)
 	{
 		// BigInteger.Zero
-		this->_sign = 0;
-		this->_bitsSize = 0;
 		// AssertValid();
 		return;
 	}
@@ -250,9 +230,7 @@ BigInteger::BigInteger(byte* value, int32 byteCount) :_bits(NULL)
 	if (byteCount <= 4)
 	{
 		if (isNegative)
-			this->_sign = (int)0xffffffff;
-		else
-			this->_sign = 0;
+			this->_sign = (int32)0xffffffff;
 
 		for (int32 i = byteCount - 1; i >= 0; i--)
 		{
@@ -322,60 +300,56 @@ BigInteger::BigInteger(byte* value, int32 byteCount) :_bits(NULL)
 			}
 		}
 
-		if (isZero)
+		if (!isZero)
 		{
-			this->_sign = 0;
-			this->_bitsSize = 0;
-		}
-		else if (isNegative)
-		{
-			this->DangerousMakeTwosComplement(val, dwordCount); // mutates val
-			// pack _bits to remove any wasted space after the twos complement
-
-			int32 len = dwordCount;
-			while (len > 0 && val[len - 1] == 0)
-				len--;
-
-			if (len == 1 && ((int)(val[0])) > 0)
+			if (isNegative)
 			{
-				if (val[0] == 1) // abs(-1)
+				this->DangerousMakeTwosComplement(val, dwordCount); // mutates val
+				// pack _bits to remove any wasted space after the twos complement
+
+				int32 len = dwordCount;
+				while (len > 0 && val[len - 1] == 0)
+					len--;
+
+				if (len == 1 && ((int32)(val[0])) > 0)
 				{
-					this->_sign = -1;
-					this->_bitsSize = 0;
+					if (val[0] == 1) // abs(-1)
+					{
+						this->_sign = -1;
+					}
+					else if (val[0] == kuMaskHighBit) // abs(Int32.MinValue)
+					{
+						this->_sign = -1;
+						this->_bits = new uint32[1]{ BigInteger::kuMaskHighBit };
+						this->_bitsSize = 1;
+					}
+					else
+					{
+						this->_sign = (-1) * ((int32)val[0]);
+					}
 				}
-				else if (val[0] == kuMaskHighBit) // abs(Int32.MinValue)
+				else if (len != dwordCount)
 				{
 					this->_sign = -1;
-					this->_bits = new uint32[1]{ BigInteger::kuMaskHighBit };
-					this->_bitsSize = 1;
+					this->_bits = new uint32[len];
+					this->_bitsSize = len;
+
+					for (int32 x = 0; x < len; x++)
+						this->_bits[x] = val[x];
 				}
 				else
 				{
-					this->_sign = (-1) * ((int)val[0]);
-					this->_bitsSize = 0;
+					this->_sign = -1;
+					this->_bits = val;
+					this->_bitsSize = dwordCount;
 				}
-			}
-			else if (len != dwordCount)
-			{
-				this->_sign = -1;
-				this->_bits = new uint32[len];
-				this->_bitsSize = len;
-
-				for (int32 x = 0; x < len; x++)
-					this->_bits[x] = val[x];
 			}
 			else
 			{
-				this->_sign = -1;
+				this->_sign = +1;
 				this->_bits = val;
 				this->_bitsSize = dwordCount;
 			}
-		}
-		else
-		{
-			this->_sign = +1;
-			this->_bits = val;
-			this->_bitsSize = dwordCount;
 		}
 
 		// Free resources
@@ -1092,19 +1066,12 @@ int32 BigInteger::ToByteArraySize()
 {
 	// TODO: Is not the exactly size of ToByteArray
 
-	if (this->_bitsSize == 0 && _sign == 0)
-	{
-		return 1;
-	}
-
 	if (this->_bitsSize == 0)
 	{
-		return 5;
+		return  _sign == 0 ? 1 : 5;
 	}
-	else
-	{
-		return (this->_bitsSize * 4) + 1;
-	}
+
+	return (this->_bitsSize * 4) + 1;
 }
 
 int32 BigInteger::ToByteArray(byte * output, int32 length)
