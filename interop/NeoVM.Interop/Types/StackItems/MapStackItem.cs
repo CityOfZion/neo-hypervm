@@ -6,26 +6,31 @@ using System.Collections.Generic;
 
 namespace NeoVM.Interop.Types.StackItems
 {
-    public class MapStackItem : IStackItem, ICollection, IDictionary<IStackItem, IStackItem>
+    public class MapStackItem : IStackItem, IEnumerable<KeyValuePair<IStackItem, IStackItem>>
     {
         public override bool CanConvertToByteArray => false;
         public override byte[] ToByteArray() { throw new NotImplementedException(); }
 
-        readonly Dictionary<IStackItem, IStackItem> Value;
-
         public IStackItem this[IStackItem key]
         {
-            get => Value[key];
-            set => Value[key] = value;
+            get
+            {
+                if (TryGetValue(key, out IStackItem value))
+                    return value;
+
+                return null;
+            }
+            set
+            {
+                Set(key, value);
+            }
         }
 
-        public ICollection<IStackItem> Keys => Value.Keys;
-        public ICollection<IStackItem> Values => Value.Values;
-        public int Count => Value.Count;
-        public bool IsReadOnly => false;
+        public IEnumerable<IStackItem> Keys => GetKeys();
+        public IEnumerable<IStackItem> Values => GetValues();
+        public int Count => NeoVM.MapStackItem_Count(Handle);
 
-        bool ICollection.IsSynchronized => false;
-        object ICollection.SyncRoot => Value;
+        #region Constructors
 
         /// <summary>
         /// Constructor
@@ -39,80 +44,111 @@ namespace NeoVM.Interop.Types.StackItems
         /// <param name="value">Value</param>
         internal MapStackItem(ExecutionEngine engine, Dictionary<IStackItem, IStackItem> value) : base(engine, EStackItemType.Map)
         {
-            Value = value;
             CreateNativeItem();
+
+            if (value == null) return;
+
+            foreach (KeyValuePair<IStackItem, IStackItem> pair in value)
+                Set(pair.Key, pair.Value);
         }
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="handle">Handle</param>
-        internal MapStackItem(ExecutionEngine engine, IntPtr handle) : base(engine, EStackItemType.Map, handle)
+        internal MapStackItem(ExecutionEngine engine, IntPtr handle) : base(engine, EStackItemType.Map, handle) { }
+
+        #endregion
+
+        #region Write
+
+        public bool Remove(IStackItem key)
         {
-            Value = new Dictionary<IStackItem, IStackItem>();
+            return NeoVM.MapStackItem_Remove(Handle, key == null ? IntPtr.Zero : key.Handle) == NeoVM.TRUE;
         }
 
-        public void Add(IStackItem key, IStackItem value)
+        public void Set(KeyValuePair<IStackItem, IStackItem> item)
         {
-            Value.Add(key, value);
+            Set(item.Key, item.Value);
         }
 
-        void ICollection<KeyValuePair<IStackItem, IStackItem>>.Add(KeyValuePair<IStackItem, IStackItem> item)
+        public void Set(IStackItem key, IStackItem value)
         {
-            Value.Add(item.Key, item.Value);
+            NeoVM.MapStackItem_Set
+                (
+                Handle,
+                key == null ? IntPtr.Zero : key.Handle,
+                value == null ? IntPtr.Zero : value.Handle
+                );
         }
 
         public void Clear()
         {
-            Value.Clear();
+            NeoVM.MapStackItem_Clear(Handle);
         }
 
-        bool ICollection<KeyValuePair<IStackItem, IStackItem>>.Contains(KeyValuePair<IStackItem, IStackItem> item)
-        {
-            return Value.ContainsKey(item.Key);
-        }
+        #endregion
+
+        #region Read
 
         public bool ContainsKey(IStackItem key)
         {
-            return Value.ContainsKey(key);
-        }
-
-        void ICollection<KeyValuePair<IStackItem, IStackItem>>.CopyTo(KeyValuePair<IStackItem, IStackItem>[] array, int arrayIndex)
-        {
-            foreach (KeyValuePair<IStackItem, IStackItem> item in Value)
-                array[arrayIndex++] = item;
-        }
-
-        void ICollection.CopyTo(Array array, int index)
-        {
-            foreach (KeyValuePair<IStackItem, IStackItem> item in Value)
-                array.SetValue(item, index++);
-        }
-
-        IEnumerator<KeyValuePair<IStackItem, IStackItem>> IEnumerable<KeyValuePair<IStackItem, IStackItem>>.GetEnumerator()
-        {
-            return Value.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return Value.GetEnumerator();
-        }
-
-        public bool Remove(IStackItem key)
-        {
-            return Value.Remove(key);
-        }
-
-        bool ICollection<KeyValuePair<IStackItem, IStackItem>>.Remove(KeyValuePair<IStackItem, IStackItem> item)
-        {
-            return Value.Remove(item.Key);
+            return NeoVM.MapStackItem_Get(Handle, key == null ? IntPtr.Zero : key.Handle) != IntPtr.Zero;
         }
 
         public bool TryGetValue(IStackItem key, out IStackItem value)
         {
-            return Value.TryGetValue(key, out value);
+            IntPtr ret = NeoVM.MapStackItem_Get(Handle, key == null ? IntPtr.Zero : key.Handle);
+
+            if (ret == IntPtr.Zero)
+            {
+                value = null;
+                return false;
+            }
+
+            value = Engine.ConvertFromNative(ret);
+            return true;
         }
+
+        #endregion
+
+        #region Enumerables
+
+        public IEnumerable<IStackItem> GetKeys()
+        {
+            for (int x = 0, c = Count; x < c; x++)
+                yield return Engine.ConvertFromNative(NeoVM.MapStackItem_GetKey(Handle, x));
+        }
+
+        public IEnumerable<IStackItem> GetValues()
+        {
+            for (int x = 0, c = Count; x < c; x++)
+                yield return Engine.ConvertFromNative(NeoVM.MapStackItem_GetValue(Handle, x));
+        }
+        
+        IEnumerator<KeyValuePair<IStackItem, IStackItem>> IEnumerable<KeyValuePair<IStackItem, IStackItem>>.GetEnumerator()
+        {
+            for (int x = 0, c = Count; x < c; x++)
+            {
+                IStackItem key = Engine.ConvertFromNative(NeoVM.MapStackItem_GetKey(Handle, x));
+                IStackItem value = Engine.ConvertFromNative(NeoVM.MapStackItem_GetValue(Handle, x));
+
+                yield return new KeyValuePair<IStackItem, IStackItem>(key, value);
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            for (int x = 0, c = Count; x < c; x++)
+            {
+                IStackItem key = Engine.ConvertFromNative(NeoVM.MapStackItem_GetKey(Handle, x));
+                IStackItem value = Engine.ConvertFromNative(NeoVM.MapStackItem_GetValue(Handle, x));
+
+                yield return new KeyValuePair<IStackItem, IStackItem>(key, value);
+            }
+        }
+
+        #endregion
 
         protected override byte[] GetNativeByteArray()
         {

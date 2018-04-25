@@ -263,7 +263,7 @@ EXE:Drop[0]".Replace("\r", ""));
         /// Test array type
         /// </summary>
         [TestMethod]
-        public void TestArrayItem()
+        public void TestArrayStackItem()
         {
             using (ExecutionEngine engine = NeoVM.CreateEngine(null))
                 for (int x = 0; x < 2; x++)
@@ -395,37 +395,178 @@ EXE:Drop[0]".Replace("\r", ""));
                 }
         }
 
+        /// <summary>
+        /// Test array type
+        /// </summary>
         [TestMethod]
-        public void TestNativeStackItems()
+        public void TestMapStackItem()
         {
             using (ExecutionEngine engine = NeoVM.CreateEngine(null))
             {
-                // Bool
+                // First test for array, second for Struct
 
+                using (MapStackItem ar = engine.CreateMap())
+                {
+                    // Clear
+
+                    Assert.AreEqual(0, ar.Count);
+                    ar.Clear();
+                    Assert.AreEqual(0, ar.Count);
+
+                    // Test Equal key and value
+
+                    using (BooleanStackItem b = engine.CreateBool(true))
+                        ar[b] = b;
+
+                    Assert.AreEqual(1, ar.Count);
+
+                    // Test remove
+
+                    using (BooleanStackItem b = engine.CreateBool(true))
+                    {
+                        Assert.IsTrue(ar.ContainsKey(b));
+                        Assert.IsTrue(ar.Remove(b));
+                        Assert.IsFalse(ar.Remove(b));
+                        Assert.IsFalse(ar.ContainsKey(b));
+                    }
+
+                    // Test equal Set and Get
+
+                    using (BooleanStackItem b = engine.CreateBool(true))
+                    using (IntegerStackItem bi = engine.CreateInteger(1))
+                        ar[b] = bi;
+
+                    Assert.AreEqual(1, ar.Count);
+
+                    using (BooleanStackItem b = engine.CreateBool(true))
+                    using (IntegerStackItem bi = engine.CreateInteger(2))
+                        ar[b] = bi;
+
+                    Assert.AreEqual(1, ar.Count);
+
+                    using (BooleanStackItem b = engine.CreateBool(true))
+                    using (IStackItem bi = ar[b])
+                        Assert.IsTrue(bi is IntegerStackItem ii && ii.Value == 2);
+
+                    // Test get keys
+
+                    using (BooleanStackItem b = engine.CreateBool(false))
+                    using (IntegerStackItem bi = engine.CreateInteger(5))
+                        ar[b] = bi;
+
+                    Assert.AreEqual(2, ar.Count);
+
+                    List<bool> keys = new List<bool> { true, false };
+                    foreach (IStackItem i in ar.Keys)
+                    {
+                        Assert.IsTrue(i is BooleanStackItem);
+
+                        BooleanStackItem bb = (BooleanStackItem)i;
+                        keys.Remove(bb.Value);
+
+                        i.Dispose();
+                    }
+
+                    Assert.AreEqual(0, keys.Count);
+
+                    // Test get values
+
+                    List<BigInteger> values = new List<BigInteger>() { 2, 5 };
+
+                    foreach (IStackItem i in ar.Values)
+                    {
+                        Assert.IsTrue(i is IntegerStackItem);
+
+                        IntegerStackItem bb = (IntegerStackItem)i;
+                        values.Remove(bb.Value);
+
+                        i.Dispose();
+                    }
+
+                    Assert.AreEqual(0, values.Count);
+
+                    // Test get key/values
+
+                    keys = new List<bool> { true, false };
+                    values = new List<BigInteger>() { 2, 5 };
+
+                    foreach (KeyValuePair<IStackItem, IStackItem> i in ar)
+                    {
+                        Assert.IsTrue(i.Key is BooleanStackItem);
+                        Assert.IsTrue(i.Value is IntegerStackItem);
+
+                        BooleanStackItem bb = (BooleanStackItem)i.Key;
+                        int ix = keys.IndexOf(bb.Value);
+
+                        keys.RemoveAt(ix);
+                        values.RemoveAt(ix);
+
+                        i.Key.Dispose();
+                        i.Value.Dispose();
+                    }
+
+                    Assert.AreEqual(0, keys.Count);
+                    Assert.AreEqual(0, values.Count);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Test bool type
+        /// </summary>
+        [TestMethod]
+        public void TestBoolStackItem()
+        {
+            using (ExecutionEngine engine = NeoVM.CreateEngine(null))
+            {
                 using (BooleanStackItem btrue = engine.CreateBool(true))
                 using (BooleanStackItem bfalse = engine.CreateBool(false))
                 {
                     Assert.IsTrue(btrue.Value);
                     Assert.IsFalse(bfalse.Value);
                 }
+            }
+        }
 
-                // Integer
-
+        /// <summary>
+        /// Test integer type
+        /// </summary>
+        [TestMethod]
+        public void TestIntegerStackItem()
+        {
+            using (ExecutionEngine engine = NeoVM.CreateEngine(null))
+            {
                 foreach (BigInteger bi in TestBigIntegers)
                     using (IntegerStackItem bnat = engine.CreateInteger(bi))
                         Assert.AreEqual(bnat.Value, bi);
+            }
+        }
 
-                // ByteArray
-
+        /// <summary>
+        /// Test byte array type
+        /// </summary>
+        [TestMethod]
+        public void TestByteArrayStackItem()
+        {
+            using (ExecutionEngine engine = NeoVM.CreateEngine(null))
+            {
                 using (ByteArrayStackItem bOneByte = engine.CreateByteArray(new byte[] { 0x00, 0x01 }))
                 using (ByteArrayStackItem bTwoBytes = engine.CreateByteArray(new byte[] { 0x00, 0x02 }))
                 {
                     Assert.IsTrue(bOneByte.Value.SequenceEqual(new byte[] { 0x00, 0x01 }));
                     Assert.IsTrue(bTwoBytes.Value.SequenceEqual(new byte[] { 0x00, 0x02 }));
                 }
+            }
+        }
 
-                // Interop
-
+        /// <summary>
+        /// Test interop type
+        /// </summary>
+        [TestMethod]
+        public void TestInteropStackItem()
+        {
+            using (ExecutionEngine engine = NeoVM.CreateEngine(null))
+            {
                 using (DisposableDummy o1 = new DisposableDummy())
                 using (DisposableDummy o2 = new DisposableDummy())
                 using (InteropStackItem bInterop1 = engine.CreateInterop(o1))

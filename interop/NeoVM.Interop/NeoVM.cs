@@ -12,6 +12,9 @@ namespace NeoVM.Interop
 {
     public static class NeoVM
     {
+        internal const byte TRUE = 0x01;
+        internal const byte FALSE = 0x00;
+
         const string LibraryName = "NeoVM";
 
         /// <summary>
@@ -68,10 +71,13 @@ namespace NeoVM.Interop
         internal delegate byte delByte_HandleRefInt(IntPtr item, out int size);
         internal delegate IntPtr delHandle_HandleInt(IntPtr pointer, int value);
         internal delegate void delVoid_HandleHandle(IntPtr pointer1, IntPtr pointer2);
+        internal delegate byte delByte_HandleHandle(IntPtr pointer1, IntPtr pointer2);
+        internal delegate IntPtr delHandle_HandleHandle(IntPtr pointer1, IntPtr pointer2);
         internal delegate IntPtr delHandle_ByteHandleInt(byte type, IntPtr data, int size);
         internal delegate void delVoid_HandleIntByte(IntPtr handle, int index, byte dispose);
         internal delegate int delInt_HandleHandleInt(IntPtr pointer1, IntPtr pointer2, int value);
         internal delegate void delVoid_HandleHandleInt(IntPtr pointer1, IntPtr pointer2, int value);
+        internal delegate void delVoid_HandleHandleHandle(IntPtr pointer1, IntPtr pointer2, IntPtr pointer3);
 
         // Specific
 
@@ -118,6 +124,14 @@ namespace NeoVM.Interop
         internal static delByte_HandleRefInt StackItem_SerializeInfo;
         internal static delInt_HandleHandleInt StackItem_Serialize;
         internal static delVoid_RefHandle StackItem_Free;
+
+        internal static delInt_Handle MapStackItem_Count;
+        internal static delVoid_Handle MapStackItem_Clear;
+        internal static delByte_HandleHandle MapStackItem_Remove;
+        internal static delHandle_HandleHandle MapStackItem_Get;
+        internal static delVoid_HandleHandleHandle MapStackItem_Set;
+        internal static delHandle_HandleInt MapStackItem_GetKey;
+        internal static delHandle_HandleInt MapStackItem_GetValue;
 
         internal static delInt_Handle ArrayStackItem_Count;
         internal static delVoid_Handle ArrayStackItem_Clear;

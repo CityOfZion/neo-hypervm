@@ -258,6 +258,43 @@ EStackItemType StackItem_SerializeInfo(IStackItem* item, int32 &size)
 	return item->Type;
 }
 
+// MapStackItem
+
+int32 MapStackItem_Count(MapStackItem* map)
+{
+	return map->Count();
+}
+
+void MapStackItem_Clear(MapStackItem* map)
+{
+	return map->Clear();
+}
+
+byte MapStackItem_Remove(MapStackItem* map, IStackItem* key)
+{
+	return map->Remove(key) ? 0x01 : 0x00;
+}
+
+void MapStackItem_Set(MapStackItem* map, IStackItem* key, IStackItem* value)
+{
+	map->Set(key, value);
+}
+
+IStackItem* MapStackItem_Get(MapStackItem* map, IStackItem* key)
+{
+	return map->Get(key);
+}
+
+IStackItem* MapStackItem_GetKey(MapStackItem* map, int index)
+{
+	return map->GetKey(index);
+}
+
+IStackItem* MapStackItem_GetValue(MapStackItem* map, int index)
+{
+	return map->GetValue(index);
+}
+
 // ArrayStackItem
 
 int32 ArrayStackItem_Count(ArrayStackItem* array)

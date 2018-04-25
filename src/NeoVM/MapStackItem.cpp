@@ -15,7 +15,7 @@ bool MapStackItem::GetInt32(int32 &ret) { return false; }
 int32 MapStackItem::ReadByteArray(byte * output, int32 sourceIndex, int32 count) { return -1; }
 int32 MapStackItem::ReadByteArraySize() { return -1; }
 
-bool MapStackItem::Remove(IStackItem* key, bool dispose)
+bool MapStackItem::Remove(IStackItem* &key)
 {
 	for (std::map<IStackItem*, IStackItem*>::iterator it = this->Dictionary.begin(); it != this->Dictionary.end(); ++it)
 	{
@@ -23,19 +23,23 @@ bool MapStackItem::Remove(IStackItem* key, bool dispose)
 
 		IStackItem* value = it->second;
 
-		if (dispose)
-		{
-			if (it->first == key)
-				IStackItem::UnclaimAndFree(key);
+		// Unclaim
 
-			IStackItem::UnclaimAndFree(value);
-		}
-		else 
-		{
-			value->UnClaim();
-		}
+		IStackItem* ckey = it->first; // Could be different
 
-		this->Dictionary.erase(key);
+		ckey->UnClaim();
+		value->UnClaim();
+
+		// Remove
+
+		this->Dictionary.erase(ckey);
+
+		// Free
+
+		bool equal = ckey == key;
+		IStackItem::Free(ckey, value);
+		if (equal) key = ckey;
+
 		return true;
 	}
 
@@ -67,6 +71,34 @@ IStackItem* MapStackItem::Get(IStackItem* key)
 	{
 		if (!it->first->Equals(key)) continue;
 		return it->second;
+	}
+
+	return NULL;
+}
+
+IStackItem* MapStackItem::GetKey(int index)
+{
+	int32 ix = 0;
+	for (std::map<IStackItem*, IStackItem*>::iterator it = this->Dictionary.begin(); it != this->Dictionary.end(); ++it, ix++)
+	{
+		if (ix == index)
+		{
+			return it->first;
+		}
+	}
+
+	return NULL;
+}
+
+IStackItem* MapStackItem::GetValue(int index)
+{
+	int32 ix = 0;
+	for (std::map<IStackItem*, IStackItem*>::iterator it = this->Dictionary.begin(); it != this->Dictionary.end(); ++it, ix++)
+	{
+		if (ix == index)
+		{
+			return it->second;
+		}
 	}
 
 	return NULL;

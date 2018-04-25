@@ -27,9 +27,11 @@ public:
 	int32 Count();
 	bool Set(IStackItem* key, IStackItem* value);
 	IStackItem* Get(IStackItem* key);
-	bool Remove(IStackItem* key, bool dispose);
+	bool Remove(IStackItem* &key);
 	void FillKeys(ArrayStackItem* arr);
 	void FillValues(ArrayStackItem* arr);
+	IStackItem* GetKey(int index);
+	IStackItem* GetValue(int index);
 
 	// Constructor
 

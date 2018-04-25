@@ -238,14 +238,14 @@ namespace NeoVM.Interop.Types
         {
             if (ScriptTable == null)
             {
-                return 0x00;
+                return NeoVM.FALSE;
             }
 
-            byte[] script = ScriptTable.GetScript(scriptHash, isDynamicInvoke == 0x01);
+            byte[] script = ScriptTable.GetScript(scriptHash, isDynamicInvoke == NeoVM.TRUE);
 
             if (script == null || script.Length <= 0)
             {
-                return 0x00;
+                return NeoVM.FALSE;
             }
 
             fixed (byte* p = script)
@@ -253,7 +253,7 @@ namespace NeoVM.Interop.Types
                 NeoVM.ExecutionEngine_LoadScript(Handle, (IntPtr)p, script.Length);
             }
 
-            return 0x01;
+            return NeoVM.TRUE;
         }
         /// <summary>
         /// Invoke Interop callback
@@ -264,13 +264,13 @@ namespace NeoVM.Interop.Types
         byte InternalInvokeInterop(IntPtr ptr, byte size)
         {
             if (InteropService == null)
-                return 0x00;
+                return NeoVM.FALSE;
 
             string method = Marshal.PtrToStringUTF8(ptr, size);
             if (InteropService.Invoke(method, this))
-                return 0x01;
+                return NeoVM.TRUE;
 
-            return 0x00;
+            return NeoVM.FALSE;
         }
 
         #region Load Script
@@ -408,6 +408,13 @@ namespace NeoVM.Interop.Types
             }
         }
 
+        /// <summary>
+        /// Create Map StackItem
+        /// </summary>
+        public MapStackItem CreateMap()
+        {
+            return new MapStackItem(this);
+        }
         /// <summary>
         /// Create Array StackItem
         /// </summary>

@@ -2657,7 +2657,7 @@ ExecuteOpCode:
 		{
 			MapStackItem *arr = (MapStackItem*)item;
 
-			arr->Remove(key, true);
+			arr->Remove(key);
 
 			IStackItem::Free(key, item);
 			return;

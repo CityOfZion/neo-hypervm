@@ -25,7 +25,7 @@ namespace NeoVM.Interop.Types.StackItems
         /// <param name="engine">Engine</param>
         /// <param name="handle">Handle</param>
         /// <param name="value">Raw value</param>
-        internal BooleanStackItem(ExecutionEngine engine, IntPtr handle, byte[] value) : base(engine, value[0] == 0x01, EStackItemType.Bool, handle) { }
+        internal BooleanStackItem(ExecutionEngine engine, IntPtr handle, byte[] value) : base(engine, value[0] == NeoVM.TRUE, EStackItemType.Bool, handle) { }
 
         public bool Equals(BooleanStackItem other)
         {
