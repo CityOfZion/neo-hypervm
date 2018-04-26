@@ -12,6 +12,7 @@ using System.Linq;
 using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace NeoVM.Interop.Tests
 {
@@ -127,6 +128,64 @@ namespace NeoVM.Interop.Tests
 
                 Assert.AreEqual(EVMState.HALT, engine.Execute());
             }
+        }
+
+        [TestMethod]
+        public void TestParallel()
+        {
+            ExecutionEngineArgs args = new ExecutionEngineArgs()
+            {
+                ScriptTable = new DummyScriptTable(new byte[] { (byte) EVMOpCode.EQUAL }, new byte[] { (byte)EVMOpCode.EQUAL })
+            };
+
+            // 5 Scripts
+
+            List<ExecutionEngine> engines = new List<ExecutionEngine>()
+            {
+                NeoVM.CreateEngine(args),
+                NeoVM.CreateEngine(args),
+                NeoVM.CreateEngine(args),
+                NeoVM.CreateEngine(args),
+                NeoVM.CreateEngine(args),
+                NeoVM.CreateEngine(args),
+                NeoVM.CreateEngine(args),
+                NeoVM.CreateEngine(args),
+                NeoVM.CreateEngine(args),
+                NeoVM.CreateEngine(args)
+            };
+
+            Parallel.ForEach(engines, (engine) =>
+            {
+                for (ushort x = 0; x < 1000; x++)
+                {
+                    // Load script
+
+                    engine.Clean(x);
+
+                    using (ScriptBuilder script = new ScriptBuilder())
+                    {
+                        script.EmitPush(x);
+                        script.EmitPush(x);
+                        script.EmitAppCall(new byte[] 
+                        {
+                            0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,
+                            0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,
+                        });
+
+                        engine.LoadScript(script);
+                    }
+
+                    // Execute
+
+                    Assert.AreEqual(EVMState.HALT, engine.Execute());
+
+                    // Check result
+
+                    Assert.IsTrue(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
+                }
+
+                engine.Dispose();
+            });
         }
 
         /// <summary>

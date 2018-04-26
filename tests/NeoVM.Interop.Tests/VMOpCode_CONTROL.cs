@@ -421,7 +421,7 @@ namespace NeoVM.Interop.Tests
 
                     // Check
 
-                    Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 0x05);
+                    Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 0x04);
 
                     CheckClean(engine);
                 }
