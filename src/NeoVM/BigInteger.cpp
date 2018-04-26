@@ -25,7 +25,7 @@ BigInteger::BigInteger(BigInteger *value) : _sign(value->_sign)
 		this->_bitsSize = value->_bitsSize;
 		this->_bits = new uint32[value->_bitsSize];
 
-		for (int32 x = 0; x < value->_bitsSize; x++)
+		for (int32 x = 0; x < value->_bitsSize; ++x)
 			this->_bits[x] = value->_bits[x];
 	}
 
@@ -44,7 +44,7 @@ BigInteger::BigInteger(const BigInteger &value) : _sign(value._sign)
 		this->_bitsSize = value._bitsSize;
 		this->_bits = new uint32[value._bitsSize];
 
-		for (int32 x = 0; x < value._bitsSize; x++)
+		for (int32 x = 0; x < value._bitsSize; ++x)
 			this->_bits[x] = value._bits[x];
 	}
 
@@ -84,7 +84,7 @@ BigInteger::BigInteger(uint32* value, int32 valueSize, bool negative) :_sign(0),
 			this->_bitsSize = len;
 			this->_sign = negative ? -1 : +1;
 			this->_bits = new uint32[len];
-			for (int32 x = 0; x < len; x++)
+			for (int32 x = 0; x < len; ++x)
 				this->_bits[x] = value[x];
 		}
 	}
@@ -143,7 +143,7 @@ BigInteger::BigInteger(uint32* value, int32 size) :_sign(0), _bits(NULL), _bitsS
 			this->_bitsSize = dwordCount;
 			this->_bits = new uint32[dwordCount];
 
-			for (int32 x = 0; x < dwordCount; x++)
+			for (int32 x = 0; x < dwordCount; ++x)
 				this->_bits[x] = value[x];
 		}
 		// no trimming is possible.  Assign value directly to _bits.  
@@ -152,7 +152,7 @@ BigInteger::BigInteger(uint32* value, int32 size) :_sign(0), _bits(NULL), _bitsS
 			this->_sign = +1;
 			this->_bitsSize = size;
 			this->_bits = new uint32[size];
-			for (int32 x = 0; x < size; x++)
+			for (int32 x = 0; x < size; ++x)
 				this->_bits[x] = value[x];
 		}
 
@@ -191,7 +191,7 @@ BigInteger::BigInteger(uint32* value, int32 size) :_sign(0), _bits(NULL), _bitsS
 		this->_bitsSize = len;
 		this->_bits = new uint32[len];
 
-		for (int32 x = 0; x < len; x++)
+		for (int32 x = 0; x < len; ++x)
 			this->_bits[x] = value[x];
 	}
 	// no trimming is possible.  Assign value directly to _bits.  
@@ -200,7 +200,7 @@ BigInteger::BigInteger(uint32* value, int32 size) :_sign(0), _bits(NULL), _bitsS
 		this->_sign = -1;
 		this->_bitsSize = size;
 		this->_bits = new uint32[size];
-		for (int32 x = 0; x < size; x++)
+		for (int32 x = 0; x < size; ++x)
 			this->_bits[x] = value[x];
 	}
 
@@ -274,7 +274,7 @@ BigInteger::BigInteger(byte* value, int32 byteCount) : _sign(0), _bits(NULL), _b
 		int32 max = dwordCount - (unalignedBytes == 0 ? 0 : 1);
 		int32 curDword = 0, curByte = 3, byteInDword;
 
-		for (; curDword < max; curDword++)
+		for (; curDword < max; ++curDword)
 		{
 			byteInDword = 0;
 			while (byteInDword < 4)
@@ -282,8 +282,8 @@ BigInteger::BigInteger(byte* value, int32 byteCount) : _sign(0), _bits(NULL), _b
 				if (value[curByte] != 0x00) isZero = false;
 				val[curDword] <<= 8;
 				val[curDword] |= value[curByte];
-				curByte--;
-				byteInDword++;
+				--curByte;
+				++byteInDword;
 			}
 			curByte += 8;
 		}
@@ -334,7 +334,7 @@ BigInteger::BigInteger(byte* value, int32 byteCount) : _sign(0), _bits(NULL), _b
 					this->_bits = new uint32[len];
 					this->_bitsSize = len;
 
-					for (int32 x = 0; x < len; x++)
+					for (int32 x = 0; x < len; ++x)
 						this->_bits[x] = val[x];
 				}
 				else
@@ -370,7 +370,7 @@ void BigInteger::CopyInternal(const BigInteger &reg)
 	{
 		this->_bits = new uint32[this->_bitsSize];
 
-		for (int32 x = 0; x < this->_bitsSize; x++)
+		for (int32 x = 0; x < this->_bitsSize; ++x)
 			this->_bits[x] = reg._bits[x];
 	}
 	else
@@ -391,16 +391,16 @@ void BigInteger::DangerousMakeTwosComplement(uint32 *d, int32 dSize)
 	// first do complement and +1 as long as carry is needed
 	int32 i = 0;
 	uint32 v = 0;
-	for (; i < dSize; i++)
+	for (; i < dSize; ++i)
 	{
 		v = ~d[i] + 1;
 		d[i] = v;
-		if (v != 0) { i++; break; }
+		if (v != 0) { ++i; break; }
 	}
 	if (v != 0)
 	{
 		// now ones complement is sufficient
-		for (; i < dSize; i++)
+		for (; i < dSize; ++i)
 			d[i] = ~d[i];
 	}
 	else
@@ -480,7 +480,7 @@ int32 BigInteger::ToUInt32Array(uint32 * &output)
 	int32 trimmed_size = msb + 1 + (needExtraByte ? 1 : 0);
 	output = new uint32[trimmed_size];
 
-	for (int32 x = 0, m = msb + 1; x < m; x++)
+	for (int32 x = 0, m = msb + 1; x < m; ++x)
 		output[x] = dwords[x];
 
 	if (needExtraByte) output[trimmed_size - 1] = highDWord;
@@ -518,7 +518,7 @@ BigInteger* BigInteger::Or(BigInteger* bi)
 
 	uint32 xu, yu;
 
-	for (int32 i = 0; i < sizez; i++)
+	for (int32 i = 0; i < sizez; ++i)
 	{
 		xu = (i < sizex) ? x[i] : xExtend;
 		yu = (i < sizey) ? y[i] : yExtend;
@@ -559,7 +559,7 @@ BigInteger* BigInteger::Xor(BigInteger* bi)
 
 	uint32 xu, yu;
 
-	for (int32 i = 0; i < sizez; i++)
+	for (int32 i = 0; i < sizez; ++i)
 	{
 		xu = (i < sizex) ? x[i] : xExtend;
 		yu = (i < sizey) ? y[i] : yExtend;
@@ -627,7 +627,7 @@ BigInteger* BigInteger::Shl(int32 shift)
 
 	if (smallShift == 0)
 	{
-		for (int32 i = 0; i < xl; i++)
+		for (int32 i = 0; i < xl; ++i)
 			zd[i + digitShift] = xd[i];
 	}
 	else
@@ -636,7 +636,7 @@ BigInteger* BigInteger::Shl(int32 shift)
 		int32 carryShift = kcbitUint - smallShift;
 		uint32 carry = 0;
 
-		for (i = 0; i < xl; i++)
+		for (i = 0; i < xl; ++i)
 		{
 			uint32 rot = xd[i];
 			zd[i + digitShift] = rot << smallShift | carry;
@@ -676,7 +676,7 @@ BigInteger* BigInteger::Shr(int32 shift)
 
 		/*
 		uint32 *temp = new uint32[xl];
-		for (int32 i = 0; i < xl; i++)temp[i] = xd[i];  // make a copy of immutable value._bits
+		for (int32 i = 0; i < xl; ++i)temp[i] = xd[i];  // make a copy of immutable value._bits
 		delete[](xd);
 		xd = temp;
 		*/
@@ -743,7 +743,7 @@ BigInteger* BigInteger::And(BigInteger* bi)
 
 	uint32 xu, yu;
 
-	for (int32 i = 0; i < sizez; i++)
+	for (int32 i = 0; i < sizez; ++i)
 	{
 		xu = (i < sizex) ? x[i] : xExtend;
 		yu = (i < sizey) ? y[i] : yExtend;
@@ -1056,7 +1056,7 @@ BigInteger::BigInteger(int32 sign, uint32 *rgu, int32 rguSize)
 	this->_bitsSize = rguSize;
 	this->_bits = new uint32[rguSize];
 
-	for (int32 x = 0; x < rguSize; x++)
+	for (int32 x = 0; x < rguSize; ++x)
 		this->_bits[x] = rgu[x];
 
 	// AssertValid();
@@ -1109,7 +1109,7 @@ int32 BigInteger::ToByteArray(byte * output, int32 length)
 		{
 			// Clone
 			dwords = new uint32[dwordsSize];
-			for (int32 x = 0; x < dwordsSize; x++)
+			for (int32 x = 0; x < dwordsSize; ++x)
 				dwords[x] = this->_bits[x];
 
 			this->DangerousMakeTwosComplement(dwords, dwordsSize);  // mutates dwords
@@ -1132,7 +1132,7 @@ int32 BigInteger::ToByteArray(byte * output, int32 length)
 	int32 curByte = 0;
 
 	uint32 dword;
-	for (int32 i = 0; i < dwordsSize; i++)
+	for (int32 i = 0; i < dwordsSize; ++i)
 	{
 		dword = dwords[i];
 		for (int32 j = 0; j < 4; j++)

@@ -179,7 +179,7 @@ void StackItems::Clear()
 			IStackItem* ptr = (IStackItem*)*it;
 
 			Log(ptr, index, ELogStackOperation::Drop);
-			index++;
+			++index;
 
 			IStackItem::UnclaimAndFree(ptr);
 		}

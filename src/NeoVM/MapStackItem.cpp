@@ -79,7 +79,7 @@ IStackItem* MapStackItem::Get(IStackItem* key)
 IStackItem* MapStackItem::GetKey(int index)
 {
 	int32 ix = 0;
-	for (std::map<IStackItem*, IStackItem*>::iterator it = this->Dictionary.begin(); it != this->Dictionary.end(); ++it, ix++)
+	for (std::map<IStackItem*, IStackItem*>::iterator it = this->Dictionary.begin(); it != this->Dictionary.end(); ++it, ++ix)
 	{
 		if (ix == index)
 		{
@@ -93,7 +93,7 @@ IStackItem* MapStackItem::GetKey(int index)
 IStackItem* MapStackItem::GetValue(int index)
 {
 	int32 ix = 0;
-	for (std::map<IStackItem*, IStackItem*>::iterator it = this->Dictionary.begin(); it != this->Dictionary.end(); ++it, ix++)
+	for (std::map<IStackItem*, IStackItem*>::iterator it = this->Dictionary.begin(); it != this->Dictionary.end(); ++it, ++ix)
 	{
 		if (ix == index)
 		{

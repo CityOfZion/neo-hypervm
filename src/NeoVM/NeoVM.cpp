@@ -124,7 +124,7 @@ int32 StackItems_Drop(StackItems* stack, int32 count)
 	int ret = stack->Count();
 	ret = ret > count ? count : ret;
 
-	for (int x = 0; x < ret; x++) stack->Drop();
+	for (int x = 0; x < ret; ++x) stack->Drop();
 	return ret;
 }
 
@@ -164,7 +164,7 @@ int32 ExecutionContextStack_Drop(ExecutionContextStack* stack, int32 count)
 	int ret = stack->Count();
 	ret = ret > count ? count : ret;
 
-	for (int x = 0; x < ret; x++) stack->Drop();
+	for (int x = 0; x < ret; ++x) stack->Drop();
 	return ret;
 }
 
@@ -217,7 +217,7 @@ IStackItem* StackItem_Create(EStackItemType type, byte *data, int32 size)
 
 			bool ret = false;
 
-			for (int x = 0; x < size; x++)
+			for (int x = 0; x < size; ++x)
 				if (data[x] != 0x00)
 				{
 					ret = true;

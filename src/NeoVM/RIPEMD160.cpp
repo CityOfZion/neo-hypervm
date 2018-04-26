@@ -172,7 +172,7 @@ static inline void byteswap_digest(uint32_t *p)
 {
 	unsigned int i;
 
-	for (i = 0; i < 4; i++) {
+	for (i = 0; i < 4; ++i) {
 		byteswap32(p++);
 		byteswap32(p++);
 		byteswap32(p++);
@@ -205,55 +205,55 @@ static void ripemd160_compress(ripemd160_state *self)
 
 	/* Round 1 */
 	round = 0;
-	for (w = 0; w < 16; w++) { /* left line */
+	for (w = 0; w < 16; ++w) { /* left line */
 		T = ROL(SL[round][w], AL + F1(BL, CL, DL) + self->buf.w[RL[round][w]] + KL[round]) + EL;
 		AL = EL; EL = DL; DL = ROL(10, CL); CL = BL; BL = T;
 	}
-	for (w = 0; w < 16; w++) { /* right line */
+	for (w = 0; w < 16; ++w) { /* right line */
 		T = ROL(SR[round][w], AR + F5(BR, CR, DR) + self->buf.w[RR[round][w]] + KR[round]) + ER;
 		AR = ER; ER = DR; DR = ROL(10, CR); CR = BR; BR = T;
 	}
 
 	/* Round 2 */
 	round++;
-	for (w = 0; w < 16; w++) { /* left line */
+	for (w = 0; w < 16; ++w) { /* left line */
 		T = ROL(SL[round][w], AL + F2(BL, CL, DL) + self->buf.w[RL[round][w]] + KL[round]) + EL;
 		AL = EL; EL = DL; DL = ROL(10, CL); CL = BL; BL = T;
 	}
-	for (w = 0; w < 16; w++) { /* right line */
+	for (w = 0; w < 16; ++w) { /* right line */
 		T = ROL(SR[round][w], AR + F4(BR, CR, DR) + self->buf.w[RR[round][w]] + KR[round]) + ER;
 		AR = ER; ER = DR; DR = ROL(10, CR); CR = BR; BR = T;
 	}
 
 	/* Round 3 */
 	round++;
-	for (w = 0; w < 16; w++) { /* left line */
+	for (w = 0; w < 16; ++w) { /* left line */
 		T = ROL(SL[round][w], AL + F3(BL, CL, DL) + self->buf.w[RL[round][w]] + KL[round]) + EL;
 		AL = EL; EL = DL; DL = ROL(10, CL); CL = BL; BL = T;
 	}
-	for (w = 0; w < 16; w++) { /* right line */
+	for (w = 0; w < 16; ++w) { /* right line */
 		T = ROL(SR[round][w], AR + F3(BR, CR, DR) + self->buf.w[RR[round][w]] + KR[round]) + ER;
 		AR = ER; ER = DR; DR = ROL(10, CR); CR = BR; BR = T;
 	}
 
 	/* Round 4 */
 	round++;
-	for (w = 0; w < 16; w++) { /* left line */
+	for (w = 0; w < 16; ++w) { /* left line */
 		T = ROL(SL[round][w], AL + F4(BL, CL, DL) + self->buf.w[RL[round][w]] + KL[round]) + EL;
 		AL = EL; EL = DL; DL = ROL(10, CL); CL = BL; BL = T;
 	}
-	for (w = 0; w < 16; w++) { /* right line */
+	for (w = 0; w < 16; ++w) { /* right line */
 		T = ROL(SR[round][w], AR + F2(BR, CR, DR) + self->buf.w[RR[round][w]] + KR[round]) + ER;
 		AR = ER; ER = DR; DR = ROL(10, CR); CR = BR; BR = T;
 	}
 
 	/* Round 5 */
 	round++;
-	for (w = 0; w < 16; w++) { /* left line */
+	for (w = 0; w < 16; ++w) { /* left line */
 		T = ROL(SL[round][w], AL + F5(BL, CL, DL) + self->buf.w[RL[round][w]] + KL[round]) + EL;
 		AL = EL; EL = DL; DL = ROL(10, CL); CL = BL; BL = T;
 	}
-	for (w = 0; w < 16; w++) { /* right line */
+	for (w = 0; w < 16; ++w) { /* right line */
 		T = ROL(SR[round][w], AR + F1(BR, CR, DR) + self->buf.w[RR[round][w]] + KR[round]) + ER;
 		AR = ER; ER = DR; DR = ROL(10, CR); CR = BR; BR = T;
 	}

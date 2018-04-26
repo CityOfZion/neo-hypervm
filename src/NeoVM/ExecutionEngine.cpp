@@ -348,7 +348,7 @@ ExecuteOpCode:
 		}
 
 		bool isDynamicInvoke = true;
-		for (int32 x = 0; x < 20; x++)
+		for (int32 x = 0; x < 20; ++x)
 			if (script_hash[x] != 0x00) { isDynamicInvoke = false; break; }
 
 		if (isDynamicInvoke)
@@ -2092,7 +2092,7 @@ ExecuteOpCode:
 		int * signaturesL;
 		int pubKeysCount, signaturesCount;
 
-		for (byte x = 0; x < 2; x++)
+		for (byte x = 0; x < 2; ++x)
 		{
 			IStackItem* item = this->EvaluationStack->Pop();
 			ic--;
@@ -2111,7 +2111,7 @@ ExecuteOpCode:
 					byte **data = new byte*[v];
 					int32 *dataL = new int32[v];
 
-					for (int32 i = 0; i < v; i++)
+					for (int32 i = 0; i < v; ++i)
 					{
 						IStackItem* ret = arr->Get(i);
 
@@ -2155,7 +2155,7 @@ ExecuteOpCode:
 					byte **data = new byte*[v];
 					int32 *dataL = new int32[v];
 
-					for (int32 i = 0; i < v; i++)
+					for (int32 i = 0; i < v; ++i)
 					{
 						IStackItem* ret = this->EvaluationStack->Pop();
 						ic--;
@@ -2226,7 +2226,7 @@ ExecuteOpCode:
 		for (int32 i = 0, j = 0; fSuccess && i < signaturesCount && j < pubKeysCount;)
 		{
 			if (Crypto::VerifySignature(msg, msgL, signatures[i], signaturesL[i], pubKeys[j], pubKeysL[j]))
-				i++;
+				++i;
 
 			j++;
 
@@ -2317,7 +2317,7 @@ ExecuteOpCode:
 		IStackItem::Free(item);
 		ArrayStackItem *items = new ArrayStackItem(false);
 
-		for (int32 i = 0; i < size; i++)
+		for (int32 i = 0; i < size; ++i)
 		{
 			items->Add(this->EvaluationStack->Pop());
 		}

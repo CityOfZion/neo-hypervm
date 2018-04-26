@@ -149,7 +149,7 @@ int32 ExecutionContext::Read(byte * data, int32 length)
 
 	int read = 0;
 
-	for (int x = 0; x < length && this->InstructionPointer < this->ScriptLength; x++)
+	for (int x = 0; x < length && this->InstructionPointer < this->ScriptLength; ++x)
 	{
 		data[x] = this->Script[this->InstructionPointer];
 		this->InstructionPointer++;

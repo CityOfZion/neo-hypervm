@@ -128,7 +128,7 @@ void ExecutionContextStack::Clear()
 		{
 			ExecutionContext* ptr = (ExecutionContext*)*it;
 			this->Log(ptr, index, ELogStackOperation::Drop);
-			index++;
+			++index;
 
 			ExecutionContext::UnclaimAndFree(ptr);
 		}

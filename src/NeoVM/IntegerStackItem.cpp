@@ -88,7 +88,7 @@ bool IntegerStackItem::Equals(IStackItem * it)
 		}
 
 		bool ret = true;
-		for (int x = 0; x < i0; x++)
+		for (int x = 0; x < i0; ++x)
 			if (d0[x] != d1[x])
 			{
 				ret = false;

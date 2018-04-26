@@ -31,7 +31,7 @@ void SHA256::transform(const byte *message, uint32 block_nb)
 	int32 i;
 	int32 j;
 
-	for (i = 0; i < (int32)block_nb; i++)
+	for (i = 0; i < (int32)block_nb; ++i)
 	{
 		sub_block = message + (i << 6);
 		for (j = 0; j < 16; j++)
@@ -119,7 +119,7 @@ void SHA256::final(byte *digest)
 	m_block[m_len] = 0x80;
 	SHA2_UNPACK32(len_b, m_block + pm_len - 4);
 	transform(m_block, block_nb);
-	for (i = 0; i < 8; i++) {
+	for (i = 0; i < 8; ++i) {
 		SHA2_UNPACK32(m_h[i], &digest[i << 2]);
 	}
 }

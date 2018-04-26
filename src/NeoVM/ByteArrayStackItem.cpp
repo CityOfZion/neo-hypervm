@@ -54,7 +54,7 @@ ByteArrayStackItem::~ByteArrayStackItem()
 
 bool ByteArrayStackItem::GetBoolean()
 {
-	for (int32 x = 0; x < this->PayloadLength; x++)
+	for (int32 x = 0; x < this->PayloadLength; ++x)
 		if (this->Payload[x] != 0x00)
 			return true;
 
@@ -116,7 +116,7 @@ bool ByteArrayStackItem::Equals(IStackItem * it)
 			return false;
 		}
 
-		for (int x = 0; x < iz; x++)
+		for (int x = 0; x < iz; ++x)
 			if (data[x] != this->Payload[x])
 			{
 				delete[](data);

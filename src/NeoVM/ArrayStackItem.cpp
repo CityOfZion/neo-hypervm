@@ -9,7 +9,7 @@ ArrayStackItem::ArrayStackItem(bool isStruct, int32 count) :
 	IStackItem(isStruct ? EStackItemType::Struct : EStackItemType::Array), List(std::list<IStackItem*>())
 {
 	// Init size
-	for (int32 i = 0; i < count; i++)
+	for (int32 i = 0; i < count; ++i)
 		this->Add(new BoolStackItem(false));
 }
 
@@ -33,7 +33,7 @@ IStackItem* ArrayStackItem::Clone()
 {
 	ArrayStackItem* ret = new ArrayStackItem(this->Type == EStackItemType::Struct);
 
-	for (int32 x = 0, m = this->Count(); x < m; x++)
+	for (int32 x = 0, m = this->Count(); x < m; ++x)
 	{
 		IStackItem* i = this->Get(x);
 
@@ -76,7 +76,7 @@ bool ArrayStackItem::Equals(IStackItem * it)
 
 	// Check sequence
 
-	for (int32 x = 0; x < c; x++)
+	for (int32 x = 0; x < c; ++x)
 	{
 		if (!this->Get(x)->Equals(arr->Get(x)))
 			return false;
@@ -111,7 +111,7 @@ int32 ArrayStackItem::IndexOf(IStackItem* item)
 		if ((IStackItem*)*it == item)
 			return index;
 
-		index++;
+		++index;
 	}
 	return -1;
 }

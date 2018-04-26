@@ -550,7 +550,7 @@ void BigIntegerBuilder::ModDivCore(BigIntegerBuilder *regNum, BigIntegerBuilder 
 				uint32 uSub = (uint32)uuBorrow;
 				uuBorrow >>= kcbitUint;
 				if (regNum->_rgu[iu + iu2] < uSub)
-					uuBorrow++;
+					++uuBorrow;
 				regNum->_rgu[iu + iu2] -= uSub;
 			}
 
@@ -663,7 +663,7 @@ void BigIntegerBuilder::SetSizeKeep(int32 cu, int32 cuExtra)
 		{
 			rgu[0] = this->_uSmall;
 
-			for (int i = 1; i < l; i++)
+			for (int i = 1; i < l; ++i)
 				rgu[i] = 0;
 		}
 		else
@@ -671,11 +671,11 @@ void BigIntegerBuilder::SetSizeKeep(int32 cu, int32 cuExtra)
 			int to = cu < _iuLast + 1 ? cu : _iuLast + 1;
 
 			// Array.Copy(_rgu, rgu, to);
-			for (int i = 0; i < to; i++)
+			for (int i = 0; i < to; ++i)
 				rgu[i] = this->_rgu[i];
 
 			// Clear rest
-			for (int i = to; i < l; i++)
+			for (int i = to; i < l; ++i)
 				rgu[i] = 0;
 		}
 
@@ -689,7 +689,7 @@ void BigIntegerBuilder::SetSizeKeep(int32 cu, int32 cuExtra)
 	else if (_iuLast + 1 < cu)
 	{
 		// Array.Clear(_rgu, _iuLast + 1, cu - _iuLast - 1);
-		for (int i = _iuLast + 1, m = i + cu - _iuLast - 1; i < m; i++)
+		for (int i = _iuLast + 1, m = i + cu - _iuLast - 1; i < m; ++i)
 			this->_rgu[i] = 0;
 
 		if (this->_iuLast == 0)
@@ -835,7 +835,7 @@ void BigIntegerBuilder::Add(BigIntegerBuilder &reg)
 		cuAdd = this->_iuLast + 1;
 
 		//Array.Copy(reg._rgu, _iuLast + 1, _rgu, _iuLast + 1, reg._iuLast - _iuLast);
-		for (int x = 0; x < reg._iuLast - this->_iuLast; x++)
+		for (int x = 0; x < reg._iuLast - this->_iuLast; ++x)
 			this->_rgu[x + this->_iuLast + 1] = reg._rgu[x + this->_iuLast + 1];
 
 		// Contract.Assert(_iuLast > 0);
