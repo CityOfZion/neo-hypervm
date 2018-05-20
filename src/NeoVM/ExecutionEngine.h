@@ -36,7 +36,6 @@ public:
 	// Load scripts
 
 	void LoadScript(byte * script, int32 scriptLength);
-	void LoadPushOnlyScript(byte * script, int32 scriptLength);
 
 	// Getters
 

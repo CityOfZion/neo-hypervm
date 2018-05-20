@@ -15,7 +15,6 @@ public:
 
 	static const int32 ScriptHashLength = 20;
 
-	const bool IsPushOnly;
 	const int32 ScriptLength;
 
 	// Position
@@ -51,12 +50,12 @@ public:
 
 	// Constructor
 
-	ExecutionContext(byte* script, int32 scriptLength, bool pushOnly, int32 instructorPointer);
+	ExecutionContext(byte* script, int32 scriptLength, int32 instructorPointer);
 
 	// Destructor
 
 	~ExecutionContext();
-	
+
 	// Claims
 
 	void Claim();

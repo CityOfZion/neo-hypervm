@@ -99,7 +99,6 @@ namespace NeoVM.Interop
         internal static delCreateExecutionEngine ExecutionEngine_Create;
         internal static delVoid_RefHandle ExecutionEngine_Free;
         internal static delVoid_HandleHandleInt ExecutionEngine_LoadScript;
-        internal static delVoid_HandleHandleInt ExecutionEngine_LoadPushOnlyScript;
         internal static delByte_Handle ExecutionEngine_Execute;
         internal static delVoid_Handle ExecutionEngine_StepInto;
         internal static delVoid_Handle ExecutionEngine_StepOver;

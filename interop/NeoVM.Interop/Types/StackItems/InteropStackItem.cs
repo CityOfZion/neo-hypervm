@@ -7,7 +7,7 @@ namespace NeoVM.Interop.Types.StackItems
 {
     public class InteropStackItem : IStackItem<object>, IEquatable<InteropStackItem>
     {
-        int ObjKey;
+        readonly int _objKey;
 
         /// <summary>
         /// Constructor
@@ -18,13 +18,13 @@ namespace NeoVM.Interop.Types.StackItems
         {
             // Search
 
-            ObjKey = engine.InteropCache.IndexOf(data);
+            _objKey = engine.InteropCache.IndexOf(data);
 
             // New
 
-            if (ObjKey == -1)
+            if (_objKey == -1)
             {
-                ObjKey = engine.InteropCache.Count;
+                _objKey = engine.InteropCache.Count;
                 engine.InteropCache.Add(data);
             }
 
@@ -41,7 +41,7 @@ namespace NeoVM.Interop.Types.StackItems
         internal InteropStackItem(ExecutionEngine engine, IntPtr handle, int objKey) :
             base(engine, engine.InteropCache[objKey], EStackItemType.Interop, handle)
         {
-            ObjKey = objKey;
+            _objKey = objKey;
         }
 
         public bool Equals(InteropStackItem other)
@@ -62,7 +62,7 @@ namespace NeoVM.Interop.Types.StackItems
 
         protected override byte[] GetNativeByteArray()
         {
-            return BitHelper.GetBytes(ObjKey);
+            return BitHelper.GetBytes(_objKey);
         }
     }
 }

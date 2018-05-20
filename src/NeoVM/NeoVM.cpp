@@ -89,11 +89,6 @@ void ExecutionEngine_LoadScript(ExecutionEngine* engine, byte * script, int32 sc
 	engine->LoadScript(script, scriptLength);
 }
 
-void ExecutionEngine_LoadPushOnlyScript(ExecutionEngine* engine, byte * script, int32 scriptLength)
-{
-	engine->LoadPushOnlyScript(script, scriptLength);
-}
-
 byte ExecutionEngine_Execute(ExecutionEngine* engine)
 {
 	return (byte)engine->Execute();

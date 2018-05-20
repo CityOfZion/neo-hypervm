@@ -15,14 +15,14 @@ namespace NeoVM.Interop.Types
     {
         #region Delegates
 
-        NeoVM.OnStepIntoCallback _InternalOnStepInto;
-        NeoVM.OnStackChangeCallback _InternalOnExecutionContextChange;
-        NeoVM.OnStackChangeCallback _InternalOnAltStackChange;
-        NeoVM.OnStackChangeCallback _InternalOnEvaluationStackChange;
+        readonly NeoVM.OnStepIntoCallback _InternalOnStepInto;
+        readonly NeoVM.OnStackChangeCallback _InternalOnExecutionContextChange;
+        readonly NeoVM.OnStackChangeCallback _InternalOnAltStackChange;
+        readonly NeoVM.OnStackChangeCallback _InternalOnEvaluationStackChange;
 
-        NeoVM.InvokeInteropCallback _InternalInvokeInterop;
-        NeoVM.LoadScriptCallback _InternalLoadScript;
-        NeoVM.GetMessageCallback _InternalGetMessage;
+        readonly NeoVM.InvokeInteropCallback _InternalInvokeInterop;
+        readonly NeoVM.LoadScriptCallback _InternalLoadScript;
+        readonly NeoVM.GetMessageCallback _InternalGetMessage;
 
         #endregion
 
@@ -284,17 +284,6 @@ namespace NeoVM.Interop.Types
             fixed (byte* p = script)
             {
                 NeoVM.ExecutionEngine_LoadScript(Handle, (IntPtr)p, script.Length);
-            }
-        }
-        /// <summary>
-        /// Load script
-        /// </summary>
-        /// <param name="script">Script</param>
-        public void LoadPushOnlyScript(byte[] script)
-        {
-            fixed (byte* p = script)
-            {
-                NeoVM.ExecutionEngine_LoadPushOnlyScript(Handle, (IntPtr)p, script.Length);
             }
         }
 

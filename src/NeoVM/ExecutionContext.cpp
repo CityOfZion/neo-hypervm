@@ -2,8 +2,8 @@
 #include "Crypto.h"
 #include <cstring>
 
-ExecutionContext::ExecutionContext(byte* script, int32 scriptLength, bool pushOnly, int32 instructorPointer)
-	:Claims(0), IsPushOnly(pushOnly), ScriptLength(scriptLength), InstructionPointer(instructorPointer), IsScriptHashCalculated(false)
+ExecutionContext::ExecutionContext(byte* script, int32 scriptLength, int32 instructorPointer)
+	:Claims(0), ScriptLength(scriptLength), InstructionPointer(instructorPointer), IsScriptHashCalculated(false)
 {
 	// Copy script
 
@@ -204,7 +204,7 @@ void ExecutionContext::Seek(int32 position)
 
 ExecutionContext* ExecutionContext::Clone()
 {
-	return new ExecutionContext(this->Script, this->ScriptLength, this->IsPushOnly, this->InstructionPointer);
+	return new ExecutionContext(this->Script, this->ScriptLength, this->InstructionPointer);
 }
 
 void ExecutionContext::Free(ExecutionContext* &item)

@@ -47,12 +47,7 @@ ExecutionEngine::ExecutionEngine
 
 void ExecutionEngine::LoadScript(byte * script, int32 scriptLength)
 {
-	this->InvocationStack->Push(new ExecutionContext(script, scriptLength, false, 0));
-}
-
-void ExecutionEngine::LoadPushOnlyScript(byte * script, int32 scriptLength)
-{
-	this->InvocationStack->Push(new ExecutionContext(script, scriptLength, true, 0));
+	this->InvocationStack->Push(new ExecutionContext(script, scriptLength, 0));
 }
 
 ExecutionContext* ExecutionEngine::GetCurrentContext()
@@ -126,14 +121,6 @@ void ExecutionEngine::StepInto()
 	}
 
 	EVMOpCode opcode = context->ReadNextInstruction();
-
-	// Check PushOnly
-
-	if (context->IsPushOnly && opcode > EVMOpCode::PUSH16 && opcode != EVMOpCode::RET)
-	{
-		this->State = EVMState::FAULT;
-		return;
-	}
 
 ExecuteOpCode:
 
