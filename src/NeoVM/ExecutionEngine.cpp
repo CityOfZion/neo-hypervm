@@ -552,11 +552,8 @@ ExecuteOpCode:
 			return;
 		}
 
-		IStackItem *x2 = this->EvaluationStack->Pop();
-		IStackItem *x1 = this->EvaluationStack->Pop();
+		IStackItem *x1 = this->EvaluationStack->Remove(1);
 		IStackItem::Free(x1);
-
-		this->EvaluationStack->Push(x2);
 		return;
 	}
 	case EVMOpCode::OVER:
@@ -567,10 +564,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		IStackItem *x2 = this->EvaluationStack->Pop();
-		IStackItem *x1 = this->EvaluationStack->Peek(0);
-
-		this->EvaluationStack->Push(x2);
+		IStackItem *x1 = this->EvaluationStack->Peek(1);
 		this->EvaluationStack->Push(x1);
 		return;
 	}
@@ -644,12 +638,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		IStackItem *x3 = this->EvaluationStack->Pop();
-		IStackItem *x2 = this->EvaluationStack->Pop();
-		IStackItem *x1 = this->EvaluationStack->Pop();
-
-		this->EvaluationStack->Push(x2);
-		this->EvaluationStack->Push(x3);
+		IStackItem *x1 = this->EvaluationStack->Remove(2);
 		this->EvaluationStack->Push(x1);
 		return;
 	}
@@ -661,10 +650,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		IStackItem *x2 = this->EvaluationStack->Pop();
-		IStackItem *x1 = this->EvaluationStack->Pop();
-
-		this->EvaluationStack->Push(x2);
+		IStackItem *x1 = this->EvaluationStack->Remove(1);
 		this->EvaluationStack->Push(x1);
 		return;
 	}
@@ -676,12 +662,8 @@ ExecuteOpCode:
 			return;
 		}
 
-		IStackItem *x2 = this->EvaluationStack->Pop();
-		IStackItem *x1 = this->EvaluationStack->Pop();
-
-		this->EvaluationStack->Push(x2);
-		this->EvaluationStack->Push(x1);
-		this->EvaluationStack->Push(x1);
+		IStackItem *x1 = this->EvaluationStack->Peek(0);
+		this->EvaluationStack->Insert(2, x1);
 		return;
 	}
 	case EVMOpCode::CAT:
