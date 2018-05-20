@@ -245,6 +245,72 @@ namespace NeoVM.Interop.Tests
                     CheckClean(engine);
                 }
             }
+
+            // Test with dup
+
+            foreach (BigInteger i in IntSingleIteration())
+            {
+                using (ScriptBuilder script = new ScriptBuilder())
+                using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+                {
+                    // Make the script
+
+                    script.EmitPush(i);
+                    script.Emit(EVMOpCode.DUP);
+
+                    script.Emit(operand, EVMOpCode.RET);
+
+                    // Load script
+
+                    engine.LoadScript(script.ToArray());
+
+                    // Execute
+
+                    // PUSH A
+                    engine.StepInto();
+                    Assert.AreEqual(1, engine.EvaluationStack.Count);
+
+                    // PUSH B
+                    engine.StepInto();
+                    Assert.AreEqual(2, engine.EvaluationStack.Count);
+
+                    // Operand
+
+                    CancelEventArgs cancel = new CancelEventArgs(false);
+
+#pragma warning disable CS0162
+                    if (CalculateNumericalTimes)
+                    {
+                        sw.Restart();
+                    }
+#pragma warning restore
+
+                    engine.StepInto();
+                    check(engine, i, i, cancel);
+
+#pragma warning disable CS0162
+                    if (CalculateNumericalTimes)
+                    {
+                        sw.Stop();
+                        Console.WriteLine("[" + sw.Elapsed.ToString() + "] " + i + " " + operand.ToString() + " " + i);
+                    }
+#pragma warning restore
+
+                    if (cancel.Cancel)
+                    {
+                        CheckClean(engine, false);
+                        continue;
+                    }
+
+                    // RET
+                    engine.StepInto();
+                    Assert.AreEqual(EVMState.HALT, engine.State);
+
+                    // Check
+
+                    CheckClean(engine);
+                }
+            }
         }
         /// <summary>
         /// Check operand with one BigIntegers
