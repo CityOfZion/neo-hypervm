@@ -1,5 +1,6 @@
 #pragma once
 
+#include <list>
 #include "Types.h"
 #include "Limits.h"
 #include "StackItems.h"
@@ -27,15 +28,18 @@ private:
 
 	// Stacks
 
-	StackItems * AltStack;
-	StackItems * EvaluationStack;
+	StackItems * ResultStack;
 	ExecutionContextStack * InvocationStack;
+
+	std::list<ExecutionScript*> Scripts;
 
 public:
 
 	// Load scripts
 
-	void LoadScript(byte * script, int32 scriptLength);
+	ExecutionContext* LoadScript(ExecutionScript * script, int32 rvcount);
+	int32 LoadScript(byte * script, int32 scriptLength, int32 rvcount);
+	bool LoadScript(byte scriptIndex, int32 rvcount);
 
 	// Getters
 
@@ -46,8 +50,7 @@ public:
 	ExecutionContext* GetEntryContext();
 
 	ExecutionContextStack * GetInvocationStack();
-	StackItems * GetEvaluationStack();
-	StackItems * GetAltStack();
+	StackItems * GetResultStack();
 
 	// Setters
 
@@ -56,10 +59,10 @@ public:
 
 	// Run
 
-	EVMState Execute();
 	void StepInto();
 	void StepOut();
 	void StepOver();
+	EVMState Execute();
 
 	// Constructor
 

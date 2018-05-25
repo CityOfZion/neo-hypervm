@@ -132,6 +132,11 @@ namespace NeoVM.Interop.Types
             return Emit(op, BitConverter.GetBytes(offset));
         }
 
+        public ScriptBuilder EmitRET()
+        {
+            return Emit(EVMOpCode.RET);
+        }
+
         public ScriptBuilder EmitPush(BigInteger number)
         {
             if (number == -1) return Emit(EVMOpCode.PUSHM1);

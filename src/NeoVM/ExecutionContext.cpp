@@ -2,13 +2,16 @@
 #include "Crypto.h"
 #include <cstring>
 
-ExecutionContext::ExecutionContext(byte* script, int32 scriptLength, int32 instructorPointer)
-	:Claims(0), ScriptLength(scriptLength), InstructionPointer(instructorPointer), IsScriptHashCalculated(false)
+ExecutionContext::ExecutionContext(ExecutionScript* script, int32 instructorPointer, int32 rvcount) 
+	:
+	IClaimable(),
+	ScriptLength(script->ScriptLength),
+	RVCount(rvcount),
+	Script(script),
+	InstructionPointer(instructorPointer),
+	AltStack(new StackItems()),
+	EvaluationStack(new StackItems())
 {
-	// Copy script
-
-	this->Script = new byte[scriptLength];
-	memcpy(this->Script, script, scriptLength);
 }
 
 bool ExecutionContext::ReadUInt8(byte &ret)
@@ -151,7 +154,7 @@ int32 ExecutionContext::Read(byte * data, int32 length)
 
 	for (int x = 0; x < length && this->InstructionPointer < this->ScriptLength; ++x)
 	{
-		data[x] = this->Script[this->InstructionPointer];
+		data[x] = this->Script->Content[this->InstructionPointer];
 		this->InstructionPointer++;
 		read++;
 	}
@@ -167,7 +170,7 @@ EVMOpCode ExecutionContext::GetNextInstruction()
 	}
 	else
 	{
-		return (EVMOpCode)this->Script[this->InstructionPointer];
+		return (EVMOpCode)this->Script->Content[this->InstructionPointer];
 	}
 }
 
@@ -179,7 +182,7 @@ EVMOpCode ExecutionContext::ReadNextInstruction()
 	}
 	else
 	{
-		EVMOpCode ret = (EVMOpCode)this->Script[this->InstructionPointer];
+		EVMOpCode ret = (EVMOpCode)this->Script->Content[this->InstructionPointer];
 		this->InstructionPointer++;
 		return ret;
 	}
@@ -187,14 +190,7 @@ EVMOpCode ExecutionContext::ReadNextInstruction()
 
 int32 ExecutionContext::GetScriptHash(byte* hash)
 {
-	if (!this->IsScriptHashCalculated)
-	{
-		this->IsScriptHashCalculated = true;
-		Crypto::ComputeHash160(this->Script, this->ScriptLength, &this->ScriptHash[0]);
-	}
-
-	memcpy(hash, this->ScriptHash, this->ScriptHashLength);
-	return this->ScriptHashLength;
+	return this->Script->GetScriptHash(hash);
 }
 
 void ExecutionContext::Seek(int32 position)
@@ -202,48 +198,26 @@ void ExecutionContext::Seek(int32 position)
 	this->InstructionPointer = position;
 }
 
-ExecutionContext* ExecutionContext::Clone()
-{
-	return new ExecutionContext(this->Script, this->ScriptLength, this->InstructionPointer);
-}
-
 void ExecutionContext::Free(ExecutionContext* &item)
 {
-	if (item != NULL && item->Claims == 0)
+	if (item != NULL && item->IsUnClaimed())
 	{
 		delete(item);
 		item = NULL;
 	}
 }
-
-void ExecutionContext::UnClaim() { this->Claims--; }
-
-void ExecutionContext::Claim() { this->Claims++; }
 
 void ExecutionContext::UnclaimAndFree(ExecutionContext* &item)
 {
-	if (item == NULL) return;
-
-	if (item->Claims == 1)
+	if (item != NULL && item->UnClaim())
 	{
-		item->Claims = 0;
-
-		// Is zero because if the item is cloned you can call this method twice (PUSH1,DUP,EQUAL)
-
 		delete(item);
 		item = NULL;
-	}
-	else
-	{
-		item->Claims--;
 	}
 }
 
 ExecutionContext::~ExecutionContext()
 {
-	if (this->Script == NULL)
-		return;
-
-	delete[](this->Script);
-	this->Script = NULL;
+	delete(this->EvaluationStack);
+	delete(this->AltStack);
 }

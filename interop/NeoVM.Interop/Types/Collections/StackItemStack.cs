@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 
 namespace NeoVM.Interop.Types.Collections
 {
-    public class StackItemStack : IEnumerable<IStackItem>
+    public class StackItemStack : IEnumerable<IStackItem>, IDisposable
     {
         /// <summary>
         /// Execution Engine parent
@@ -15,7 +15,7 @@ namespace NeoVM.Interop.Types.Collections
         /// <summary>
         /// Native handle
         /// </summary>
-        protected readonly IntPtr Handle;
+        private IntPtr Handle;
 
         /// <summary>
         /// Return the number of items in the stack
@@ -179,5 +179,13 @@ namespace NeoVM.Interop.Types.Collections
         }
 
         #endregion
+
+        /// <summary>
+        /// Free resources
+        /// </summary>
+        public void Dispose()
+        {
+            Handle = IntPtr.Zero;
+        }
     }
 }

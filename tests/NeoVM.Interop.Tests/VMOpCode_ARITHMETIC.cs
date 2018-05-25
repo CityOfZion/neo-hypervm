@@ -34,7 +34,7 @@ namespace NeoVM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
+                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, res);
             });
         }
 
@@ -53,7 +53,7 @@ namespace NeoVM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
+                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, res);
             });
         }
 
@@ -72,7 +72,7 @@ namespace NeoVM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
+                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, res);
             });
         }
 
@@ -91,7 +91,7 @@ namespace NeoVM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
+                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, res);
             });
         }
 
@@ -110,7 +110,7 @@ namespace NeoVM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
+                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, res);
             });
         }
 
@@ -131,7 +131,7 @@ namespace NeoVM.Interop.Tests
 
                 // Execute
 
-                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+                Assert.IsFalse(engine.Execute());
 
                 // Check
 
@@ -154,11 +154,11 @@ namespace NeoVM.Interop.Tests
 
                 // Execute
 
-                Assert.AreEqual(EVMState.HALT, engine.Execute());
+                Assert.IsTrue(engine.Execute());
 
                 // Check
 
-                Assert.IsTrue(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
+                Assert.IsTrue(engine.ResultStack.Pop<BooleanStackItem>().Value);
 
                 CheckClean(engine);
             }
@@ -179,7 +179,7 @@ namespace NeoVM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(engine.EvaluationStack.Pop<BooleanStackItem>().Value, res);
+                Assert.AreEqual(engine.ResultStack.Pop<BooleanStackItem>().Value, res);
             });
         }
 
@@ -198,7 +198,7 @@ namespace NeoVM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
+                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, res);
             });
         }
 
@@ -217,7 +217,7 @@ namespace NeoVM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
+                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, res);
             });
         }
 
@@ -236,7 +236,7 @@ namespace NeoVM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
+                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, res);
             });
         }
 
@@ -255,7 +255,7 @@ namespace NeoVM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
+                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, res);
             });
         }
 
@@ -274,7 +274,7 @@ namespace NeoVM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, res);
+                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, res);
             });
         }
 
@@ -299,7 +299,7 @@ namespace NeoVM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (bi << ishift));
+                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, (bi << ishift));
             });
         }
 
@@ -324,7 +324,7 @@ namespace NeoVM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, (bi >> ishift));
+                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, (bi >> ishift));
             });
         }
 
@@ -347,11 +347,12 @@ namespace NeoVM.Interop.Tests
 
                 // Execute
 
-                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+                Assert.IsFalse(engine.Execute());
 
                 // Check
 
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 3);
+                Assert.AreEqual(engine.InvocationStack.Count, 1);
+                Assert.AreEqual(engine.CurrentContext.EvaluationStack.Pop<IntegerStackItem>().Value, 3);
 
                 CheckClean(engine, false);
             }
@@ -374,11 +375,11 @@ namespace NeoVM.Interop.Tests
 
                 // Execute
 
-                Assert.AreEqual(EVMState.HALT, engine.Execute());
+                Assert.IsTrue(engine.Execute());
 
                 // Check
 
-                Assert.IsTrue(!engine.EvaluationStack.Pop<BooleanStackItem>().Value);
+                Assert.IsTrue(!engine.ResultStack.Pop<BooleanStackItem>().Value);
 
                 CheckClean(engine);
             }
@@ -403,11 +404,12 @@ namespace NeoVM.Interop.Tests
 
                 // Execute
 
-                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+                Assert.IsFalse(engine.Execute());
 
                 // Check
 
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 3);
+                Assert.AreEqual(engine.InvocationStack.Count, 1);
+                Assert.AreEqual(engine.CurrentContext.EvaluationStack.Pop<IntegerStackItem>().Value, 3);
 
                 CheckClean(engine, false);
             }
@@ -430,11 +432,11 @@ namespace NeoVM.Interop.Tests
 
                 // Execute
 
-                Assert.AreEqual(EVMState.HALT, engine.Execute());
+                Assert.IsTrue(engine.Execute());
 
                 // Check
 
-                Assert.IsTrue(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
+                Assert.IsTrue(engine.ResultStack.Pop<BooleanStackItem>().Value);
 
                 CheckClean(engine);
             }
@@ -455,7 +457,7 @@ namespace NeoVM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(res, engine.EvaluationStack.Pop<BooleanStackItem>().Value);
+                Assert.AreEqual(res, engine.ResultStack.Pop<BooleanStackItem>().Value);
             });
         }
 
@@ -474,7 +476,7 @@ namespace NeoVM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(res, engine.EvaluationStack.Pop<BooleanStackItem>().Value);
+                Assert.AreEqual(res, engine.ResultStack.Pop<BooleanStackItem>().Value);
             });
         }
 
@@ -493,7 +495,7 @@ namespace NeoVM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(res, engine.EvaluationStack.Pop<BooleanStackItem>().Value);
+                Assert.AreEqual(res, engine.ResultStack.Pop<BooleanStackItem>().Value);
             });
         }
 
@@ -512,7 +514,7 @@ namespace NeoVM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(res, engine.EvaluationStack.Pop<BooleanStackItem>().Value);
+                Assert.AreEqual(res, engine.ResultStack.Pop<BooleanStackItem>().Value);
             });
         }
 
@@ -531,7 +533,7 @@ namespace NeoVM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(res, engine.EvaluationStack.Pop<BooleanStackItem>().Value);
+                Assert.AreEqual(res, engine.ResultStack.Pop<BooleanStackItem>().Value);
             });
         }
 
@@ -550,7 +552,7 @@ namespace NeoVM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(res, engine.EvaluationStack.Pop<BooleanStackItem>().Value);
+                Assert.AreEqual(res, engine.ResultStack.Pop<BooleanStackItem>().Value);
             });
         }
 
@@ -569,7 +571,7 @@ namespace NeoVM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(res, engine.EvaluationStack.Pop<IntegerStackItem>().Value);
+                Assert.AreEqual(res, engine.ResultStack.Pop<IntegerStackItem>().Value);
             });
         }
 
@@ -588,7 +590,7 @@ namespace NeoVM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(res, engine.EvaluationStack.Pop<IntegerStackItem>().Value);
+                Assert.AreEqual(res, engine.ResultStack.Pop<IntegerStackItem>().Value);
             });
         }
 
@@ -611,12 +613,13 @@ namespace NeoVM.Interop.Tests
 
                 // Execute
 
-                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+                Assert.IsFalse(engine.Execute());
 
                 // Check
 
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 5);
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 1);
+                Assert.AreEqual(engine.InvocationStack.Count, 1);
+                Assert.AreEqual(engine.CurrentContext.EvaluationStack.Pop<IntegerStackItem>().Value, 5);
+                Assert.AreEqual(engine.CurrentContext.EvaluationStack.Pop<IntegerStackItem>().Value, 1);
 
                 CheckClean(engine, false);
             }
@@ -637,7 +640,7 @@ namespace NeoVM.Interop.Tests
 
                 // Execute
 
-                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+                Assert.IsFalse(engine.Execute());
 
                 // Check
 
@@ -678,15 +681,15 @@ namespace NeoVM.Interop.Tests
 
                 // Execute
 
-                Assert.AreEqual(EVMState.HALT, engine.Execute());
+                Assert.IsTrue(engine.Execute());
 
                 // Check
 
-                Assert.IsFalse(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
-                Assert.IsFalse(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
-                Assert.IsTrue(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
-                Assert.IsFalse(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
-                Assert.IsTrue(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
+                Assert.IsFalse(engine.ResultStack.Pop<BooleanStackItem>().Value);
+                Assert.IsFalse(engine.ResultStack.Pop<BooleanStackItem>().Value);
+                Assert.IsTrue(engine.ResultStack.Pop<BooleanStackItem>().Value);
+                Assert.IsFalse(engine.ResultStack.Pop<BooleanStackItem>().Value);
+                Assert.IsTrue(engine.ResultStack.Pop<BooleanStackItem>().Value);
 
                 CheckClean(engine);
             }

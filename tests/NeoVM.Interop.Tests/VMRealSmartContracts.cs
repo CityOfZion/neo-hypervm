@@ -9,7 +9,7 @@ using System;
 namespace NeoVM.Interop.Tests
 {
     [TestClass]
-    public class VM_AVM : VMOpCodeTest
+    public class VMRealSmartContracts : VMOpCodeTest
     {
         /* Length: 000006E1 */
 
@@ -194,9 +194,9 @@ namespace NeoVM.Interop.Tests
             args.Logger.OnExecutionContextChange += (stack, item, index, oper) =>
             { Console.WriteLine("ExeStack: " + index.ToString() + "-" + oper.ToString()); };
 
-            args.InteropService.OnLog += (sender, e) => 
+            args.InteropService.OnLog += (sender, e) =>
             { Console.WriteLine("Log: " + e.Message); };
-            args.InteropService.OnNotify += (sender, e) => 
+            args.InteropService.OnNotify += (sender, e) =>
             { Console.WriteLine("Notification: " + e.State.ToString()); };
 
             using (ScriptBuilder arguments = new ScriptBuilder())
@@ -207,19 +207,17 @@ namespace NeoVM.Interop.Tests
 
                 Console.WriteLine("** Register proposal **" + Environment.NewLine);
 
-                arguments.Clear();
                 arguments.EmitMainPush("register_proposal", new object[] { VoteId, "My proposal", new byte[20], new byte[20] });
 
                 engine.Clean(0);
-                engine.LoadScript(script);
+                int scriptIndex = engine.LoadScript(script);
                 engine.LoadScript(arguments);
 
                 // Execute
 
-                Assert.AreEqual(engine.Execute(), EVMState.HALT);
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 0x01);
+                Assert.IsTrue(engine.Execute());
+                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, 0x01);
                 CheckClean(engine);
-
                 // Vote
 
                 Console.WriteLine(Environment.NewLine + "** Vote **" + Environment.NewLine);
@@ -228,13 +226,13 @@ namespace NeoVM.Interop.Tests
                 arguments.EmitMainPush("vote", new object[] { VoteId, new byte[20], 1 });
 
                 engine.Clean(1);
-                engine.LoadScript(script);
+                Assert.IsTrue(engine.LoadScript(scriptIndex));
                 engine.LoadScript(arguments);
 
                 // Execute
 
-                Assert.AreEqual(engine.Execute(), EVMState.HALT);
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 0x01);
+                Assert.IsTrue(engine.Execute());
+                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, 0x01);
                 CheckClean(engine);
 
                 // Count
@@ -245,13 +243,13 @@ namespace NeoVM.Interop.Tests
                 arguments.EmitMainPush("count", new object[] { VoteId });
 
                 engine.Clean(2);
-                engine.LoadScript(script);
+                Assert.IsTrue(engine.LoadScript(scriptIndex));
                 engine.LoadScript(arguments);
 
                 // Execute
 
-                Assert.AreEqual(engine.Execute(), EVMState.HALT);
-                Assert.AreEqual(engine.EvaluationStack.Pop<IntegerStackItem>().Value, 0x01);
+                Assert.IsTrue(engine.Execute());
+                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, 0x01);
                 CheckClean(engine);
             }
         }

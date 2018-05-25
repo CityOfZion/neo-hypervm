@@ -27,14 +27,18 @@ namespace NeoVM.Interop.Enums
         /// AltStack changes
         /// </summary>
         AltStackChanges = 8,
+        /// <summary>
+        /// ResultStack changes
+        /// </summary>
+        ResultStackChanges = 16,
 
         /// <summary>
         /// All
         /// </summary>
-        All = StepInto | ExecutionContextStackChanges | EvaluationStackChanges | AltStackChanges,
+        All = StepInto | ExecutionContextStackChanges | EvaluationStackChanges | AltStackChanges| ResultStackChanges,
         /// <summary>
         /// Stack changes
         /// </summary>
-        StackChanges = ExecutionContextStackChanges | EvaluationStackChanges | AltStackChanges,
+        StackChanges = ExecutionContextStackChanges | EvaluationStackChanges | AltStackChanges | ResultStackChanges,
     }
 }

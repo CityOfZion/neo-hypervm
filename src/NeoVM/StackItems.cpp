@@ -52,6 +52,7 @@ void StackItems::Insert(int32 index, IStackItem *it)
 
 IStackItem* StackItems::TryPeek(int32 index)
 {
+	if (index < 0) index += this->Size;
 	if (this->Size <= index || index < 0)
 	{
 		if (this->Log != NULL)
@@ -97,6 +98,7 @@ IStackItem* StackItems::Peek(int32 index)
 
 		return ret;
 	}
+	if (index < 0) index += this->Size;
 	if (index < 0)
 	{
 		if (this->Log != NULL)
@@ -120,6 +122,8 @@ IStackItem* StackItems::Peek(int32 index)
 
 IStackItem* StackItems::Remove(int32 index)
 {
+	if (index < 0) index += this->Size;
+	
 	std::list<IStackItem*>::iterator it = this->Stack.begin();
 	if (index > 0) std::advance(it, index);
 
@@ -195,6 +199,25 @@ void StackItems::Clear()
 
 	this->Size = 0;
 	this->Stack.clear();
+}
+
+void StackItems::CopyTo(StackItems *stack, int32 count)
+{
+	if (stack == NULL || count == 0) return;
+
+	if (count == -1)
+	{
+		count = this->Size;
+	}
+
+	std::list<IStackItem*>::iterator it = this->Stack.begin();
+	std::advance(it, this->Size - count);
+
+	for (; it != this->Stack.end(); ++it)
+	{
+		IStackItem* ptr = (IStackItem*)*it;
+		stack->Insert(stack->Size, ptr);
+	}
 }
 
 StackItems::~StackItems()

@@ -25,7 +25,7 @@ extern "C"
 	DllExport int32 __stdcall ExecutionContext_GetScriptHash(ExecutionContext* context, byte *output, int32 index);
 	DllExport EVMOpCode __stdcall ExecutionContext_GetNextInstruction(ExecutionContext* context);
 	DllExport int32 __stdcall ExecutionContext_GetInstructionPointer(ExecutionContext* context);
-	DllExport void __stdcall ExecutionContext_Claim(ExecutionContext* context);
+	DllExport void __stdcall ExecutionContext_Claim(ExecutionContext* context, StackItems* &evStack, StackItems* &altStack);
 	DllExport void __stdcall ExecutionContext_Free(ExecutionContext* &context);
 
 	// ExecutionEngine
@@ -33,11 +33,12 @@ extern "C"
 	DllExport ExecutionEngine* __stdcall ExecutionEngine_Create
 	(
 		InvokeInteropCallback interopCallback, LoadScriptCallback getScriptCallback, GetMessageCallback getMessageCallback,
-		ExecutionContextStack* &invStack, StackItems* &evStack, StackItems* &altStack
+		ExecutionContextStack* &invStack, StackItems* &resStack
 	);
 	DllExport void __stdcall ExecutionEngine_Free(ExecutionEngine* &engine);
 	DllExport void __stdcall ExecutionEngine_Clean(ExecutionEngine* engine, uint32 iteration);
-	DllExport void __stdcall ExecutionEngine_LoadScript(ExecutionEngine* engine, byte * script, int32 scriptLength);
+	DllExport int32 __stdcall ExecutionEngine_LoadScript(ExecutionEngine* engine, byte * script, int32 scriptLength, int32 rvcount);
+	DllExport byte __stdcall ExecutionEngine_LoadCachedScript(ExecutionEngine* engine, int32 scriptIndex, int32 rvcount);
 	DllExport byte __stdcall ExecutionEngine_Execute(ExecutionEngine* engine);
 	DllExport void __stdcall ExecutionEngine_StepInto(ExecutionEngine* engine);
 	DllExport void __stdcall ExecutionEngine_StepOver(ExecutionEngine* engine);

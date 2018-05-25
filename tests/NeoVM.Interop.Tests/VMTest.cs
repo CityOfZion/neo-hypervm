@@ -68,17 +68,17 @@ namespace NeoVM.Interop.Tests
                 engine.LoadScript(script);
 
                 engine.StepInto();
-                Assert.IsTrue(engine.EvaluationStack.Count == 1);
-                Assert.IsTrue(engine.EvaluationStack.Peek<ByteArrayStackItem>(0).Value.Length == 0);
+                Assert.IsTrue(engine.CurrentContext.EvaluationStack.Count == 1);
+                Assert.IsTrue(engine.CurrentContext.EvaluationStack.Peek<ByteArrayStackItem>(0).Value.Length == 0);
                 engine.StepInto();
-                Assert.IsTrue(engine.EvaluationStack.Count == 1);
-                Assert.IsTrue(engine.EvaluationStack.Peek<BooleanStackItem>(0).Value);
+                Assert.IsTrue(engine.CurrentContext.EvaluationStack.Count == 1);
+                Assert.IsTrue(engine.CurrentContext.EvaluationStack.Peek<BooleanStackItem>(0).Value);
                 engine.StepInto();
-                Assert.IsTrue(engine.EvaluationStack.Count == 1);
-                Assert.IsTrue(!engine.EvaluationStack.Peek<BooleanStackItem>(0).Value);
+                Assert.IsTrue(engine.CurrentContext.EvaluationStack.Count == 1);
+                Assert.IsTrue(!engine.CurrentContext.EvaluationStack.Peek<BooleanStackItem>(0).Value);
                 engine.Execute();
 
-                Assert.IsTrue(engine.EvaluationStack.Count == 0);
+                CheckClean(engine);
             }
         }
 
@@ -98,10 +98,9 @@ namespace NeoVM.Interop.Tests
                 Assert.AreEqual(Args.ScriptTable, engine.ScriptTable);
 
                 Assert.AreEqual(0, engine.InvocationStack.Count);
-                Assert.AreEqual(0, engine.AltStack.Count);
-                Assert.AreEqual(0, engine.EvaluationStack.Count);
+                Assert.AreEqual(0, engine.ResultStack.Count);
 
-                Assert.AreEqual(EVMState.HALT, engine.Execute());
+                Assert.IsTrue(engine.Execute());
             }
         }
 
@@ -110,7 +109,11 @@ namespace NeoVM.Interop.Tests
         {
             ExecutionEngineArgs args = new ExecutionEngineArgs()
             {
-                ScriptTable = new DummyScriptTable(new byte[] { (byte) EVMOpCode.EQUAL }, new byte[] { (byte)EVMOpCode.EQUAL })
+                ScriptTable = new DummyScriptTable
+                    (
+                    new byte[] { (byte)EVMOpCode.EQUAL },
+                    new byte[] { (byte)EVMOpCode.EQUAL }
+                    )
             };
 
             // 5 Scripts
@@ -141,7 +144,7 @@ namespace NeoVM.Interop.Tests
                     {
                         script.EmitPush(x);
                         script.EmitPush(x);
-                        script.EmitAppCall(new byte[] 
+                        script.EmitAppCall(new byte[]
                         {
                             0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,
                             0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,
@@ -152,11 +155,11 @@ namespace NeoVM.Interop.Tests
 
                     // Execute
 
-                    Assert.AreEqual(EVMState.HALT, engine.Execute());
+                    Assert.IsTrue(engine.Execute());
 
                     // Check result
 
-                    Assert.IsTrue(engine.EvaluationStack.Pop<BooleanStackItem>().Value);
+                    Assert.IsTrue(engine.ResultStack.Pop<BooleanStackItem>().Value);
                 }
 
                 engine.Dispose();
@@ -198,6 +201,11 @@ namespace NeoVM.Interop.Tests
                     stackLog.AppendLine("ALT:" + operation.ToString() + "[" + index + "]");
                 };
 
+                engine.Logger.OnResultStackChange += (stack, item, index, operation) =>
+                {
+                    stackLog.AppendLine("RES:" + operation.ToString() + "[" + index + "]");
+                };
+
                 StringBuilder stackOp = new StringBuilder();
 
                 engine.Logger.OnStepInto += (context) =>
@@ -211,7 +219,7 @@ namespace NeoVM.Interop.Tests
 
                 // Execute
 
-                Assert.AreEqual(EVMState.HALT, engine.Execute());
+                Assert.IsTrue(engine.Execute());
 
                 // Test
 
@@ -232,7 +240,9 @@ EXE:TryPeek[0]
 ALT:Pop[0]
 EVA:Push[0]
 EXE:TryPeek[0]
-EXE:Drop[0]".Replace("\r", ""));
+EXE:Drop[0]
+RES:Insert[0]
+EVA:Drop[0]".Replace("\r", ""));
 
             }
         }
@@ -622,8 +632,8 @@ EXE:Drop[0]".Replace("\r", ""));
             {
                 // Empty stack
 
-                Assert.AreEqual(engine.AltStack.Count, 0);
-                Assert.IsFalse(engine.AltStack.TryPeek(0, out IStackItem obj));
+                Assert.AreEqual(engine.ResultStack.Count, 0);
+                Assert.IsFalse(engine.ResultStack.TryPeek(0, out IStackItem obj));
 
                 // Check integer
 
@@ -668,29 +678,29 @@ EXE:Drop[0]".Replace("\r", ""));
                         CheckItem(engine, it);
 
                     using (InteropStackItem it = engine.CreateInterop(dis))
-                        engine.AltStack.Push(it);
+                        engine.ResultStack.Push(it);
                 }
 
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
 
-                using (InteropStackItem id = engine.AltStack.Pop<InteropStackItem>())
+                using (InteropStackItem id = engine.ResultStack.Pop<InteropStackItem>())
                     Assert.IsTrue(id != null && id.Value is DisposableDummy dd && !dd.IsDisposed);
             }
         }
 
         void CheckItem(ExecutionEngine engine, IStackItem item)
         {
-            int c = engine.AltStack.Count;
-            engine.AltStack.Push(item);
-            Assert.AreEqual(engine.AltStack.Count, c + 1);
+            int c = engine.ResultStack.Count;
+            engine.ResultStack.Push(item);
+            Assert.AreEqual(engine.ResultStack.Count, c + 1);
 
-            Assert.IsTrue(engine.AltStack.TryPeek(0, out IStackItem obj));
+            Assert.IsTrue(engine.ResultStack.TryPeek(0, out IStackItem obj));
 
             // PEEK
 
             obj.Dispose();
-            obj = engine.AltStack.Peek(0);
+            obj = engine.ResultStack.Peek(0);
             Assert.IsNotNull(obj);
 
             Assert.AreEqual(obj.Type, item.Type);
@@ -699,8 +709,8 @@ EXE:Drop[0]".Replace("\r", ""));
             // POP
 
             obj.Dispose();
-            obj = engine.AltStack.Pop();
-            Assert.AreEqual(engine.AltStack.Count, c);
+            obj = engine.ResultStack.Pop();
+            Assert.AreEqual(engine.ResultStack.Count, c);
 
             Assert.IsNotNull(obj);
 

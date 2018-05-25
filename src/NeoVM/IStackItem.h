@@ -2,13 +2,10 @@
 
 #include "EStackItemType.h"
 #include "BigInteger.h"
+#include "IClaimable.h"
 
-class IStackItem
+class IStackItem : public IClaimable
 {
-private:
-
-	int32 Claims;
-
 public:
 
 	EStackItemType Type;
@@ -31,9 +28,6 @@ public:
 	virtual ~IStackItem() { };
 
 	// Claims
-
-	void Claim();
-	void UnClaim();
 
 	static void Free(IStackItem* &item);
 	static void Free(IStackItem* &itemA, IStackItem* &itemB);

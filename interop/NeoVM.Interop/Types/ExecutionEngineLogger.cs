@@ -34,6 +34,10 @@ namespace NeoVM.Interop.Types
         /// On EvaluationStackChange
         /// </summary>
         public event delOnStackItemsStackChange OnEvaluationStackChange;
+        /// <summary>
+        /// On ResultStackChange
+        /// </summary>
+        public event delOnStackItemsStackChange OnResultStackChange;
 
         #endregion
 
@@ -70,6 +74,17 @@ namespace NeoVM.Interop.Types
         public virtual void RaiseOnExecutionContextChange(ExecutionContextStack stack, ExecutionContext item, int index, ELogStackOperation operation)
         {
             OnExecutionContextChange?.Invoke(stack, item, index, operation);
+        }
+        /// <summary>
+        /// Raise OnResultStackChange
+        /// </summary>
+        /// <param name="stack">Stack</param>
+        /// <param name="item">Item</param>
+        /// <param name="index">Index</param>
+        /// <param name="operation">Operation</param>
+        public virtual void RaiseOnResultStackChange(StackItemStack stack, IStackItem item, int index, ELogStackOperation operation)
+        {
+            OnResultStackChange?.Invoke(stack, item, index, operation);
         }
         /// <summary>
         /// Raise OnAltStackChange

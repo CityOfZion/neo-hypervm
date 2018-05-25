@@ -200,6 +200,29 @@
         KEYS = 0xCC,
         VALUES = 0xCD,
 
+        // Stack isolation
+
+        /// <summary>
+        /// The instruction CALL_I is very similar to the old instruction CALL. The difference is that CALL_I requires an operand behind the instruction for representing the number of parameters and return values to copy.
+        /// </summary>
+        CALL_I = 0xE0,
+        /// <summary>
+        /// The instruction CALL_E is very similar to the old instruction APPCALL for static invocations. The difference is that CALL_E requires an operand behind the instruction for representing the number of parameters and return values to copy.
+        /// </summary>
+        CALL_E = 0xE1,
+        /// <summary>
+        /// The instruction CALL_ED is very similar to the old instruction APPCALL for dynamic invocations. The difference is that CALL_ED requires an operand behind the instruction for representing the number of parameters and return values to copy.
+        /// </summary>
+        CALL_ED = 0xE2,
+        /// <summary>
+        /// The instruction CALL_ET is very similar to the instruction CALL_E. The difference is that CALL_ET will start a tail call.
+        /// </summary>
+        CALL_ET = 0xE3,
+        /// <summary>
+        /// The instruction CALL_EDT is very similar to the instruction CALL_ED. The difference is that CALL_EDT will start a tail call.
+        /// </summary>
+        CALL_EDT = 0xE4,
+
         // Exceptions
         THROW = 0xF0,
         THROWIFNOT = 0xF1

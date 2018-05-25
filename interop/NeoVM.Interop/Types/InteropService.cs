@@ -102,52 +102,52 @@ namespace NeoVM.Interop.Types
 
         static bool NeoRuntimeGetTrigger(ExecutionEngine engine)
         {
+            using (ExecutionContext ctx = engine.CurrentContext)
             using (IStackItem item = engine.CreateInteger((int)engine.Trigger))
-                engine.EvaluationStack.Push(item);
+                ctx.EvaluationStack.Push(item);
 
             return true;
         }
 
         bool NeoRuntimeLog(ExecutionEngine engine)
         {
-            if (engine.EvaluationStack.Count < 1)
+            using (ExecutionContext ctx = engine.CurrentContext)
             {
-                return false;
+                if (ctx == null) return false;
+
+                if (!ctx.EvaluationStack.TryPop(out IStackItem it))
+                    return false;
+
+                using (it)
+                {
+                    if (OnLog == null)
+                        return true;
+
+                    // Get string
+
+                    string message = it.ToString();
+                    OnLog.Invoke(this, new LogEventArgs(engine.MessageProvider, ctx?.ScriptHash, message ?? ""));
+                }
             }
 
-            string message = null;
-            using (IStackItem it = engine.EvaluationStack.Pop())
-            {
-                if (OnLog == null)
-                    return true;
-
-                // Get string
-
-                message = it.ToString();
-            }
-
-            ExecutionContext ctx = engine.CurrentContext;
-            OnLog.Invoke(this, new LogEventArgs(engine.MessageProvider, ctx?.ScriptHash, message ?? ""));
             return true;
         }
 
         bool NeoRuntimeNotify(ExecutionEngine engine)
         {
-            if (engine.EvaluationStack.Count < 1)
+            using (ExecutionContext ctx = engine.CurrentContext)
             {
-                return false;
+                if (ctx == null) return false;
+
+                if (!ctx.EvaluationStack.TryPop(out IStackItem it))
+                    return false;
+
+                using (it)
+                {
+                    OnNotify?.Invoke(this, new NotifyEventArgs(engine.MessageProvider, ctx?.ScriptHash, it));
+                }
             }
 
-            IStackItem it = engine.EvaluationStack.Pop();
-
-            if (OnNotify == null)
-            {
-                it.Dispose();
-                return true;
-            }
-
-            ExecutionContext ctx = engine.CurrentContext;
-            OnNotify.Invoke(this, new NotifyEventArgs(engine.MessageProvider, ctx?.ScriptHash, it));
             return true;
         }
 
@@ -156,41 +156,50 @@ namespace NeoVM.Interop.Types
             if (engine.MessageProvider == null)
                 return false;
 
+            using (ExecutionContext current = engine.CurrentContext)
             using (IStackItem item = engine.CreateInterop(engine.MessageProvider))
-                engine.EvaluationStack.Push(item);
+                current.EvaluationStack.Push(item);
 
             return true;
         }
 
         static bool GetExecutingScriptHash(ExecutionEngine engine)
         {
-            ExecutionContext ctx = engine.CurrentContext;
-            if (ctx == null) return false;
+            using (ExecutionContext ctx = engine.CurrentContext)
+            {
+                if (ctx == null) return false;
 
-            using (IStackItem item = engine.CreateByteArray(ctx.ScriptHash))
-                engine.EvaluationStack.Push(item);
+                using (IStackItem item = engine.CreateByteArray(ctx.ScriptHash))
+                    ctx.EvaluationStack.Push(item);
+            }
 
             return true;
         }
 
         static bool GetCallingScriptHash(ExecutionEngine engine)
         {
-            ExecutionContext ctx = engine.CallingContext;
-            if (ctx == null) return false;
+            using (ExecutionContext ctx = engine.CallingContext)
+            {
+                if (ctx == null) return false;
 
-            using (IStackItem item = engine.CreateByteArray(ctx.ScriptHash))
-                engine.EvaluationStack.Push(item);
+                using (ExecutionContext current = engine.CurrentContext)
+                using (IStackItem item = engine.CreateByteArray(ctx.ScriptHash))
+                    current.EvaluationStack.Push(item);
+            }
 
             return true;
         }
 
         static bool GetEntryScriptHash(ExecutionEngine engine)
         {
-            ExecutionContext ctx = engine.EntryContext;
-            if (ctx == null) return false;
+            using (ExecutionContext ctx = engine.EntryContext)
+            {
+                if (ctx == null) return false;
 
-            using (IStackItem item = engine.CreateByteArray(ctx.ScriptHash))
-                engine.EvaluationStack.Push(item);
+                using (ExecutionContext current = engine.CurrentContext)
+                using (IStackItem item = engine.CreateByteArray(ctx.ScriptHash))
+                    current.EvaluationStack.Push(item);
+            }
 
             return true;
         }

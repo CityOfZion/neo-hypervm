@@ -17,8 +17,7 @@ namespace NeoVM.Interop.Types
 
         readonly NeoVM.OnStepIntoCallback _InternalOnStepInto;
         readonly NeoVM.OnStackChangeCallback _InternalOnExecutionContextChange;
-        readonly NeoVM.OnStackChangeCallback _InternalOnAltStackChange;
-        readonly NeoVM.OnStackChangeCallback _InternalOnEvaluationStackChange;
+        readonly NeoVM.OnStackChangeCallback _InternalOnResultStackChange;
 
         readonly NeoVM.InvokeInteropCallback _InternalInvokeInterop;
         readonly NeoVM.LoadScriptCallback _InternalLoadScript;
@@ -64,13 +63,9 @@ namespace NeoVM.Interop.Types
         /// </summary>
         public readonly ExecutionContextStack InvocationStack;
         /// <summary>
-        /// Evaluation Stack
+        /// Result Stack
         /// </summary>
-        public readonly StackItemStack EvaluationStack;
-        /// <summary>
-        /// Alt Stack
-        /// </summary>
-        public readonly StackItemStack AltStack;
+        public readonly StackItemStack ResultStack;
         /// <summary>
         /// Virtual Machine State
         /// </summary>
@@ -79,6 +74,7 @@ namespace NeoVM.Interop.Types
         /// Interop Cache
         /// </summary>
         internal readonly List<object> InteropCache;
+
         #region Shortcuts
 
         public ExecutionContext CurrentContext => InvocationStack.TryPeek(0, out ExecutionContext i) ? i : null;
@@ -101,15 +97,14 @@ namespace NeoVM.Interop.Types
             Handle = NeoVM.ExecutionEngine_Create
                 (
                 _InternalInvokeInterop, _InternalLoadScript, _InternalGetMessage,
-                out IntPtr invHandle, out IntPtr evHandle, out IntPtr altHandle
+                out IntPtr invHandle, out IntPtr resHandle
                 );
 
             if (Handle == IntPtr.Zero)
                 throw (new ExternalException());
 
-            InvocationStack = new ExecutionContextStack(invHandle);
-            EvaluationStack = new StackItemStack(this, evHandle);
-            AltStack = new StackItemStack(this, altHandle);
+            InvocationStack = new ExecutionContextStack(this, invHandle);
+            ResultStack = new StackItemStack(this, resHandle);
 
             if (e != null)
             {
@@ -136,16 +131,10 @@ namespace NeoVM.Interop.Types
                         NeoVM.ExecutionContextStack_AddLog(invHandle, _InternalOnExecutionContextChange);
                     }
 
-                    if (Logger.Verbosity.HasFlag(ELogVerbosity.AltStackChanges))
+                    if (Logger.Verbosity.HasFlag(ELogVerbosity.ResultStackChanges))
                     {
-                        _InternalOnAltStackChange = new NeoVM.OnStackChangeCallback(InternalOnAltStackChange);
-                        NeoVM.StackItems_AddLog(altHandle, _InternalOnAltStackChange);
-                    }
-
-                    if (Logger.Verbosity.HasFlag(ELogVerbosity.EvaluationStackChanges))
-                    {
-                        _InternalOnEvaluationStackChange = new NeoVM.OnStackChangeCallback(InternalOnEvaluationStackChange);
-                        NeoVM.StackItems_AddLog(evHandle, _InternalOnEvaluationStackChange);
+                        _InternalOnResultStackChange = new NeoVM.OnStackChangeCallback(InternalOnResultStackChange);
+                        NeoVM.StackItems_AddLog(resHandle, _InternalOnResultStackChange);
                     }
                 }
                 else
@@ -161,7 +150,7 @@ namespace NeoVM.Interop.Types
         /// <param name="it">Context</param>
         void InternalOnStepInto(IntPtr it)
         {
-            using (ExecutionContext context = new ExecutionContext(it))
+            using (ExecutionContext context = new ExecutionContext(this, it))
                 Logger.RaiseOnStepInto(context);
         }
         /// <summary>
@@ -172,30 +161,19 @@ namespace NeoVM.Interop.Types
         /// <param name="operation">Operation</param>
         void InternalOnExecutionContextChange(IntPtr it, int index, byte operation)
         {
-            using (ExecutionContext context = new ExecutionContext(it))
+            using (ExecutionContext context = new ExecutionContext(this, it))
                 Logger.RaiseOnExecutionContextChange(InvocationStack, context, index, (ELogStackOperation)operation);
         }
         /// <summary>
-        /// Internal callback for OnAltStackChange
+        /// Internal callback for OnResultStackChange
         /// </summary>
         /// <param name="item">Item</param>
         /// <param name="index">Index</param>
         /// <param name="operation">Operation</param>
-        void InternalOnAltStackChange(IntPtr item, int index, byte operation)
+        void InternalOnResultStackChange(IntPtr item, int index, byte operation)
         {
             using (IStackItem it = ConvertFromNative(item))
-                Logger.RaiseOnAltStackChange(AltStack, it, index, (ELogStackOperation)operation);
-        }
-        /// <summary>
-        /// Internal callback for OnEvaluationStackChange
-        /// </summary>
-        /// <param name="item">Item</param>
-        /// <param name="index">Index</param>
-        /// <param name="operation">Operation</param>
-        void InternalOnEvaluationStackChange(IntPtr item, int index, byte operation)
-        {
-            using (IStackItem it = ConvertFromNative(item))
-                Logger.RaiseOnEvaluationStackChange(EvaluationStack, it, index, (ELogStackOperation)operation);
+                Logger.RaiseOnResultStackChange(ResultStack, it, index, (ELogStackOperation)operation);
         }
         /// <summary>
         /// Get message callback
@@ -233,8 +211,9 @@ namespace NeoVM.Interop.Types
         /// </summary>
         /// <param name="scriptHash">Hash</param>
         /// <param name="isDynamicInvoke">Is dynamic invoke</param>
+        /// <param name="rvcount">RV count</param>
         /// <returns>Return 0x01 if is corrected loaded</returns>
-        byte InternalLoadScript(byte[] scriptHash, byte isDynamicInvoke)
+        byte InternalLoadScript(byte[] scriptHash, byte isDynamicInvoke, int rvcount)
         {
             if (ScriptTable == null)
             {
@@ -250,7 +229,7 @@ namespace NeoVM.Interop.Types
 
             fixed (byte* p = script)
             {
-                NeoVM.ExecutionEngine_LoadScript(Handle, (IntPtr)p, script.Length);
+                NeoVM.ExecutionEngine_LoadScript(Handle, (IntPtr)p, script.Length, rvcount);
             }
 
             return NeoVM.TRUE;
@@ -279,12 +258,23 @@ namespace NeoVM.Interop.Types
         /// Load script
         /// </summary>
         /// <param name="script">Script</param>
-        public void LoadScript(byte[] script)
+        /// <returns>Script index in script cache</returns>
+        public int LoadScript(byte[] script)
         {
             fixed (byte* p = script)
             {
-                NeoVM.ExecutionEngine_LoadScript(Handle, (IntPtr)p, script.Length);
+                return NeoVM.ExecutionEngine_LoadScript(Handle, (IntPtr)p, script.Length, -1);
             }
+        }
+
+        /// <summary>
+        /// Load script
+        /// </summary>
+        /// <param name="scriptIndex">Script Index</param>
+        /// <returns>True if is loaded</returns>
+        public bool LoadScript(int scriptIndex)
+        {
+            return NeoVM.ExecutionEngine_LoadCachedScript(Handle, scriptIndex, -1) == NeoVM.TRUE;
         }
 
         #endregion
@@ -295,16 +285,16 @@ namespace NeoVM.Interop.Types
         /// Clean Execution engine state
         /// </summary>
         /// <param name="iteration">Iteration</param>
-        public void Clean(uint iteration)
+        public void Clean(uint iteration = 0)
         {
             NeoVM.ExecutionEngine_Clean(Handle, iteration);
         }
         /// <summary>
         /// Execute
         /// </summary>
-        public EVMState Execute()
+        public bool Execute()
         {
-            return (EVMState)NeoVM.ExecutionEngine_Execute(Handle);
+            return NeoVM.ExecutionEngine_Execute(Handle) == NeoVM.TRUE;
         }
         /// <summary>
         /// Step Into
@@ -511,6 +501,7 @@ namespace NeoVM.Interop.Types
             }
 
             // free unmanaged resources (unmanaged objects) and override a finalizer below. set large fields to null.
+            ResultStack.Dispose();
             NeoVM.ExecutionEngine_Free(ref Handle);
         }
 

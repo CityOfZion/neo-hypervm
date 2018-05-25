@@ -12,8 +12,7 @@ namespace NeoVM.Interop.Tests
         {
             using (ScriptBuilder script = new ScriptBuilder
                 (
-                EVMOpCode.THROW,
-                EVMOpCode.RET
+                EVMOpCode.THROW
                 ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
@@ -23,7 +22,9 @@ namespace NeoVM.Interop.Tests
 
                 // Execute
 
-                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+                engine.StepInto();
+
+                Assert.AreEqual(EVMState.FAULT, engine.State);
 
                 CheckClean(engine, false);
             }
@@ -49,7 +50,7 @@ namespace NeoVM.Interop.Tests
 
                 // Execute
 
-                Assert.AreEqual(EVMState.HALT, engine.Execute());
+                Assert.IsTrue(engine.Execute());
 
                 CheckClean(engine);
             }
@@ -70,7 +71,7 @@ namespace NeoVM.Interop.Tests
 
                 // Execute
 
-                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+                Assert.IsFalse(engine.Execute());
 
                 CheckClean(engine, false);
             }
@@ -79,8 +80,7 @@ namespace NeoVM.Interop.Tests
 
             using (ScriptBuilder script = new ScriptBuilder
                 (
-                EVMOpCode.THROWIFNOT,
-                EVMOpCode.RET
+                EVMOpCode.THROWIFNOT
                 ))
             using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
             {
@@ -90,7 +90,7 @@ namespace NeoVM.Interop.Tests
 
                 // Execute
 
-                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+                Assert.IsFalse(engine.Execute());
 
                 CheckClean(engine, false);
             }

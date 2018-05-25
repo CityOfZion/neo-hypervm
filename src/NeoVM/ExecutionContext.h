@@ -2,24 +2,27 @@
 
 #include "EVMOpCode.h"
 #include "Types.h"
+#include "StackItems.h"
+#include "ExecutionScript.h"
 
-class ExecutionContext
+class ExecutionContext :public IClaimable
 {
-private:
-
-	int32 Claims;
-
 public:
 
-	// Constants
-
-	static const int32 ScriptHashLength = 20;
+	// Consts
 
 	const int32 ScriptLength;
+	const int32 RVCount;
 
-	// Position
+	// Script
 
+	ExecutionScript* Script;
 	int32 InstructionPointer;
+
+	// Stacks
+
+	StackItems * AltStack;
+	StackItems * EvaluationStack;
 
 	// Reads
 
@@ -44,13 +47,9 @@ public:
 
 	int32 GetScriptHash(byte* hash);
 
-	// Clone execution context
-
-	ExecutionContext* Clone();
-
 	// Constructor
 
-	ExecutionContext(byte* script, int32 scriptLength, int32 instructorPointer);
+	ExecutionContext(ExecutionScript *script, int32 instructorPointer, int32 rvcount);
 
 	// Destructor
 
@@ -58,17 +57,6 @@ public:
 
 	// Claims
 
-	void Claim();
-	void UnClaim();
-
 	static void Free(ExecutionContext* &item);
 	static void UnclaimAndFree(ExecutionContext* &item);
-
-private:
-
-	// Script
-
-	byte* Script;
-	bool IsScriptHashCalculated;
-	byte ScriptHash[ScriptHashLength];
 };

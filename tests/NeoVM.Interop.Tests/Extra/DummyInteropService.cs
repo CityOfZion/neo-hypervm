@@ -38,54 +38,79 @@ namespace NeoVM.Interop.Tests.Extra
         {
             // Fake CheckWitness
 
-            if (!engine.EvaluationStack.TryPop(out IStackItem it) || !it.CanConvertToByteArray)
-                return false;
+            using (ExecutionContext context = engine.CurrentContext)
+            {
+                if (context == null) return false;
 
-            using (IStackItem itb = engine.CreateBool(true))
-                engine.EvaluationStack.Push(itb);
+                if (!context.EvaluationStack.TryPop(out IStackItem it))
+                    return false;
+
+                using (it)
+                {
+                    if (!it.CanConvertToByteArray) return false;
+
+                    using (IStackItem itb = engine.CreateBool(true))
+                        context.EvaluationStack.Push(itb);
+                }
+            }
 
             return true;
         }
 
         bool Storage_GetContext(ExecutionEngine engine)
         {
-            ExecutionContext cnt = engine.CurrentContext;
-
-            if (cnt == null) return false;
-
-            string id = BitHelper.ToHexString(cnt.ScriptHash);
-            if (!Storages.TryGetValue(id, out DummyStorageContext context))
+            using (ExecutionContext context = engine.CurrentContext)
             {
-                context = new DummyStorageContext(id, cnt.ScriptHash);
-                Storages[context.Id] = context;
-            }
+                if (context == null) return false;
 
-            using (IStackItem i = engine.CreateInterop(context))
-                engine.EvaluationStack.Push(i);
+                string id = BitHelper.ToHexString(context.ScriptHash);
+                if (!Storages.TryGetValue(id, out DummyStorageContext stContext))
+                {
+                    stContext = new DummyStorageContext(id, context.ScriptHash);
+                    Storages[stContext.Id] = stContext;
+                }
+
+                using (IStackItem i = engine.CreateInterop(stContext))
+                    context.EvaluationStack.Push(i);
+            }
 
             return true;
         }
 
         bool Storage_Get(ExecutionEngine engine)
         {
-            if (!engine.EvaluationStack.TryPop(out InteropStackItem inter) ||
-                !(inter.Value is DummyStorageContext context))
-                return false;
-
-            if (!engine.EvaluationStack.TryPop(out IStackItem it) || !it.CanConvertToByteArray)
-                return false;
-
-            byte[] key = it.ToByteArray();
-
-            if (context.Storage.TryGetValue(BitHelper.ToHexString(key), out byte[] value))
+            using (ExecutionContext context = engine.CurrentContext)
             {
-                using (IStackItem ret = engine.CreateByteArray(value))
-                    engine.EvaluationStack.Push(ret);
-            }
-            else
-            {
-                using (IStackItem ret = engine.CreateByteArray(new byte[] { }))
-                    engine.EvaluationStack.Push(ret);
+                if (context == null) return false;
+
+                if (!context.EvaluationStack.TryPop(out InteropStackItem inter))
+                    return false;
+
+                using (inter)
+                {
+                    if (!(inter.Value is DummyStorageContext stContext)) return false;
+
+                    if (!context.EvaluationStack.TryPop(out IStackItem it))
+                        return false;
+
+                    using (it)
+                    {
+                        if (!it.CanConvertToByteArray) return false;
+
+                        byte[] key = it.ToByteArray();
+
+                        if (stContext.Storage.TryGetValue(BitHelper.ToHexString(key), out byte[] value))
+                        {
+                            using (IStackItem ret = engine.CreateByteArray(value))
+                                context.EvaluationStack.Push(ret);
+                        }
+                        else
+                        {
+                            using (IStackItem ret = engine.CreateByteArray(new byte[] { }))
+                                context.EvaluationStack.Push(ret);
+                        }
+                    }
+                }
             }
 
             return true;
@@ -93,43 +118,86 @@ namespace NeoVM.Interop.Tests.Extra
 
         bool Storage_Delete(ExecutionEngine engine)
         {
-            if (!engine.EvaluationStack.TryPop(out InteropStackItem inter) ||
-                !(inter.Value is DummyStorageContext context))
-                return false;
+            using (ExecutionContext context = engine.CurrentContext)
+            {
+                if (context == null) return false;
 
-            if (!engine.EvaluationStack.TryPop(out IStackItem it) || !it.CanConvertToByteArray)
-                return false;
+                if (!context.EvaluationStack.TryPop(out InteropStackItem inter))
+                    return false;
 
-            byte[] key = it.ToByteArray();
-            context.Storage.Remove(BitHelper.ToHexString(key));
+                using (inter)
+                {
+                    if (!(inter.Value is DummyStorageContext stContext))
+                        return false;
+
+                    if (!context.EvaluationStack.TryPop(out IStackItem it))
+                        return false;
+
+                    using (it)
+                    {
+                        if (!it.CanConvertToByteArray) return false;
+                        byte[] key = it.ToByteArray();
+                        stContext.Storage.Remove(BitHelper.ToHexString(key));
+                    }
+                }
+            }
+
             return true;
         }
 
         bool Storage_Put(ExecutionEngine engine)
         {
-            if (!engine.EvaluationStack.TryPop(out InteropStackItem inter) ||
-                !(inter.Value is DummyStorageContext context))
-                return false;
+            using (ExecutionContext context = engine.CurrentContext)
+            {
+                if (context == null) return false;
 
-            if (!engine.EvaluationStack.TryPop(out IStackItem it) || !it.CanConvertToByteArray)
-                return false;
+                if (!context.EvaluationStack.TryPop(out InteropStackItem inter))
+                    return false;
 
-            byte[] key = it.ToByteArray();
-            if (key.Length > 1024) return false;
+                using (inter)
+                {
+                    if (!(inter.Value is DummyStorageContext stContext))
+                        return false;
 
-            if (!engine.EvaluationStack.TryPop(out it) || !it.CanConvertToByteArray)
-                return false;
+                    if (!context.EvaluationStack.TryPop(out IStackItem it))
+                        return false;
 
-            byte[] value = it.ToByteArray();
+                    byte[] key;
+                    using (it)
+                    {
+                        if (!it.CanConvertToByteArray) return false;
 
-            context.Storage[BitHelper.ToHexString(key)] = value;
+                        key = it.ToByteArray();
+                        if (key.Length > 1024) return false;
+                    }
+
+                    if (!context.EvaluationStack.TryPop(out it))
+                        return false;
+
+                    byte[] value;
+                    using (it)
+                    {
+                        if (!it.CanConvertToByteArray) return false;
+
+                        value = it.ToByteArray();
+                    }
+
+                    stContext.Storage[BitHelper.ToHexString(key)] = value;
+                }
+            }
+
             return true;
         }
 
         bool TestMethod(ExecutionEngine engine)
         {
-            using (IStackItem it = engine.CreateInterop(new DisposableDummy()))
-                engine.EvaluationStack.Push(it);
+            using (ExecutionContext context = engine.CurrentContext)
+            {
+                if (context == null) return false;
+
+                using (IStackItem it = engine.CreateInterop(new DisposableDummy()))
+                    context.EvaluationStack.Push(it);
+            }
 
             return true;
         }

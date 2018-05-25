@@ -161,7 +161,9 @@
     <ClInclude Include="BoolStackItem.h" />
     <ClInclude Include="ByteArrayStackItem.h" />
     <ClInclude Include="ELogStackOperation.h" />
+    <ClInclude Include="IClaimable.h" />
     <ClInclude Include="Limits.h" />
+    <ClInclude Include="ExecutionScript.h" />
     <ClInclude Include="Types.h" />
     <ClInclude Include="Crypto.h" />
     <ClInclude Include="ExecutionContext.h" />
@@ -190,6 +192,7 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="ExecutionContext.cpp" />
     <ClCompile Include="ExecutionEngine.cpp" />
+    <ClCompile Include="IClaimable.cpp" />
     <ClCompile Include="IntegerStackItem.cpp" />
     <ClCompile Include="InteropStackItem.cpp" />
     <ClCompile Include="IStackItem.cpp" />
@@ -197,6 +200,7 @@
     <ClCompile Include="NeoVM.cpp" />
     <ClCompile Include="ExecutionContextStack.cpp" />
     <ClCompile Include="RIPEMD160.cpp" />
+    <ClCompile Include="ExecutionScript.cpp" />
     <ClCompile Include="SHA1.cpp" />
     <ClCompile Include="SHA256.cpp" />
     <ClCompile Include="StackItems.cpp" />

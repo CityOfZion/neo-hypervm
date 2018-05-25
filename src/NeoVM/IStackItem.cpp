@@ -2,13 +2,13 @@
 
 // Constructor
 
-IStackItem::IStackItem(EStackItemType type) :Claims(0), Type(type) { }
+IStackItem::IStackItem(EStackItemType type) : IClaimable(), Type(type) { }
 
 // Methods
 
 void IStackItem::Free(IStackItem* &item)
 {
-	if (item != NULL && item->Claims == 0)
+	if (item != NULL && item->IsUnClaimed())
 	{
 		// Is zero because if the item is cloned you can call this method twice (PUSH1,DUP,EQUAL)
 		// But in Linux doesn't work (next call is not NULL) careful!
@@ -73,7 +73,7 @@ void IStackItem::Free(IStackItem* &itemA, IStackItem* &itemB, IStackItem* &itemC
 
 void IStackItem::Free(IStackItem* &itemA, IStackItem* &itemB)
 {
-	if (itemA != NULL && itemA->Claims == 0)
+	if (itemA != NULL && itemA->IsUnClaimed())
 	{
 		// Check equals
 
@@ -86,32 +86,20 @@ void IStackItem::Free(IStackItem* &itemA, IStackItem* &itemB)
 		itemA = NULL;
 	}
 
-	if (itemB != NULL && itemB->Claims == 0)
+	if (itemB != NULL && itemB->IsUnClaimed())
 	{
 		delete(itemB);
 		itemB = NULL;
 	}
 }
 
-void IStackItem::UnClaim() { this->Claims--; }
-
-void IStackItem::Claim() { this->Claims++; }
-
 void IStackItem::UnclaimAndFree(IStackItem* &item)
 {
-	if (item == NULL) return;
-
-	if (item->Claims == 1)
+	if (item != NULL && item->UnClaim())
 	{
-		item->Claims = 0;
-
 		// Is zero because if the item is cloned you can call this method twice (PUSH1,DUP,EQUAL)
 
 		delete(item);
 		item = NULL;
-	}
-	else
-	{
-		item->Claims--;
 	}
 }

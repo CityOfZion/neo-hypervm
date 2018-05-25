@@ -5,12 +5,16 @@ using System.Runtime.InteropServices;
 
 namespace NeoVM.Interop.Types.Collections
 {
-    public class ExecutionContextStack : IEnumerable<ExecutionContext>
+    public class ExecutionContextStack : IEnumerable<ExecutionContext>, IDisposable
     {
         /// <summary>
         /// Native handle
         /// </summary>
-        protected readonly IntPtr Handle;
+        private IntPtr Handle;
+        /// <summary>
+        /// Engine
+        /// </summary>
+        private readonly ExecutionEngine Engine;
 
         /// <summary>
         /// Return the number of items in the stack
@@ -47,7 +51,7 @@ namespace NeoVM.Interop.Types.Collections
                 return false;
             }
 
-            obj = new ExecutionContext(ptr);
+            obj = new ExecutionContext(Engine, ptr);
             return true;
         }
         /// <summary>
@@ -66,10 +70,12 @@ namespace NeoVM.Interop.Types.Collections
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="engine">Engine</param>
         /// <param name="handle">Handle</param>
-        internal ExecutionContextStack(IntPtr handle)
+        internal ExecutionContextStack(ExecutionEngine engine, IntPtr handle)
         {
             Handle = handle;
+            Engine = engine;
 
             if (handle == IntPtr.Zero)
                 throw new ExternalException();
@@ -98,5 +104,13 @@ namespace NeoVM.Interop.Types.Collections
         }
 
         #endregion
+
+        /// <summary>
+        /// Free resources
+        /// </summary>
+        public void Dispose()
+        {
+            Handle = IntPtr.Zero;
+        }
     }
 }

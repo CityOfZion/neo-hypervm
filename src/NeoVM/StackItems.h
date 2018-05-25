@@ -21,6 +21,7 @@ public:
 	IStackItem* TryPeek(int32 index);
 	IStackItem* Remove(int32 index);
 	void Insert(int32 index, IStackItem *it);
+	void CopyTo(StackItems *stack, int32 count);
 
 	~StackItems();
 };

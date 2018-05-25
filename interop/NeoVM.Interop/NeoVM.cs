@@ -48,7 +48,7 @@ namespace NeoVM.Interop
         internal delegate byte InvokeInteropCallback(IntPtr ptr, byte size);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate byte LoadScriptCallback([MarshalAs(UnmanagedType.LPArray, SizeConst = 20)]byte[] scriptHash, byte isDynamicInvoke);
+        internal delegate byte LoadScriptCallback([MarshalAs(UnmanagedType.LPArray, SizeConst = 20)]byte[] scriptHash, byte isDynamicInvoke, int rvcount);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate int GetMessageCallback(uint iteration, out IntPtr script);
@@ -73,10 +73,12 @@ namespace NeoVM.Interop
         internal delegate void delVoid_HandleHandle(IntPtr pointer1, IntPtr pointer2);
         internal delegate byte delByte_HandleHandle(IntPtr pointer1, IntPtr pointer2);
         internal delegate IntPtr delHandle_HandleHandle(IntPtr pointer1, IntPtr pointer2);
+        internal delegate byte delByte_HandleIntInt(IntPtr handle, int index, int index2);
         internal delegate IntPtr delHandle_ByteHandleInt(byte type, IntPtr data, int size);
         internal delegate void delVoid_HandleIntByte(IntPtr handle, int index, byte dispose);
         internal delegate int delInt_HandleHandleInt(IntPtr pointer1, IntPtr pointer2, int value);
         internal delegate void delVoid_HandleHandleInt(IntPtr pointer1, IntPtr pointer2, int value);
+        internal delegate int delInt_HandleHandleIntInt(IntPtr pointer1, IntPtr pointer2, int value, int value2);
         internal delegate void delVoid_HandleHandleHandle(IntPtr pointer1, IntPtr pointer2, IntPtr pointer3);
 
         // Specific
@@ -86,7 +88,12 @@ namespace NeoVM.Interop
         internal delegate IntPtr delCreateExecutionEngine
             (
             InvokeInteropCallback interopCallback, LoadScriptCallback scriptCallback, GetMessageCallback getMessageCallback,
-            out IntPtr invocationHandle, out IntPtr evaluationHandle, out IntPtr altStack
+            out IntPtr invocationHandle, out IntPtr resultStack
+            );
+
+        internal delegate void delExecutionContextClaim
+            (
+            IntPtr handle, out IntPtr invocationHandle, out IntPtr resultStack
             );
 
         #endregion
@@ -98,7 +105,8 @@ namespace NeoVM.Interop
 
         internal static delCreateExecutionEngine ExecutionEngine_Create;
         internal static delVoid_RefHandle ExecutionEngine_Free;
-        internal static delVoid_HandleHandleInt ExecutionEngine_LoadScript;
+        internal static delInt_HandleHandleIntInt ExecutionEngine_LoadScript;
+        internal static delByte_HandleIntInt ExecutionEngine_LoadCachedScript;
         internal static delByte_Handle ExecutionEngine_Execute;
         internal static delVoid_Handle ExecutionEngine_StepInto;
         internal static delVoid_Handle ExecutionEngine_StepOver;
@@ -145,7 +153,7 @@ namespace NeoVM.Interop
         internal static delByte_Handle ExecutionContext_GetNextInstruction;
         internal static delInt_Handle ExecutionContext_GetInstructionPointer;
         internal static delVoid_RefHandle ExecutionContext_Free;
-        internal static delVoid_Handle ExecutionContext_Claim;
+        internal static delExecutionContextClaim ExecutionContext_Claim;
 #pragma warning restore CS0649
 
         #endregion

@@ -137,7 +137,7 @@ namespace NeoVM.Interop.Tests
 
                 // Execute
 
-                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+                Assert.IsFalse(engine.Execute());
 
                 // Check
 
@@ -165,12 +165,12 @@ namespace NeoVM.Interop.Tests
                 {
                     // Equal command don't FAULT here
 
-                    Assert.AreEqual(EVMState.HALT, engine.Execute());
-                    Assert.AreEqual(engine.EvaluationStack.Pop<BooleanStackItem>().Value, false);
+                    Assert.IsTrue(engine.Execute());
+                    Assert.AreEqual(engine.ResultStack.Pop<BooleanStackItem>().Value, false);
                 }
                 else
                 {
-                    Assert.AreEqual(EVMState.FAULT, engine.Execute());
+                    Assert.IsFalse(engine.Execute());
                 }
 
                 // Check
@@ -202,11 +202,11 @@ namespace NeoVM.Interop.Tests
 
                     // PUSH A
                     engine.StepInto();
-                    Assert.AreEqual(1, engine.EvaluationStack.Count);
+                    Assert.AreEqual(1, engine.CurrentContext.EvaluationStack.Count);
 
                     // PUSH B
                     engine.StepInto();
-                    Assert.AreEqual(2, engine.EvaluationStack.Count);
+                    Assert.AreEqual(2, engine.CurrentContext.EvaluationStack.Count);
 
                     // Operand
 
@@ -220,6 +220,8 @@ namespace NeoVM.Interop.Tests
 #pragma warning restore
 
                     engine.StepInto();
+                    engine.StepInto();
+
                     check(engine, pair.A, pair.B, cancel);
 
 #pragma warning disable CS0162
@@ -237,7 +239,7 @@ namespace NeoVM.Interop.Tests
                     }
 
                     // RET
-                    engine.StepInto();
+
                     Assert.AreEqual(EVMState.HALT, engine.State);
 
                     // Check
@@ -257,7 +259,6 @@ namespace NeoVM.Interop.Tests
 
                     script.EmitPush(i);
                     script.Emit(EVMOpCode.DUP);
-
                     script.Emit(operand, EVMOpCode.RET);
 
                     // Load script
@@ -268,11 +269,11 @@ namespace NeoVM.Interop.Tests
 
                     // PUSH A
                     engine.StepInto();
-                    Assert.AreEqual(1, engine.EvaluationStack.Count);
+                    Assert.AreEqual(1, engine.CurrentContext.EvaluationStack.Count);
 
                     // PUSH B
                     engine.StepInto();
-                    Assert.AreEqual(2, engine.EvaluationStack.Count);
+                    Assert.AreEqual(2, engine.CurrentContext.EvaluationStack.Count);
 
                     // Operand
 
@@ -285,7 +286,7 @@ namespace NeoVM.Interop.Tests
                     }
 #pragma warning restore
 
-                    engine.StepInto();
+                    engine.StepInto(2);
                     check(engine, i, i, cancel);
 
 #pragma warning disable CS0162
@@ -330,7 +331,7 @@ namespace NeoVM.Interop.Tests
 
                 // Execute
 
-                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+                Assert.IsFalse(engine.Execute());
 
                 // Check
 
@@ -353,7 +354,7 @@ namespace NeoVM.Interop.Tests
 
                 // Execute
 
-                Assert.AreEqual(EVMState.FAULT, engine.Execute());
+                Assert.IsFalse(engine.Execute());
 
                 // Check
 
@@ -376,13 +377,13 @@ namespace NeoVM.Interop.Tests
 
                     // Load script
 
-                    engine.LoadScript(script.ToArray());
+                    engine.LoadScript(script);
 
                     // Execute
 
                     // PUSH A
                     engine.StepInto();
-                    Assert.AreEqual(1, engine.EvaluationStack.Count);
+                    Assert.AreEqual(1, engine.CurrentContext.EvaluationStack.Count);
 
                     // Operand
 
@@ -395,7 +396,7 @@ namespace NeoVM.Interop.Tests
                     }
 #pragma warning restore
 
-                    engine.StepInto();
+                    engine.StepInto(2);
                     check(engine, bi, cancel);
 
 #pragma warning disable CS0162
@@ -425,9 +426,24 @@ namespace NeoVM.Interop.Tests
         /// <param name="invocationStack">True for Check invocationStack</param>
         protected void CheckClean(ExecutionEngine engine, bool invocationStack = true)
         {
-            Assert.AreEqual(0, engine.EvaluationStack.Count);
-            Assert.AreEqual(0, engine.AltStack.Count);
-            if (invocationStack) Assert.AreEqual(0, engine.InvocationStack.Count);
+            Assert.AreEqual(0, engine.ResultStack.Count);
+
+            if (invocationStack)
+            {
+                Assert.AreEqual(0, engine.InvocationStack.Count);
+            }
+            else
+            {
+                if (engine.CurrentContext == null)
+                {
+                    Assert.AreEqual(EVMState.HALT, engine.State);
+                }
+                else
+                {
+                    Assert.AreEqual(0, engine.CurrentContext.EvaluationStack.Count);
+                    Assert.AreEqual(0, engine.CurrentContext.AltStack.Count);
+                }
+            }
         }
         /// <summary>
         /// Check Array (using peek)
