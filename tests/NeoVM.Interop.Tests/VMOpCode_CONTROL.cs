@@ -495,6 +495,319 @@ namespace NeoVM.Interop.Tests
             }
         }
 
+        void GLOBAL_CALL_EX(EVMOpCode opcode)
+        {
+            // Without push
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                new byte[]
+                {
+                (byte)opcode, 0x00, 0x01
+                }
+            ))
+            {
+                using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+                {
+                    // Load script
+
+                    engine.LoadScript(script);
+
+                    // Execute
+
+                    Assert.IsFalse(engine.Execute());
+
+                    // Check
+
+                    CheckClean(engine, false);
+                }
+            }
+
+            // Without pcount
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                new byte[]
+                {
+                (byte)opcode, 0x00
+                }
+            ))
+            {
+                using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+                {
+                    // Load script
+
+                    engine.LoadScript(script);
+
+                    // Execute
+
+                    Assert.IsFalse(engine.Execute());
+
+                    // Check
+
+                    CheckClean(engine, false);
+                }
+            }
+
+            // Without rvcount
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                new byte[]
+                {
+                (byte)opcode
+                }
+            ))
+            {
+                using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+                {
+                    // Load script
+
+                    engine.LoadScript(script);
+
+                    // Execute
+
+                    Assert.IsFalse(engine.Execute());
+
+                    // Check
+
+                    CheckClean(engine, false);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void CALL_ED()
+        {
+            // Global tests
+
+            GLOBAL_CALL_EX(EVMOpCode.CALL_ED);
+
+            // Check without IScriptTable
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                new byte[]
+                {
+                (byte)EVMOpCode.PUSHBYTES20,
+                0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,
+                0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,
+                (byte)EVMOpCode.CALL_ED, 0x01, 0x00
+                }
+            ))
+            {
+                using (ExecutionEngine engine = NeoVM.CreateEngine(new ExecutionEngineArgs()))
+                {
+                    // Load script
+
+                    engine.LoadScript(script);
+
+                    // Execute
+
+                    Assert.IsFalse(engine.Execute());
+
+                    // Check
+
+                    CheckClean(engine, false);
+                }
+
+                // Check without complete hash
+
+                using (ExecutionEngine engine = NeoVM.CreateEngine(new ExecutionEngineArgs()))
+                {
+                    // Load script
+
+                    byte[] raw = script.ToArray().Skip(1).ToArray();
+                    raw[0] = (byte)EVMOpCode.PUSHBYTES19;
+                    engine.LoadScript(raw);
+
+                    // Execute
+
+                    Assert.IsFalse(engine.Execute());
+
+                    // Check
+
+                    CheckClean(engine, false);
+                }
+
+                // Check without pushes
+
+                using (ExecutionEngine engine = NeoVM.CreateEngine(new ExecutionEngineArgs()))
+                {
+                    // Load script
+
+                    byte[] raw = script.ToArray().ToArray();
+                    raw[23] = 1;
+                    engine.LoadScript(raw);
+
+                    // Execute
+
+                    Assert.IsFalse(engine.Execute());
+
+                    // Check
+
+                    Assert.IsTrue(engine.CurrentContext.EvaluationStack.Pop<ByteArrayStackItem>().Value.SequenceEqual
+                        (
+                        new byte[] 
+                            {
+                            0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,
+                            0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A
+                            }
+                        ));
+
+                    CheckClean(engine, false);
+                }
+
+                // Check script
+
+                using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+                {
+                    // Load script
+
+                    engine.LoadScript(script);
+
+                    // Execute
+
+                    Assert.IsTrue(engine.Execute());
+
+                    // Check
+
+                    Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, 0x06);
+
+                    CheckClean(engine);
+                }
+
+                // Check isolated
+
+                using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+                {
+                    // Load script
+
+                    byte[] raw = script.ToArray();
+                    raw[22] = 0x00; // no return
+                    engine.LoadScript(raw);
+
+                    // Execute
+
+                    Assert.IsTrue(engine.Execute());
+
+                    // Check
+
+                    CheckClean(engine);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void CALL_E()
+        {
+            // Global tests
+
+            GLOBAL_CALL_EX(EVMOpCode.CALL_E);
+
+            // Check without IScriptTable
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                new byte[]
+                {
+                (byte)EVMOpCode.CALL_E, 0x01, 0x00,
+                0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,
+                0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A
+                }
+            ))
+            {
+                // Test cache with the real hash
+
+                byte[] msg = Args.ScriptTable.GetScript(script.ToArray().Skip(3).Take(20).ToArray(), false);
+
+                byte[] realHash;
+                using (SHA256 sha = SHA256.Create())
+                using (RIPEMD160Managed ripe = new RIPEMD160Managed())
+                {
+                    realHash = sha.ComputeHash(msg);
+                    realHash = ripe.ComputeHash(realHash);
+                }
+
+                script.Emit(EVMOpCode.CALL_E);
+                script.Emit(0x01, 0x00);
+                script.Emit(realHash);
+
+                using (ExecutionEngine engine = NeoVM.CreateEngine(new ExecutionEngineArgs()))
+                {
+                    // Load script
+
+                    engine.LoadScript(script);
+
+                    // Execute
+
+                    Assert.IsFalse(engine.Execute());
+
+                    // Check
+
+                    CheckClean(engine, false);
+                }
+
+                // Check without complete hash
+
+                using (ExecutionEngine engine = NeoVM.CreateEngine(new ExecutionEngineArgs()))
+                {
+                    // Load script
+
+                    engine.LoadScript(script.ToArray().Take(22).ToArray());
+
+                    // Execute
+
+                    Assert.IsFalse(engine.Execute());
+
+                    // Check
+
+                    CheckClean(engine, false);
+                }
+
+                // Check script
+
+                using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+                {
+                    // Load script
+
+                    engine.LoadScript(script);
+
+                    // Execute
+
+                    Assert.IsTrue(engine.Execute());
+
+                    // Check
+
+                    Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, 0x04);
+                    Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, 0x04);
+
+                    CheckClean(engine);
+                }
+
+                // Check isolated
+
+                using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+                {
+                    // Load script
+
+                    byte[] raw = script.ToArray();
+                    raw[1] = 0x00; // no return
+                    engine.LoadScript(raw);
+
+                    // Execute
+
+                    Assert.IsTrue(engine.Execute());
+
+                    // Check
+
+                    Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, 0x04);
+
+                    CheckClean(engine);
+                }
+            }
+        }
+
         public void APPCALL_AND_TAILCALL(EVMOpCode opcode)
         {
             Assert.IsTrue(opcode == EVMOpCode.APPCALL || opcode == EVMOpCode.TAILCALL);

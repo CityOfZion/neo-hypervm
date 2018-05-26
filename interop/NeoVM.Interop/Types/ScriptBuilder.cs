@@ -75,7 +75,7 @@ namespace NeoVM.Interop.Types
             return this;
         }
 
-        public ScriptBuilder Emit(byte[] raw)
+        public ScriptBuilder Emit(params byte[] raw)
         {
             if (raw != null)
                 writer.Write(raw, 0, raw.Length);

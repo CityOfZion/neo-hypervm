@@ -428,7 +428,7 @@ ExecuteOpCode:
 
 		if (isDynamicInvoke)
 		{
-			// Requite one element more
+			// Require one element more
 
 			if (ec < pcount + 1)
 			{
@@ -439,17 +439,12 @@ ExecuteOpCode:
 			// Get hash from the evaluation stack
 
 			IStackItem *it = context->EvaluationStack->Pop();
-
 			int32 size = it->ReadByteArraySize();
-			if (size != scriptLength)
-			{
-				this->State = EVMState::FAULT;
-				return;
-			}
 
-			if (it->ReadByteArray(script_hash, 0, scriptLength) != scriptLength)
+			if (size != scriptLength || it->ReadByteArray(script_hash, 0, scriptLength) != scriptLength)
 			{
 				this->State = EVMState::FAULT;
+				IStackItem::UnclaimAndFree(it);
 				return;
 			}
 
@@ -490,7 +485,7 @@ ExecuteOpCode:
 		{
 			this->InvocationStack->Remove(1);
 		}
-		else 
+		else
 		{
 			for (int i = 0; i < pcount; i++)
 				context->EvaluationStack->Drop();
