@@ -184,7 +184,6 @@ ExecuteOpCode:
 
 	switch (opcode)
 	{
-
 		// Push value
 
 	case EVMOpCode::PUSH0:

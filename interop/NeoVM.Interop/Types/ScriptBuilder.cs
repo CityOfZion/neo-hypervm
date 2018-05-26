@@ -65,6 +65,7 @@ namespace NeoVM.Interop.Types
         {
             writer.Dispose();
         }
+
         /// <summary>
         /// Clear buffer
         /// </summary>
@@ -74,7 +75,7 @@ namespace NeoVM.Interop.Types
 
             return this;
         }
-
+        
         public ScriptBuilder Emit(params byte[] raw)
         {
             if (raw != null)

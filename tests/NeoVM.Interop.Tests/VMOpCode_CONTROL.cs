@@ -648,7 +648,7 @@ namespace NeoVM.Interop.Tests
 
                     Assert.IsTrue(engine.CurrentContext.EvaluationStack.Pop<ByteArrayStackItem>().Value.SequenceEqual
                         (
-                        new byte[] 
+                        new byte[]
                             {
                             0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,
                             0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A
@@ -805,6 +805,182 @@ namespace NeoVM.Interop.Tests
 
                     CheckClean(engine);
                 }
+            }
+        }
+
+        [TestMethod]
+        public void CALL_ET()
+        {
+            // Global tests
+
+            GLOBAL_CALL_EX(EVMOpCode.CALL_ET);
+
+            // Check without IScriptTable
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                new byte[]
+                {
+                (byte)EVMOpCode.CALL_ET, 0x01, 0x00,
+                0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,
+                0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A
+                }
+            ))
+            {
+                // Test cache with the real hash
+
+                byte[] msg = Args.ScriptTable.GetScript(script.ToArray().Skip(3).Take(20).ToArray(), false);
+
+                byte[] realHash;
+                using (SHA256 sha = SHA256.Create())
+                using (RIPEMD160Managed ripe = new RIPEMD160Managed())
+                {
+                    realHash = sha.ComputeHash(msg);
+                    realHash = ripe.ComputeHash(realHash);
+                }
+
+                script.Emit(EVMOpCode.CALL_ET);
+                script.Emit(0x01, 0x00);
+                script.Emit(realHash);
+
+                using (ExecutionEngine engine = NeoVM.CreateEngine(new ExecutionEngineArgs()))
+                {
+                    // Load script
+
+                    engine.LoadScript(script);
+
+                    // Execute
+
+                    Assert.IsFalse(engine.Execute());
+
+                    // Check
+
+                    CheckClean(engine, false);
+                }
+
+                // Check without complete hash
+
+                using (ExecutionEngine engine = NeoVM.CreateEngine(new ExecutionEngineArgs()))
+                {
+                    // Load script
+
+                    engine.LoadScript(script.ToArray().Take(22).ToArray());
+
+                    // Execute
+
+                    Assert.IsFalse(engine.Execute());
+
+                    // Check
+
+                    CheckClean(engine, false);
+                }
+
+                // Without context
+
+                using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+                {
+                    // Load script
+
+                    engine.LoadScript(script);
+
+                    // Execute
+
+                    Assert.IsFalse(engine.Execute());
+
+                    // Check
+
+                    CheckClean(engine, false);
+                }
+
+                // TODO: More real tests here
+            }
+        }
+
+        [TestMethod]
+        public void CALL_EDT()
+        {
+            // Global tests
+
+            GLOBAL_CALL_EX(EVMOpCode.CALL_EDT);
+
+            // Check without IScriptTable
+
+            using (ScriptBuilder script = new ScriptBuilder
+            (
+                new byte[]
+                {
+                (byte)EVMOpCode.CALL_EDT, 0x01, 0x00,
+                0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,
+                0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A
+                }
+            ))
+            {
+                // Test cache with the real hash
+
+                byte[] msg = Args.ScriptTable.GetScript(script.ToArray().Skip(3).Take(20).ToArray(), false);
+
+                byte[] realHash;
+                using (SHA256 sha = SHA256.Create())
+                using (RIPEMD160Managed ripe = new RIPEMD160Managed())
+                {
+                    realHash = sha.ComputeHash(msg);
+                    realHash = ripe.ComputeHash(realHash);
+                }
+
+                script.Emit(EVMOpCode.CALL_EDT);
+                script.Emit(0x01, 0x00);
+                script.Emit(realHash);
+
+                using (ExecutionEngine engine = NeoVM.CreateEngine(new ExecutionEngineArgs()))
+                {
+                    // Load script
+
+                    engine.LoadScript(script);
+
+                    // Execute
+
+                    Assert.IsFalse(engine.Execute());
+
+                    // Check
+
+                    CheckClean(engine, false);
+                }
+
+                // Check without complete hash
+
+                using (ExecutionEngine engine = NeoVM.CreateEngine(new ExecutionEngineArgs()))
+                {
+                    // Load script
+
+                    engine.LoadScript(script.ToArray().Take(22).ToArray());
+
+                    // Execute
+
+                    Assert.IsFalse(engine.Execute());
+
+                    // Check
+
+                    CheckClean(engine, false);
+                }
+
+                // Without context
+
+                using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+                {
+                    // Load script
+
+                    engine.LoadScript(script);
+
+                    // Execute
+
+                    Assert.IsFalse(engine.Execute());
+
+                    // Check
+
+                    CheckClean(engine, false);
+                }
+
+                // TODO: More real tests here
             }
         }
 
