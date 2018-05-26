@@ -5,11 +5,11 @@
 
 class ExecutionContextStack
 {
-	int32 Size;
+	int32 Size = 0;
 	std::list<ExecutionContext*> Stack;
 
 public:
-	
+
 	OnStackChangeCallback Log;
 	int32 Count();
 
