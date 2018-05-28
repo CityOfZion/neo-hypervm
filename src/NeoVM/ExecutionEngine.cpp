@@ -1,4 +1,5 @@
 #include "ExecutionEngine.h"
+#include "ExecutionScript.h"
 #include "ByteArrayStackItem.h"
 #include "IntegerStackItem.h"
 #include "BoolStackItem.h"
@@ -73,6 +74,8 @@ int32 ExecutionEngine::LoadScript(byte * script, int32 scriptLength, int32 rvcou
 	int32 index = Scripts.size();
 
 	ExecutionScript * sc = new ExecutionScript(script, scriptLength);
+	sc->Claim();
+
 	Scripts.push_back(sc);
 
 	ExecutionContext * context = new ExecutionContext(sc, 0, rvcount);
@@ -3054,7 +3057,7 @@ ExecutionEngine::~ExecutionEngine()
 	for (std::list<ExecutionScript*>::iterator it = this->Scripts.begin(); it != this->Scripts.end(); ++it)
 	{
 		ExecutionScript* ptr = (ExecutionScript*)*it;
-		delete(ptr);
+		ExecutionScript::UnclaimAndFree(ptr);
 	}
 
 	this->Scripts.clear();

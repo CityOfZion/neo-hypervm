@@ -2,7 +2,7 @@
 
 namespace NeoVM.Interop.Native
 {
-    internal class MacCore : UnixCore
+    internal class MacCore : LinuxCore
     {
         public MacCore() : base(EPlatform.Mac, ".so") { }
     }

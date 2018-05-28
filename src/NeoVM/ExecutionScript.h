@@ -3,7 +3,7 @@
 #include "Types.h"
 #include "IClaimable.h"
 
-class ExecutionScript
+class ExecutionScript : public IClaimable
 {
 private:
 
@@ -26,10 +26,6 @@ public:
 	int32 GetScriptHash(byte* hash);
 	bool IsTheSameHash(byte *hash, int32 length);
 
-	// Claim
-
-	static void UnclaimAndFree(ExecutionScript* &item);
-
 	// Constructor
 
 	ExecutionScript(byte * script, int32 scriptLength);
@@ -37,4 +33,9 @@ public:
 	// Destructor
 
 	~ExecutionScript();
+
+	// Claims
+
+	static void Free(ExecutionScript* &item);
+	static void UnclaimAndFree(ExecutionScript* &item);
 };

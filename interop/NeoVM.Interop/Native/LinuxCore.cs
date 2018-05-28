@@ -5,14 +5,14 @@ using System.Runtime.InteropServices;
 
 namespace NeoVM.Interop.Native
 {
-    internal class UnixCore : CrossPlatformLibrary
+    internal class LinuxCore : CrossPlatformLibrary
     {
         const string NativeLibrary = "libdl.so";
 
         #region Constructors
 
-        public UnixCore() : base(EPlatform.Unix, ".so") { }
-        protected UnixCore(EPlatform platform, string extension) : base(platform, extension) { }
+        public LinuxCore() : base(EPlatform.Linux, ".so") { }
+        protected LinuxCore(EPlatform platform, string extension) : base(platform, extension) { }
 
         #endregion
 

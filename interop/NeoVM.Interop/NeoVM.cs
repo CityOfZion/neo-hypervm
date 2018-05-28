@@ -179,7 +179,7 @@ namespace NeoVM.Interop
                 case PlatformID.Unix:
                 case (PlatformID)128:
                     {
-                        Core = new UnixCore();
+                        Core = new LinuxCore();
                         break;
                     }
                 case PlatformID.MacOSX:

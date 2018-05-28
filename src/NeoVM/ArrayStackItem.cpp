@@ -2,11 +2,11 @@
 #include "BoolStackItem.h"
 
 ArrayStackItem::ArrayStackItem(bool isStruct) :
-	IStackItem(isStruct ? EStackItemType::Struct : EStackItemType::Array), List(std::list<IStackItem*>())
+	IStackItem((isStruct ? EStackItemType::Struct : EStackItemType::Array)), List(std::list<IStackItem*>())
 { }
 
 ArrayStackItem::ArrayStackItem(bool isStruct, int32 count) :
-	IStackItem(isStruct ? EStackItemType::Struct : EStackItemType::Array), List(std::list<IStackItem*>())
+	IStackItem((isStruct ? EStackItemType::Struct : EStackItemType::Array)), List(std::list<IStackItem*>())
 {
 	// Init size
 	for (int32 i = 0; i < count; ++i)
@@ -66,7 +66,7 @@ bool ArrayStackItem::Equals(IStackItem * it)
 
 	// Different size
 
-	int c = this->Count();
+	int32 c = this->Count();
 	ArrayStackItem* arr = (ArrayStackItem*)it;
 
 	if (arr->Count() != c)
@@ -105,7 +105,7 @@ IStackItem* ArrayStackItem::Get(int32 index)
 
 int32 ArrayStackItem::IndexOf(IStackItem* item)
 {
-	int index = 0;
+	int32 index = 0;
 	for (std::list<IStackItem*>::iterator it = this->List.begin(); it != this->List.end(); ++it)
 	{
 		if ((IStackItem*)*it == item)

@@ -12,6 +12,7 @@ ExecutionContext::ExecutionContext(ExecutionScript* script, int32 instructorPoin
 	AltStack(new StackItems()),
 	EvaluationStack(new StackItems())
 {
+	script->Claim();
 }
 
 bool ExecutionContext::ReadUInt8(byte &ret)
@@ -220,4 +221,6 @@ ExecutionContext::~ExecutionContext()
 {
 	delete(this->EvaluationStack);
 	delete(this->AltStack);
+
+	ExecutionScript::UnclaimAndFree(this->Script);
 }

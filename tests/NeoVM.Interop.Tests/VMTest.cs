@@ -293,10 +293,14 @@ EVA:Drop[0]".Replace("\r", ""));
 
                     Assert.IsTrue(ar[0] is BooleanStackItem b0 && b0.Value);
                 }
+
+                Assert.IsFalse(context.IsDisposed);
+                Assert.AreEqual(context.NextInstruction, EVMOpCode.RET);
             }
 
             // Check
 
+            Assert.IsFalse(context.IsDisposed);
             Assert.AreEqual(context.NextInstruction, EVMOpCode.RET);
             Assert.IsTrue(context.ScriptHash.SequenceEqual(realHash));
 

@@ -2,7 +2,9 @@
 #include "Crypto.h"
 #include <cstring>
 
-ExecutionScript::ExecutionScript(byte * script, int32 scriptLength) :
+ExecutionScript::ExecutionScript(byte * script, int32 scriptLength) 
+	:
+	IClaimable(),
 	IsScriptHashCalculated(false),
 	ScriptLength(scriptLength)
 {
@@ -43,6 +45,24 @@ bool ExecutionScript::IsTheSameHash(byte *hash, int32 length)
 			return false;
 
 	return true;
+}
+
+void ExecutionScript::Free(ExecutionScript* &item)
+{
+	if (item != NULL && item->IsUnClaimed())
+	{
+		delete(item);
+		item = NULL;
+	}
+}
+
+void ExecutionScript::UnclaimAndFree(ExecutionScript* &item)
+{
+	if (item != NULL && item->UnClaim())
+	{
+		delete(item);
+		item = NULL;
+	}
 }
 
 ExecutionScript::~ExecutionScript()
