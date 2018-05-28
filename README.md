@@ -57,6 +57,10 @@ There is a `Makefile` in the root of the project. To build the `VM` source:
 make
 ```
 
+For cross compiling x86 from x64
+
+`apt-get install g++-multilib`
+
 # Contributing
 
 Feel free to contribute to this project after reading the
