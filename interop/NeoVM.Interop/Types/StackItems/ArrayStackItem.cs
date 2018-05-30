@@ -1,49 +1,48 @@
-﻿using NeoVM.Interop.Enums;
-using NeoVM.Interop.Interfaces;
+﻿using NeoSharp.VM;
+using NeoVM.Interop.Extensions;
+using NeoVM.Interop.Native;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace NeoVM.Interop.Types.StackItems
 {
-    public class ArrayStackItem : IStackItem, ICollection, IList<IStackItem>, IEquatable<ArrayStackItem>, IEquatable<IStackItem>
+    public class ArrayStackItem : IArrayStackItem, INativeStackItem
     {
-        public override bool CanConvertToByteArray => false;
-        public override byte[] ToByteArray() { throw new NotImplementedException(); }
-
+        /// <summary>
+        /// Native Handle
+        /// </summary>
+        IntPtr _handle;
+        /// <summary>
+        /// Native Handle
+        /// </summary>
+        public IntPtr Handle => _handle;
+        /// <summary>
+        /// Is Disposed
+        /// </summary>
+        public override bool IsDisposed => _handle == IntPtr.Zero;
         /// <summary>
         /// Count
         /// </summary>
-        public int Count => NeoVM.ArrayStackItem_Count(Handle);
+        public override int Count => NeoVM.ArrayStackItem_Count(_handle);
         /// <summary>
-        /// IsStruct
+        /// Type
         /// </summary>
-        public bool IsStruct => Type == EStackItemType.Struct;
+        public new EStackItemType Type => base.Type;
+        /// <summary>
+        /// Engine
+        /// </summary>
+        private readonly new ExecutionEngine Engine;
+
         /// <summary>
         /// Index
         /// </summary>
         /// <param name="index">Position</param>
         /// <returns>Returns the StackItem element</returns>
-        public IStackItem this[int index]
+        public override IStackItem this[int index]
         {
-            get { return Engine.ConvertFromNative(NeoVM.ArrayStackItem_Get(Handle, index)); }
+            get { return Engine.ConvertFromNative(NeoVM.ArrayStackItem_Get(_handle, index)); }
             set { Set(index, value); }
         }
-
-        /// <summary>
-        /// IsReadOnly
-        /// </summary>
-        public bool IsReadOnly => false;
-        /// <summary>
-        /// IsSynchronized
-        /// </summary>
-        bool ICollection.IsSynchronized => false;
-        /// <summary>
-        /// SyncRoot
-        /// </summary>
-        object ICollection.SyncRoot => this;
 
         /// <summary>
         /// Constructor
@@ -51,9 +50,10 @@ namespace NeoVM.Interop.Types.StackItems
         /// <param name="engine">Engine</param>
         /// <param name="isStruct">Is struct?</param>
         internal ArrayStackItem(ExecutionEngine engine, bool isStruct) :
-            base(engine, isStruct ? EStackItemType.Struct : EStackItemType.Array)
+            base(engine, isStruct)
         {
-            CreateNativeItem();
+            Engine = engine;
+            _handle = this.CreateNativeItem();
         }
         /// <summary>
         /// Constructor
@@ -62,10 +62,16 @@ namespace NeoVM.Interop.Types.StackItems
         /// <param name="data">Data</param>
         /// <param name="isStruct">Is struct?</param>
         internal ArrayStackItem(ExecutionEngine engine, IEnumerable<IStackItem> data, bool isStruct) :
-            base(engine, isStruct ? EStackItemType.Struct : EStackItemType.Array)
+            base(engine, isStruct)
         {
-            CreateNativeItem();
-            foreach (IStackItem s in data) Add(s);
+            Engine = engine;
+            _handle = this.CreateNativeItem();
+
+            if (data != null)
+            {
+                foreach (var s in data)
+                    Add(s);
+            }
         }
         /// <summary>
         /// Constructor
@@ -74,161 +80,79 @@ namespace NeoVM.Interop.Types.StackItems
         /// <param name="handle">Handle</param>
         /// <param name="isStruct">Is struct?</param>
         internal ArrayStackItem(ExecutionEngine engine, IntPtr handle, bool isStruct) :
-            base(engine, isStruct ? EStackItemType.Struct : EStackItemType.Array, handle)
-        { }
+            base(engine, isStruct)
+        {
+            Engine = engine;
+            _handle = handle;
+        }
+
+        #region Read
+
+        public override int IndexOf(IStackItem item)
+        {
+            return NeoVM.ArrayStackItem_IndexOf(Handle, ((INativeStackItem)item).Handle);
+        }
+
+        #endregion
 
         #region Write
 
-        public void Add(IStackItem item)
+        public override void Add(IStackItem item)
         {
-            NeoVM.ArrayStackItem_Add(Handle, item.Handle);
+            NeoVM.ArrayStackItem_Add(Handle, ((INativeStackItem)item).Handle);
         }
 
-        public void Add(params IStackItem[] items)
+        public override void Add(params IStackItem[] items)
         {
-            foreach (IStackItem i in items)
-                NeoVM.ArrayStackItem_Add(Handle, i.Handle);
+            foreach (var item in items)
+                NeoVM.ArrayStackItem_Add(Handle, ((INativeStackItem)item).Handle);
         }
 
-        public void Add(IEnumerable<IStackItem> items)
+        public override void Add(IEnumerable<IStackItem> items)
         {
-            foreach (IStackItem i in items)
-                NeoVM.ArrayStackItem_Add(Handle, i.Handle);
+            foreach (var item in items)
+                NeoVM.ArrayStackItem_Add(Handle, ((INativeStackItem)item).Handle);
         }
 
-        public void Clear()
+        public override void Clear()
         {
             NeoVM.ArrayStackItem_Clear(Handle);
         }
 
-        public int IndexOf(IStackItem item)
+        public override void Insert(int index, IStackItem item)
         {
-            return NeoVM.ArrayStackItem_IndexOf(Handle, item.Handle);
+            NeoVM.ArrayStackItem_Insert(Handle, ((INativeStackItem)item).Handle, index);
         }
 
-        public void Insert(int index, IStackItem item)
+        public override void Set(int index, IStackItem item)
         {
-            NeoVM.ArrayStackItem_Insert(Handle, item.Handle, index);
+            NeoVM.ArrayStackItem_Set(Handle, ((INativeStackItem)item).Handle, index);
         }
 
-        public void Set(int index, IStackItem item)
-        {
-            NeoVM.ArrayStackItem_Set(Handle, item.Handle, index);
-        }
-
-        public bool Remove(IStackItem item)
-        {
-            int ix = IndexOf(item);
-            if (ix < 0) return false;
-
-            RemoveAt(ix);
-            return true;
-        }
-
-        public void RemoveAt(int index)
+        public override void RemoveAt(int index)
         {
             NeoVM.ArrayStackItem_RemoveAt(Handle, index);
         }
 
         #endregion
 
-        #region Read
-
-        public bool Equals(ArrayStackItem other)
-        {
-            if (other == null) return false;
-            if (other == this) return true;
-            if (other.Type != Type) return false;
-
-            return this.SequenceEqual(other);
-        }
-
-        public override bool Equals(IStackItem other)
-        {
-            if (!(other is ArrayStackItem st)) return false;
-            if (st.Type != Type) return false;
-
-            return this.SequenceEqual(st);
-        }
-
-        /// <summary>
-        /// Clone
-        /// </summary>
-        /// <returns>Returns copy of this object</returns>
-        public ArrayStackItem Clone()
-        {
-            if (Type == EStackItemType.Struct)
-            {
-                // Struct logic
-
-                List<IStackItem> newArray = new List<IStackItem>(Count);
-
-                foreach (IStackItem it in this)
-                {
-                    if (it is ArrayStackItem s && it.Type == EStackItemType.Struct)
-                        newArray.Add(s.Clone());
-                    else
-                        newArray.Add(it);
-                }
-                return new ArrayStackItem(Engine, newArray, true);
-            }
-            else
-            {
-                return new ArrayStackItem(Engine, this, false);
-            }
-        }
-
-        public bool Contains(IStackItem item)
-        {
-            return IndexOf(item) >= 0;
-        }
-
-        public void CopyTo(Array array, int index)
-        {
-            foreach (IStackItem item in this) array.SetValue(item, index++);
-        }
-
-        public void CopyTo(IStackItem[] array, int index)
-        {
-            foreach (IStackItem item in this) array.SetValue(item, index++);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        public IEnumerator<IStackItem> GetEnumerator()
-        {
-            for (int x = 0, m = Count; x < m; x++)
-                yield return this[x];
-        }
-
-        #endregion
-
-        protected override byte[] GetNativeByteArray()
+        public byte[] GetNativeByteArray()
         {
             return null;
         }
 
-        public override string ToString()
+        #region IDisposable Support
+
+        protected override void Dispose(bool disposing)
         {
-            StringBuilder sb = new StringBuilder();
-            sb.Append("[");
-
-            bool first = true;
-            foreach (IStackItem it in this)
+            lock (this)
             {
-                if (first) first = false;
-                else sb.Append(",");
+                if (_handle == IntPtr.Zero) return;
 
-                sb.Append(it.ToString());
-                it.Dispose();
+                NeoVM.StackItem_Free(ref _handle);
             }
-
-            sb.Append("]");
-
-            return sb.ToString();
         }
+
+        #endregion
     }
 }

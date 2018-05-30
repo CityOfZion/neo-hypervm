@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NeoVM.Interop.Enums;
-using NeoVM.Interop.Types;
+using NeoSharp.VM;
 
 namespace NeoVM.Interop.Tests
 {
@@ -10,11 +9,11 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void THROW()
         {
-            using (ScriptBuilder script = new ScriptBuilder
+            using (var script = new ScriptBuilder
                 (
                 EVMOpCode.THROW
                 ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            using (var engine = CreateEngine(Args))
             {
                 // Load Script
 
@@ -24,7 +23,7 @@ namespace NeoVM.Interop.Tests
 
                 engine.StepInto();
 
-                Assert.AreEqual(EVMState.FAULT, engine.State);
+                Assert.AreEqual(EVMState.Fault, engine.State);
 
                 CheckClean(engine, false);
             }
@@ -35,14 +34,14 @@ namespace NeoVM.Interop.Tests
         {
             // Not throw exception
 
-            using (ScriptBuilder script = new ScriptBuilder
+            using (var script = new ScriptBuilder
                 (
                 EVMOpCode.PUSH0,
                 EVMOpCode.NOT,
                 EVMOpCode.THROWIFNOT,
                 EVMOpCode.RET
                 ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            using (var engine = CreateEngine(Args))
             {
                 // Load Script
 
@@ -57,13 +56,13 @@ namespace NeoVM.Interop.Tests
 
             // Throw exception (with PUSH)
 
-            using (ScriptBuilder script = new ScriptBuilder
+            using (var script = new ScriptBuilder
                 (
                 EVMOpCode.PUSH0,
                 EVMOpCode.THROWIFNOT,
                 EVMOpCode.RET
                 ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            using (var engine = CreateEngine(Args))
             {
                 // Load Script
 
@@ -78,11 +77,11 @@ namespace NeoVM.Interop.Tests
 
             // Throw exception (without PUSH - FAULT)
 
-            using (ScriptBuilder script = new ScriptBuilder
+            using (var script = new ScriptBuilder
                 (
                 EVMOpCode.THROWIFNOT
                 ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            using (var engine = CreateEngine(Args))
             {
                 // Load Script
 

@@ -1,41 +1,48 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using NeoSharp.VM;
+using System;
 using System.Runtime.InteropServices;
 
 namespace NeoVM.Interop.Types.Collections
 {
-    public class ExecutionContextStack : IEnumerable<ExecutionContext>, IDisposable
+    public class ExecutionContextStack : IStack<IExecutionContext>
     {
         /// <summary>
         /// Native handle
         /// </summary>
-        private IntPtr Handle;
+        private IntPtr _handle;
         /// <summary>
         /// Engine
         /// </summary>
-        private readonly ExecutionEngine Engine;
+        public new readonly ExecutionEngine Engine;
 
         /// <summary>
         /// Return the number of items in the stack
         /// </summary>
-        public int Count => NeoVM.ExecutionContextStack_Count(Handle);
+        public override int Count => NeoVM.ExecutionContextStack_Count(_handle);
         /// <summary>
         /// Drop object from the stack
         /// </summary>
         /// <param name="count">Number of items to drop</param>
         /// <returns>Return the first element of the stack</returns>
-        public int Drop(int count = 0)
+        public override int Drop(int count = 0)
         {
-            return NeoVM.ExecutionContextStack_Drop(Handle, count);
+            return NeoVM.ExecutionContextStack_Drop(_handle, count);
         }
+
+        #region Not implemented
+
+        public override IExecutionContext Pop() { throw new NotImplementedException(); }
+        public override void Push(IExecutionContext item) { throw new NotImplementedException(); }
+
+        #endregion
+
         /// <summary>
         /// Try to obtain the element at `index` position, without consume them
         /// </summary>
         /// <param name="index">Index</param>
         /// <param name="obj">Object</param>
         /// <returns>Return tru eif object exists</returns>
-        public bool TryPeek(int index, out ExecutionContext obj)
+        public override bool TryPeek(int index, out IExecutionContext obj)
         {
             if (index < 0)
             {
@@ -43,7 +50,7 @@ namespace NeoVM.Interop.Types.Collections
                 return false;
             }
 
-            IntPtr ptr = NeoVM.ExecutionContextStack_Peek(Handle, index);
+            IntPtr ptr = NeoVM.ExecutionContextStack_Peek(_handle, index);
 
             if (ptr == IntPtr.Zero)
             {
@@ -54,28 +61,16 @@ namespace NeoVM.Interop.Types.Collections
             obj = new ExecutionContext(Engine, ptr);
             return true;
         }
-        /// <summary>
-        /// Obtain the element at `index` position, without consume them
-        /// </summary>
-        /// <param name="index">Index</param>
-        /// <returns>Return object</returns>
-        public ExecutionContext Peek(int index = 0)
-        {
-            if (!TryPeek(index, out ExecutionContext obj))
-                throw new ArgumentOutOfRangeException();
-
-            return obj;
-        }
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="handle">Handle</param>
-        internal ExecutionContextStack(ExecutionEngine engine, IntPtr handle)
+        internal ExecutionContextStack(ExecutionEngine engine, IntPtr handle) : base(engine)
         {
-            Handle = handle;
             Engine = engine;
+            _handle = handle;
 
             if (handle == IntPtr.Zero)
                 throw new ExternalException();
@@ -89,28 +84,12 @@ namespace NeoVM.Interop.Types.Collections
             return Count.ToString();
         }
 
-        #region IEnumerable
-
-        public IEnumerator<ExecutionContext> GetEnumerator()
-        {
-            for (int x = 0, m = Count; x < m; x++)
-                yield return Peek(x);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            for (int x = 0, m = Count; x < m; x++)
-                yield return Peek(x);
-        }
-
-        #endregion
-
         /// <summary>
         /// Free resources
         /// </summary>
-        public void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            Handle = IntPtr.Zero;
+            _handle = IntPtr.Zero;
         }
     }
 }

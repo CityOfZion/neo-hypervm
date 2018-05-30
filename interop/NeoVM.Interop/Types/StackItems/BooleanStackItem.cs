@@ -1,23 +1,39 @@
-﻿using NeoVM.Interop.Enums;
-using NeoVM.Interop.Interfaces;
+﻿using NeoSharp.VM;
+using NeoVM.Interop.Extensions;
+using NeoVM.Interop.Native;
 using System;
 
 namespace NeoVM.Interop.Types.StackItems
 {
-    public class BooleanStackItem : IStackItem<bool>, IEquatable<BooleanStackItem>
+    public class BooleanStackItem : IBooleanStackItem, INativeStackItem
     {
-        static readonly byte[] TRUE = { 1 };
-        static readonly byte[] FALSE = new byte[0];
         static readonly byte[] FALSE_0 = { 0 };
+
+        /// <summary>
+        /// Native Handle
+        /// </summary>
+        IntPtr _handle;
+        /// <summary>
+        /// Native Handle
+        /// </summary>
+        public IntPtr Handle => _handle;
+        /// <summary>
+        /// Is Disposed
+        /// </summary>
+        public override bool IsDisposed => _handle == IntPtr.Zero;
+        /// <summary>
+        /// Type
+        /// </summary>
+        public new EStackItemType Type => base.Type;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="data">Data</param>
-        internal BooleanStackItem(ExecutionEngine engine, bool data) : base(engine, data, EStackItemType.Bool)
+        internal BooleanStackItem(ExecutionEngine engine, bool data) : base(engine, data)
         {
-            CreateNativeItem();
+            _handle = this.CreateNativeItem();
         }
         /// <summary>
         /// Constructor
@@ -25,30 +41,28 @@ namespace NeoVM.Interop.Types.StackItems
         /// <param name="engine">Engine</param>
         /// <param name="handle">Handle</param>
         /// <param name="value">Raw value</param>
-        internal BooleanStackItem(ExecutionEngine engine, IntPtr handle, byte[] value) : base(engine, value[0] == NeoVM.TRUE, EStackItemType.Bool, handle) { }
-
-        public bool Equals(BooleanStackItem other)
+        internal BooleanStackItem(ExecutionEngine engine, IntPtr handle, byte[] value) : base(engine, value[0] == NeoVM.TRUE)
         {
-            return other != null && other.Value == Value;
+            _handle = handle;
         }
 
-        public override bool Equals(IStackItem other)
-        {
-            if (other is BooleanStackItem b)
-                return b.Value == Value;
-
-            return false;
-        }
-
-        public override bool CanConvertToByteArray => true;
-        public override byte[] ToByteArray()
-        {
-            return Value ? TRUE : FALSE;
-        }
-
-        protected override byte[] GetNativeByteArray()
+        public byte[] GetNativeByteArray()
         {
             return Value ? TRUE : FALSE_0;
         }
+
+        #region IDisposable Support
+
+        protected override void Dispose(bool disposing)
+        {
+            lock (this)
+            {
+                if (_handle == IntPtr.Zero) return;
+
+                NeoVM.StackItem_Free(ref _handle);
+            }
+        }
+
+        #endregion
     }
 }

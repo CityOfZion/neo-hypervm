@@ -1,7 +1,5 @@
-﻿using NeoVM.Interop.Enums;
-using NeoVM.Interop.Helpers;
-using NeoVM.Interop.Interfaces;
-using NeoVM.Interop.Types.Arguments;
+﻿using NeoSharp.VM;
+using NeoVM.Interop.Extensions;
 using NeoVM.Interop.Types.Collections;
 using NeoVM.Interop.Types.StackItems;
 using System;
@@ -11,7 +9,7 @@ using System.Runtime.InteropServices;
 
 namespace NeoVM.Interop.Types
 {
-    public unsafe class ExecutionEngine : IDisposable
+    public unsafe class ExecutionEngine : IExecutionEngine
     {
         #region Delegates
 
@@ -33,61 +31,37 @@ namespace NeoVM.Interop.Types
         /// Last message
         /// </summary>
         byte[] LastMessage;
-        /// <summary>
-        /// Trigger
-        /// </summary>
-        public readonly ETriggerType Trigger;
-        /// <summary>
-        /// Interop service
-        /// </summary>
-        public readonly InteropService InteropService;
-        /// <summary>
-        /// Script table
-        /// </summary>
-        public readonly IScriptTable ScriptTable;
+
+        IStackItemsStack _ResultStack;
+        IStack<IExecutionContext> _InvocationStack;
+
         /// <summary>
         /// Is Disposed
         /// </summary>
-        public bool IsDisposed => Handle == IntPtr.Zero;
+        public override bool IsDisposed => Handle == IntPtr.Zero;
 
-        /// <summary>
-        /// Logger
-        /// </summary>
-        public readonly ExecutionEngineLogger Logger;
-        /// <summary>
-        /// Message Provider
-        /// </summary>
-        public readonly IMessageProvider MessageProvider;
         /// <summary>
         /// Invocation Stack
         /// </summary>
-        public readonly ExecutionContextStack InvocationStack;
+        public override IStack<IExecutionContext> InvocationStack => _InvocationStack;
         /// <summary>
         /// Result Stack
         /// </summary>
-        public readonly StackItemStack ResultStack;
+        public override IStackItemsStack ResultStack => _ResultStack;
         /// <summary>
         /// Virtual Machine State
         /// </summary>
-        public EVMState State => (EVMState)NeoVM.ExecutionEngine_GetState(Handle);
+        public override EVMState State => (EVMState)NeoVM.ExecutionEngine_GetState(Handle);
         /// <summary>
         /// Interop Cache
         /// </summary>
         internal readonly List<object> InteropCache;
 
-        #region Shortcuts
-
-        public ExecutionContext CurrentContext => InvocationStack.TryPeek(0, out ExecutionContext i) ? i : null;
-        public ExecutionContext CallingContext => InvocationStack.TryPeek(1, out ExecutionContext i) ? i : null;
-        public ExecutionContext EntryContext => InvocationStack.TryPeek(InvocationStack.Count - 1, out ExecutionContext i) ? i : null;
-
-        #endregion
-
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="e">Arguments</param>
-        public ExecutionEngine(ExecutionEngineArgs e)
+        public ExecutionEngine(ExecutionEngineArgs e) : base(e)
         {
             _InternalInvokeInterop = new NeoVM.InvokeInteropCallback(InternalInvokeInterop);
             _InternalLoadScript = new NeoVM.LoadScriptCallback(InternalLoadScript);
@@ -103,43 +77,27 @@ namespace NeoVM.Interop.Types
             if (Handle == IntPtr.Zero)
                 throw (new ExternalException());
 
-            InvocationStack = new ExecutionContextStack(this, invHandle);
-            ResultStack = new StackItemStack(this, resHandle);
+            _InvocationStack = new ExecutionContextStack(this, invHandle);
+            _ResultStack = new StackItemStack(this, resHandle);
 
-            if (e != null)
+            if (Logger != null)
             {
-                InteropService = e.InteropService;
-                ScriptTable = e.ScriptTable;
-                MessageProvider = e.MessageProvider;
-                Trigger = e.Trigger;
-
-                // Register logs
-
-                if (e.Logger != null)
+                if (Logger.Verbosity.HasFlag(ELogVerbosity.StepInto))
                 {
-                    Logger = e.Logger;
-
-                    if (Logger.Verbosity.HasFlag(ELogVerbosity.StepInto))
-                    {
-                        _InternalOnStepInto = new NeoVM.OnStepIntoCallback(InternalOnStepInto);
-                        NeoVM.ExecutionEngine_AddLog(Handle, _InternalOnStepInto);
-                    }
-
-                    if (Logger.Verbosity.HasFlag(ELogVerbosity.ExecutionContextStackChanges))
-                    {
-                        _InternalOnExecutionContextChange = new NeoVM.OnStackChangeCallback(InternalOnExecutionContextChange);
-                        NeoVM.ExecutionContextStack_AddLog(invHandle, _InternalOnExecutionContextChange);
-                    }
-
-                    if (Logger.Verbosity.HasFlag(ELogVerbosity.ResultStackChanges))
-                    {
-                        _InternalOnResultStackChange = new NeoVM.OnStackChangeCallback(InternalOnResultStackChange);
-                        NeoVM.StackItems_AddLog(resHandle, _InternalOnResultStackChange);
-                    }
+                    _InternalOnStepInto = new NeoVM.OnStepIntoCallback(InternalOnStepInto);
+                    NeoVM.ExecutionEngine_AddLog(Handle, _InternalOnStepInto);
                 }
-                else
+
+                if (Logger.Verbosity.HasFlag(ELogVerbosity.ExecutionContextStackChanges))
                 {
-                    Logger = null;
+                    _InternalOnExecutionContextChange = new NeoVM.OnStackChangeCallback(InternalOnExecutionContextChange);
+                    NeoVM.ExecutionContextStack_AddLog(invHandle, _InternalOnExecutionContextChange);
+                }
+
+                if (Logger.Verbosity.HasFlag(ELogVerbosity.ResultStackChanges))
+                {
+                    _InternalOnResultStackChange = new NeoVM.OnStackChangeCallback(InternalOnResultStackChange);
+                    NeoVM.StackItems_AddLog(resHandle, _InternalOnResultStackChange);
                 }
             }
         }
@@ -150,7 +108,7 @@ namespace NeoVM.Interop.Types
         /// <param name="it">Context</param>
         void InternalOnStepInto(IntPtr it)
         {
-            using (ExecutionContext context = new ExecutionContext(this, it))
+            using (var context = new ExecutionContext(this, it))
                 Logger.RaiseOnStepInto(context);
         }
         /// <summary>
@@ -161,7 +119,7 @@ namespace NeoVM.Interop.Types
         /// <param name="operation">Operation</param>
         void InternalOnExecutionContextChange(IntPtr it, int index, byte operation)
         {
-            using (ExecutionContext context = new ExecutionContext(this, it))
+            using (var context = new ExecutionContext(this, it))
                 Logger.RaiseOnExecutionContextChange(InvocationStack, context, index, (ELogStackOperation)operation);
         }
         /// <summary>
@@ -172,7 +130,7 @@ namespace NeoVM.Interop.Types
         /// <param name="operation">Operation</param>
         void InternalOnResultStackChange(IntPtr item, int index, byte operation)
         {
-            using (IStackItem it = ConvertFromNative(item))
+            using (var it = this.ConvertFromNative(item))
                 Logger.RaiseOnResultStackChange(ResultStack, it, index, (ELogStackOperation)operation);
         }
         /// <summary>
@@ -259,7 +217,7 @@ namespace NeoVM.Interop.Types
         /// </summary>
         /// <param name="script">Script</param>
         /// <returns>Script index in script cache</returns>
-        public int LoadScript(byte[] script)
+        public override int LoadScript(byte[] script)
         {
             fixed (byte* p = script)
             {
@@ -272,7 +230,7 @@ namespace NeoVM.Interop.Types
         /// </summary>
         /// <param name="scriptIndex">Script Index</param>
         /// <returns>True if is loaded</returns>
-        public bool LoadScript(int scriptIndex)
+        public override bool LoadScript(int scriptIndex)
         {
             return NeoVM.ExecutionEngine_LoadCachedScript(Handle, scriptIndex, -1) == NeoVM.TRUE;
         }
@@ -285,29 +243,22 @@ namespace NeoVM.Interop.Types
         /// Clean Execution engine state
         /// </summary>
         /// <param name="iteration">Iteration</param>
-        public void Clean(uint iteration = 0)
+        public override void Clean(uint iteration = 0)
         {
             NeoVM.ExecutionEngine_Clean(Handle, iteration);
         }
         /// <summary>
         /// Execute
         /// </summary>
-        public bool Execute()
+        public override bool Execute()
         {
             return NeoVM.ExecutionEngine_Execute(Handle) == NeoVM.TRUE;
         }
         /// <summary>
         /// Step Into
         /// </summary>
-        public void StepInto()
-        {
-            NeoVM.ExecutionEngine_StepInto(Handle);
-        }
-        /// <summary>
-        /// Step Into
-        /// </summary>
         /// <param name="steps">Steps</param>
-        public void StepInto(int steps)
+        public override void StepInto(int steps = 1)
         {
             for (int x = 0; x < steps; x++)
                 NeoVM.ExecutionEngine_StepInto(Handle);
@@ -315,14 +266,14 @@ namespace NeoVM.Interop.Types
         /// <summary>
         /// Step Out
         /// </summary>
-        public void StepOut()
+        public override void StepOut()
         {
             NeoVM.ExecutionEngine_StepOut(Handle);
         }
         /// <summary>
         /// Step Over
         /// </summary>
-        public void StepOver()
+        public override void StepOver()
         {
             NeoVM.ExecutionEngine_StepOver(Handle);
         }
@@ -332,87 +283,17 @@ namespace NeoVM.Interop.Types
         #region Create items
 
         /// <summary>
-        /// Convert native pointer to stack item
-        /// </summary>
-        /// <param name="item">Item</param>
-        /// <returns>Return StackItem</returns>
-        internal IStackItem ConvertFromNative(IntPtr item)
-        {
-            if (item == IntPtr.Zero) return null;
-
-            EStackItemType state = (EStackItemType)NeoVM.StackItem_SerializeInfo(item, out int size);
-            if (state == EStackItemType.None) return null;
-
-            int readed;
-            byte[] payload;
-
-            if (size > 0)
-            {
-                payload = new byte[size];
-                fixed (byte* p = payload)
-                {
-                    readed = NeoVM.StackItem_Serialize(item, (IntPtr)p, size);
-                }
-            }
-            else
-            {
-                readed = 0;
-                payload = null;
-            }
-
-            switch (state)
-            {
-                case EStackItemType.Array: return new ArrayStackItem(this, item, false);
-                case EStackItemType.Struct: return new ArrayStackItem(this, item, true);
-                case EStackItemType.Map: return new MapStackItem(this, item);
-                case EStackItemType.Interop:
-                    {
-                        // Extract object
-
-                        return new InteropStackItem(this, item, BitHelper.ToInt32(payload, 0));
-                    }
-                case EStackItemType.ByteArray: return new ByteArrayStackItem(this, item, payload ?? (new byte[] { }));
-                case EStackItemType.Integer:
-                    {
-                        if (readed != size)
-                        {
-                            // TODO: Try to fix this issue with BigInteger
-                            Array.Resize(ref payload, readed);
-                        }
-
-                        return new IntegerStackItem(this, item, payload ?? (new byte[] { }));
-                    }
-                case EStackItemType.Bool: return new BooleanStackItem(this, item, payload ?? (new byte[] { }));
-                default: throw new ExternalException();
-            }
-        }
-
-        /// <summary>
         /// Create Map StackItem
         /// </summary>
-        public MapStackItem CreateMap()
+        public override IMapStackItem CreateMap()
         {
             return new MapStackItem(this);
         }
         /// <summary>
         /// Create Array StackItem
         /// </summary>
-        public ArrayStackItem CreateArray()
-        {
-            return new ArrayStackItem(this, false);
-        }
-        /// <summary>
-        /// Create Struct StackItem
-        /// </summary>
-        public ArrayStackItem CreateStruct()
-        {
-            return new ArrayStackItem(this, true);
-        }
-        /// <summary>
-        /// Create Array StackItem
-        /// </summary>
         /// <param name="items">Items</param>
-        public ArrayStackItem CreateArray(IEnumerable<IStackItem> items)
+        public override IArrayStackItem CreateArray(IEnumerable<IStackItem> items = null)
         {
             return new ArrayStackItem(this, items, false);
         }
@@ -420,7 +301,7 @@ namespace NeoVM.Interop.Types
         /// Create Struct StackItem
         /// </summary>
         /// <param name="items">Items</param>
-        public ArrayStackItem CreateStruct(IEnumerable<IStackItem> items)
+        public override IArrayStackItem CreateStruct(IEnumerable<IStackItem> items = null)
         {
             return new ArrayStackItem(this, items, true);
         }
@@ -428,7 +309,7 @@ namespace NeoVM.Interop.Types
         /// Create ByteArrayStackItem
         /// </summary>
         /// <param name="data">Buffer</param>
-        public ByteArrayStackItem CreateByteArray(byte[] data)
+        public override IByteArrayStackItem CreateByteArray(byte[] data)
         {
             return new ByteArrayStackItem(this, data);
         }
@@ -436,7 +317,7 @@ namespace NeoVM.Interop.Types
         /// Create InteropStackItem
         /// </summary>
         /// <param name="obj">Object</param>
-        public InteropStackItem CreateInterop(object obj)
+        public override IInteropStackItem CreateInterop(object obj)
         {
             return new InteropStackItem(this, obj);
         }
@@ -444,7 +325,7 @@ namespace NeoVM.Interop.Types
         /// Create BooleanStackItem
         /// </summary>
         /// <param name="value">Value</param>
-        public BooleanStackItem CreateBool(bool value)
+        public override IBooleanStackItem CreateBool(bool value)
         {
             return new BooleanStackItem(this, value);
         }
@@ -452,7 +333,7 @@ namespace NeoVM.Interop.Types
         /// Create IntegerStackItem
         /// </summary>
         /// <param name="value">Value</param>
-        public IntegerStackItem CreateInteger(int value)
+        public override IIntegerStackItem CreateInteger(int value)
         {
             return new IntegerStackItem(this, value);
         }
@@ -460,7 +341,7 @@ namespace NeoVM.Interop.Types
         /// Create IntegerStackItem
         /// </summary>
         /// <param name="value">Value</param>
-        public IntegerStackItem CreateInteger(long value)
+        public override IIntegerStackItem CreateInteger(long value)
         {
             return new IntegerStackItem(this, value);
         }
@@ -468,7 +349,7 @@ namespace NeoVM.Interop.Types
         /// Create IntegerStackItem
         /// </summary>
         /// <param name="value">Value</param>
-        public IntegerStackItem CreateInteger(BigInteger value)
+        public override IIntegerStackItem CreateInteger(BigInteger value)
         {
             return new IntegerStackItem(this, value);
         }
@@ -476,7 +357,7 @@ namespace NeoVM.Interop.Types
         /// Create IntegerStackItem
         /// </summary>
         /// <param name="value">Value</param>
-        public IntegerStackItem CreateInteger(byte[] value)
+        public override IIntegerStackItem CreateInteger(byte[] value)
         {
             return new IntegerStackItem(this, value);
         }
@@ -485,7 +366,7 @@ namespace NeoVM.Interop.Types
 
         #region IDisposable Support
 
-        protected virtual void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (Handle == IntPtr.Zero) return;
 
@@ -493,7 +374,7 @@ namespace NeoVM.Interop.Types
             {
                 // Clear interop cache
 
-                foreach (object v in InteropCache)
+                foreach (var v in InteropCache)
                     if (v is IDisposable dsp)
                         dsp.Dispose();
 
@@ -503,21 +384,6 @@ namespace NeoVM.Interop.Types
             // free unmanaged resources (unmanaged objects) and override a finalizer below. set large fields to null.
             ResultStack.Dispose();
             NeoVM.ExecutionEngine_Free(ref Handle);
-        }
-
-        ~ExecutionEngine()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(false);
-        }
-
-        // This code added to correctly implement the disposable pattern.
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
-            // uncomment the following line if the finalizer is overridden above.
-            GC.SuppressFinalize(this);
         }
 
         #endregion

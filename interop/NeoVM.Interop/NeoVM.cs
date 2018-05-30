@@ -1,7 +1,7 @@
-﻿using NeoVM.Interop.Interfaces;
+﻿using NeoSharp.VM;
+using NeoVM.Interop.Interfaces;
 using NeoVM.Interop.Native;
 using NeoVM.Interop.Types;
-using NeoVM.Interop.Types.Arguments;
 using System;
 using System.IO;
 using System.Linq;
@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 
 namespace NeoVM.Interop
 {
-    public static class NeoVM
+    public class NeoVM : IVMFactory
     {
         internal const byte TRUE = 0x01;
         internal const byte FALSE = 0x00;
@@ -249,7 +249,7 @@ namespace NeoVM.Interop
         /// Create new Execution Engine
         /// </summary>
         /// <param name="e">Arguments</param>
-        public static ExecutionEngine CreateEngine(ExecutionEngineArgs e)
+        public IExecutionEngine Create(ExecutionEngineArgs e)
         {
             return new ExecutionEngine(e);
         }

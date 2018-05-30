@@ -1,9 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NeoVM.Interop.Enums;
+using NeoSharp.VM;
 using NeoVM.Interop.Tests.Extra;
-using NeoVM.Interop.Types;
-using NeoVM.Interop.Types.Arguments;
-using NeoVM.Interop.Types.Collections;
 using NeoVM.Interop.Types.StackItems;
 using System;
 using System.Collections.Generic;
@@ -16,15 +13,28 @@ namespace NeoVM.Interop.Tests
 {
     public class VMOpCodeTest
     {
-        const bool CalculateNumericalTimes = false;
+        private const bool CalculateNumericalTimes = false;
+        private IVMFactory _VMFactory;
 
         [TestInitialize]
         public void TestInitialize()
         {
+            _VMFactory = new NeoVM();
+
             Console.WriteLine("Native Library Info");
             Console.WriteLine("  Path: " + NeoVM.LibraryPath);
             Console.WriteLine("  Version: " + NeoVM.LibraryVersion);
             Console.WriteLine("");
+        }
+
+        /// <summary>
+        /// Create new Engine
+        /// </summary>
+        /// <param name="args">Arguments</param>
+        /// <returns>Return new engine</returns>
+        public IExecutionEngine CreateEngine(ExecutionEngineArgs args)
+        {
+            return _VMFactory.Create(args);
         }
 
         /// <summary>
@@ -80,7 +90,7 @@ namespace NeoVM.Interop.Tests
         {
             List<BigInteger> ret = new List<BigInteger>();
 
-            foreach (BigInteger bi in TestBigIntegers)
+            foreach (var bi in TestBigIntegers)
             {
                 // Equal
                 ret.Add(bi);
@@ -109,7 +119,7 @@ namespace NeoVM.Interop.Tests
             BigInteger[] ar = IntSingleIteration().ToArray();
             List<BigIntegerPair> ret = new List<BigIntegerPair>();
 
-            foreach (BigInteger ba in ar) foreach (BigInteger bb in ar)
+            foreach (var ba in ar) foreach (var bb in ar)
                     ret.Add(new BigIntegerPair(ba, bb));
 
             // Invert all values
@@ -124,12 +134,12 @@ namespace NeoVM.Interop.Tests
         /// </summary>
         /// <param name="operand">Operand</param>
         /// <param name="check">Check</param>
-        protected void InternalTestBigInteger(EVMOpCode operand, Action<ExecutionEngine, BigInteger, BigInteger, CancelEventArgs> check)
+        protected void InternalTestBigInteger(EVMOpCode operand, Action<IExecutionEngine, BigInteger, BigInteger, CancelEventArgs> check)
         {
             // Test without push
 
-            using (ScriptBuilder script = new ScriptBuilder(operand))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            using (var script = new ScriptBuilder(operand))
+            using (var engine = CreateEngine(Args))
             {
                 // Load script
 
@@ -146,14 +156,14 @@ namespace NeoVM.Interop.Tests
 
             // Test with wrong type
 
-            using (ScriptBuilder script = new ScriptBuilder
+            using (var script = new ScriptBuilder
                 (
                 EVMOpCode.PUSH1,
                 EVMOpCode.PUSH1,
                 EVMOpCode.NEWARRAY,
                 operand
                 ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            using (var engine = CreateEngine(Args))
             {
                 // Load script
 
@@ -182,10 +192,10 @@ namespace NeoVM.Interop.Tests
 
             // Test with push
 
-            foreach (BigIntegerPair pair in IntPairIteration())
+            foreach (var pair in IntPairIteration())
             {
-                using (ScriptBuilder script = new ScriptBuilder())
-                using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+                using (var script = new ScriptBuilder())
+                using (var engine = CreateEngine(Args))
                 {
                     // Make the script
 
@@ -240,7 +250,7 @@ namespace NeoVM.Interop.Tests
 
                     // RET
 
-                    Assert.AreEqual(EVMState.HALT, engine.State);
+                    Assert.AreEqual(EVMState.Halt, engine.State);
 
                     // Check
 
@@ -250,10 +260,10 @@ namespace NeoVM.Interop.Tests
 
             // Test with dup
 
-            foreach (BigInteger i in IntSingleIteration())
+            foreach (var i in IntSingleIteration())
             {
-                using (ScriptBuilder script = new ScriptBuilder())
-                using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+                using (var script = new ScriptBuilder())
+                using (var engine = CreateEngine(Args))
                 {
                     // Make the script
 
@@ -305,7 +315,7 @@ namespace NeoVM.Interop.Tests
 
                     // RET
                     engine.StepInto();
-                    Assert.AreEqual(EVMState.HALT, engine.State);
+                    Assert.AreEqual(EVMState.Halt, engine.State);
 
                     // Check
 
@@ -318,12 +328,12 @@ namespace NeoVM.Interop.Tests
         /// </summary>
         /// <param name="operand">Operand</param>
         /// <param name="check">Check</param>
-        protected void InternalTestBigInteger(EVMOpCode operand, Action<ExecutionEngine, BigInteger, CancelEventArgs> check)
+        protected void InternalTestBigInteger(EVMOpCode operand, Action<IExecutionEngine, BigInteger, CancelEventArgs> check)
         {
             // Test without push
 
-            using (ScriptBuilder script = new ScriptBuilder(operand))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            using (var script = new ScriptBuilder(operand))
+            using (var engine = CreateEngine(Args))
             {
                 // Load script
 
@@ -340,13 +350,13 @@ namespace NeoVM.Interop.Tests
 
             // Test with wrong type
 
-            using (ScriptBuilder script = new ScriptBuilder
+            using (var script = new ScriptBuilder
                 (
                 EVMOpCode.PUSH1,
                 EVMOpCode.NEWARRAY,
                 operand
                 ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            using (var engine = CreateEngine(Args))
             {
                 // Load script
 
@@ -365,10 +375,10 @@ namespace NeoVM.Interop.Tests
 
             Stopwatch sw = new Stopwatch();
 
-            foreach (BigInteger bi in IntSingleIteration())
+            foreach (var bi in IntSingleIteration())
             {
-                using (ScriptBuilder script = new ScriptBuilder())
-                using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+                using (var script = new ScriptBuilder())
+                using (var engine = CreateEngine(Args))
                 {
                     // Make the script
 
@@ -411,7 +421,7 @@ namespace NeoVM.Interop.Tests
 
                     // RET
                     engine.StepInto();
-                    Assert.AreEqual(EVMState.HALT, engine.State);
+                    Assert.AreEqual(EVMState.Halt, engine.State);
 
                     // Check
 
@@ -424,7 +434,7 @@ namespace NeoVM.Interop.Tests
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="invocationStack">True for Check invocationStack</param>
-        protected void CheckClean(ExecutionEngine engine, bool invocationStack = true)
+        protected void CheckClean(IExecutionEngine engine, bool invocationStack = true)
         {
             Assert.AreEqual(0, engine.ResultStack.Count);
 
@@ -436,7 +446,7 @@ namespace NeoVM.Interop.Tests
             {
                 if (engine.CurrentContext == null)
                 {
-                    Assert.AreEqual(EVMState.HALT, engine.State);
+                    Assert.AreEqual(EVMState.Halt, engine.State);
                 }
                 else
                 {
@@ -453,9 +463,9 @@ namespace NeoVM.Interop.Tests
         /// <param name="isStruct">Is struct</param>
         /// <param name="count">Count</param>
         /// <param name="values">Values</param>
-        protected void CheckArrayPeek(StackItemStack stack, int index, bool isStruct, params object[] values)
+        protected void CheckArrayPeek(IStackItemsStack stack, int index, bool isStruct, params object[] values)
         {
-            using (ArrayStackItem arr = stack.Peek<ArrayStackItem>(index))
+            using (var arr = stack.Peek<IArrayStackItem>(index))
             {
                 Assert.IsTrue(arr != null);
                 Assert.AreEqual(isStruct, arr.IsStruct);
@@ -468,9 +478,9 @@ namespace NeoVM.Interop.Tests
         /// <param name="stack">Stack</param>
         /// <param name="isStruct">Is struct</param>
         /// <param name="values">Values</param>
-        protected void CheckArrayPop(StackItemStack stack, bool isStruct, params object[] values)
+        protected void CheckArrayPop(IStackItemsStack stack, bool isStruct, params object[] values)
         {
-            using (ArrayStackItem arr = stack.Pop<ArrayStackItem>())
+            using (var arr = stack.Pop<IArrayStackItem>())
             {
                 Assert.IsTrue(arr != null);
                 CheckArray(arr, isStruct, values);
@@ -482,7 +492,7 @@ namespace NeoVM.Interop.Tests
         /// <param name="arr">Array</param>
         /// <param name="isStruct">Is struct</param>
         /// <param name="values">Values</param>
-        protected void CheckArray(ArrayStackItem arr, bool isStruct, params object[] values)
+        protected void CheckArray(IArrayStackItem arr, bool isStruct, params object[] values)
         {
             Assert.AreEqual(isStruct, arr.IsStruct);
             Assert.IsTrue(arr.Count == values.Length);
@@ -493,14 +503,14 @@ namespace NeoVM.Interop.Tests
 
                 if (val is Int32)
                 {
-                    Assert.IsTrue(arr[x] is IntegerStackItem);
-                    IntegerStackItem i = arr[x] as IntegerStackItem;
+                    Assert.IsTrue(arr[x] is IIntegerStackItem);
+                    var i = arr[x] as IIntegerStackItem;
                     Assert.AreEqual(i.Value, (int)values[x]);
                 }
                 else if (val is bool)
                 {
-                    Assert.IsTrue(arr[x] is BooleanStackItem);
-                    BooleanStackItem i = arr[x] as BooleanStackItem;
+                    Assert.IsTrue(arr[x] is IBooleanStackItem);
+                    var i = arr[x] as IBooleanStackItem;
                     Assert.AreEqual(i.Value, (bool)values[x]);
                 }
                 else

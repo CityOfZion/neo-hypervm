@@ -1,8 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NeoVM.Interop.Enums;
+using NeoSharp.VM;
 using NeoVM.Interop.Tests.Crypto;
 using NeoVM.Interop.Types;
-using NeoVM.Interop.Types.Arguments;
 using NeoVM.Interop.Types.StackItems;
 using System.Linq;
 using System.Security.Cryptography;
@@ -21,14 +20,14 @@ namespace NeoVM.Interop.Tests
 
                 try
                 {
-                    using (SHA1 sha = System.Security.Cryptography.SHA1.Create())
+                    using (var sha = System.Security.Cryptography.SHA1.Create())
                     {
                         hash = sha.ComputeHash(a == 0 ? new byte[] { } : a.ToByteArray());
                     }
                 }
                 catch
                 {
-                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    Assert.AreEqual(engine.State, EVMState.Fault);
                     cancel.Cancel = true;
                     return;
                 }
@@ -46,14 +45,14 @@ namespace NeoVM.Interop.Tests
 
                 try
                 {
-                    using (SHA256 sha = System.Security.Cryptography.SHA256.Create())
+                    using (var sha = System.Security.Cryptography.SHA256.Create())
                     {
                         hash = sha.ComputeHash(a == 0 ? new byte[] { } : a.ToByteArray());
                     }
                 }
                 catch
                 {
-                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    Assert.AreEqual(engine.State, EVMState.Fault);
                     cancel.Cancel = true;
                     return;
                 }
@@ -71,8 +70,8 @@ namespace NeoVM.Interop.Tests
 
                 try
                 {
-                    using (SHA256 sha = System.Security.Cryptography.SHA256.Create())
-                    using (RIPEMD160Managed ripe = new RIPEMD160Managed())
+                    using (var sha = System.Security.Cryptography.SHA256.Create())
+                    using (var ripe = new RIPEMD160Managed())
                     {
                         hash = sha.ComputeHash(a == 0 ? new byte[] { } : a.ToByteArray());
                         hash = ripe.ComputeHash(hash);
@@ -80,7 +79,7 @@ namespace NeoVM.Interop.Tests
                 }
                 catch
                 {
-                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    Assert.AreEqual(engine.State, EVMState.Fault);
                     cancel.Cancel = true;
                     return;
                 }
@@ -98,7 +97,7 @@ namespace NeoVM.Interop.Tests
 
                 try
                 {
-                    using (SHA256 sha = System.Security.Cryptography.SHA256.Create())
+                    using (var sha = System.Security.Cryptography.SHA256.Create())
                     {
                         hash = sha.ComputeHash(a == 0 ? new byte[] { } : a.ToByteArray());
                         hash = sha.ComputeHash(hash);
@@ -106,7 +105,7 @@ namespace NeoVM.Interop.Tests
                 }
                 catch
                 {
-                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    Assert.AreEqual(engine.State, EVMState.Fault);
                     cancel.Cancel = true;
                     return;
                 }
@@ -120,12 +119,12 @@ namespace NeoVM.Interop.Tests
         {
             // Without push
 
-            using (ScriptBuilder script = new ScriptBuilder
+            using (var script = new ScriptBuilder
                 (
                 EVMOpCode.PUSH5,
                 EVMOpCode.CHECKSIG
                 ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            using (var engine = CreateEngine(Args))
             {
                 // Load script
 
@@ -144,8 +143,8 @@ namespace NeoVM.Interop.Tests
 
             // Without get message
 
-            using (ScriptBuilder script = new ScriptBuilder())
-            using (ExecutionEngine engine = NeoVM.CreateEngine(new ExecutionEngineArgs()))
+            using (var script = new ScriptBuilder())
+            using (var engine = CreateEngine(new ExecutionEngineArgs()))
             {
                 // Load script
 
@@ -178,13 +177,13 @@ namespace NeoVM.Interop.Tests
 
             // Without valid push
 
-            using (ScriptBuilder script = new ScriptBuilder
+            using (var script = new ScriptBuilder
                 (
                 EVMOpCode.PUSH5,
                 EVMOpCode.PUSH6,
                 EVMOpCode.CHECKSIG
                 ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            using (var engine = CreateEngine(Args))
             {
                 // Load script
 
@@ -203,7 +202,7 @@ namespace NeoVM.Interop.Tests
 
             // Real test
 
-            foreach (bool value in new bool[] { true, false, true, true, false, true, true, false, false, false })
+            foreach (var value in new bool[] { true, false, true, true, false, true, true, false, false, false })
             {
                 // Get data
 
@@ -213,7 +212,7 @@ namespace NeoVM.Interop.Tests
 
                 byte[] publicKey, signature;
 
-                using (CngKey hkey = CngKey.Create(CngAlgorithm.ECDsaP256, null, new CngKeyCreationParameters()
+                using (var hkey = CngKey.Create(CngAlgorithm.ECDsaP256, null, new CngKeyCreationParameters()
                 {
                     KeyCreationOptions = CngKeyCreationOptions.None,
                     KeyUsage = CngKeyUsages.AllUsages,
@@ -221,7 +220,7 @@ namespace NeoVM.Interop.Tests
                     Provider = CngProvider.MicrosoftSoftwareKeyStorageProvider,
                     UIPolicy = new CngUIPolicy(CngUIProtectionLevels.None),
                 }))
-                using (ECDsaCng sign = new ECDsaCng(hkey)
+                using (var sign = new ECDsaCng(hkey)
                 {
                     HashAlgorithm = CngAlgorithm.Sha256
                 })
@@ -237,8 +236,8 @@ namespace NeoVM.Interop.Tests
                     signature[0] = (byte)(signature[0] == 0xFF ? 0x00 : signature[0] + 0x01);
                 }
 
-                using (ScriptBuilder script = new ScriptBuilder())
-                using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+                using (var script = new ScriptBuilder())
+                using (var engine = CreateEngine(Args))
                 {
                     // Load script
 
@@ -266,12 +265,12 @@ namespace NeoVM.Interop.Tests
         {
             // Without push
 
-            using (ScriptBuilder script = new ScriptBuilder
+            using (var script = new ScriptBuilder
                 (
                 EVMOpCode.PUSH5,
                 EVMOpCode.VERIFY
                 ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            using (var engine = CreateEngine(Args))
             {
                 // Load script
 
@@ -290,14 +289,14 @@ namespace NeoVM.Interop.Tests
 
             // Without valid push
 
-            using (ScriptBuilder script = new ScriptBuilder
+            using (var script = new ScriptBuilder
                 (
                 EVMOpCode.PUSH5,
                 EVMOpCode.PUSH6,
                 EVMOpCode.PUSH6,
                 EVMOpCode.VERIFY
                 ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            using (var engine = CreateEngine(Args))
             {
                 // Load script
 
@@ -316,7 +315,7 @@ namespace NeoVM.Interop.Tests
 
             // Real test
 
-            foreach (bool value in new bool[] { true, false, true, true, false, true, true, false, false, false })
+            foreach (var value in new bool[] { true, false, true, true, false, true, true, false, false, false })
             {
                 // Get data
 
@@ -326,7 +325,7 @@ namespace NeoVM.Interop.Tests
 
                 byte[] publicKey, signature;
 
-                using (CngKey hkey = CngKey.Create(CngAlgorithm.ECDsaP256, null, new CngKeyCreationParameters()
+                using (var hkey = CngKey.Create(CngAlgorithm.ECDsaP256, null, new CngKeyCreationParameters()
                 {
                     KeyCreationOptions = CngKeyCreationOptions.None,
                     KeyUsage = CngKeyUsages.AllUsages,
@@ -334,7 +333,7 @@ namespace NeoVM.Interop.Tests
                     Provider = CngProvider.MicrosoftSoftwareKeyStorageProvider,
                     UIPolicy = new CngUIPolicy(CngUIProtectionLevels.None),
                 }))
-                using (ECDsaCng sign = new ECDsaCng(hkey)
+                using (var sign = new ECDsaCng(hkey)
                 {
                     HashAlgorithm = CngAlgorithm.Sha256
                 })
@@ -350,8 +349,8 @@ namespace NeoVM.Interop.Tests
                     signature[0] = (byte)(signature[0] == 0xFF ? 0x00 : signature[0] + 0x01);
                 }
 
-                using (ScriptBuilder script = new ScriptBuilder())
-                using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+                using (var script = new ScriptBuilder())
+                using (var engine = CreateEngine(Args))
                 {
                     // Load script
 

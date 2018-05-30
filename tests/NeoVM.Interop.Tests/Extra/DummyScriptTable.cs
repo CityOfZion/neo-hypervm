@@ -1,5 +1,4 @@
-﻿using NeoVM.Interop.Enums;
-using NeoVM.Interop.Interfaces;
+﻿using NeoSharp.VM;
 using System.Linq;
 
 namespace NeoVM.Interop.Tests.Extra

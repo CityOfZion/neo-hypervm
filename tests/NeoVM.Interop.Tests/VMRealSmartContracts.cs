@@ -1,8 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NeoVM.Interop.Enums;
+using NeoSharp.VM;
 using NeoVM.Interop.Tests.Extra;
-using NeoVM.Interop.Types;
-using NeoVM.Interop.Types.Arguments;
 using NeoVM.Interop.Types.StackItems;
 using System;
 
@@ -173,7 +171,7 @@ namespace NeoVM.Interop.Tests
 
             // Create arguments
 
-            ExecutionEngineArgs args = new ExecutionEngineArgs()
+            var args = new ExecutionEngineArgs()
             {
                 InteropService = new DummyInteropService(),
                 ScriptTable = new DummyScriptTable(),
@@ -199,8 +197,8 @@ namespace NeoVM.Interop.Tests
             args.InteropService.OnNotify += (sender, e) =>
             { Console.WriteLine("Notification: " + e.State.ToString()); };
 
-            using (ScriptBuilder arguments = new ScriptBuilder())
-            using (ExecutionEngine engine = NeoVM.CreateEngine(args))
+            using (var arguments = new ScriptBuilder())
+            using (var engine = CreateEngine(args))
             // for (int x = 0; x < 5000; x++) // Benchmark
             {
                 // Register proposal

@@ -1,34 +1,38 @@
-﻿using NeoVM.Interop.Enums;
-using NeoVM.Interop.Interfaces;
+﻿using NeoSharp.VM;
+using NeoVM.Interop.Extensions;
+using NeoVM.Interop.Native;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace NeoVM.Interop.Types.StackItems
 {
-    public class MapStackItem : IStackItem, IEnumerable<KeyValuePair<IStackItem, IStackItem>>
+    public class MapStackItem : IMapStackItem, INativeStackItem
     {
         public override bool CanConvertToByteArray => false;
         public override byte[] ToByteArray() { throw new NotImplementedException(); }
 
-        public IStackItem this[IStackItem key]
-        {
-            get
-            {
-                if (TryGetValue(key, out IStackItem value))
-                    return value;
+        /// <summary>
+        /// Native Handle
+        /// </summary>
+        IntPtr _handle;
+        /// <summary>
+        /// Native Handle
+        /// </summary>
+        public IntPtr Handle => _handle;
+        /// <summary>
+        /// Is Disposed
+        /// </summary>
+        public override bool IsDisposed => _handle == IntPtr.Zero;
+        /// <summary>
+        /// Type
+        /// </summary>
+        public new EStackItemType Type => base.Type;
+        /// <summary>
+        /// Engine
+        /// </summary>
+        private readonly new ExecutionEngine Engine;
 
-                return null;
-            }
-            set
-            {
-                Set(key, value);
-            }
-        }
-
-        public IEnumerable<IStackItem> Keys => GetKeys();
-        public IEnumerable<IStackItem> Values => GetValues();
-        public int Count => NeoVM.MapStackItem_Count(Handle);
+        public override int Count => NeoVM.MapStackItem_Count(_handle);
 
         #region Constructors
 
@@ -36,15 +40,16 @@ namespace NeoVM.Interop.Types.StackItems
         /// Constructor
         /// </summary>
         /// <param name="engine">Engine</param>
-        internal MapStackItem(ExecutionEngine engine) : this(engine, new Dictionary<IStackItem, IStackItem>()) { }
+        internal MapStackItem(ExecutionEngine engine) : this(engine, null) { }
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="value">Value</param>
-        internal MapStackItem(ExecutionEngine engine, Dictionary<IStackItem, IStackItem> value) : base(engine, EStackItemType.Map)
+        internal MapStackItem(ExecutionEngine engine, Dictionary<IStackItem, IStackItem> value) : base(engine)
         {
-            CreateNativeItem();
+            Engine = engine;
+            _handle = this.CreateNativeItem();
 
             if (value == null) return;
 
@@ -56,49 +61,53 @@ namespace NeoVM.Interop.Types.StackItems
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="handle">Handle</param>
-        internal MapStackItem(ExecutionEngine engine, IntPtr handle) : base(engine, EStackItemType.Map, handle) { }
+        internal MapStackItem(ExecutionEngine engine, IntPtr handle) : base(engine)
+        {
+            Engine = engine;
+            _handle = handle;
+        }
 
         #endregion
 
         #region Write
 
-        public bool Remove(IStackItem key)
+        public override bool Remove(IStackItem key)
         {
-            return NeoVM.MapStackItem_Remove(Handle, key == null ? IntPtr.Zero : key.Handle) == NeoVM.TRUE;
+            return NeoVM.MapStackItem_Remove(_handle, key == null ? IntPtr.Zero : ((INativeStackItem)key).Handle) == NeoVM.TRUE;
         }
 
-        public void Set(KeyValuePair<IStackItem, IStackItem> item)
+        public override void Set(KeyValuePair<IStackItem, IStackItem> item)
         {
             Set(item.Key, item.Value);
         }
 
-        public void Set(IStackItem key, IStackItem value)
+        public override void Set(IStackItem key, IStackItem value)
         {
             NeoVM.MapStackItem_Set
                 (
-                Handle,
-                key == null ? IntPtr.Zero : key.Handle,
-                value == null ? IntPtr.Zero : value.Handle
+                _handle,
+                key == null ? IntPtr.Zero : ((INativeStackItem)key).Handle,
+                value == null ? IntPtr.Zero : ((INativeStackItem)value).Handle
                 );
         }
 
-        public void Clear()
+        public override void Clear()
         {
-            NeoVM.MapStackItem_Clear(Handle);
+            NeoVM.MapStackItem_Clear(_handle);
         }
 
         #endregion
 
         #region Read
 
-        public bool ContainsKey(IStackItem key)
+        public override bool ContainsKey(IStackItem key)
         {
-            return NeoVM.MapStackItem_Get(Handle, key == null ? IntPtr.Zero : key.Handle) != IntPtr.Zero;
+            return NeoVM.MapStackItem_Get(_handle, key == null ? IntPtr.Zero : ((INativeStackItem)key).Handle) != IntPtr.Zero;
         }
 
-        public bool TryGetValue(IStackItem key, out IStackItem value)
+        public override bool TryGetValue(IStackItem key, out IStackItem value)
         {
-            IntPtr ret = NeoVM.MapStackItem_Get(Handle, key == null ? IntPtr.Zero : key.Handle);
+            IntPtr ret = NeoVM.MapStackItem_Get(_handle, key == null ? IntPtr.Zero : ((INativeStackItem)key).Handle);
 
             if (ret == IntPtr.Zero)
             {
@@ -114,35 +123,24 @@ namespace NeoVM.Interop.Types.StackItems
 
         #region Enumerables
 
-        public IEnumerable<IStackItem> GetKeys()
+        public override IEnumerable<IStackItem> GetKeys()
         {
             for (int x = 0, c = Count; x < c; x++)
-                yield return Engine.ConvertFromNative(NeoVM.MapStackItem_GetKey(Handle, x));
+                yield return Engine.ConvertFromNative(NeoVM.MapStackItem_GetKey(_handle, x));
         }
 
-        public IEnumerable<IStackItem> GetValues()
+        public override IEnumerable<IStackItem> GetValues()
         {
             for (int x = 0, c = Count; x < c; x++)
-                yield return Engine.ConvertFromNative(NeoVM.MapStackItem_GetValue(Handle, x));
+                yield return Engine.ConvertFromNative(NeoVM.MapStackItem_GetValue(_handle, x));
         }
-        
-        IEnumerator<KeyValuePair<IStackItem, IStackItem>> IEnumerable<KeyValuePair<IStackItem, IStackItem>>.GetEnumerator()
+
+        public override IEnumerator<KeyValuePair<IStackItem, IStackItem>> GetEnumerator()
         {
             for (int x = 0, c = Count; x < c; x++)
             {
-                IStackItem key = Engine.ConvertFromNative(NeoVM.MapStackItem_GetKey(Handle, x));
-                IStackItem value = Engine.ConvertFromNative(NeoVM.MapStackItem_GetValue(Handle, x));
-
-                yield return new KeyValuePair<IStackItem, IStackItem>(key, value);
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            for (int x = 0, c = Count; x < c; x++)
-            {
-                IStackItem key = Engine.ConvertFromNative(NeoVM.MapStackItem_GetKey(Handle, x));
-                IStackItem value = Engine.ConvertFromNative(NeoVM.MapStackItem_GetValue(Handle, x));
+                IStackItem key = Engine.ConvertFromNative(NeoVM.MapStackItem_GetKey(_handle, x));
+                IStackItem value = Engine.ConvertFromNative(NeoVM.MapStackItem_GetValue(_handle, x));
 
                 yield return new KeyValuePair<IStackItem, IStackItem>(key, value);
             }
@@ -150,9 +148,23 @@ namespace NeoVM.Interop.Types.StackItems
 
         #endregion
 
-        protected override byte[] GetNativeByteArray()
+        public byte[] GetNativeByteArray()
         {
             return null;
         }
+
+        #region IDisposable Support
+
+        protected override void Dispose(bool disposing)
+        {
+            lock (this)
+            {
+                if (_handle == IntPtr.Zero) return;
+
+                NeoVM.StackItem_Free(ref _handle);
+            }
+        }
+
+        #endregion
     }
 }

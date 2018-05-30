@@ -23,4 +23,8 @@
     <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\neo-sharp\src\NeoSharp.VM\NeoSharp.VM.csproj" />
+  </ItemGroup>
+
 </Project>

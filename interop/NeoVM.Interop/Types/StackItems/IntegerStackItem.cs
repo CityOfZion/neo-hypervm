@@ -1,47 +1,65 @@
-﻿using NeoVM.Interop.Enums;
-using NeoVM.Interop.Interfaces;
+﻿using NeoSharp.VM;
+using NeoVM.Interop.Extensions;
+using NeoVM.Interop.Native;
 using System;
 using System.Numerics;
 
 namespace NeoVM.Interop.Types.StackItems
 {
-    public class IntegerStackItem : IStackItem<BigInteger>, IEquatable<IntegerStackItem>
+    public class IntegerStackItem : IIntegerStackItem, INativeStackItem
     {
         /// <summary>
+        /// Native Handle
+        /// </summary>
+        IntPtr _handle;
+        /// <summary>
+        /// Native Handle
+        /// </summary>
+        public IntPtr Handle => _handle;
+        /// <summary>
+        /// Is Disposed
+        /// </summary>
+        public override bool IsDisposed => _handle == IntPtr.Zero;
+        /// <summary>
+        /// Type
+        /// </summary>
+        public new EStackItemType Type => base.Type;
+
+        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="data">Data</param>
-        internal IntegerStackItem(ExecutionEngine engine, int data) : base(engine, new BigInteger(data), EStackItemType.Integer)
+        internal IntegerStackItem(ExecutionEngine engine, int data) : base(engine, new BigInteger(data))
         {
-            CreateNativeItem();
+            _handle = this.CreateNativeItem();
         }
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="data">Data</param>
-        internal IntegerStackItem(ExecutionEngine engine, long data) : base(engine, new BigInteger(data), EStackItemType.Integer)
+        internal IntegerStackItem(ExecutionEngine engine, long data) : base(engine, new BigInteger(data))
         {
-            CreateNativeItem();
+            _handle = this.CreateNativeItem();
         }
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="data">Data</param>
-        internal IntegerStackItem(ExecutionEngine engine, byte[] data) : base(engine, new BigInteger(data), EStackItemType.Integer)
+        internal IntegerStackItem(ExecutionEngine engine, byte[] data) : base(engine, new BigInteger(data))
         {
-            CreateNativeItem();
+            _handle = this.CreateNativeItem();
         }
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="data">Data</param>
-        internal IntegerStackItem(ExecutionEngine engine, BigInteger data) : base(engine, data, EStackItemType.Integer)
+        internal IntegerStackItem(ExecutionEngine engine, BigInteger data) : base(engine, data)
         {
-            CreateNativeItem();
+            _handle = this.CreateNativeItem();
         }
         /// <summary>
         /// Constructor
@@ -50,31 +68,28 @@ namespace NeoVM.Interop.Types.StackItems
         /// <param name="handle">Handle</param>
         /// <param name="value">Raw value</param>
         internal IntegerStackItem(ExecutionEngine engine, IntPtr handle, byte[] value) :
-            base(engine, new BigInteger(value), EStackItemType.Integer, handle)
-        { }
-
-        public bool Equals(IntegerStackItem other)
+            base(engine, new BigInteger(value))
         {
-            return other != null && other.Value.Equals(Value);
+            _handle = handle;
         }
 
-        public override bool Equals(IStackItem other)
-        {
-            if (other is IntegerStackItem b)
-                return b.Value.Equals(Value);
-
-            return false;
-        }
-
-        public override bool CanConvertToByteArray => true;
-        public override byte[] ToByteArray()
+        public byte[] GetNativeByteArray()
         {
             return Value.ToByteArray();
         }
 
-        protected override byte[] GetNativeByteArray()
+        #region IDisposable Support
+
+        protected override void Dispose(bool disposing)
         {
-            return Value.ToByteArray();
+            lock (this)
+            {
+                if (_handle == IntPtr.Zero) return;
+
+                NeoVM.StackItem_Free(ref _handle);
+            }
         }
+
+        #endregion
     }
 }

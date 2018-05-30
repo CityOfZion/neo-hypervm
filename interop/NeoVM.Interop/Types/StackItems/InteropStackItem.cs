@@ -1,20 +1,38 @@
-﻿using NeoVM.Interop.Enums;
-using NeoVM.Interop.Helpers;
-using NeoVM.Interop.Interfaces;
+﻿using NeoSharp.VM;
+using NeoSharp.VM.Helpers;
+using NeoVM.Interop.Extensions;
+using NeoVM.Interop.Native;
 using System;
 
 namespace NeoVM.Interop.Types.StackItems
 {
-    public class InteropStackItem : IStackItem<object>, IEquatable<InteropStackItem>
+    public class InteropStackItem : IInteropStackItem, INativeStackItem
     {
         readonly int _objKey;
+
+        /// <summary>
+        /// Native Handle
+        /// </summary>
+        IntPtr _handle;
+        /// <summary>
+        /// Native Handle
+        /// </summary>
+        public IntPtr Handle => _handle;
+        /// <summary>
+        /// Is Disposed
+        /// </summary>
+        public override bool IsDisposed => _handle == IntPtr.Zero;
+        /// <summary>
+        /// Type
+        /// </summary>
+        public new EStackItemType Type => base.Type;
 
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="data">Data</param>
-        internal InteropStackItem(ExecutionEngine engine, object data) : base(engine, data, EStackItemType.Interop)
+        internal InteropStackItem(ExecutionEngine engine, object data) : base(engine, data)
         {
             // Search
 
@@ -30,7 +48,7 @@ namespace NeoVM.Interop.Types.StackItems
 
             // Create native item
 
-            CreateNativeItem();
+            _handle = this.CreateNativeItem();
         }
         /// <summary>
         /// Constructor
@@ -39,30 +57,29 @@ namespace NeoVM.Interop.Types.StackItems
         /// <param name="handle">Handle</param>
         /// <param name="objKey">Object key</param>
         internal InteropStackItem(ExecutionEngine engine, IntPtr handle, int objKey) :
-            base(engine, engine.InteropCache[objKey], EStackItemType.Interop, handle)
+            base(engine, engine.InteropCache[objKey])
         {
             _objKey = objKey;
+            _handle = handle;
         }
 
-        public bool Equals(InteropStackItem other)
-        {
-            return other != null && other.Value.Equals(Value);
-        }
-
-        public override bool Equals(IStackItem other)
-        {
-            if (other is InteropStackItem b)
-                return b.Value.Equals(Value);
-
-            return false;
-        }
-
-        public override bool CanConvertToByteArray => false;
-        public override byte[] ToByteArray() { throw new NotImplementedException(); }
-
-        protected override byte[] GetNativeByteArray()
+        public byte[] GetNativeByteArray()
         {
             return BitHelper.GetBytes(_objKey);
         }
+
+        #region IDisposable Support
+
+        protected override void Dispose(bool disposing)
+        {
+            lock (this)
+            {
+                if (_handle == IntPtr.Zero) return;
+
+                NeoVM.StackItem_Free(ref _handle);
+            }
+        }
+
+        #endregion
     }
 }

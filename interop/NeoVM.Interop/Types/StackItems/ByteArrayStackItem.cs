@@ -1,22 +1,37 @@
-﻿using NeoVM.Interop.Enums;
-using NeoVM.Interop.Helpers;
-using NeoVM.Interop.Interfaces;
+﻿using NeoSharp.VM;
+using NeoVM.Interop.Extensions;
+using NeoVM.Interop.Native;
 using System;
-using System.Linq;
-using System.Text;
 
 namespace NeoVM.Interop.Types.StackItems
 {
-    public class ByteArrayStackItem : IStackItem<byte[]>, IEquatable<ByteArrayStackItem>
+    public class ByteArrayStackItem : IByteArrayStackItem, INativeStackItem
     {
+        /// <summary>
+        /// Native Handle
+        /// </summary>
+        IntPtr _handle;
+        /// <summary>
+        /// Native Handle
+        /// </summary>
+        public IntPtr Handle => _handle;
+        /// <summary>
+        /// Is Disposed
+        /// </summary>
+        public override bool IsDisposed => _handle == IntPtr.Zero;
+        /// <summary>
+        /// Type
+        /// </summary>
+        public new EStackItemType Type => base.Type;
+
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="data">Data</param>
-        internal ByteArrayStackItem(ExecutionEngine engine, byte[] data) : base(engine, data, EStackItemType.ByteArray)
+        internal ByteArrayStackItem(ExecutionEngine engine, byte[] data) : base(engine, data)
         {
-            CreateNativeItem();
+            _handle = this.CreateNativeItem();
         }
         /// <summary>
         /// Constructor
@@ -24,47 +39,28 @@ namespace NeoVM.Interop.Types.StackItems
         /// <param name="engine">Engine</param>
         /// <param name="handle">Handle</param>
         /// <param name="value">Raw value</param>
-        internal ByteArrayStackItem(ExecutionEngine engine, IntPtr handle, byte[] value) : base(engine, value, EStackItemType.ByteArray, handle) { }
-
-        public bool Equals(ByteArrayStackItem other)
+        internal ByteArrayStackItem(ExecutionEngine engine, IntPtr handle, byte[] value) : base(engine, value)
         {
-            return other != null && other.Value.SequenceEqual(Value);
+            _handle = handle;
         }
 
-        public override bool Equals(IStackItem other)
-        {
-            if (other is ByteArrayStackItem b)
-                return b.Value.SequenceEqual(Value);
-
-            return false;
-        }
-
-        public override bool CanConvertToByteArray => true;
-        public override byte[] ToByteArray()
+        public byte[] GetNativeByteArray()
         {
             return Value;
         }
 
-        protected override byte[] GetNativeByteArray()
+        #region IDisposable Support
+
+        protected override void Dispose(bool disposing)
         {
-            return Value;
+            lock (this)
+            {
+                if (_handle == IntPtr.Zero) return;
+
+                NeoVM.StackItem_Free(ref _handle);
+            }
         }
 
-        public override string ToString()
-        {
-            if (Value == null) return "NULL";
-
-            // Check printable characters
-
-            bool allOk = true;
-            foreach (byte c in Value)
-                if (c < 32 || c > 126)
-                {
-                    allOk = false;
-                    break;
-                }
-
-            return allOk ? "'" + Encoding.ASCII.GetString(Value) + "'" : BitHelper.ToHexString(Value);
-        }
+        #endregion
     }
 }

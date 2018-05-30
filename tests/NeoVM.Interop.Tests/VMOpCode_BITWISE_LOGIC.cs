@@ -1,9 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NeoVM.Interop.Enums;
+using NeoSharp.VM;
 using NeoVM.Interop.Tests.Extra;
-using NeoVM.Interop.Types;
-using NeoVM.Interop.Types.Arguments;
 using NeoVM.Interop.Types.StackItems;
+using System;
 using System.Numerics;
 
 namespace NeoVM.Interop.Tests
@@ -21,7 +20,7 @@ namespace NeoVM.Interop.Tests
                 try { res = ~a; }
                 catch
                 {
-                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    Assert.AreEqual(engine.State, EVMState.Fault);
                     cancel.Cancel = true;
                     return;
                 }
@@ -40,7 +39,7 @@ namespace NeoVM.Interop.Tests
                 try { res = (a & b); }
                 catch
                 {
-                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    Assert.AreEqual(engine.State, EVMState.Fault);
                     cancel.Cancel = true;
                     return;
                 }
@@ -59,7 +58,7 @@ namespace NeoVM.Interop.Tests
                 try { res = (a | b); }
                 catch
                 {
-                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    Assert.AreEqual(engine.State, EVMState.Fault);
                     cancel.Cancel = true;
                     return;
                 }
@@ -78,7 +77,7 @@ namespace NeoVM.Interop.Tests
                 try { res = (a ^ b); }
                 catch
                 {
-                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    Assert.AreEqual(engine.State, EVMState.Fault);
                     cancel.Cancel = true;
                     return;
                 }
@@ -92,8 +91,8 @@ namespace NeoVM.Interop.Tests
         {
             // Interop equal = true, false, false
 
-            using (ScriptBuilder script = new ScriptBuilder())
-            using (ExecutionEngine engine = NeoVM.CreateEngine(new ExecutionEngineArgs()
+            using (var script = new ScriptBuilder())
+            using (var engine = CreateEngine(new ExecutionEngineArgs()
             {
                 InteropService = new DummyInteropService(),
                 MessageProvider = new DummyMessageProvider(),
@@ -132,14 +131,14 @@ namespace NeoVM.Interop.Tests
                 // Check
 
                 engine.StepInto();
-                Assert.AreEqual(EVMState.HALT, engine.State);
+                Assert.AreEqual(EVMState.Halt, engine.State);
 
                 CheckClean(engine);
             }
 
             // Equals map, array and structure (false,false,true)
 
-            using (ScriptBuilder script = new ScriptBuilder
+            using (var script = new ScriptBuilder
             (
                 EVMOpCode.NEWMAP,
                 EVMOpCode.NEWMAP,
@@ -159,7 +158,7 @@ namespace NeoVM.Interop.Tests
 
                 EVMOpCode.RET
             ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            using (var engine = CreateEngine(Args))
             {
                 // Load script
 
@@ -178,7 +177,7 @@ namespace NeoVM.Interop.Tests
                 Assert.IsTrue(engine.CurrentContext.EvaluationStack.Pop<BooleanStackItem>().Value);
 
                 engine.StepInto();
-                Assert.AreEqual(EVMState.HALT, engine.State);
+                Assert.AreEqual(EVMState.Halt, engine.State);
 
                 // Check
 
@@ -187,7 +186,7 @@ namespace NeoVM.Interop.Tests
 
             // Equals map, array and structure (true)
 
-            using (ScriptBuilder script = new ScriptBuilder
+            using (var script = new ScriptBuilder
             (
                 EVMOpCode.NEWMAP,
                 EVMOpCode.DUP,
@@ -205,7 +204,7 @@ namespace NeoVM.Interop.Tests
 
                 EVMOpCode.RET
             ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            using (var engine = CreateEngine(Args))
             {
                 // Load script
 
@@ -224,7 +223,7 @@ namespace NeoVM.Interop.Tests
                 Assert.IsTrue(engine.CurrentContext.EvaluationStack.Pop<BooleanStackItem>().Value);
 
                 engine.StepInto();
-                Assert.AreEqual(EVMState.HALT, engine.State);
+                Assert.AreEqual(EVMState.Halt, engine.State);
 
                 // Check
 
@@ -233,7 +232,7 @@ namespace NeoVM.Interop.Tests
 
             // Byte array conversions
 
-            using (ScriptBuilder script = new ScriptBuilder
+            using (var script = new ScriptBuilder
             (
                 EVMOpCode.PUSHBYTES1, EVMOpCode.PUSHBYTES1 /*0x01*/,
                 EVMOpCode.PUSH0,
@@ -250,7 +249,7 @@ namespace NeoVM.Interop.Tests
                 EVMOpCode.PUSHBYTES1, EVMOpCode.PUSHBYTES1 /*0x00*/,
                 EVMOpCode.EQUAL
             ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            using (var engine = CreateEngine(Args))
             {
                 // Load script
 
@@ -271,14 +270,14 @@ namespace NeoVM.Interop.Tests
 
             // Bool compare = true
 
-            using (ScriptBuilder script = new ScriptBuilder
+            using (var script = new ScriptBuilder
             (
                 EVMOpCode.PUSH1,
                 EVMOpCode.NOT,
                 EVMOpCode.DUP,
                 EVMOpCode.EQUAL
             ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            using (var engine = CreateEngine(Args))
             {
                 // Load script
 
@@ -297,14 +296,14 @@ namespace NeoVM.Interop.Tests
 
             // Bool compare = false
 
-            using (ScriptBuilder script = new ScriptBuilder
+            using (var script = new ScriptBuilder
             (
                 EVMOpCode.PUSH1,
                 EVMOpCode.NOT,
                 EVMOpCode.PUSH1,
                 EVMOpCode.EQUAL
             ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            using (var engine = CreateEngine(Args))
             {
                 // Load script
 
@@ -323,12 +322,12 @@ namespace NeoVM.Interop.Tests
 
             // Without push
 
-            using (ScriptBuilder script = new ScriptBuilder
+            using (var script = new ScriptBuilder
             (
                 EVMOpCode.PUSH1,
                 EVMOpCode.EQUAL
             ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            using (var engine = CreateEngine(Args))
             {
                 // Load script
 
@@ -355,7 +354,7 @@ namespace NeoVM.Interop.Tests
                 try { res = a == b; }
                 catch
                 {
-                    Assert.AreEqual(engine.State, EVMState.FAULT);
+                    Assert.AreEqual(engine.State, EVMState.Fault);
                     cancel.Cancel = true;
                     return;
                 }

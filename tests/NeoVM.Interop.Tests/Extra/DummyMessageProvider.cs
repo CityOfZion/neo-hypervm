@@ -1,4 +1,4 @@
-﻿using NeoVM.Interop.Interfaces;
+﻿using NeoSharp.VM;
 using System;
 using System.Linq;
 

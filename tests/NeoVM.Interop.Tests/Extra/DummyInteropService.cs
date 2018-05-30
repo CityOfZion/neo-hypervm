@@ -1,6 +1,5 @@
-﻿using NeoVM.Interop.Helpers;
-using NeoVM.Interop.Interfaces;
-using NeoVM.Interop.Types;
+﻿using NeoSharp.VM;
+using NeoSharp.VM.Helpers;
 using NeoVM.Interop.Types.StackItems;
 using System.Collections.Generic;
 
@@ -34,11 +33,11 @@ namespace NeoVM.Interop.Tests.Extra
             //Register("Neo.Iterator.Value", Iterator_Value);
         }
 
-        bool CheckWitness(ExecutionEngine engine)
+        bool CheckWitness(IExecutionEngine engine)
         {
             // Fake CheckWitness
 
-            using (ExecutionContext context = engine.CurrentContext)
+            using (var context = engine.CurrentContext)
             {
                 if (context == null) return false;
 
@@ -49,7 +48,7 @@ namespace NeoVM.Interop.Tests.Extra
                 {
                     if (!it.CanConvertToByteArray) return false;
 
-                    using (IStackItem itb = engine.CreateBool(true))
+                    using (var itb = engine.CreateBool(true))
                         context.EvaluationStack.Push(itb);
                 }
             }
@@ -57,9 +56,9 @@ namespace NeoVM.Interop.Tests.Extra
             return true;
         }
 
-        bool Storage_GetContext(ExecutionEngine engine)
+        bool Storage_GetContext(IExecutionEngine engine)
         {
-            using (ExecutionContext context = engine.CurrentContext)
+            using (var context = engine.CurrentContext)
             {
                 if (context == null) return false;
 
@@ -70,16 +69,16 @@ namespace NeoVM.Interop.Tests.Extra
                     Storages[stContext.Id] = stContext;
                 }
 
-                using (IStackItem i = engine.CreateInterop(stContext))
+                using (var i = engine.CreateInterop(stContext))
                     context.EvaluationStack.Push(i);
             }
 
             return true;
         }
 
-        bool Storage_Get(ExecutionEngine engine)
+        bool Storage_Get(IExecutionEngine engine)
         {
-            using (ExecutionContext context = engine.CurrentContext)
+            using (var context = engine.CurrentContext)
             {
                 if (context == null) return false;
 
@@ -101,12 +100,12 @@ namespace NeoVM.Interop.Tests.Extra
 
                         if (stContext.Storage.TryGetValue(BitHelper.ToHexString(key), out byte[] value))
                         {
-                            using (IStackItem ret = engine.CreateByteArray(value))
+                            using (var ret = engine.CreateByteArray(value))
                                 context.EvaluationStack.Push(ret);
                         }
                         else
                         {
-                            using (IStackItem ret = engine.CreateByteArray(new byte[] { }))
+                            using (var ret = engine.CreateByteArray(new byte[] { }))
                                 context.EvaluationStack.Push(ret);
                         }
                     }
@@ -116,9 +115,9 @@ namespace NeoVM.Interop.Tests.Extra
             return true;
         }
 
-        bool Storage_Delete(ExecutionEngine engine)
+        bool Storage_Delete(IExecutionEngine engine)
         {
-            using (ExecutionContext context = engine.CurrentContext)
+            using (var context = engine.CurrentContext)
             {
                 if (context == null) return false;
 
@@ -145,9 +144,9 @@ namespace NeoVM.Interop.Tests.Extra
             return true;
         }
 
-        bool Storage_Put(ExecutionEngine engine)
+        bool Storage_Put(IExecutionEngine engine)
         {
-            using (ExecutionContext context = engine.CurrentContext)
+            using (var context = engine.CurrentContext)
             {
                 if (context == null) return false;
 
@@ -189,13 +188,13 @@ namespace NeoVM.Interop.Tests.Extra
             return true;
         }
 
-        bool TestMethod(ExecutionEngine engine)
+        bool TestMethod(IExecutionEngine engine)
         {
-            using (ExecutionContext context = engine.CurrentContext)
+            using (var context = engine.CurrentContext)
             {
                 if (context == null) return false;
 
-                using (IStackItem it = engine.CreateInterop(new DisposableDummy()))
+                using (var it = engine.CreateInterop(new DisposableDummy()))
                     context.EvaluationStack.Push(it);
             }
 

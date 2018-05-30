@@ -1,10 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NeoVM.Interop.Enums;
-using NeoVM.Interop.Interfaces;
+using NeoSharp.VM;
 using NeoVM.Interop.Tests.Crypto;
 using NeoVM.Interop.Tests.Extra;
-using NeoVM.Interop.Types;
-using NeoVM.Interop.Types.Arguments;
 using NeoVM.Interop.Types.StackItems;
 using System;
 using System.Collections.Generic;
@@ -22,12 +19,12 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void TestScriptHash()
         {
-            using (ScriptBuilder script = new ScriptBuilder
+            using (var script = new ScriptBuilder
             (
                 EVMOpCode.PUSH0,
                 EVMOpCode.RET
             ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(null))
+            using (var engine = CreateEngine(null))
             {
                 // Load script
 
@@ -37,7 +34,7 @@ namespace NeoVM.Interop.Tests
 
                 Assert.AreEqual(1, engine.InvocationStack.Count);
 
-                ExecutionContext context = engine.InvocationStack.Peek(0);
+                IExecutionContext context = engine.InvocationStack.Peek(0);
 
                 // Check
 
@@ -56,27 +53,30 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void TestScriptLogic()
         {
-            using (ScriptBuilder script = new ScriptBuilder
+            using (var script = new ScriptBuilder
             (
                 EVMOpCode.PUSH0,
                 EVMOpCode.NOT,
                 EVMOpCode.NOT,
                 EVMOpCode.DROP
             ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(null))
+            using (var engine = CreateEngine(null))
             {
                 engine.LoadScript(script);
 
-                engine.StepInto();
-                Assert.IsTrue(engine.CurrentContext.EvaluationStack.Count == 1);
-                Assert.IsTrue(engine.CurrentContext.EvaluationStack.Peek<ByteArrayStackItem>(0).Value.Length == 0);
-                engine.StepInto();
-                Assert.IsTrue(engine.CurrentContext.EvaluationStack.Count == 1);
-                Assert.IsTrue(engine.CurrentContext.EvaluationStack.Peek<BooleanStackItem>(0).Value);
-                engine.StepInto();
-                Assert.IsTrue(engine.CurrentContext.EvaluationStack.Count == 1);
-                Assert.IsTrue(!engine.CurrentContext.EvaluationStack.Peek<BooleanStackItem>(0).Value);
-                engine.Execute();
+                using (var context = engine.CurrentContext)
+                {
+                    engine.StepInto();
+                    Assert.IsTrue(context.EvaluationStack.Count == 1);
+                    Assert.IsTrue(context.EvaluationStack.Peek<ByteArrayStackItem>(0).Value.Length == 0);
+                    engine.StepInto();
+                    Assert.IsTrue(context.EvaluationStack.Count == 1);
+                    Assert.IsTrue(context.EvaluationStack.Peek<BooleanStackItem>(0).Value);
+                    engine.StepInto();
+                    Assert.IsTrue(context.EvaluationStack.Count == 1);
+                    Assert.IsTrue(!context.EvaluationStack.Peek<BooleanStackItem>(0).Value);
+                    engine.Execute();
+                }
 
                 CheckClean(engine);
             }
@@ -85,9 +85,9 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void TestInit()
         {
-            using (ExecutionEngine engine = NeoVM.CreateEngine(Args))
+            using (var engine = CreateEngine(Args))
             {
-                Assert.AreEqual(EVMState.NONE, engine.State);
+                Assert.AreEqual(EVMState.None, engine.State);
 
                 Assert.IsNull(engine.CurrentContext);
                 Assert.IsNull(engine.EntryContext);
@@ -118,18 +118,18 @@ namespace NeoVM.Interop.Tests
 
             // 5 Scripts
 
-            List<ExecutionEngine> engines = new List<ExecutionEngine>()
+            List<IExecutionEngine> engines = new List<IExecutionEngine>()
             {
-                NeoVM.CreateEngine(args),
-                NeoVM.CreateEngine(args),
-                NeoVM.CreateEngine(args),
-                NeoVM.CreateEngine(args),
-                NeoVM.CreateEngine(args),
-                NeoVM.CreateEngine(args),
-                NeoVM.CreateEngine(args),
-                NeoVM.CreateEngine(args),
-                NeoVM.CreateEngine(args),
-                NeoVM.CreateEngine(args)
+                CreateEngine(args),
+                CreateEngine(args),
+                CreateEngine(args),
+                CreateEngine(args),
+                CreateEngine(args),
+                CreateEngine(args),
+                CreateEngine(args),
+                CreateEngine(args),
+                CreateEngine(args),
+                CreateEngine(args)
             };
 
             Parallel.ForEach(engines, (engine) =>
@@ -140,7 +140,7 @@ namespace NeoVM.Interop.Tests
 
                     engine.Clean(x);
 
-                    using (ScriptBuilder script = new ScriptBuilder())
+                    using (var script = new ScriptBuilder())
                     {
                         script.EmitPush(x);
                         script.EmitPush(x);
@@ -172,14 +172,14 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void TestLogs()
         {
-            using (ScriptBuilder script = new ScriptBuilder
+            using (var script = new ScriptBuilder
             (
                 EVMOpCode.PUSH10,
                 EVMOpCode.TOALTSTACK,
                 EVMOpCode.FROMALTSTACK,
                 EVMOpCode.RET
             ))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(new ExecutionEngineArgs()
+            using (var engine = CreateEngine(new ExecutionEngineArgs()
             {
                 Logger = new ExecutionEngineLogger(ELogVerbosity.All)
             }))
@@ -253,11 +253,11 @@ EVA:Drop[0]".Replace("\r", ""));
         [TestMethod]
         public void TestDoubleFree()
         {
-            ExecutionContext context;
+            IExecutionContext context;
 
             byte[] realHash;
-            using (ScriptBuilder script = new ScriptBuilder(EVMOpCode.RET))
-            using (ExecutionEngine engine = NeoVM.CreateEngine(null))
+            using (var script = new ScriptBuilder(EVMOpCode.RET))
+            using (var engine = CreateEngine(null))
             {
                 // Load script
 
@@ -265,8 +265,8 @@ EVA:Drop[0]".Replace("\r", ""));
 
                 // Compute hash
 
-                using (SHA256 sha = SHA256.Create())
-                using (RIPEMD160Managed ripe = new RIPEMD160Managed())
+                using (var sha = SHA256.Create())
+                using (var ripe = new RIPEMD160Managed())
                 {
                     realHash = sha.ComputeHash(script);
                     realHash = ripe.ComputeHash(realHash);
@@ -278,11 +278,11 @@ EVA:Drop[0]".Replace("\r", ""));
 
                 // Create new array
 
-                using (ArrayStackItem ar = engine.CreateArray())
+                using (var ar = engine.CreateArray())
                 {
                     // Create bool item and free
 
-                    using (BooleanStackItem btest = engine.CreateBool(true))
+                    using (var btest = engine.CreateBool(true))
                     {
                         // Apend item to array
 
@@ -313,21 +313,21 @@ EVA:Drop[0]".Replace("\r", ""));
         [TestMethod]
         public void TestArrayStackItem()
         {
-            using (ExecutionEngine engine = NeoVM.CreateEngine(null))
+            using (var engine = CreateEngine(null))
                 for (int x = 0; x < 2; x++)
                 {
                     bool isStruct = x == 1;
 
                     // First test for array, second for Struct
 
-                    using (ArrayStackItem ar = isStruct ? engine.CreateStruct() : engine.CreateArray())
+                    using (var ar = isStruct ? engine.CreateStruct() : engine.CreateArray())
                     {
                         Assert.AreEqual(isStruct, ar.IsStruct);
 
                         // Create two random integer types
 
-                        foreach (BigInteger bi in TestBigIntegers)
-                            using (IntegerStackItem btest = engine.CreateInteger(bi))
+                        foreach (var bi in TestBigIntegers)
+                            using (var btest = engine.CreateInteger(bi))
                             {
                                 // Check contains
 
@@ -344,7 +344,7 @@ EVA:Drop[0]".Replace("\r", ""));
 
                                 // Check item by position
 
-                                using (IntegerStackItem iau = (IntegerStackItem)ar[0])
+                                using (var iau = (IntegerStackItem)ar[0])
                                     Assert.AreEqual(iau.Value, btest.Value);
 
                                 // Remove
@@ -359,7 +359,7 @@ EVA:Drop[0]".Replace("\r", ""));
 
                         // Add bool and check contains
 
-                        using (BooleanStackItem bkill = engine.CreateBool(true))
+                        using (var bkill = engine.CreateBool(true))
                         {
                             Assert.AreEqual(ar.IndexOf(bkill), -1);
 
@@ -372,12 +372,12 @@ EVA:Drop[0]".Replace("\r", ""));
 
                         // Create new array
 
-                        ArrayStackItem ar2;
+                        IArrayStackItem ar2;
 
                         {
                             IStackItem[] art = new IStackItem[] { engine.CreateBool(true), engine.CreateBool(false) };
                             ar2 = engine.CreateArray(art);
-                            foreach (IStackItem it in art) it.Dispose();
+                            foreach (var it in art) it.Dispose();
                         }
 
                         Assert.IsFalse(ar.Contains(ar2));
@@ -407,7 +407,7 @@ EVA:Drop[0]".Replace("\r", ""));
                         {
                             IStackItem[] art = new IStackItem[] { engine.CreateInteger(1), engine.CreateInteger(2), engine.CreateInteger(3) };
                             ar.Add(art);
-                            foreach (IStackItem it in art) it.Dispose();
+                            foreach (var it in art) it.Dispose();
                         }
 
                         // Remove 2
@@ -420,24 +420,24 @@ EVA:Drop[0]".Replace("\r", ""));
 
                         // Check values 1 and 3
 
-                        using (IntegerStackItem iau = (IntegerStackItem)ar[0])
+                        using (var iau = (IntegerStackItem)ar[0])
                             Assert.AreEqual(iau.Value, 1);
 
-                        using (IntegerStackItem iau = (IntegerStackItem)ar[1])
+                        using (var iau = (IntegerStackItem)ar[1])
                             Assert.AreEqual(iau.Value, 3);
 
                         // Insert bool
 
-                        using (BooleanStackItem inte = engine.CreateBool(true))
+                        using (var inte = engine.CreateBool(true))
                             ar.Insert(1, inte);
 
                         // Check values
 
-                        using (IntegerStackItem iau = (IntegerStackItem)ar[0])
+                        using (var iau = (IntegerStackItem)ar[0])
                             Assert.AreEqual(iau.Value, 1);
-                        using (BooleanStackItem iau = (BooleanStackItem)ar[1])
+                        using (var iau = (BooleanStackItem)ar[1])
                             Assert.IsTrue(iau.Value);
-                        using (IntegerStackItem iau = (IntegerStackItem)ar[2])
+                        using (var iau = (IntegerStackItem)ar[2])
                             Assert.AreEqual(iau.Value, 3);
                     }
                 }
@@ -449,11 +449,11 @@ EVA:Drop[0]".Replace("\r", ""));
         [TestMethod]
         public void TestMapStackItem()
         {
-            using (ExecutionEngine engine = NeoVM.CreateEngine(null))
+            using (var engine = CreateEngine(null))
             {
                 // First test for array, second for Struct
 
-                using (MapStackItem ar = engine.CreateMap())
+                using (var ar = engine.CreateMap())
                 {
                     // Clear
 
@@ -463,14 +463,14 @@ EVA:Drop[0]".Replace("\r", ""));
 
                     // Test Equal key and value
 
-                    using (BooleanStackItem b = engine.CreateBool(true))
+                    using (var b = engine.CreateBool(true))
                         ar[b] = b;
 
                     Assert.AreEqual(1, ar.Count);
 
                     // Test remove
 
-                    using (BooleanStackItem b = engine.CreateBool(true))
+                    using (var b = engine.CreateBool(true))
                     {
                         Assert.IsTrue(ar.ContainsKey(b));
                         Assert.IsTrue(ar.Remove(b));
@@ -480,32 +480,32 @@ EVA:Drop[0]".Replace("\r", ""));
 
                     // Test equal Set and Get
 
-                    using (BooleanStackItem b = engine.CreateBool(true))
-                    using (IntegerStackItem bi = engine.CreateInteger(1))
+                    using (var b = engine.CreateBool(true))
+                    using (var bi = engine.CreateInteger(1))
                         ar[b] = bi;
 
                     Assert.AreEqual(1, ar.Count);
 
-                    using (BooleanStackItem b = engine.CreateBool(true))
-                    using (IntegerStackItem bi = engine.CreateInteger(2))
+                    using (var b = engine.CreateBool(true))
+                    using (var bi = engine.CreateInteger(2))
                         ar[b] = bi;
 
                     Assert.AreEqual(1, ar.Count);
 
-                    using (BooleanStackItem b = engine.CreateBool(true))
-                    using (IStackItem bi = ar[b])
+                    using (var b = engine.CreateBool(true))
+                    using (var bi = ar[b])
                         Assert.IsTrue(bi is IntegerStackItem ii && ii.Value == 2);
 
                     // Test get keys
 
-                    using (BooleanStackItem b = engine.CreateBool(false))
-                    using (IntegerStackItem bi = engine.CreateInteger(5))
+                    using (var b = engine.CreateBool(false))
+                    using (var bi = engine.CreateInteger(5))
                         ar[b] = bi;
 
                     Assert.AreEqual(2, ar.Count);
 
                     List<bool> keys = new List<bool> { true, false };
-                    foreach (IStackItem i in ar.Keys)
+                    foreach (var i in ar.Keys)
                     {
                         Assert.IsTrue(i is BooleanStackItem);
 
@@ -521,7 +521,7 @@ EVA:Drop[0]".Replace("\r", ""));
 
                     List<BigInteger> values = new List<BigInteger>() { 2, 5 };
 
-                    foreach (IStackItem i in ar.Values)
+                    foreach (var i in ar.Values)
                     {
                         Assert.IsTrue(i is IntegerStackItem);
 
@@ -538,7 +538,7 @@ EVA:Drop[0]".Replace("\r", ""));
                     keys = new List<bool> { true, false };
                     values = new List<BigInteger>() { 2, 5 };
 
-                    foreach (KeyValuePair<IStackItem, IStackItem> i in ar)
+                    foreach (var i in ar)
                     {
                         Assert.IsTrue(i.Key is BooleanStackItem);
                         Assert.IsTrue(i.Value is IntegerStackItem);
@@ -565,10 +565,10 @@ EVA:Drop[0]".Replace("\r", ""));
         [TestMethod]
         public void TestBoolStackItem()
         {
-            using (ExecutionEngine engine = NeoVM.CreateEngine(null))
+            using (var engine = CreateEngine(null))
             {
-                using (BooleanStackItem btrue = engine.CreateBool(true))
-                using (BooleanStackItem bfalse = engine.CreateBool(false))
+                using (var btrue = engine.CreateBool(true))
+                using (var bfalse = engine.CreateBool(false))
                 {
                     Assert.IsTrue(btrue.Value);
                     Assert.IsFalse(bfalse.Value);
@@ -582,10 +582,10 @@ EVA:Drop[0]".Replace("\r", ""));
         [TestMethod]
         public void TestIntegerStackItem()
         {
-            using (ExecutionEngine engine = NeoVM.CreateEngine(null))
+            using (var engine = CreateEngine(null))
             {
-                foreach (BigInteger bi in TestBigIntegers)
-                    using (IntegerStackItem bnat = engine.CreateInteger(bi))
+                foreach (var bi in TestBigIntegers)
+                    using (var bnat = engine.CreateInteger(bi))
                         Assert.AreEqual(bnat.Value, bi);
             }
         }
@@ -596,10 +596,10 @@ EVA:Drop[0]".Replace("\r", ""));
         [TestMethod]
         public void TestByteArrayStackItem()
         {
-            using (ExecutionEngine engine = NeoVM.CreateEngine(null))
+            using (var engine = CreateEngine(null))
             {
-                using (ByteArrayStackItem bOneByte = engine.CreateByteArray(new byte[] { 0x00, 0x01 }))
-                using (ByteArrayStackItem bTwoBytes = engine.CreateByteArray(new byte[] { 0x00, 0x02 }))
+                using (var bOneByte = engine.CreateByteArray(new byte[] { 0x00, 0x01 }))
+                using (var bTwoBytes = engine.CreateByteArray(new byte[] { 0x00, 0x02 }))
                 {
                     Assert.IsTrue(bOneByte.Value.SequenceEqual(new byte[] { 0x00, 0x01 }));
                     Assert.IsTrue(bTwoBytes.Value.SequenceEqual(new byte[] { 0x00, 0x02 }));
@@ -613,12 +613,12 @@ EVA:Drop[0]".Replace("\r", ""));
         [TestMethod]
         public void TestInteropStackItem()
         {
-            using (ExecutionEngine engine = NeoVM.CreateEngine(null))
+            using (var engine = CreateEngine(null))
             {
-                using (DisposableDummy o1 = new DisposableDummy())
-                using (DisposableDummy o2 = new DisposableDummy())
-                using (InteropStackItem bInterop1 = engine.CreateInterop(o1))
-                using (InteropStackItem bInterop2 = engine.CreateInterop(o2))
+                using (var o1 = new DisposableDummy())
+                using (var o2 = new DisposableDummy())
+                using (var bInterop1 = engine.CreateInterop(o1))
+                using (var bInterop2 = engine.CreateInterop(o2))
                 {
                     Assert.AreEqual(bInterop1.Value, o1);
                     Assert.AreEqual(bInterop2.Value, o2);
@@ -632,7 +632,7 @@ EVA:Drop[0]".Replace("\r", ""));
         [TestMethod]
         public void TestStacksEngine()
         {
-            using (ExecutionEngine engine = NeoVM.CreateEngine(null))
+            using (var engine = CreateEngine(null))
             {
                 // Empty stack
 
@@ -641,18 +641,18 @@ EVA:Drop[0]".Replace("\r", ""));
 
                 // Check integer
 
-                foreach (BigInteger bi in TestBigIntegers)
+                foreach (var bi in TestBigIntegers)
                 {
-                    using (IntegerStackItem it = engine.CreateInteger(bi))
+                    using (var it = engine.CreateInteger(bi))
                         CheckItem(engine, it);
                 }
 
                 // Check bool
 
-                using (BooleanStackItem it = engine.CreateBool(true))
+                using (var it = engine.CreateBool(true))
                     CheckItem(engine, it);
 
-                using (BooleanStackItem it = engine.CreateBool(false))
+                using (var it = engine.CreateBool(false))
                     CheckItem(engine, it);
 
 
@@ -660,7 +660,7 @@ EVA:Drop[0]".Replace("\r", ""));
 
                 for (int x = 0; x < 100; x++)
                 {
-                    using (ByteArrayStackItem it = engine.CreateByteArray(new BigInteger(Rand.Next()).ToByteArray()))
+                    using (var it = engine.CreateByteArray(new BigInteger(Rand.Next()).ToByteArray()))
                         CheckItem(engine, it);
                 }
 
@@ -671,29 +671,29 @@ EVA:Drop[0]".Replace("\r", ""));
                         {"key","value" }
                     };
 
-                using (InteropStackItem it = engine.CreateInterop(dic))
+                using (var it = engine.CreateInterop(dic))
                     CheckItem(engine, it);
 
                 // Check disposed object
 
                 {
                     DisposableDummy dis = new DisposableDummy();
-                    using (InteropStackItem it = engine.CreateInterop(dis))
+                    using (var it = engine.CreateInterop(dis))
                         CheckItem(engine, it);
 
-                    using (InteropStackItem it = engine.CreateInterop(dis))
+                    using (var it = engine.CreateInterop(dis))
                         engine.ResultStack.Push(it);
                 }
 
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
 
-                using (InteropStackItem id = engine.ResultStack.Pop<InteropStackItem>())
+                using (var id = engine.ResultStack.Pop<InteropStackItem>())
                     Assert.IsTrue(id != null && id.Value is DisposableDummy dd && !dd.IsDisposed);
             }
         }
 
-        void CheckItem(ExecutionEngine engine, IStackItem item)
+        void CheckItem(IExecutionEngine engine, IStackItem item)
         {
             int c = engine.ResultStack.Count;
             engine.ResultStack.Push(item);

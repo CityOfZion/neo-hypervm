@@ -1,43 +1,44 @@
-﻿using NeoVM.Interop.Interfaces;
+﻿using NeoSharp.VM;
+using NeoVM.Interop.Extensions;
+using NeoVM.Interop.Native;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace NeoVM.Interop.Types.Collections
 {
-    public class StackItemStack : IEnumerable<IStackItem>, IDisposable
+    public class StackItemStack : IStackItemsStack
     {
-        /// <summary>
-        /// Execution Engine parent
-        /// </summary>
-        public readonly ExecutionEngine Engine;
         /// <summary>
         /// Native handle
         /// </summary>
-        private IntPtr Handle;
+        private IntPtr _handle;
+
+        /// <summary>
+        /// Engine
+        /// </summary>
+        private new readonly ExecutionEngine Engine;
 
         /// <summary>
         /// Return the number of items in the stack
         /// </summary>
-        public int Count => NeoVM.StackItems_Count(Handle);
+        public override int Count => NeoVM.StackItems_Count(_handle);
         /// <summary>
         /// Drop object from the stack
         /// </summary>
         /// <param name="count">Number of items to drop</param>
         /// <returns>Return the first element of the stack</returns>
-        public int Drop(int count = 0)
+        public override int Drop(int count = 0)
         {
-            return NeoVM.StackItems_Drop(Handle, count);
+            return NeoVM.StackItems_Drop(_handle, count);
         }
         /// <summary>
         /// Pop object from the stack
         /// </summary>
         /// <param name="free">True for free object</param>
         /// <returns>Return the first element of the stack</returns>
-        public IStackItem Pop()
+        public override IStackItem Pop()
         {
-            IntPtr ptr = NeoVM.StackItems_Pop(Handle);
+            IntPtr ptr = NeoVM.StackItems_Pop(_handle);
 
             if (ptr == IntPtr.Zero)
                 throw (new IndexOutOfRangeException());
@@ -48,9 +49,9 @@ namespace NeoVM.Interop.Types.Collections
         /// Push objet to the stack
         /// </summary>
         /// <param name="item">Object</param>
-        public void Push(IStackItem item)
+        public override void Push(IStackItem item)
         {
-            NeoVM.StackItems_Push(Handle, item.Handle);
+            NeoVM.StackItems_Push(_handle, ((INativeStackItem)item).Handle);
         }
         /// <summary>
         /// Try to obtain the element at `index` position, without consume them
@@ -58,7 +59,7 @@ namespace NeoVM.Interop.Types.Collections
         /// <param name="index">Index</param>
         /// <param name="obj">Object</param>
         /// <returns>Return tru eif object exists</returns>
-        public bool TryPeek(int index, out IStackItem obj)
+        public override bool TryPeek(int index, out IStackItem obj)
         {
             if (index < 0)
             {
@@ -66,7 +67,7 @@ namespace NeoVM.Interop.Types.Collections
                 return false;
             }
 
-            IntPtr ptr = NeoVM.StackItems_Peek(Handle, index);
+            IntPtr ptr = NeoVM.StackItems_Peek(_handle, index);
 
             if (ptr == IntPtr.Zero)
             {
@@ -78,52 +79,14 @@ namespace NeoVM.Interop.Types.Collections
             return true;
         }
         /// <summary>
-        /// Obtain the element at `index` position, without consume them
-        /// </summary>
-        /// <param name="index">Index</param>
-        /// <returns>Return object</returns>
-        public IStackItem Peek(int index = 0)
-        {
-            if (!TryPeek(index, out IStackItem obj))
-                throw new ArgumentOutOfRangeException();
-
-            return obj;
-        }
-        /// <summary>
-        /// Obtain the element at `index` position, without consume them
-        /// </summary>
-        /// <param name="index">Index</param>
-        /// <typeparam name="TStackItem">Object type</typeparam>
-        /// <returns>Return object</returns>
-        public TStackItem Peek<TStackItem>(int index = 0) where TStackItem : IStackItem
-        {
-            if (!TryPeek(index, out IStackItem obj))
-                throw new ArgumentOutOfRangeException();
-
-            if (obj is TStackItem ts) return ts;
-
-            throw (new FormatException());
-        }
-        /// <summary>
-        /// Pop object casting to this type
-        /// </summary>
-        /// <typeparam name="TStackItem">Object type</typeparam>
-        /// <returns>Return object</returns>
-        public TStackItem Pop<TStackItem>() where TStackItem : IStackItem
-        {
-            if (Pop() is TStackItem ts) return ts;
-
-            throw (new FormatException());
-        }
-        /// <summary>
         /// Try Pop object casting to this type
         /// </summary>
         /// <typeparam name="TStackItem">Object type</typeparam>
         /// <param name="item">Item</param>
         /// <returns>Return false if it is something wrong</returns>
-        public bool TryPop<TStackItem>(out TStackItem item) where TStackItem : IStackItem
+        public override bool TryPop<TStackItem>(out TStackItem item)
         {
-            IntPtr ptr = NeoVM.StackItems_Pop(Handle);
+            IntPtr ptr = NeoVM.StackItems_Pop(_handle);
 
             if (ptr == IntPtr.Zero)
             {
@@ -147,10 +110,10 @@ namespace NeoVM.Interop.Types.Collections
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="handle">Handle</param>
-        internal StackItemStack(ExecutionEngine engine, IntPtr handle)
+        internal StackItemStack(IExecutionEngine engine, IntPtr handle) : base(engine)
         {
-            Engine = engine;
-            Handle = handle;
+            _handle = handle;
+            Engine = (ExecutionEngine)engine;
 
             if (handle == IntPtr.Zero)
                 throw new ExternalException();
@@ -164,28 +127,12 @@ namespace NeoVM.Interop.Types.Collections
             return Count.ToString();
         }
 
-        #region IEnumerable
-
-        public IEnumerator<IStackItem> GetEnumerator()
-        {
-            for (int x = 0, m = Count; x < m; x++)
-                yield return Peek(x);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            for (int x = 0, m = Count; x < m; x++)
-                yield return Peek(x);
-        }
-
-        #endregion
-
         /// <summary>
         /// Free resources
         /// </summary>
-        public void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            Handle = IntPtr.Zero;
+            _handle = IntPtr.Zero;
         }
     }
 }
