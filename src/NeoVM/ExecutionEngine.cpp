@@ -2192,7 +2192,6 @@ ExecuteOpCode:
 		if (this->OnGetMessage == NULL || pubKeySize < 33 || signatureSize < 32)
 		{
 			IStackItem::Free(ipubKey, isignature);
-
 			context->EvaluationStack->Push(new BoolStackItem(false));
 			return;
 		}
@@ -2206,7 +2205,6 @@ ExecuteOpCode:
 		if (msgL <= 0)
 		{
 			IStackItem::Free(ipubKey, isignature);
-
 			context->EvaluationStack->Push(new BoolStackItem(false));
 			return;
 		}
@@ -2221,14 +2219,14 @@ ExecuteOpCode:
 		byte * signature = new byte[signatureSize];
 		signatureSize = isignature->ReadByteArray(signature, 0, signatureSize);
 
-		bool ret = Crypto::VerifySignature(msg, msgL, signature, signatureSize, pubKey, pubKeySize);
+		int16 ret = Crypto::VerifySignature(msg, msgL, signature, signatureSize, pubKey, pubKeySize);
 
 		delete[](pubKey);
 		delete[](signature);
 
 		IStackItem::Free(ipubKey, isignature);
 
-		context->EvaluationStack->Push(new BoolStackItem(ret));
+		context->EvaluationStack->Push(new BoolStackItem(ret == 0x01));
 		return;
 	}
 	case EVMOpCode::VERIFY:
@@ -2250,8 +2248,7 @@ ExecuteOpCode:
 		if (pubKeySize < 33 || signatureSize < 32 || msgSize < 0)
 		{
 			IStackItem::Free(ipubKey, isignature, imsg);
-
-			context->EvaluationStack->Push(new BoolStackItem(false));
+			this->State = EVMState::FAULT;
 			return;
 		}
 
@@ -2270,7 +2267,7 @@ ExecuteOpCode:
 		byte * signature = new byte[signatureSize];
 		signatureSize = isignature->ReadByteArray(signature, 0, signatureSize);
 
-		bool ret = Crypto::VerifySignature(msg, msgSize, signature, signatureSize, pubKey, pubKeySize);
+		int16 ret = Crypto::VerifySignature(msg, msgSize, signature, signatureSize, pubKey, pubKeySize);
 
 		delete[](msg);
 		delete[](pubKey);
@@ -2278,7 +2275,7 @@ ExecuteOpCode:
 
 		IStackItem::Free(imsg, ipubKey, isignature);
 
-		context->EvaluationStack->Push(new BoolStackItem(ret));
+		context->EvaluationStack->Push(new BoolStackItem(ret == 0x01));
 		return;
 	}
 	case EVMOpCode::CHECKMULTISIG:

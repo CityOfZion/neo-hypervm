@@ -13,14 +13,19 @@ namespace NeoVM.Interop.Native
 
         #region Windows
 
-        [DllImport(NativeLibrary, EntryPoint = "LoadLibrary")]
+        [DllImport(NativeLibrary, EntryPoint = "LoadLibrary", SetLastError = true)]
         static extern IntPtr _LoadLibrary(string fileName);
 
-        [DllImport(NativeLibrary, EntryPoint = "FreeLibrary")]
+        [DllImport(NativeLibrary, EntryPoint = "FreeLibrary", SetLastError = true)]
         static extern bool _FreeLibrary(IntPtr hModule);
 
-        [DllImport(NativeLibrary, EntryPoint = "GetProcAddress")]
+        [DllImport(NativeLibrary, EntryPoint = "GetProcAddress", SetLastError = true)]
         static extern IntPtr _GetProcAddress(IntPtr handle, string procedureName);
+
+#if DEBUG
+        [DllImport("kernel32.dll")]
+        static extern uint GetLastError();
+#endif
 
         #endregion
 
@@ -39,7 +44,17 @@ namespace NeoVM.Interop.Native
         protected override bool InternalLoadLibrary(string fileName, out IntPtr handle)
         {
             handle = _LoadLibrary(fileName);
-            return handle != IntPtr.Zero;
+
+            if (handle == IntPtr.Zero)
+            {
+#if DEBUG
+                uint err = GetLastError();
+                System.Diagnostics.Debugger.Log(0, "NATIVE_ERROR", err.ToString());
+#endif
+                return false;
+            }
+
+            return true;
         }
 
         #endregion

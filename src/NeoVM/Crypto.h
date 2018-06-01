@@ -27,5 +27,7 @@ public:
 	static void ComputeHash160(byte* data, int32 length, byte *output);
 	static void ComputeHash256(byte* data, int32 length, byte *output);
 
-	static bool VerifySignature(byte* data, int32 dataLength, byte* signature, int32 signatureLength, byte* pubKey, int32 pubKeyLength);
+
+	// -1=ERROR , 0= False , 1=True 
+	static int16 VerifySignature(byte* data, int32 dataLength, byte* signature, int32 signatureLength, byte* pubKey, int32 pubKeyLength);
 };
