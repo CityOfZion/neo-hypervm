@@ -7,13 +7,14 @@ SRCS := $(shell find $(SRC_DIRS) -name *.cpp -or -name *.c -or -name *.s)
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 
-INC_DIRS := $(shell find $(SRC_DIRS) -type d)
+INC_DIRS  := $(shell find $(SRC_DIRS) -type d) ../build/libs/libressl-2.7.3/include
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
+LIBS := /mnt/c/Sources/Neo/neo-hypervm/build/libs/libressl-2.7.3/linux-libcrypto-x64.a
 
 CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -Wall -fPIC --std=c++11
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
-	$(CXX) -fPIC -shared $(OBJS) -o $@ $(LDFLAGS)
+	$(CXX) -fPIC -shared $(OBJS) $(LIBS) -o $@ $(LDFLAGS)
 
 # assembly
 $(BUILD_DIR)/%.s.o: %.s

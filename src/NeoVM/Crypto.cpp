@@ -66,16 +66,17 @@ int16 Crypto::VerifySignature
 	}
 
 	int32 ret = -1;
+	int32 curve = NID_X9_62_prime256v1;
 
-	EC_GROUP *ecgroup = EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1);
+	EC_GROUP *ecgroup = EC_GROUP_new_by_curve_name(curve);
 	if (ecgroup != NULL)
 	{
-		EC_KEY *eckey = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1);
+		EC_KEY *eckey = EC_KEY_new_by_curve_name(curve);
 		if (eckey != NULL)
 		{
 			BIGNUM *bn = BN_bin2bn(pubKey, pubKeyLength, NULL);
 			EC_POINT *pub = EC_POINT_bn2point(ecgroup, bn, NULL, NULL);
-
+			
 			if (pub != NULL)
 			{
 				int32 gen_status = EC_KEY_set_public_key(eckey, pub);
@@ -83,6 +84,7 @@ int16 Crypto::VerifySignature
 				{
 					//ECDSA_SIG *sig = ECDSA_SIG_new();
 					//i2d_ECDSA_SIG(sig, &signature);
+
 					ECDSA_SIG *sig = d2i_ECDSA_SIG(NULL, (const unsigned char **)&signature, signatureLength);
 
 					if (sig != NULL)
@@ -155,8 +157,6 @@ void Crypto::ComputeSHA256(byte* data, int32 length, byte *output)
 	}
 
 	SHA256_CTX c;
-	static unsigned char m[SHA256_LENGTH];
-
 	SHA256_Init(&c);
 	SHA256_Update(&c, data, length);
 	SHA256_Final(output, &c);
@@ -172,8 +172,6 @@ void Crypto::ComputeSHA1(byte* data, int32 length, byte *output)
 	}
 
 	SHA_CTX c;
-	static unsigned char m[SHA1_LENGTH];
-
 	SHA1_Init(&c);
 	SHA1_Update(&c, data, length);
 	SHA1_Final(output, &c);
