@@ -115,9 +115,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="NeoVM.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>

@@ -188,7 +188,6 @@
     <ClCompile Include="BoolStackItem.cpp" />
     <ClCompile Include="ByteArrayStackItem.cpp" />
     <ClCompile Include="Crypto.cpp" />
-    <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="ExecutionContext.cpp" />
     <ClCompile Include="ExecutionEngine.cpp" />
     <ClCompile Include="IClaimable.cpp" />
