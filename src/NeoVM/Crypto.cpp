@@ -73,36 +73,34 @@ int16 Crypto::VerifySignature
 		EC_KEY *eckey = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1);
 		if (eckey != NULL)
 		{
-			EC_POINT *pub = EC_POINT_new(ecgroup);
-			int gen_status = EC_KEY_set_public_key(eckey, pub);
+			BIGNUM *bn = BN_bin2bn(pubKey, pubKeyLength, NULL);
+			EC_POINT *pub = EC_POINT_bn2point(ecgroup, bn, NULL, NULL);
 
 			if (pub != NULL)
 			{
+				int32 gen_status = EC_KEY_set_public_key(eckey, pub);
 				if (gen_status == 0x01)
 				{
-					gen_status = EC_KEY_generate_key(eckey);
-					if (gen_status == 0x01)
-					{
-						//ECDSA_SIG *sig = ECDSA_SIG_new();
-						//i2d_ECDSA_SIG(sig, &signature);
-						ECDSA_SIG *sig = d2i_ECDSA_SIG(NULL, (const unsigned char **)&signature, signatureLength);
+					//ECDSA_SIG *sig = ECDSA_SIG_new();
+					//i2d_ECDSA_SIG(sig, &signature);
+					ECDSA_SIG *sig = d2i_ECDSA_SIG(NULL, (const unsigned char **)&signature, signatureLength);
 
-						//	ECDSA_do_sign(data, dataLength, eckey);
-						if (sig != NULL)
-						{
-							ret = ECDSA_do_verify(data, dataLength, sig, eckey);
-							ECDSA_SIG_free(sig);
-						}
+					if (sig != NULL)
+					{
+						ret = ECDSA_do_verify(data, dataLength, sig, eckey);
+						ECDSA_SIG_free(sig);
 					}
 				}
+
 				EC_POINT_free(pub);
+				BN_free(bn);
 			}
 			EC_KEY_free(eckey);
 		}
 		EC_GROUP_free(ecgroup);
 	}
 
-	return ret ? 0x01 : 0x00;
+	return ret == 0x01 ? 0x01 : 0x00;
 }
 
 void Crypto::ComputeHash160(byte* data, int32 length, byte *output)
