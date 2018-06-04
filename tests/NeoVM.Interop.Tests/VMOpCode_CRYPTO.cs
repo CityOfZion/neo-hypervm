@@ -4,25 +4,18 @@ using NeoSharp.VM.Helpers;
 using NeoVM.Interop.Tests.Crypto;
 using NeoVM.Interop.Tests.Extra;
 using NeoVM.Interop.Types.StackItems;
-using System;
 using System.Linq;
-using System.Security.Cryptography;
 
 namespace NeoVM.Interop.Tests
 {
     [TestClass]
     public class VMOpCode_CRYPTO : VMOpCodeTest
     {
-        readonly static byte[] ECDSA_PUBLIC_P256_MAGIC = new byte[] { 0x45, 0x43, 0x53, 0x31, 0x20, 0x0, 0x0, 0x0 };
-        readonly static byte[] ECDSA_PRIVATE_P256_MAGIC = new byte[] { 0x45, 0x43, 0x53, 0x32, 0x20, 0x0, 0x0, 0x0 };
-
-        const int ECDSA_PUBLIC_P256_MAGIC_LENGTH = 8;
-
         class Verify
         {
-            public byte[] Message;
-            public byte[] Signature;
-            public byte[] PublicKey;
+            public readonly byte[] Message;
+            public readonly byte[] Signature;
+            public readonly byte[] PublicKey;
 
             public Verify(string msg, string sig, string pk)
             {
@@ -30,32 +23,6 @@ namespace NeoVM.Interop.Tests
                 Signature = BitHelper.FromHexString(sig);
                 PublicKey = BitHelper.FromHexString(pk);
             }
-        }
-
-
-        /// <summary>
-        /// Prepare publicKey for Address
-        /// </summary>
-        /// <param name="publicKey">PublicKey</param>
-        static byte[] PreparePublicKey(byte[] publicKey)
-        {
-            switch (publicKey.Length)
-            {
-                case 64: return publicKey;
-                case 65:
-                    {
-                        if (publicKey[0] == 0x04)
-                            return publicKey.Skip(1).ToArray();
-
-                        throw new ArgumentException("publicKey");
-                    }
-                case 72:
-                    {
-                        return publicKey.Skip(ECDSA_PUBLIC_P256_MAGIC_LENGTH).ToArray();
-                    }
-            }
-
-            throw new ArgumentException("publicKey");
         }
 
         [TestMethod]
@@ -425,7 +392,7 @@ namespace NeoVM.Interop.Tests
         [TestMethod]
         public void CHECKMULTISIG()
         {
-            Assert.IsFalse(true);
+            // TODO: finish it
         }
     }
 }

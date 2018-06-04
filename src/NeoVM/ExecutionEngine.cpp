@@ -372,7 +372,7 @@ ExecuteOpCode:
 		clone->InstructionPointer = context->InstructionPointer;
 		context->InstructionPointer += 2;
 
-		for (int i = 0; i < pcount; i++)
+		for (int32 i = 0; i < pcount; i++)
 			context->EvaluationStack->Drop();
 
 		// Jump
@@ -489,7 +489,7 @@ ExecuteOpCode:
 		}
 		else
 		{
-			for (int i = 0; i < pcount; i++)
+			for (int32 i = 0; i < pcount; i++)
 				context->EvaluationStack->Drop();
 		}
 
@@ -1318,7 +1318,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		int ret = bi->GetSign();
+		int32 ret = bi->GetSign();
 		delete(bi);
 
 		context->EvaluationStack->Push(new IntegerStackItem(ret));
@@ -2186,8 +2186,8 @@ ExecuteOpCode:
 		IStackItem* ipubKey = context->EvaluationStack->Pop();
 		IStackItem* isignature = context->EvaluationStack->Pop();
 
-		int pubKeySize = ipubKey->ReadByteArraySize();
-		int signatureSize = isignature->ReadByteArraySize();
+		int32 pubKeySize = ipubKey->ReadByteArraySize();
+		int32 signatureSize = isignature->ReadByteArraySize();
 
 		if (this->OnGetMessage == NULL || pubKeySize < 33 || signatureSize < 32)
 		{
@@ -2241,9 +2241,9 @@ ExecuteOpCode:
 		IStackItem* isignature = context->EvaluationStack->Pop();
 		IStackItem* imsg = context->EvaluationStack->Pop();
 
-		int pubKeySize = ipubKey->ReadByteArraySize();
-		int signatureSize = isignature->ReadByteArraySize();
-		int msgSize = imsg->ReadByteArraySize();
+		int32 pubKeySize = ipubKey->ReadByteArraySize();
+		int32 signatureSize = isignature->ReadByteArraySize();
+		int32 msgSize = imsg->ReadByteArraySize();
 
 		if (pubKeySize < 33 || signatureSize < 32 || msgSize < 0)
 		{
@@ -2280,7 +2280,7 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::CHECKMULTISIG:
 	{
-		int ic = context->EvaluationStack->Count();
+		int32 ic = context->EvaluationStack->Count();
 
 		if (ic < 2)
 		{
@@ -2288,12 +2288,11 @@ ExecuteOpCode:
 			return;
 		}
 
-		/*
 		byte ** pubKeys;
 		byte ** signatures;
-		int * pubKeysL;
-		int * signaturesL;
-		int pubKeysCount, signaturesCount;
+		int32 * pubKeysL;
+		int32 * signaturesL;
+		int32 pubKeysCount, signaturesCount;
 
 		for (byte x = 0; x < 2; ++x)
 		{
@@ -2373,6 +2372,7 @@ ExecuteOpCode:
 
 						data[i] = new byte[c];
 						dataL[i] = ret->ReadByteArray(data[i], 0, c);
+
 						IStackItem::Free(ret);
 					}
 
@@ -2414,6 +2414,7 @@ ExecuteOpCode:
 
 		byte* msg;
 		int32 msgL = this->OnGetMessage(this->Iteration, msg);
+
 		if (msgL <= 0)
 		{
 			if (pubKeys != NULL)	delete[](pubKeys);
@@ -2446,7 +2447,6 @@ ExecuteOpCode:
 		if (signaturesL != NULL)delete[](signaturesL);
 
 		context->EvaluationStack->Push(new BoolStackItem(fSuccess));
-		*/
 		return;
 	}
 
