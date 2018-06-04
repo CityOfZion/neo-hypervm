@@ -77,6 +77,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
+    <IncludePath>$(SolutionDir)build\libs\libressl-2.7.3\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -114,6 +115,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(SolutionDir)build\libs\libressl-2.7.3\windows-crypto-x64.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -175,9 +177,6 @@
     <ClInclude Include="ExecutionContextStack.h" />
     <ClInclude Include="IStackItem.h" />
     <ClInclude Include="EStackItemType.h" />
-    <ClInclude Include="RIPEMD160.h" />
-    <ClInclude Include="SHA1.h" />
-    <ClInclude Include="SHA256.h" />
     <ClInclude Include="StackItems.h" />
     <ClInclude Include="EVMOpCode.h" />
     <ClInclude Include="EVMState.h" />
@@ -189,7 +188,6 @@
     <ClCompile Include="BoolStackItem.cpp" />
     <ClCompile Include="ByteArrayStackItem.cpp" />
     <ClCompile Include="Crypto.cpp" />
-    <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="ExecutionContext.cpp" />
     <ClCompile Include="ExecutionEngine.cpp" />
     <ClCompile Include="IClaimable.cpp" />
@@ -199,10 +197,7 @@
     <ClCompile Include="MapStackItem.cpp" />
     <ClCompile Include="NeoVM.cpp" />
     <ClCompile Include="ExecutionContextStack.cpp" />
-    <ClCompile Include="RIPEMD160.cpp" />
     <ClCompile Include="ExecutionScript.cpp" />
-    <ClCompile Include="SHA1.cpp" />
-    <ClCompile Include="SHA256.cpp" />
     <ClCompile Include="StackItems.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

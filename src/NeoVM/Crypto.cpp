@@ -1,8 +1,10 @@
 #include "Crypto.h"
-#include "SHA1.h"
-#include "SHA256.h"
-#include "RIPEMD160.h"
 #include <cstring>
+#include <openssl/ec.h>      // for EC_GROUP_new_by_curve_name, EC_GROUP_free, EC_KEY_new, EC_KEY_set_group, EC_KEY_generate_key, EC_KEY_free
+#include <openssl/ecdsa.h>   // for ECDSA_do_sign, ECDSA_do_verify
+#include <openssl/obj_mac.h> // for NID_secp192k1
+#include <openssl/sha.h>
+#include <openssl/ripemd.h>
 
 const byte Crypto::EMPTY_SHA1[] =
 {
@@ -28,7 +30,7 @@ const byte Crypto::EMPTY_HASH256[] =
 	0x03,0x81,0x53,0x45,0x45,0xf5,0x5c,0xf4,0x3e,0x41,0x98,0x3f,0x5d,0x4c,0x94,0x56
 };
 
-bool Crypto::VerifySignature
+int16 Crypto::VerifySignature
 (
 	byte* data, int32 dataLength,
 	byte* signature, int32 signatureLength,
@@ -36,7 +38,7 @@ bool Crypto::VerifySignature
 )
 {
 	if (signatureLength <= 0)
-		return false;
+		return -1;
 
 	int pubKeyIndex = 0;
 	if (pubKeyLength == 33 && (pubKey[0] == 0x02 || pubKey[0] == 0x03))
@@ -51,6 +53,7 @@ bool Crypto::VerifySignature
 			return false;
 		}
 		*/
+		return -1;
 	}
 	else if (pubKeyLength == 65 && pubKey[0] == 0x04)
 	{
@@ -59,25 +62,47 @@ bool Crypto::VerifySignature
 	}
 	else if (pubKeyLength != 64)
 	{
-		return false;
+		return -1;
 	}
 
-	/*
-	using (var ecdsa = ECDsa.Create(new ECParameters
-		{
-			Curve = ECCurve.NamedCurves.nistP256,
-			Q = new ECPoint
-		{
-			X = pubkey.Take(32).ToArray(),
-			Y = pubkey.Skip(32).ToArray()
-		}
-		}))
+	int32 ret = -1;
+	int32 curve = NID_X9_62_prime256v1;
+
+	EC_GROUP *ecgroup = EC_GROUP_new_by_curve_name(curve);
+	if (ecgroup != NULL)
 	{
-		return ecdsa.VerifyData(message, signature, HashAlgorithmName.SHA256);
-	}
-	*/
+		EC_KEY *eckey = EC_KEY_new_by_curve_name(curve);
+		if (eckey != NULL)
+		{
+			BIGNUM *bn = BN_bin2bn(pubKey, pubKeyLength, NULL);
+			EC_POINT *pub = EC_POINT_bn2point(ecgroup, bn, NULL, NULL);
+			
+			if (pub != NULL)
+			{
+				int32 gen_status = EC_KEY_set_public_key(eckey, pub);
+				if (gen_status == 0x01)
+				{
+					//ECDSA_SIG *sig = ECDSA_SIG_new();
+					//i2d_ECDSA_SIG(sig, &signature);
 
-	return false;
+					ECDSA_SIG *sig = d2i_ECDSA_SIG(NULL, (const unsigned char **)&signature, signatureLength);
+
+					if (sig != NULL)
+					{
+						ret = ECDSA_do_verify(data, dataLength, sig, eckey);
+						ECDSA_SIG_free(sig);
+					}
+				}
+
+				EC_POINT_free(pub);
+				BN_free(bn);
+			}
+			EC_KEY_free(eckey);
+		}
+		EC_GROUP_free(ecgroup);
+	}
+
+	return ret == 0x01 ? 0x01 : 0x00;
 }
 
 void Crypto::ComputeHash160(byte* data, int32 length, byte *output)
@@ -88,18 +113,20 @@ void Crypto::ComputeHash160(byte* data, int32 length, byte *output)
 		return;
 	}
 
-	byte digest[SHA256::DIGEST_SIZE];
+	byte digest[SHA256_DIGEST_LENGTH];
 
 	// First SHA256
 
-	SHA256 ctx = SHA256();
-	ctx.init();
-	ctx.update(&data[0], length);
-	ctx.final(digest);
+	ComputeSHA256(data, length, digest);
 
 	// Then RIPEMD160
 
-	ripemd160(digest, SHA256::DIGEST_SIZE, output);
+	RIPEMD160_CTX c;
+
+	RIPEMD160_Init(&c);
+	RIPEMD160_Update(&c, digest, SHA256_DIGEST_LENGTH);
+	RIPEMD160_Final(output, &c);
+	OPENSSL_cleanse(&c, sizeof(c));
 }
 
 void Crypto::ComputeHash256(byte* data, int32 length, byte *output)
@@ -110,20 +137,15 @@ void Crypto::ComputeHash256(byte* data, int32 length, byte *output)
 		return;
 	}
 
-	byte digest[SHA256::DIGEST_SIZE];
+	byte digest[SHA256_LENGTH];
 
 	// First SHA256
 
-	SHA256 ctx = SHA256();
-	ctx.init();
-	ctx.update(&data[0], length);
-	ctx.final(digest);
+	ComputeSHA256(data, length, digest);
 
 	// Then SHA256 Again
 
-	ctx.init();
-	ctx.update(&digest[0], SHA256::DIGEST_SIZE);
-	ctx.final(output);
+	ComputeSHA256(digest, SHA256_LENGTH, output);
 }
 
 void Crypto::ComputeSHA256(byte* data, int32 length, byte *output)
@@ -134,10 +156,11 @@ void Crypto::ComputeSHA256(byte* data, int32 length, byte *output)
 		return;
 	}
 
-	SHA256 ctx = SHA256();
-	ctx.init();
-	ctx.update(&data[0], length);
-	ctx.final(output);
+	SHA256_CTX c;
+	SHA256_Init(&c);
+	SHA256_Update(&c, data, length);
+	SHA256_Final(output, &c);
+	OPENSSL_cleanse(&c, sizeof(c));
 }
 
 void Crypto::ComputeSHA1(byte* data, int32 length, byte *output)
@@ -148,7 +171,9 @@ void Crypto::ComputeSHA1(byte* data, int32 length, byte *output)
 		return;
 	}
 
-	SHA1 ctx = SHA1();
-	ctx.addBytes((const byte*)data, length);
-	ctx.getDigest(output);
+	SHA_CTX c;
+	SHA1_Init(&c);
+	SHA1_Update(&c, data, length);
+	SHA1_Final(output, &c);
+	OPENSSL_cleanse(&c, sizeof(c));
 }

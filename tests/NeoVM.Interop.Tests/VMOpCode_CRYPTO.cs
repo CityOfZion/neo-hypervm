@@ -1,8 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NeoSharp.VM;
+using NeoSharp.VM.Helpers;
 using NeoVM.Interop.Tests.Crypto;
-using NeoVM.Interop.Types;
+using NeoVM.Interop.Tests.Extra;
 using NeoVM.Interop.Types.StackItems;
+using System;
 using System.Linq;
 using System.Security.Cryptography;
 
@@ -11,6 +13,36 @@ namespace NeoVM.Interop.Tests
     [TestClass]
     public class VMOpCode_CRYPTO : VMOpCodeTest
     {
+        readonly static byte[] ECDSA_PUBLIC_P256_MAGIC = new byte[] { 0x45, 0x43, 0x53, 0x31, 0x20, 0x0, 0x0, 0x0 };
+        readonly static byte[] ECDSA_PRIVATE_P256_MAGIC = new byte[] { 0x45, 0x43, 0x53, 0x32, 0x20, 0x0, 0x0, 0x0 };
+
+        const int ECDSA_PUBLIC_P256_MAGIC_LENGTH = 8;
+
+        /// <summary>
+        /// Prepare publicKey for Address
+        /// </summary>
+        /// <param name="publicKey">PublicKey</param>
+        static byte[] PreparePublicKey(byte[] publicKey)
+        {
+            switch (publicKey.Length)
+            {
+                case 64: return publicKey;
+                case 65:
+                    {
+                        if (publicKey[0] == 0x04)
+                            return publicKey.Skip(1).ToArray();
+
+                        throw new ArgumentException("publicKey");
+                    }
+                case 72:
+                    {
+                        return publicKey.Skip(ECDSA_PUBLIC_P256_MAGIC_LENGTH).ToArray();
+                    }
+            }
+
+            throw new ArgumentException("publicKey");
+        }
+
         [TestMethod]
         public void SHA1()
         {
@@ -136,7 +168,7 @@ namespace NeoVM.Interop.Tests
 
                 // Check
 
-                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, 0x05);
+                Assert.AreEqual(engine.CurrentContext.EvaluationStack.Pop<IntegerStackItem>().Value, 0x05);
 
                 CheckClean(engine, false);
             }
@@ -148,17 +180,57 @@ namespace NeoVM.Interop.Tests
             {
                 // Load script
 
-                script.EmitPush(new byte[] {
-                    0x00, 0x01, 0x02, 0x03, 0x04, 0x00, 0x01, 0x02, 0x03, 0x04,
-                    0x00, 0x01, 0x02, 0x03, 0x04, 0x00, 0x01, 0x02, 0x03, 0x04,
-                    0x00, 0x01, 0x02, 0x03, 0x04, 0x00, 0x01, 0x02, 0x03, 0x04,
-                    0x00, 0x01, 0x02 });
+                // signature
 
                 script.EmitPush(new byte[] {
                     0x00, 0x01, 0x02, 0x03, 0x04, 0x00, 0x01, 0x02, 0x03, 0x04,
                     0x00, 0x01, 0x02, 0x03, 0x04, 0x00, 0x01, 0x02, 0x03, 0x04,
                     0x00, 0x01, 0x02, 0x03, 0x04, 0x00, 0x01, 0x02, 0x03, 0x04,
                     0x00, 0x01, 0x02 });
+
+                // publicKey
+
+                script.EmitPush(new byte[] {
+                    0x00, 0x01, 0x02, 0x03, 0x04, 0x00, 0x01, 0x02, 0x03, 0x04,
+                    0x00, 0x01, 0x02, 0x03, 0x04, 0x00, 0x01, 0x02, 0x03, 0x04,
+                    0x00, 0x01, 0x02, 0x03, 0x04, 0x00, 0x01, 0x02, 0x03, 0x04,
+                    0x00, 0x01, 0x02 });
+
+                script.Emit(EVMOpCode.CHECKSIG);
+
+                engine.LoadScript(script);
+
+                // Execute
+
+                Assert.IsTrue(engine.Execute());
+
+                // Check
+
+                Assert.IsFalse(engine.ResultStack.Pop<BooleanStackItem>().Value);
+
+                CheckClean(engine, false);
+            }
+
+            // Real message
+
+            using (var script = new ScriptBuilder())
+            using (var engine = CreateEngine(new ExecutionEngineArgs()
+            {
+                MessageProvider = new DummyMessageProvider(0, BitHelper.FromHexString(
+                        "00000000bf4421c88776c53b43ce1dc45463bfd2028e322fdfb60064be150ed3e36125d418f98ec3ed2c2d1c9427385e7b85d0d1a366e29c4e399693a59718380f8bbad6d6d90358010000004490d0bb7170726c59e75d652b5d3827bf04c165bbe9ef95cca4bf55"))
+            }))
+            {
+                // Load script
+
+                // signature
+
+                script.EmitPush(BitHelper.FromHexString(
+                    "4e0ebd369e81093866fe29406dbf6b402c003774541799d08bf9bb0fc6070ec0f6bad908ab95f05fa64e682b485800b3c12102a8596e6c715ec76f4564d5eff3"));
+
+                // publicKey
+
+                script.EmitPush(BitHelper.FromHexString(
+                    "ca0e27697b9c248f6f16e085fd0061e26f44da85b58ee835c110caa5ec3ba5543672835e89a5c1f821d773214881e84618770508ce1ddfd488ae377addf7ca38"));
 
                 script.Emit(EVMOpCode.CHECKSIG);
 
@@ -225,7 +297,7 @@ namespace NeoVM.Interop.Tests
                     HashAlgorithm = CngAlgorithm.Sha256
                 })
                 {
-                    publicKey = hkey.Export(CngKeyBlobFormat.EccPublicBlob);
+                    publicKey = PreparePublicKey(hkey.Export(CngKeyBlobFormat.EccPublicBlob));
                     signature = sign.SignData(message);
                 }
 
@@ -282,7 +354,7 @@ namespace NeoVM.Interop.Tests
 
                 // Check
 
-                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, 0x05);
+                Assert.AreEqual(engine.CurrentContext.EvaluationStack.Pop<IntegerStackItem>().Value, 0x05);
 
                 CheckClean(engine, false);
             }
