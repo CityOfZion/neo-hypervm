@@ -1,9 +1,14 @@
 #pragma once
 
 #include "Types.h"
+#include <openssl/obj_mac.h> // for NID_secp192k1
 
 class Crypto
 {
+private:
+
+	static const int32 _curve = NID_X9_62_prime256v1;
+
 public:
 
 	// Constants

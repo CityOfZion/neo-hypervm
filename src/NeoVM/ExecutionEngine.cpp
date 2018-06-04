@@ -2248,7 +2248,7 @@ ExecuteOpCode:
 		if (pubKeySize < 33 || signatureSize < 32 || msgSize < 0)
 		{
 			IStackItem::Free(ipubKey, isignature, imsg);
-			this->State = EVMState::FAULT;
+			context->EvaluationStack->Push(new BoolStackItem(false));
 			return;
 		}
 

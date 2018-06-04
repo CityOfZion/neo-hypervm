@@ -2,7 +2,6 @@
 #include <cstring>
 #include <openssl/ec.h>      // for EC_GROUP_new_by_curve_name, EC_GROUP_free, EC_KEY_new, EC_KEY_set_group, EC_KEY_generate_key, EC_KEY_free
 #include <openssl/ecdsa.h>   // for ECDSA_do_sign, ECDSA_do_verify
-#include <openssl/obj_mac.h> // for NID_secp192k1
 #include <openssl/sha.h>
 #include <openssl/ripemd.h>
 
@@ -37,59 +36,72 @@ int16 Crypto::VerifySignature
 	byte* pubKey, int32 pubKeyLength
 )
 {
-	if (signatureLength <= 0)
+	if (signatureLength != 64)
 		return -1;
 
-	int pubKeyIndex = 0;
+	byte * realPubKey = NULL;
+	int realPublicKeyLength = 65;
+
 	if (pubKeyLength == 33 && (pubKey[0] == 0x02 || pubKey[0] == 0x03))
 	{
-		/*
-		try
-		{
-			pubkey = Cryptography.ECC.ECPoint.DecodePoint(pubkey, Cryptography.ECC.ECCurve.Secp256r1).EncodePoint(false).Skip(1).ToArray();
-		}
-		catch
-		{
-			return false;
-		}
-		*/
-		return -1;
+		realPubKey = pubKey;
+		realPublicKeyLength = 33;
 	}
-	else if (pubKeyLength == 65 && pubKey[0] == 0x04)
+	else if (pubKeyLength == 64)
 	{
-		pubKeyIndex = 1;
-		pubKeyLength = 64;
+		// 0x04 first
+
+		realPubKey = new byte[65];
+		realPubKey[0] = 0x04;
+
+		memcpy(&realPubKey[1], pubKey, 64);
 	}
-	else if (pubKeyLength != 64)
+	else if (pubKeyLength == 65)
+	{
+		if (pubKey[0] != 0x04)
+			return -1;
+
+		realPubKey = data;
+	}
+	else if (pubKeyLength != 65)
 	{
 		return -1;
 	}
 
 	int32 ret = -1;
-	int32 curve = NID_X9_62_prime256v1;
 
-	EC_GROUP *ecgroup = EC_GROUP_new_by_curve_name(curve);
+	EC_GROUP *ecgroup = EC_GROUP_new_by_curve_name(_curve);
 	if (ecgroup != NULL)
 	{
-		EC_KEY *eckey = EC_KEY_new_by_curve_name(curve);
+		EC_KEY *eckey = EC_KEY_new_by_curve_name(_curve);
 		if (eckey != NULL)
 		{
-			BIGNUM *bn = BN_bin2bn(pubKey, pubKeyLength, NULL);
+			BIGNUM *bn = BN_bin2bn(realPubKey, realPublicKeyLength, NULL);
 			EC_POINT *pub = EC_POINT_bn2point(ecgroup, bn, NULL, NULL);
-			
+
 			if (pub != NULL)
 			{
 				int32 gen_status = EC_KEY_set_public_key(eckey, pub);
 				if (gen_status == 0x01)
 				{
-					//ECDSA_SIG *sig = ECDSA_SIG_new();
-					//i2d_ECDSA_SIG(sig, &signature);
+					// DER encoding
 
-					ECDSA_SIG *sig = d2i_ECDSA_SIG(NULL, (const unsigned char **)&signature, signatureLength);
+					BIGNUM *r = BN_bin2bn(&signature[0], 32, NULL);
+					BIGNUM *s = BN_bin2bn(&signature[32], 32, NULL);
+
+					ECDSA_SIG *sig = ECDSA_SIG_new();
+					gen_status = ECDSA_SIG_set0(sig, r, s);
 
 					if (sig != NULL)
 					{
-						ret = ECDSA_do_verify(data, dataLength, sig, eckey);
+						if (gen_status == 0x01)
+						{
+							byte hash[Crypto::SHA256_LENGTH];
+							ComputeSHA256(data, dataLength, hash);
+							ret = ECDSA_do_verify(hash, Crypto::SHA256_LENGTH, sig, eckey);
+						}
+
+						// Free r,s and sig
 						ECDSA_SIG_free(sig);
 					}
 				}
@@ -100,6 +112,13 @@ int16 Crypto::VerifySignature
 			EC_KEY_free(eckey);
 		}
 		EC_GROUP_free(ecgroup);
+	}
+
+	// free
+
+	if (realPubKey != pubKey)
+	{
+		free(realPubKey);
 	}
 
 	return ret == 0x01 ? 0x01 : 0x00;

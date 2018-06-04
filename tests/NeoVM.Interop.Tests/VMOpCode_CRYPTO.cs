@@ -18,6 +18,21 @@ namespace NeoVM.Interop.Tests
 
         const int ECDSA_PUBLIC_P256_MAGIC_LENGTH = 8;
 
+        class Verify
+        {
+            public byte[] Message;
+            public byte[] Signature;
+            public byte[] PublicKey;
+
+            public Verify(string msg, string sig, string pk)
+            {
+                Message = BitHelper.FromHexString(msg);
+                Signature = BitHelper.FromHexString(sig);
+                PublicKey = BitHelper.FromHexString(pk);
+            }
+        }
+
+
         /// <summary>
         /// Prepare publicKey for Address
         /// </summary>
@@ -211,42 +226,6 @@ namespace NeoVM.Interop.Tests
                 CheckClean(engine, false);
             }
 
-            // Real message
-
-            using (var script = new ScriptBuilder())
-            using (var engine = CreateEngine(new ExecutionEngineArgs()
-            {
-                MessageProvider = new DummyMessageProvider(0, BitHelper.FromHexString(
-                        "00000000bf4421c88776c53b43ce1dc45463bfd2028e322fdfb60064be150ed3e36125d418f98ec3ed2c2d1c9427385e7b85d0d1a366e29c4e399693a59718380f8bbad6d6d90358010000004490d0bb7170726c59e75d652b5d3827bf04c165bbe9ef95cca4bf55"))
-            }))
-            {
-                // Load script
-
-                // signature
-
-                script.EmitPush(BitHelper.FromHexString(
-                    "4e0ebd369e81093866fe29406dbf6b402c003774541799d08bf9bb0fc6070ec0f6bad908ab95f05fa64e682b485800b3c12102a8596e6c715ec76f4564d5eff3"));
-
-                // publicKey
-
-                script.EmitPush(BitHelper.FromHexString(
-                    "ca0e27697b9c248f6f16e085fd0061e26f44da85b58ee835c110caa5ec3ba5543672835e89a5c1f821d773214881e84618770508ce1ddfd488ae377addf7ca38"));
-
-                script.Emit(EVMOpCode.CHECKSIG);
-
-                engine.LoadScript(script);
-
-                // Execute
-
-                Assert.IsTrue(engine.Execute());
-
-                // Check
-
-                Assert.IsFalse(engine.ResultStack.Pop<BooleanStackItem>().Value);
-
-                CheckClean(engine, false);
-            }
-
             // Without valid push
 
             using (var script = new ScriptBuilder
@@ -272,64 +251,61 @@ namespace NeoVM.Interop.Tests
                 CheckClean(engine, false);
             }
 
-            // Real test
+            // Real message
 
-            foreach (var value in new bool[] { true, false, true, true, false, true, true, false, false, false })
-            {
-                // Get data
-
-                byte[] message = Args.MessageProvider.GetMessage(0);
-
-                // Create Ecdsa
-
-                byte[] publicKey, signature;
-
-                using (var hkey = CngKey.Create(CngAlgorithm.ECDsaP256, null, new CngKeyCreationParameters()
+            foreach (bool ok in new bool[] { true, false })
+                foreach (var ver in new Verify[]
                 {
-                    KeyCreationOptions = CngKeyCreationOptions.None,
-                    KeyUsage = CngKeyUsages.AllUsages,
-                    ExportPolicy = CngExportPolicies.AllowExport | CngExportPolicies.AllowArchiving | CngExportPolicies.AllowPlaintextArchiving | CngExportPolicies.AllowPlaintextExport,
-                    Provider = CngProvider.MicrosoftSoftwareKeyStorageProvider,
-                    UIPolicy = new CngUIPolicy(CngUIProtectionLevels.None),
-                }))
-                using (var sign = new ECDsaCng(hkey)
-                {
-                    HashAlgorithm = CngAlgorithm.Sha256
+                new Verify(
+                    "00000000ea5029691bd94d9667cb32bf136cbba38cf9eb5978bd1d0bf825a3f8a80be6af157aee574e343ff867f3c470ffeecd77312bed61195ba8f1c6588fd275257f60ef6b0458d6070000a36a49f800ef916159e75d652b5d3827bf04c165bbe9ef95cca4bf55",
+                    "95083c5c98cdacdaf57af61104b68940cd0f7cae59b907ddea7f77ae1c4884348321ab62e65eabd82876e2e5f58f822538633521307be831a260ecab2cc5d16c",
+                    "03b8d9d5771d8f513aa0869b9cc8d50986403b78c6da36890638c3d46a5adce04a"),
+                new Verify(
+                    "00000000bf4421c88776c53b43ce1dc45463bfd2028e322fdfb60064be150ed3e36125d418f98ec3ed2c2d1c9427385e7b85d0d1a366e29c4e399693a59718380f8bbad6d6d90358010000004490d0bb7170726c59e75d652b5d3827bf04c165bbe9ef95cca4bf55",
+                    "4e0ebd369e81093866fe29406dbf6b402c003774541799d08bf9bb0fc6070ec0f6bad908ab95f05fa64e682b485800b3c12102a8596e6c715ec76f4564d5eff3",
+                    "ca0e27697b9c248f6f16e085fd0061e26f44da85b58ee835c110caa5ec3ba5543672835e89a5c1f821d773214881e84618770508ce1ddfd488ae377addf7ca38")
                 })
-                {
-                    publicKey = PreparePublicKey(hkey.Export(CngKeyBlobFormat.EccPublicBlob));
-                    signature = sign.SignData(message);
-                }
 
-                // Fake results
+                    using (var script = new ScriptBuilder())
+                    using (var engine = CreateEngine(new ExecutionEngineArgs()
+                    {
+                        MessageProvider = new DummyMessageProvider(0, ver.Message)
+                    }))
+                    {
+                        // Signature
 
-                if (!value)
-                {
-                    signature[0] = (byte)(signature[0] == 0xFF ? 0x00 : signature[0] + 0x01);
-                }
+                        script.EmitPush(ver.Signature);
 
-                using (var script = new ScriptBuilder())
-                using (var engine = CreateEngine(Args))
-                {
-                    // Load script
+                        // PublicKey
 
-                    script.EmitPush(signature);
-                    script.EmitPush(publicKey);
-                    script.Emit(EVMOpCode.CHECKSIG);
+                        if (!ok)
+                        {
+                            byte[] bc = ver.PublicKey.Take(ver.PublicKey.Length-1)
+                                .Concat(new byte[] { (byte)(ver.PublicKey[ver.PublicKey.Length-1] + 1) }).ToArray();
 
-                    engine.LoadScript(script);
+                            script.EmitPush(bc);
+                        }
+                        else
+                        {
+                            script.EmitPush(ver.PublicKey);
+                        }
 
-                    // Execute
+                        script.Emit(EVMOpCode.CHECKSIG);
 
-                    Assert.IsTrue(engine.Execute());
+                        // Load script
 
-                    // Check
+                        engine.LoadScript(script);
 
-                    Assert.AreEqual(engine.ResultStack.Pop<BooleanStackItem>().Value, value);
+                        // Execute
 
-                    CheckClean(engine);
-                }
-            }
+                        Assert.IsTrue(engine.Execute());
+
+                        // Check
+
+                        Assert.AreEqual(ok, engine.ResultStack.Pop<BooleanStackItem>().Value);
+
+                        CheckClean(engine, false);
+                    }
         }
 
         [TestMethod]
@@ -385,65 +361,65 @@ namespace NeoVM.Interop.Tests
                 CheckClean(engine, false);
             }
 
-            // Real test
+            // Real message
 
-            foreach (var value in new bool[] { true, false, true, true, false, true, true, false, false, false })
-            {
-                // Get data
-
-                byte[] message = Args.MessageProvider.GetMessage(0);
-
-                // Create Ecdsa
-
-                byte[] publicKey, signature;
-
-                using (var hkey = CngKey.Create(CngAlgorithm.ECDsaP256, null, new CngKeyCreationParameters()
+            foreach (bool ok in new bool[] { true, false })
+                foreach (var ver in new Verify[]
                 {
-                    KeyCreationOptions = CngKeyCreationOptions.None,
-                    KeyUsage = CngKeyUsages.AllUsages,
-                    ExportPolicy = CngExportPolicies.AllowExport | CngExportPolicies.AllowArchiving | CngExportPolicies.AllowPlaintextArchiving | CngExportPolicies.AllowPlaintextExport,
-                    Provider = CngProvider.MicrosoftSoftwareKeyStorageProvider,
-                    UIPolicy = new CngUIPolicy(CngUIProtectionLevels.None),
-                }))
-                using (var sign = new ECDsaCng(hkey)
-                {
-                    HashAlgorithm = CngAlgorithm.Sha256
+                new Verify(
+                    "00000000ea5029691bd94d9667cb32bf136cbba38cf9eb5978bd1d0bf825a3f8a80be6af157aee574e343ff867f3c470ffeecd77312bed61195ba8f1c6588fd275257f60ef6b0458d6070000a36a49f800ef916159e75d652b5d3827bf04c165bbe9ef95cca4bf55",
+                    "95083c5c98cdacdaf57af61104b68940cd0f7cae59b907ddea7f77ae1c4884348321ab62e65eabd82876e2e5f58f822538633521307be831a260ecab2cc5d16c",
+                    "03b8d9d5771d8f513aa0869b9cc8d50986403b78c6da36890638c3d46a5adce04a"),
+                new Verify(
+                    "00000000bf4421c88776c53b43ce1dc45463bfd2028e322fdfb60064be150ed3e36125d418f98ec3ed2c2d1c9427385e7b85d0d1a366e29c4e399693a59718380f8bbad6d6d90358010000004490d0bb7170726c59e75d652b5d3827bf04c165bbe9ef95cca4bf55",
+                    "4e0ebd369e81093866fe29406dbf6b402c003774541799d08bf9bb0fc6070ec0f6bad908ab95f05fa64e682b485800b3c12102a8596e6c715ec76f4564d5eff3",
+                    "ca0e27697b9c248f6f16e085fd0061e26f44da85b58ee835c110caa5ec3ba5543672835e89a5c1f821d773214881e84618770508ce1ddfd488ae377addf7ca38")
                 })
-                {
-                    publicKey = hkey.Export(CngKeyBlobFormat.EccPublicBlob);
-                    signature = sign.SignData(message);
-                }
 
-                // Fake results
+                    using (var script = new ScriptBuilder())
+                    using (var engine = CreateEngine(new ExecutionEngineArgs()
+                    {
+                        MessageProvider = null
+                    }))
+                    {
+                        // Message
 
-                if (!value)
-                {
-                    signature[0] = (byte)(signature[0] == 0xFF ? 0x00 : signature[0] + 0x01);
-                }
+                        script.EmitPush(ver.Message);
+                        
+                        // Signature
 
-                using (var script = new ScriptBuilder())
-                using (var engine = CreateEngine(Args))
-                {
-                    // Load script
+                        script.EmitPush(ver.Signature);
 
-                    script.EmitPush(message);
-                    script.EmitPush(signature);
-                    script.EmitPush(publicKey);
-                    script.Emit(EVMOpCode.VERIFY);
+                        // PublicKey
 
-                    engine.LoadScript(script);
+                        if (!ok)
+                        {
+                            byte[] bc = ver.PublicKey.Take(ver.PublicKey.Length - 1)
+                                .Concat(new byte[] { (byte)(ver.PublicKey[ver.PublicKey.Length - 1] + 1) }).ToArray();
 
-                    // Execute
+                            script.EmitPush(bc);
+                        }
+                        else
+                        {
+                            script.EmitPush(ver.PublicKey);
+                        }
 
-                    Assert.IsTrue(engine.Execute());
+                        script.Emit(EVMOpCode.VERIFY);
 
-                    // Check
+                        // Load script
 
-                    Assert.AreEqual(engine.ResultStack.Pop<BooleanStackItem>().Value, value);
+                        engine.LoadScript(script);
 
-                    CheckClean(engine);
-                }
-            }
+                        // Execute
+
+                        Assert.IsTrue(engine.Execute());
+
+                        // Check
+
+                        Assert.AreEqual(ok, engine.ResultStack.Pop<BooleanStackItem>().Value);
+
+                        CheckClean(engine, false);
+                    }
         }
 
         [TestMethod]
