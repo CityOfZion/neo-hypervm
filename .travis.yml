@@ -9,7 +9,8 @@ mono: none
 dotnet: 2.0.0
 
 before_install:
-  - cd scripts
+ - cd scripts
+ - chmod +x *.sh
 
 script:
  - ./test.sh
