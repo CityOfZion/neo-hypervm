@@ -1,5 +1,6 @@
 #include "Crypto.h"
 #include <cstring>
+
 #include <openssl/ec.h>      // for EC_GROUP_new_by_curve_name, EC_GROUP_free, EC_KEY_new, EC_KEY_set_group, EC_KEY_generate_key, EC_KEY_free
 #include <openssl/ecdsa.h>   // for ECDSA_do_sign, ECDSA_do_verify
 #include <openssl/sha.h>
@@ -69,11 +70,12 @@ int16 Crypto::VerifySignature
 	}
 
 	int32 ret = -1;
-
 	EC_GROUP *ecgroup = EC_GROUP_new_by_curve_name(_curve);
+
 	if (ecgroup != NULL)
 	{
 		EC_KEY *eckey = EC_KEY_new_by_curve_name(_curve);
+
 		if (eckey != NULL)
 		{
 			BIGNUM *bn = BN_bin2bn(realPubKey, realPublicKeyLength, NULL);
@@ -82,6 +84,7 @@ int16 Crypto::VerifySignature
 			if (pub != NULL)
 			{
 				int32 gen_status = EC_KEY_set_public_key(eckey, pub);
+
 				if (gen_status == 0x01)
 				{
 					// DER encoding
@@ -102,7 +105,15 @@ int16 Crypto::VerifySignature
 						}
 
 						// Free r,s and sig
+
 						ECDSA_SIG_free(sig);
+					}
+					else
+					{
+						// TODO: Check this free
+
+						BN_free(r);
+						BN_free(s);
 					}
 				}
 
