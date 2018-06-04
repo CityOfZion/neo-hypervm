@@ -11,6 +11,8 @@ dotnet: 2.0.0
 before_install:
  - cd scripts
  - chmod +x *.sh
+ - sudo apt-get update
+ - sudo apt-get install binutils binutils-multiarch
 
 script:
  - ./test.sh

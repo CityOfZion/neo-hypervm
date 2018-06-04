@@ -32,8 +32,8 @@ namespace NeoVM.Interop.Types
         /// </summary>
         byte[] LastMessage;
 
-        IStackItemsStack _ResultStack;
-        IStack<IExecutionContext> _InvocationStack;
+        readonly IStackItemsStack _ResultStack;
+        readonly IStack<IExecutionContext> _InvocationStack;
 
         /// <summary>
         /// Is Disposed
