@@ -2288,11 +2288,11 @@ ExecuteOpCode:
 			return;
 		}
 
-		byte ** pubKeys;
-		byte ** signatures;
-		int32 * pubKeysL;
-		int32 * signaturesL;
-		int32 pubKeysCount, signaturesCount;
+		byte ** pubKeys = NULL;
+		byte ** signatures = NULL;
+		int32 * pubKeysL = NULL;
+		int32 * signaturesL = NULL;
+		int32 pubKeysCount = 0, signaturesCount = 0;
 
 		for (byte x = 0; x < 2; ++x)
 		{
@@ -2322,6 +2322,7 @@ ExecuteOpCode:
 						{
 							data[i] = NULL;
 							dataL[i] = c;
+							this->State = EVMState::FAULT;
 							continue;
 						}
 
@@ -2367,6 +2368,7 @@ ExecuteOpCode:
 						{
 							data[i] = NULL;
 							dataL[i] = c;
+							this->State = EVMState::FAULT;
 							continue;
 						}
 
@@ -2396,15 +2398,29 @@ ExecuteOpCode:
 			IStackItem::Free(item);
 		}
 
-		if (this->State == EVMState::FAULT || this->OnGetMessage == NULL ||
-			pubKeysCount <= 0 || signaturesCount <= 0 || signaturesCount > pubKeysCount)
+		// Check fault
+
+		if (pubKeysCount <= 0 || signaturesCount <= 0 || signaturesCount > pubKeysCount)
 		{
+			this->State = EVMState::FAULT;
+		}
+
+		if (this->State == EVMState::FAULT || this->OnGetMessage == NULL)
+		{
+			// Free
+
 			if (pubKeys != NULL)	delete[](pubKeys);
 			if (signatures != NULL) delete[](signatures);
 			if (pubKeysL != NULL)	delete[](pubKeysL);
 			if (signaturesL != NULL)delete[](signaturesL);
 
-			context->EvaluationStack->Push(new BoolStackItem(false));
+			// Return
+
+			if (this->State != EVMState::FAULT)
+			{
+				context->EvaluationStack->Push(new BoolStackItem(false));
+			}
+
 			return;
 		}
 
