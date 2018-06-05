@@ -24,7 +24,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\neo-sharp\src\NeoSharp.VM\NeoSharp.VM.csproj" />
+    <Reference Include="NeoSharp.VM">
+      <HintPath>..\..\build\libs\NeoSharp.VM.dll</HintPath>
+      <SpecificVersion>false</SpecificVersion>
+    </Reference>
   </ItemGroup>
 
 </Project>
