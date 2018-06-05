@@ -12,7 +12,7 @@ before_install:
  - cd scripts
  - chmod +x *.sh
  - sudo apt-get update
- - sudo apt-get install binutils binutils-multiarch
+ - sudo apt-get install binutils binutils-multiarch g++-multilib
 
 script:
  - ./test.sh
