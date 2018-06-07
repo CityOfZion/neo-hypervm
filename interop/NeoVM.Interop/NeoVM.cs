@@ -218,10 +218,7 @@ namespace NeoVM.Interop
             // Static destructor
             AppDomain.CurrentDomain.ProcessExit += (o, e) =>
             {
-                if (Core != null)
-                {
-                    Core.Dispose();
-                }
+                Core?.Dispose();
             };
 
             // Cache delegates using reflection
