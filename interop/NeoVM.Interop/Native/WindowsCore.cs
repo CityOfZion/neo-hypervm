@@ -33,12 +33,12 @@ namespace NeoVM.Interop.Native
 
         protected override bool InternalFreeLibrary()
         {
-            return _FreeLibrary(NativeHandle);
+            return _FreeLibrary(_nativeHandle);
         }
 
         protected override IntPtr GetProcAddress(string name)
         {
-            return _GetProcAddress(NativeHandle, name);
+            return _GetProcAddress(_nativeHandle, name);
         }
 
         protected override bool InternalLoadLibrary(string fileName, out IntPtr handle)

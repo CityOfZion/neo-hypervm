@@ -13,6 +13,7 @@ namespace NeoVM.Interop.Extensions
         /// <summary>
         /// Convert native pointer to stack item
         /// </summary>
+        /// <param name="engine">Engine</param>
         /// <param name="item">Item</param>
         /// <returns>Return StackItem</returns>
         public static IStackItem ConvertFromNative(this ExecutionEngine engine, IntPtr item)
@@ -74,16 +75,14 @@ namespace NeoVM.Interop.Extensions
         {
             byte[] data = item.GetNativeByteArray();
 
-            if (data == null)
+            if (data == null || data.Length == 0)
             {
                 return NeoVM.StackItem_Create((byte)item.Type, IntPtr.Zero, 0);
             }
-            else
+
+            fixed (byte* p = data)
             {
-                fixed (byte* p = data)
-                {
-                    return NeoVM.StackItem_Create((byte)item.Type, (IntPtr)p, data.Length);
-                }
+                return NeoVM.StackItem_Create((byte)item.Type, (IntPtr)p, data.Length);
             }
         }
     }

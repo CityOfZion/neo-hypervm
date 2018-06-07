@@ -21,7 +21,7 @@ namespace NeoVM.Interop.Interfaces
         /// <summary>
         /// Library Handle
         /// </summary>
-        public IntPtr NativeHandle { get; private set; } = IntPtr.Zero;
+        protected IntPtr _nativeHandle;
 
         /// <summary>
         /// Protected constructor
@@ -32,6 +32,7 @@ namespace NeoVM.Interop.Interfaces
         {
             Platform = platform;
             LibraryExtension = libraryExtension;
+            _nativeHandle = IntPtr.Zero;
         }
 
         #region CrossPlatform Support
@@ -64,16 +65,16 @@ namespace NeoVM.Interop.Interfaces
         /// <returns>Return the library handle</returns>
         public bool LoadLibrary(string fileName)
         {
-            if (NativeHandle != IntPtr.Zero)
+            if (_nativeHandle != IntPtr.Zero)
                 throw (new NotSupportedException("Library is already loaded"));
 
             if (!InternalLoadLibrary(fileName, out IntPtr h))
             {
-                NativeHandle = IntPtr.Zero;
+                _nativeHandle = IntPtr.Zero;
                 return false;
             }
 
-            NativeHandle = h;
+            _nativeHandle = h;
             return true;
         }
         /// <summary>
@@ -82,12 +83,12 @@ namespace NeoVM.Interop.Interfaces
         /// <returns>Return false if fail</returns>
         public bool FreeLibrary()
         {
-            if (NativeHandle == IntPtr.Zero)
+            if (_nativeHandle == IntPtr.Zero)
                 throw (new NotSupportedException("Library not loaded"));
 
             if (InternalFreeLibrary())
             {
-                NativeHandle = IntPtr.Zero;
+                _nativeHandle = IntPtr.Zero;
                 return true;
             }
 
@@ -99,7 +100,7 @@ namespace NeoVM.Interop.Interfaces
 
         protected virtual void Dispose(bool disposing)
         {
-            if (NativeHandle == IntPtr.Zero) return;
+            if (_nativeHandle == IntPtr.Zero) return;
 
             // Free unmanaged resources (unmanaged objects) and override a finalizer below and set large fields to null.
             FreeLibrary();

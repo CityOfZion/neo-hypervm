@@ -43,7 +43,7 @@ namespace NeoVM.Interop.Native
 
         protected override bool InternalFreeLibrary()
         {
-            return dlclose(NativeHandle) == 0;
+            return dlclose(_nativeHandle) == 0;
         }
 
         protected override IntPtr GetProcAddress(string name)
@@ -52,12 +52,13 @@ namespace NeoVM.Interop.Native
 
             dlerror();
 
-            IntPtr res = dlsym(NativeHandle, name);
+            IntPtr res = dlsym(_nativeHandle, name);
 
             if (res != IntPtr.Zero)
                 return res;
 
             IntPtr errPtr = dlerror();
+
             if (errPtr != IntPtr.Zero)
                 throw new Exception("dlsym: " + Marshal.PtrToStringAnsi(errPtr));
 
