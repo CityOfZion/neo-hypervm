@@ -22,7 +22,7 @@ extern "C"
 
 	// ExecutionContext
 
-	DllExport int32 __stdcall ExecutionContext_GetScriptHash(ExecutionContext* context, byte *output, int32 index);
+	DllExport int32 __stdcall ExecutionContext_GetScriptHash(ExecutionContext* context, byte* output, int32 index);
 	DllExport EVMOpCode __stdcall ExecutionContext_GetNextInstruction(ExecutionContext* context);
 	DllExport int32 __stdcall ExecutionContext_GetInstructionPointer(ExecutionContext* context);
 	DllExport void __stdcall ExecutionContext_Claim(ExecutionContext* context, StackItems* &evStack, StackItems* &altStack);
@@ -37,7 +37,7 @@ extern "C"
 	);
 	DllExport void __stdcall ExecutionEngine_Free(ExecutionEngine* &engine);
 	DllExport void __stdcall ExecutionEngine_Clean(ExecutionEngine* engine, uint32 iteration);
-	DllExport int32 __stdcall ExecutionEngine_LoadScript(ExecutionEngine* engine, byte * script, int32 scriptLength, int32 rvcount);
+	DllExport int32 __stdcall ExecutionEngine_LoadScript(ExecutionEngine* engine, byte* script, int32 scriptLength, int32 rvcount);
 	DllExport byte __stdcall ExecutionEngine_LoadCachedScript(ExecutionEngine* engine, int32 scriptIndex, int32 rvcount);
 	DllExport byte __stdcall ExecutionEngine_Execute(ExecutionEngine* engine);
 	DllExport void __stdcall ExecutionEngine_StepInto(ExecutionEngine* engine);
@@ -51,7 +51,7 @@ extern "C"
 	DllExport int32 __stdcall StackItems_Count(StackItems* stack);
 	DllExport IStackItem* __stdcall StackItems_Pop(StackItems* stack);
 	DllExport IStackItem* __stdcall StackItems_Peek(StackItems* stack, int32 index);
-	DllExport void __stdcall StackItems_Push(StackItems* stack, IStackItem *item);
+	DllExport void __stdcall StackItems_Push(StackItems* stack, IStackItem* item);
 	DllExport int32 __stdcall StackItems_Drop(StackItems* stack, int32 count);
 	DllExport void __stdcall StackItems_AddLog(StackItems* stack, OnStackChangeCallback callback);
 
@@ -64,9 +64,9 @@ extern "C"
 
 	// StackItem
 
-	DllExport IStackItem* __stdcall StackItem_Create(EStackItemType type, byte *data, int32 size);
+	DllExport IStackItem* __stdcall StackItem_Create(EStackItemType type, byte* data, int32 size);
 	DllExport EStackItemType __stdcall StackItem_SerializeInfo(IStackItem* item, int32 &size);
-	DllExport int32 __stdcall StackItem_Serialize(IStackItem* item, byte * output, int32 length);
+	DllExport int32 __stdcall StackItem_Serialize(IStackItem* item, byte* output, int32 length);
 	DllExport void __stdcall StackItem_Free(IStackItem* &item);
 
 	// MapStackItem

@@ -1,7 +1,7 @@
 #include "ByteArrayStackItem.h"
 #include <cstring>
 
-ByteArrayStackItem::ByteArrayStackItem(byte * data, int32 size, bool copyPointer) :IStackItem(EStackItemType::ByteArray), PayloadLength(size)
+ByteArrayStackItem::ByteArrayStackItem(byte* data, int32 size, bool copyPointer) :IStackItem(EStackItemType::ByteArray), PayloadLength(size)
 {
 	if (size > 0 && data != NULL)
 	{
@@ -21,7 +21,7 @@ ByteArrayStackItem::ByteArrayStackItem(byte * data, int32 size, bool copyPointer
 	}
 }
 
-int32 ByteArrayStackItem::ReadByteArray(byte * output, int32 sourceIndex, int32 count)
+int32 ByteArrayStackItem::ReadByteArray(byte* output, int32 sourceIndex, int32 count)
 {
 	if (sourceIndex < 0)
 	{
@@ -61,7 +61,7 @@ bool ByteArrayStackItem::GetBoolean()
 	return false;
 }
 
-BigInteger * ByteArrayStackItem::GetBigInteger()
+BigInteger* ByteArrayStackItem::GetBigInteger()
 {
 	if (this->PayloadLength == 0)
 		return new BigInteger(BigInteger::Zero);
@@ -71,7 +71,7 @@ BigInteger * ByteArrayStackItem::GetBigInteger()
 
 bool ByteArrayStackItem::GetInt32(int32 &ret)
 {
-	BigInteger * bi = this->GetBigInteger();
+	BigInteger* bi = this->GetBigInteger();
 	if (bi == NULL) return false;
 
 	bool bret = bi->ToInt32(ret);
@@ -80,7 +80,7 @@ bool ByteArrayStackItem::GetInt32(int32 &ret)
 	return bret;
 }
 
-bool ByteArrayStackItem::Equals(IStackItem * it)
+bool ByteArrayStackItem::Equals(IStackItem* it)
 {
 	if (it == this) return true;
 
@@ -107,7 +107,7 @@ bool ByteArrayStackItem::Equals(IStackItem * it)
 		if (iz == 0)
 			return this->PayloadLength == 0;
 
-		byte *data = new byte[iz];
+		byte* data = new byte[iz];
 		iz = it->ReadByteArray(data, 0, iz);
 
 		if (iz != this->PayloadLength)
@@ -131,7 +131,7 @@ bool ByteArrayStackItem::Equals(IStackItem * it)
 
 // Serialize
 
-int32 ByteArrayStackItem::Serialize(byte * data, int32 length)
+int32 ByteArrayStackItem::Serialize(byte* data, int32 length)
 {
 	if (this->PayloadLength > 0 && length > 0)
 	{

@@ -19,7 +19,7 @@ private:
 	uint32 _uSmall;
 
 	// Used if _iuLast > 0.
-	uint32 *_rgu;
+	uint32* _rgu;
 
 	int32 _rguLength;
 
@@ -27,10 +27,10 @@ private:
 	static int32 CbitHighZero(uint64 uu);
 	static uint32 AddCarry(uint32 &u1, uint32 u2, uint32 uCarry);
 	static uint32 MulCarry(uint32 &u1, uint32 u2, uint32 uCarry);
-	static uint32 Mod(BigIntegerBuilder *regNum, uint32 uDen);
-	static void ModDivCore(BigIntegerBuilder *regNum, BigIntegerBuilder &regDen, bool fQuo, BigIntegerBuilder &regQuo);
+	static uint32 Mod(BigIntegerBuilder* regNum, uint32 uDen);
+	static void ModDivCore(BigIntegerBuilder* regNum, BigIntegerBuilder &regDen, bool fQuo, BigIntegerBuilder &regQuo);
 	static uint32 AddMulCarry(uint32 &uAdd, uint32 uMul1, uint32 uMul2, uint32 uCarry);
-	static int32 GetDiffLength(uint32 *rgu1, uint32 * rgu2, int32 cu);
+	static int32 GetDiffLength(uint32* rgu1, uint32* rgu2, int32 cu);
 	static uint32 SubBorrow(uint32 &u1, uint32 u2, uint32 uBorrow);
 	static uint32 SubRevBorrow(uint32 &u1, uint32 u2, uint32 uBorrow);
 
@@ -38,7 +38,7 @@ private:
 	void Add(uint32 u);
 	void Mul(uint32 u);
 	void Sub(int32 &sign, uint32 u);
-	void SubRev(BigIntegerBuilder * reg);
+	void SubRev(BigIntegerBuilder* reg);
 	void Set(uint32 uu);
 	void Set(uint64 uu);
 	uint32 DivMod(uint32 uDen);
@@ -62,11 +62,11 @@ public:
 	void Mod(BigIntegerBuilder &regDen);
 	void Add(BigIntegerBuilder &reg);
 	void Sub(int32 &sign, BigIntegerBuilder &reg);
-	void GetInteger(int32 &sign, uint32 * &bits, int32 &bitSize);
+	void GetInteger(int32 &sign, uint32* &bits, int32 &bitSize);
 
 	// Constructor
 
-	BigIntegerBuilder(int32 sign, uint32 * bits, int32 bitSize, int32 &outSign);
+	BigIntegerBuilder(int32 sign, uint32* bits, int32 bitSize, int32 &outSign);
 
 	// Destructor
 

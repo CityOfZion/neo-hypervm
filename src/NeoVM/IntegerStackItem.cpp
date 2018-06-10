@@ -1,12 +1,12 @@
 #include "IntegerStackItem.h"
 
-IntegerStackItem::IntegerStackItem(byte * data, int32 size) :IStackItem(EStackItemType::Integer),
+IntegerStackItem::IntegerStackItem(byte* data, int32 size) :IStackItem(EStackItemType::Integer),
 Value(data, size) {}
 
 IntegerStackItem::IntegerStackItem(int32 value) : IStackItem(EStackItemType::Integer),
 Value(value) {}
 
-IntegerStackItem::IntegerStackItem(BigInteger *&value) : IStackItem(EStackItemType::Integer),
+IntegerStackItem::IntegerStackItem(BigInteger* &value) : IStackItem(EStackItemType::Integer),
 Value(value) 
 {
 	// TODO: I don't like this, should be used the same pointer
@@ -38,7 +38,7 @@ bool IntegerStackItem::GetInt32(int32 &ret)
 	return this->Value.ToInt32(ret);
 }
 
-int32 IntegerStackItem::ReadByteArray(byte * output, int32 sourceIndex, int32 count)
+int32 IntegerStackItem::ReadByteArray(byte* output, int32 sourceIndex, int32 count)
 {
 	if (sourceIndex != 0)
 	{
@@ -53,7 +53,7 @@ int32 IntegerStackItem::ReadByteArraySize()
 	return this->Value.ToByteArraySize();
 }
 
-bool IntegerStackItem::Equals(IStackItem * it)
+bool IntegerStackItem::Equals(IStackItem* it)
 {
 	if (it == this) return true;
 
@@ -74,8 +74,8 @@ bool IntegerStackItem::Equals(IStackItem * it)
 		}
 
 		int i0 = this->ReadByteArraySize();
-		byte * d0 = new byte[i0];
-		byte * d1 = new byte[i1];
+		byte* d0 = new byte[i0];
+		byte* d1 = new byte[i1];
 
 		i0 = this->ReadByteArray(d0, 0, i0);
 		i1 = it->ReadByteArray(d1, 0, i1);
@@ -104,7 +104,7 @@ bool IntegerStackItem::Equals(IStackItem * it)
 
 // Serialize
 
-int32 IntegerStackItem::Serialize(byte * data, int32 length)
+int32 IntegerStackItem::Serialize(byte* data, int32 length)
 {
 	return this->Value.ToByteArray(data, length);
 }

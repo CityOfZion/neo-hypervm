@@ -28,8 +28,8 @@ private:
 
 	// Stacks
 
-	StackItems * ResultStack;
-	ExecutionContextStack * InvocationStack;
+	StackItems* ResultStack;
+	ExecutionContextStack* InvocationStack;
 
 	std::list<ExecutionScript*> Scripts;
 
@@ -37,8 +37,8 @@ public:
 
 	// Load scripts
 
-	ExecutionContext* LoadScript(ExecutionScript * script, int32 rvcount);
-	int32 LoadScript(byte * script, int32 scriptLength, int32 rvcount);
+	ExecutionContext* LoadScript(ExecutionScript* script, int32 rvcount);
+	int32 LoadScript(byte* script, int32 scriptLength, int32 rvcount);
 	bool LoadScript(byte scriptIndex, int32 rvcount);
 
 	// Getters
@@ -49,8 +49,8 @@ public:
 	ExecutionContext* GetCallingContext();
 	ExecutionContext* GetEntryContext();
 
-	ExecutionContextStack * GetInvocationStack();
-	StackItems * GetResultStack();
+	ExecutionContextStack* GetInvocationStack();
+	StackItems* GetResultStack();
 
 	// Setters
 

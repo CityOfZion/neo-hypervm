@@ -17,18 +17,18 @@ public:
 
 	static const int32 ScriptHashLength = 20;
 
-	byte * Content;
+	byte* Content;
 	const int32 ScriptLength;
 	byte ScriptHash[ScriptHashLength];
 
 	// Get ScriptHash
 
 	int32 GetScriptHash(byte* hash);
-	bool IsTheSameHash(byte *hash, int32 length);
+	bool IsTheSameHash(byte* hash, int32 length);
 
 	// Constructor
 
-	ExecutionScript(byte * script, int32 scriptLength);
+	ExecutionScript(byte* script, int32 scriptLength);
 
 	// Destructor
 

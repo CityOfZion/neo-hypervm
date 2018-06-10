@@ -40,7 +40,7 @@ int16 Crypto::VerifySignature
 	if (signatureLength != 64)
 		return -1;
 
-	byte * realPubKey = NULL;
+	byte* realPubKey = NULL;
 	int realPublicKeyLength = 65;
 
 	if (pubKeyLength == 33 && (pubKey[0] == 0x02 || pubKey[0] == 0x03))
@@ -70,16 +70,16 @@ int16 Crypto::VerifySignature
 	}
 
 	int32 ret = -1;
-	EC_GROUP *ecgroup = EC_GROUP_new_by_curve_name(_curve);
+	EC_GROUP* ecgroup = EC_GROUP_new_by_curve_name(_curve);
 
 	if (ecgroup != NULL)
 	{
-		EC_KEY *eckey = EC_KEY_new_by_curve_name(_curve);
+		EC_KEY* eckey = EC_KEY_new_by_curve_name(_curve);
 
 		if (eckey != NULL)
 		{
-			BIGNUM *bn = BN_bin2bn(realPubKey, realPublicKeyLength, NULL);
-			EC_POINT *pub = EC_POINT_bn2point(ecgroup, bn, NULL, NULL);
+			BIGNUM* bn = BN_bin2bn(realPubKey, realPublicKeyLength, NULL);
+			EC_POINT* pub = EC_POINT_bn2point(ecgroup, bn, NULL, NULL);
 
 			if (pub != NULL)
 			{
@@ -89,10 +89,10 @@ int16 Crypto::VerifySignature
 				{
 					// DER encoding
 
-					BIGNUM *r = BN_bin2bn(&signature[0], 32, NULL);
-					BIGNUM *s = BN_bin2bn(&signature[32], 32, NULL);
+					BIGNUM* r = BN_bin2bn(&signature[0], 32, NULL);
+					BIGNUM* s = BN_bin2bn(&signature[32], 32, NULL);
 
-					ECDSA_SIG *sig = ECDSA_SIG_new();
+					ECDSA_SIG* sig = ECDSA_SIG_new();
 					gen_status = ECDSA_SIG_set0(sig, r, s);
 
 					if (sig != NULL)
@@ -135,7 +135,7 @@ int16 Crypto::VerifySignature
 	return ret == 0x01 ? 0x01 : 0x00;
 }
 
-void Crypto::ComputeHash160(byte* data, int32 length, byte *output)
+void Crypto::ComputeHash160(byte* data, int32 length, byte* output)
 {
 	if (length <= 0)
 	{
@@ -159,7 +159,7 @@ void Crypto::ComputeHash160(byte* data, int32 length, byte *output)
 	OPENSSL_cleanse(&c, sizeof(c));
 }
 
-void Crypto::ComputeHash256(byte* data, int32 length, byte *output)
+void Crypto::ComputeHash256(byte* data, int32 length, byte* output)
 {
 	if (length <= 0)
 	{
@@ -178,7 +178,7 @@ void Crypto::ComputeHash256(byte* data, int32 length, byte *output)
 	ComputeSHA256(digest, SHA256_LENGTH, output);
 }
 
-void Crypto::ComputeSHA256(byte* data, int32 length, byte *output)
+void Crypto::ComputeSHA256(byte* data, int32 length, byte* output)
 {
 	if (length <= 0)
 	{
@@ -193,7 +193,7 @@ void Crypto::ComputeSHA256(byte* data, int32 length, byte *output)
 	OPENSSL_cleanse(&c, sizeof(c));
 }
 
-void Crypto::ComputeSHA1(byte* data, int32 length, byte *output)
+void Crypto::ComputeSHA1(byte* data, int32 length, byte* output)
 {
 	if (length <= 0)
 	{

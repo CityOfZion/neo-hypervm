@@ -11,7 +11,7 @@ BigIntegerBuilder::BigIntegerBuilder()
 	// AssertValid(true);
 }
 
-BigIntegerBuilder::BigIntegerBuilder(int32 sign, uint32 * bits, int32 bitSize, int32 &outSign)
+BigIntegerBuilder::BigIntegerBuilder(int32 sign, uint32* bits, int32 bitSize, int32 &outSign)
 {
 	this->_fWritable = false;
 	this->_rgu = bits;
@@ -37,7 +37,7 @@ BigIntegerBuilder::BigIntegerBuilder(int32 sign, uint32 * bits, int32 bitSize, i
 	// AssertValid(true);
 }
 
-void BigIntegerBuilder::GetInteger(int32 &sign, uint32 * &bits, int32 &bitSize)
+void BigIntegerBuilder::GetInteger(int32 &sign, uint32* &bits, int32 &bitSize)
 {
 	// Contract.Requires(sign == +1 || sign == -1);
 	// AssertValid(true);
@@ -152,7 +152,7 @@ void BigIntegerBuilder::Div(BigIntegerBuilder &regDen)
 }
 
 // Divide regNum by uDen, returning the remainder and tossing the quotient.
-uint32 BigIntegerBuilder::Mod(BigIntegerBuilder *regNum, uint32 uDen)
+uint32 BigIntegerBuilder::Mod(BigIntegerBuilder* regNum, uint32 uDen)
 {
 	// regNum.AssertValid(true);
 
@@ -271,7 +271,7 @@ void BigIntegerBuilder::EnsureWritable(int32 cu, int32 cuExtra)
 	if (this->_fWritable && this->_rguLength >= cu)
 		return;
 
-	uint32 *rgu = new uint32[cu + cuExtra];
+	uint32* rgu = new uint32[cu + cuExtra];
 
 	if (this->_iuLast > 0)
 	{
@@ -315,7 +315,7 @@ void BigIntegerBuilder::EnsureWritable(int32 cuExtra)
 		}
 	}
 
-	uint32 *rgu = new uint32[l];
+	uint32* rgu = new uint32[l];
 
 	for (int x = l - 1; x >= 0; x--)
 		rgu[x] = this->_rgu[x];
@@ -453,7 +453,7 @@ int32 BigIntegerBuilder::CbitHighZero(uint64 uu)
 	return CbitHighZero((uint32)(uu >> 32));
 }
 
-void BigIntegerBuilder::ModDivCore(BigIntegerBuilder *regNum, BigIntegerBuilder &regDen, bool fQuo, BigIntegerBuilder &regQuo)
+void BigIntegerBuilder::ModDivCore(BigIntegerBuilder* regNum, BigIntegerBuilder &regDen, bool fQuo, BigIntegerBuilder &regQuo)
 {
 	//Contract.Assert(regNum._iuLast > 0 && regDen._iuLast > 0);
 
@@ -599,7 +599,7 @@ void BigIntegerBuilder::ApplyCarry(int32 iu)
 			if (this->_iuLast + 1 == this->_rguLength)
 			{
 				//Array.Resize(ref _rgu, _iuLast + 2);
-				uint32 * nrgu = new uint32[_iuLast + 2];
+				uint32* nrgu = new uint32[_iuLast + 2];
 				for (int x = _iuLast + 1; x >= 0; x--)
 					nrgu[x] = this->_rgu[x];
 
@@ -658,7 +658,7 @@ void BigIntegerBuilder::SetSizeKeep(int32 cu, int32 cuExtra)
 	if (!this->_fWritable || this->_rguLength < cu)
 	{
 		int32 l = cu + cuExtra;
-		uint32 * rgu = new uint32[l];
+		uint32* rgu = new uint32[l];
 		if (this->_iuLast == 0)
 		{
 			rgu[0] = this->_uSmall;
@@ -868,7 +868,7 @@ void BigIntegerBuilder::Trim()
 	// AssertValid(true);
 }
 
-int32 BigIntegerBuilder::GetDiffLength(uint32 *rgu1, uint32 * rgu2, int32 cu)
+int32 BigIntegerBuilder::GetDiffLength(uint32* rgu1, uint32* rgu2, int32 cu)
 {
 	for (int32 iv = cu; --iv >= 0; )
 	{
@@ -887,7 +887,7 @@ uint32 BigIntegerBuilder::SubRevBorrow(uint32 &u1, uint32 u2, uint32 uBorrow)
 
 // Subtract this register from the given one and put the result in this one.
 // Asserts that reg is larger in the most significant uint.
-void BigIntegerBuilder::SubRev(BigIntegerBuilder * reg)
+void BigIntegerBuilder::SubRev(BigIntegerBuilder* reg)
 {
 	// Contract.Assert(0 < _iuLast && _iuLast <= reg._iuLast);
 	// Contract.Assert(_iuLast < reg._iuLast || _rgu[_iuLast] < reg._rgu[_iuLast]);

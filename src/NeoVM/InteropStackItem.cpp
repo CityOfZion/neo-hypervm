@@ -1,7 +1,7 @@
 #include "InteropStackItem.h"
 #include <cstring>
 
-InteropStackItem::InteropStackItem(byte * data, int32 size) :IStackItem(EStackItemType::Interop), PayloadLength(size)
+InteropStackItem::InteropStackItem(byte* data, int32 size) :IStackItem(EStackItemType::Interop), PayloadLength(size)
 {
 	this->Payload = new byte[size];
 
@@ -21,15 +21,15 @@ bool InteropStackItem::GetBoolean()
 	return this->PayloadLength > 0;
 }
 
-BigInteger * InteropStackItem::GetBigInteger() { return NULL; }
+BigInteger* InteropStackItem::GetBigInteger() { return NULL; }
 
 bool InteropStackItem::GetInt32(int32 &ret) { return false; }
 
-int32 InteropStackItem::ReadByteArray(byte * output, int32 sourceIndex, int32 count) { return -1; }
+int32 InteropStackItem::ReadByteArray(byte* output, int32 sourceIndex, int32 count) { return -1; }
 
 int32 InteropStackItem::ReadByteArraySize() { return -1; }
 
-bool InteropStackItem::Equals(IStackItem * it)
+bool InteropStackItem::Equals(IStackItem* it)
 {
 	if (it == this) return true;
 
@@ -38,7 +38,7 @@ bool InteropStackItem::Equals(IStackItem * it)
 	if (it->Type != EStackItemType::Interop)
 		return false;
 
-	InteropStackItem * ii = (InteropStackItem*)it;
+	InteropStackItem* ii = (InteropStackItem*)it;
 
 	// Check content of the raw data
 
@@ -56,7 +56,7 @@ bool InteropStackItem::Equals(IStackItem * it)
 
 // Serialize
 
-int32 InteropStackItem::Serialize(byte * data, int32 length)
+int32 InteropStackItem::Serialize(byte* data, int32 length)
 {
 	if (this->PayloadLength > 0 && length > 0)
 	{

@@ -21,12 +21,12 @@ public:
 
 	// Stacks
 
-	StackItems * AltStack;
-	StackItems * EvaluationStack;
+	StackItems* AltStack;
+	StackItems* EvaluationStack;
 
 	// Reads
 
-	int32 Read(byte * data, int32 length);
+	int32 Read(byte* data, int32 length);
 
 	bool ReadUInt8(byte &ret);
 	bool ReadUInt16(uint16 &ret);
@@ -49,7 +49,7 @@ public:
 
 	// Constructor
 
-	ExecutionContext(ExecutionScript *script, int32 instructorPointer, int32 rvcount);
+	ExecutionContext(ExecutionScript* script, int32 instructorPointer, int32 rvcount);
 
 	// Destructor
 

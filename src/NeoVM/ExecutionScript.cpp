@@ -2,8 +2,7 @@
 #include "Crypto.h"
 #include <cstring>
 
-ExecutionScript::ExecutionScript(byte * script, int32 scriptLength) 
-	:
+ExecutionScript::ExecutionScript(byte* script, int32 scriptLength) :
 	IClaimable(),
 	IsScriptHashCalculated(false),
 	ScriptLength(scriptLength)
@@ -28,7 +27,7 @@ int32 ExecutionScript::GetScriptHash(byte* hash)
 	return this->ScriptHashLength;
 }
 
-bool ExecutionScript::IsTheSameHash(byte *hash, int32 length)
+bool ExecutionScript::IsTheSameHash(byte* hash, int32 length)
 {
 	if (length != ScriptHashLength) return false;
 

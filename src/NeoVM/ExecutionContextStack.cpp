@@ -6,7 +6,7 @@ int32 ExecutionContextStack::Count()
 	return this->Size;
 }
 
-void ExecutionContextStack::Push(ExecutionContext * i)
+void ExecutionContextStack::Push(ExecutionContext* i)
 {
 	this->Size++;
 	this->Stack.push_front(i);
@@ -22,7 +22,7 @@ ExecutionContext* ExecutionContextStack::Peek(int32 index)
 {
 	if (index == 0)
 	{
-		ExecutionContext *ret = this->Stack.front();
+		ExecutionContext* ret = this->Stack.front();
 
 		if (this->Log != NULL)
 		{
@@ -67,7 +67,7 @@ ExecutionContext* ExecutionContextStack::TryPeek(int32 index)
 	}
 	if (index == 0)
 	{
-		ExecutionContext *ret = this->Stack.front();
+		ExecutionContext* ret = this->Stack.front();
 
 		if (this->Log != NULL)
 		{
@@ -95,7 +95,7 @@ void ExecutionContextStack::Remove(int32 index)
 	std::list<ExecutionContext*>::iterator it = this->Stack.begin();
 	if (index > 0) std::advance(it, index);
 
-	ExecutionContext *itr = (ExecutionContext*)*it;
+	ExecutionContext* itr = (ExecutionContext*)*it;
 
 	this->Size--;
 	this->Stack.erase(it);
@@ -110,7 +110,7 @@ void ExecutionContextStack::Remove(int32 index)
 
 void ExecutionContextStack::Drop()
 {
-	ExecutionContext *it = this->Stack.front();
+	ExecutionContext* it = this->Stack.front();
 
 	this->Size--;
 	this->Stack.pop_front();
@@ -125,7 +125,7 @@ void ExecutionContextStack::Drop()
 
 ExecutionContext* ExecutionContextStack::Pop()
 {
-	ExecutionContext *it = this->Stack.front();
+	ExecutionContext* it = this->Stack.front();
 
 	this->Size--;
 	this->Stack.pop_front();

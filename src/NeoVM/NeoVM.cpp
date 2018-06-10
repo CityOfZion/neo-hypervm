@@ -61,7 +61,7 @@ void ExecutionContext_Free(ExecutionContext* &context)
 
 // ExecutionEngine
 
-ExecutionEngine * ExecutionEngine_Create
+ExecutionEngine* ExecutionEngine_Create
 (
 	InvokeInteropCallback interopCallback, LoadScriptCallback getScriptCallback, GetMessageCallback getMessageCallback,
 	ExecutionContextStack* &invStack, StackItems* &resStack
@@ -89,7 +89,7 @@ void ExecutionEngine_AddLog(ExecutionEngine* engine, OnStepIntoCallback callback
 	engine->SetLogCallback(callback);
 }
 
-void ExecutionEngine_Free(ExecutionEngine * & engine)
+void ExecutionEngine_Free(ExecutionEngine* & engine)
 {
 	if (engine == NULL) return;
 
@@ -97,7 +97,7 @@ void ExecutionEngine_Free(ExecutionEngine * & engine)
 	engine = NULL;
 }
 
-int32 ExecutionEngine_LoadScript(ExecutionEngine* engine, byte * script, int32 scriptLength, int32 rvcount)
+int32 ExecutionEngine_LoadScript(ExecutionEngine* engine, byte* script, int32 scriptLength, int32 rvcount)
 {
 	if (engine == NULL) return -1;
 
@@ -166,7 +166,7 @@ IStackItem* StackItems_Pop(StackItems* stack)
 	return stack->Pop();
 }
 
-void StackItems_Push(StackItems* stack, IStackItem * item)
+void StackItems_Push(StackItems* stack, IStackItem* item)
 {
 	if (stack == NULL) return;
 
@@ -236,9 +236,10 @@ void StackItem_Free(IStackItem*& item)
 	item = NULL;
 }
 
-IStackItem* StackItem_Create(EStackItemType type, byte *data, int32 size)
+IStackItem* StackItem_Create(EStackItemType type, byte* data, int32 size)
 {
-	IStackItem * it = NULL;
+	IStackItem* it = NULL;
+
 	switch (type)
 	{
 	default:
@@ -285,7 +286,7 @@ IStackItem* StackItem_Create(EStackItemType type, byte *data, int32 size)
 	return it;
 }
 
-int32 StackItem_Serialize(IStackItem* item, byte * output, int32 length)
+int32 StackItem_Serialize(IStackItem* item, byte* output, int32 length)
 {
 	return item == NULL ? -1 : item->Serialize(output, length);
 }

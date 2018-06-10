@@ -2,8 +2,7 @@
 #include "Crypto.h"
 #include <cstring>
 
-ExecutionContext::ExecutionContext(ExecutionScript* script, int32 instructorPointer, int32 rvcount) 
-	:
+ExecutionContext::ExecutionContext(ExecutionScript* script, int32 instructorPointer, int32 rvcount) :
 	IClaimable(),
 	ScriptLength(script->ScriptLength),
 	RVCount(rvcount),
@@ -22,7 +21,7 @@ bool ExecutionContext::ReadUInt8(byte &ret)
 	if (Read(data, 1) != 1)
 		return false;
 
-	ret = (byte)data[0];
+	ret = data[0];
 	return true;
 }
 
@@ -142,7 +141,7 @@ bool ExecutionContext::ReadVarBytes(uint32 &ret, uint32 max)
 	return ret <= max;
 }
 
-int32 ExecutionContext::Read(byte * data, int32 length)
+int32 ExecutionContext::Read(byte* data, int32 length)
 {
 	if (data == NULL)
 	{
@@ -151,9 +150,9 @@ int32 ExecutionContext::Read(byte * data, int32 length)
 		return length;
 	}
 
-	int read = 0;
+	int32 read = 0;
 
-	for (int x = 0; x < length && this->InstructionPointer < this->ScriptLength; ++x)
+	for (int32 x = 0; x < length && this->InstructionPointer < this->ScriptLength; ++x)
 	{
 		data[x] = this->Script->Content[this->InstructionPointer];
 		this->InstructionPointer++;

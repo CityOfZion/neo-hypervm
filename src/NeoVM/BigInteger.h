@@ -17,18 +17,18 @@ public:
 
 	BigInteger(int32 value);
 	BigInteger(const BigInteger &value);
-	BigInteger(BigInteger *value);
+	BigInteger(BigInteger* value);
 	BigInteger(uint32 value);
-	BigInteger(uint32 * value, int32 size);
+	BigInteger(uint32* value, int32 size);
 	BigInteger(uint32* value, int32 size, bool negative);
-	BigInteger(byte * value, int32 byteCount);
+	BigInteger(byte* value, int32 byteCount);
 
-	BigInteger *Clone();
+	BigInteger* Clone();
 	void CopyInternal(const BigInteger &ret);
 
 	bool ToInt32(int32 &ret);
 	int32 ToByteArraySize();
-	int32 ToByteArray(byte * output, int32 length);
+	int32 ToByteArray(byte* output, int32 length);
 
 	BigInteger* Div(BigInteger* reg);
 	BigInteger* Mul(BigInteger* reg);
@@ -45,7 +45,7 @@ public:
 	BigInteger* Shr(int32 shift);
 	int32 GetSign();
 
-	int32 CompareTo(BigInteger *bi);
+	int32 CompareTo(BigInteger* bi);
 	int32 CompareTo(const BigInteger &bi);
 
 	~BigInteger();
@@ -60,14 +60,14 @@ private:
 	const static int32 kcbitUint = 32;
 
 	int32 _sign;
-	uint32 * _bits;
+	uint32* _bits;
 	int32 _bitsSize;
 
-	static bool GetPartsForBitManipulation(BigInteger *x, uint32 * &xd, int32 &xl);
-	static void DangerousMakeTwosComplement(uint32 *d, int32 dSize);
-	static int32 Length(uint32 *rgu, int32 size);
-	static int32 GetDiffLength(uint32 *rgu1, uint32 * rgu2, int32 cu);
+	static bool GetPartsForBitManipulation(BigInteger* x, uint32* &xd, int32 &xl);
+	static void DangerousMakeTwosComplement(uint32* d, int32 dSize);
+	static int32 Length(uint32* rgu, int32 size);
+	static int32 GetDiffLength(uint32* rgu1, uint32* rgu2, int32 cu);
 
-	int32 ToUInt32Array(uint32 * &output);
-	BigInteger(int32 sign, uint32 *rgu, int32 rguSize);
+	int32 ToUInt32Array(uint32* &output);
+	BigInteger(int32 sign, uint32* rgu, int32 rguSize);
 };

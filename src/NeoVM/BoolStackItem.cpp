@@ -9,7 +9,7 @@ bool BoolStackItem::GetBoolean()
 	return this->Value;
 }
 
-BigInteger * BoolStackItem::GetBigInteger()
+BigInteger* BoolStackItem::GetBigInteger()
 {
 	return new BigInteger(this->Value ? BigInteger::One : BigInteger::Zero);
 }
@@ -20,7 +20,7 @@ bool BoolStackItem::GetInt32(int32 &ret)
 	return true;
 }
 
-bool BoolStackItem::Equals(IStackItem * it)
+bool BoolStackItem::Equals(IStackItem* it)
 {
 	if (it == this) return true;
 
@@ -37,7 +37,7 @@ bool BoolStackItem::Equals(IStackItem * it)
 		{
 		case 1:
 		{
-			byte *data = new byte[1];
+			byte* data = new byte[1];
 			int iz = it->ReadByteArray(data, 0, 1);
 
 			// Current true
@@ -61,7 +61,7 @@ bool BoolStackItem::Equals(IStackItem * it)
 	}
 }
 
-int32 BoolStackItem::ReadByteArray(byte * output, int32 sourceIndex, int32 count)
+int32 BoolStackItem::ReadByteArray(byte* output, int32 sourceIndex, int32 count)
 {
 	if (sourceIndex != 0)
 	{
@@ -93,7 +93,7 @@ int32 BoolStackItem::ReadByteArraySize()
 
 // Serialize
 
-int32 BoolStackItem::Serialize(byte * data, int32 length)
+int32 BoolStackItem::Serialize(byte* data, int32 length)
 {
 	if (length <= 0) return 0;
 

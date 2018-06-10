@@ -6,7 +6,7 @@ int32 StackItems::Count()
 	return this->Size;
 }
 
-void StackItems::Push(IStackItem * it)
+void StackItems::Push(IStackItem* it)
 {
 	this->Size++;
 	this->Stack.push_front(it);
@@ -18,7 +18,7 @@ void StackItems::Push(IStackItem * it)
 	}
 }
 
-void StackItems::Insert(int32 index, IStackItem *it)
+void StackItems::Insert(int32 index, IStackItem* it)
 {
 	it->Claim();
 
@@ -64,7 +64,7 @@ IStackItem* StackItems::TryPeek(int32 index)
 	}
 	if (index == 0)
 	{
-		IStackItem *ret = this->Stack.front();
+		IStackItem* ret = this->Stack.front();
 
 		if (this->Log != NULL)
 		{
@@ -89,7 +89,7 @@ IStackItem* StackItems::Peek(int32 index)
 {
 	if (index == 0)
 	{
-		IStackItem * ret = this->Stack.front();
+		IStackItem* ret = this->Stack.front();
 
 		if (this->Log != NULL)
 		{
@@ -127,7 +127,7 @@ IStackItem* StackItems::Remove(int32 index)
 	std::list<IStackItem*>::iterator it = this->Stack.begin();
 	if (index > 0) std::advance(it, index);
 
-	IStackItem *itr = (IStackItem*)*it;
+	IStackItem* itr = (IStackItem*)*it;
 
 	this->Size--;
 	this->Stack.erase(it);
@@ -143,7 +143,7 @@ IStackItem* StackItems::Remove(int32 index)
 
 void StackItems::Drop()
 {
-	IStackItem *it = this->Stack.front();
+	IStackItem* it = this->Stack.front();
 
 	this->Size--;
 	this->Stack.pop_front();
@@ -158,7 +158,7 @@ void StackItems::Drop()
 
 IStackItem* StackItems::Pop()
 {
-	IStackItem *it = this->Stack.front();
+	IStackItem* it = this->Stack.front();
 	this->Size--;
 	this->Stack.pop_front();
 
@@ -201,7 +201,7 @@ void StackItems::Clear()
 	this->Stack.clear();
 }
 
-void StackItems::CopyTo(StackItems *stack, int32 count)
+void StackItems::CopyTo(StackItems* stack, int32 count)
 {
 	if (stack == NULL || count == 0) return;
 

@@ -15,12 +15,12 @@ public:
 	// Converters
 
 	bool GetBoolean();
-	BigInteger * GetBigInteger();
+	BigInteger* GetBigInteger();
 	bool GetInt32(int32 &ret);
-	int32 ReadByteArray(byte * output, int32 sourceIndex, int32 count);
+	int32 ReadByteArray(byte* output, int32 sourceIndex, int32 count);
 	int32 ReadByteArraySize();
 	void Clear();
-	bool Equals(IStackItem * it);
+	bool Equals(IStackItem* it);
 
 	// Map Methods
 
@@ -43,6 +43,6 @@ public:
 
 	// Serialize
 
-	int32 Serialize(byte * data, int32 length);
+	int32 Serialize(byte* data, int32 length);
 	int32 GetSerializedSize();
 };

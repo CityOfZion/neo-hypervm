@@ -24,9 +24,9 @@ void ArrayStackItem::Reverse()
 }
 
 bool ArrayStackItem::GetBoolean() { return true; }
-BigInteger * ArrayStackItem::GetBigInteger() { return NULL; }
+BigInteger* ArrayStackItem::GetBigInteger() { return NULL; }
 bool ArrayStackItem::GetInt32(int32 &ret) { return false; }
-int32 ArrayStackItem::ReadByteArray(byte * output, int32 sourceIndex, int32 count) { return -1; }
+int32 ArrayStackItem::ReadByteArray(byte* output, int32 sourceIndex, int32 count) { return -1; }
 int32 ArrayStackItem::ReadByteArraySize() { return -1; }
 
 IStackItem* ArrayStackItem::Clone()
@@ -46,7 +46,7 @@ IStackItem* ArrayStackItem::Clone()
 	return ret;
 }
 
-bool ArrayStackItem::Equals(IStackItem * it)
+bool ArrayStackItem::Equals(IStackItem* it)
 {
 	if (it == this) return true;
 
@@ -159,7 +159,7 @@ void ArrayStackItem::RemoveAt(int32 index)
 {
 	if (index == 0)
 	{
-		IStackItem *it = this->List.front();
+		IStackItem* it = this->List.front();
 		this->List.pop_front();
 		IStackItem::UnclaimAndFree(it);
 	}
@@ -181,7 +181,7 @@ void ArrayStackItem::Set(int32 index, IStackItem* item)
 
 	if (index == 0)
 	{
-		IStackItem *it = this->List.front();
+		IStackItem* it = this->List.front();
 		this->List.pop_front();
 		IStackItem::UnclaimAndFree(it);
 		this->List.push_front(item);
@@ -200,5 +200,5 @@ void ArrayStackItem::Set(int32 index, IStackItem* item)
 
 // Serialize
 
-int32 ArrayStackItem::Serialize(byte * data, int32 length) { return 0; }
+int32 ArrayStackItem::Serialize(byte* data, int32 length) { return 0; }
 int32 ArrayStackItem::GetSerializedSize() { return 0; }

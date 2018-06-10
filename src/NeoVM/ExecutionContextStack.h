@@ -17,7 +17,7 @@ public:
 	void Clear();
 	void Remove(int32 index);
 	ExecutionContext* Pop();
-	void Push(ExecutionContext * i);
+	void Push(ExecutionContext* i);
 	ExecutionContext* Peek(int32 index);
 	ExecutionContext* TryPeek(int32 index);
 
