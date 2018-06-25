@@ -1,5 +1,5 @@
 #include "ByteArrayStackItem.h"
-#include <cstring>
+#include <string.h>
 
 ByteArrayStackItem::ByteArrayStackItem(byte* data, int32 size, bool copyPointer) :IStackItem(EStackItemType::ByteArray), PayloadLength(size)
 {

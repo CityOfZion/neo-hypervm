@@ -1,5 +1,5 @@
 #include "InteropStackItem.h"
-#include <cstring>
+#include <string.h>
 
 InteropStackItem::InteropStackItem(byte* data, int32 size) :IStackItem(EStackItemType::Interop), PayloadLength(size)
 {

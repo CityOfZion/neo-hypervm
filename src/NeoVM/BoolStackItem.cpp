@@ -1,5 +1,4 @@
 #include "BoolStackItem.h"
-#include <cstring>
 
 BoolStackItem::BoolStackItem(bool value) :IStackItem(EStackItemType::Bool), Value(value) { }
 BoolStackItem::~BoolStackItem() { }

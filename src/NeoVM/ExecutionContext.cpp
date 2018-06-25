@@ -1,6 +1,5 @@
 #include "ExecutionContext.h"
 #include "Crypto.h"
-#include <cstring>
 
 ExecutionContext::ExecutionContext(ExecutionScript* script, int32 instructorPointer, int32 rvcount) :
 	IClaimable(),

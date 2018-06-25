@@ -1,5 +1,6 @@
 #include "BigInteger.h"
 #include "BigIntegerBuilder.h"
+#include <string.h>
 
 // Constants
 

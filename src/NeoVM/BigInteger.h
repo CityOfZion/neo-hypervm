@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstring>
 #include "Types.h"
 
 // Ported from 

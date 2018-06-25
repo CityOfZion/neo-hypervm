@@ -25,7 +25,7 @@ void ExecutionEngine::Clean(uint32 iteration)
 	this->ResultStack->Clear();
 }
 
-void ExecutionEngine::SetFault() 
+void ExecutionEngine::SetFault()
 {
 	this->State = EVMState::FAULT;
 }
@@ -182,7 +182,7 @@ ExecuteOpCode:
 
 	// Check Push
 
-	if (opcode >= EVMOpCode::PUSH1 && opcode <= EVMOpCode::PUSH16)
+	else if (opcode >= EVMOpCode::PUSH1 && opcode <= EVMOpCode::PUSH16)
 	{
 		context->EvaluationStack->Push(new IntegerStackItem((opcode - EVMOpCode::PUSH1) + 1));
 		return;
@@ -309,16 +309,8 @@ ExecuteOpCode:
 
 		IStackItem* bitem = context->EvaluationStack->Pop();
 
-		if (opcode == EVMOpCode::JMPIFNOT)
-		{
-			if (!bitem->GetBoolean())
-				context->InstructionPointer = offset;
-		}
-		else
-		{
-			if (bitem->GetBoolean())
-				context->InstructionPointer = offset;
-		}
+		if ((opcode == EVMOpCode::JMPIF) == bitem->GetBoolean())
+			context->InstructionPointer = offset;
 
 		IStackItem::Free(bitem);
 		return;
@@ -352,15 +344,8 @@ ExecuteOpCode:
 			return;
 		}
 
-		byte rvcount = 0;
-		if (!context->ReadUInt8(rvcount))
-		{
-			this->SetFault();
-			return;
-		}
-
-		byte pcount = 0;
-		if (!context->ReadUInt8(pcount))
+		byte rvcount = 0, pcount = 0;
+		if (!context->ReadUInt8(rvcount) || !context->ReadUInt8(pcount))
 		{
 			this->SetFault();
 			return;
@@ -378,7 +363,9 @@ ExecuteOpCode:
 		context->InstructionPointer += 2;
 
 		for (int32 i = 0; i < pcount; i++)
+		{
 			context->EvaluationStack->Drop();
+		}
 
 		// Jump
 
@@ -397,15 +384,8 @@ ExecuteOpCode:
 			return;
 		}
 
-		byte rvcount = 0;
-		if (!context->ReadUInt8(rvcount))
-		{
-			this->SetFault();
-			return;
-		}
-
-		byte pcount = 0;
-		if (!context->ReadUInt8(pcount))
+		byte rvcount = 0, pcount = 0;
+		if (!context->ReadUInt8(rvcount) || !context->ReadUInt8(pcount))
 		{
 			this->SetFault();
 			return;
@@ -535,7 +515,9 @@ ExecuteOpCode:
 		}
 
 		if (this->InvocationStack->Count() == 0)
+		{
 			this->State = EVMState::HALT;
+		}
 
 		return;
 	}
@@ -640,7 +622,9 @@ ExecuteOpCode:
 		data[length] = 0x00;
 
 		if (this->OnInvokeInterop(data, (byte)length) != 0x01)
+		{
 			this->SetFault();
+		}
 
 		delete[](data);
 		return;

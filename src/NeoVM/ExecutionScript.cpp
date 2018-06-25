@@ -1,6 +1,6 @@
 #include "ExecutionScript.h"
 #include "Crypto.h"
-#include <cstring>
+#include <string.h>
 
 ExecutionScript::ExecutionScript(byte* script, int32 scriptLength) :
 	IClaimable(),
