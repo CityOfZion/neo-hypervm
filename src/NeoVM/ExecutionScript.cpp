@@ -10,7 +10,7 @@ ExecutionScript::ExecutionScript(byte* script, int32 scriptLength) :
 	// Copy script
 
 	this->Content = new byte[scriptLength];
-	memcpy(this->Content, script, scriptLength);
+	memcpy_s(this->Content, scriptLength, script, scriptLength);
 }
 
 int32 ExecutionScript::GetScriptHash(byte* hash)
@@ -23,7 +23,7 @@ int32 ExecutionScript::GetScriptHash(byte* hash)
 		Crypto::ComputeHash160(this->Content, this->ScriptLength, &this->ScriptHash[0]);
 	}
 
-	memcpy(hash, this->ScriptHash, this->ScriptHashLength);
+	memcpy_s(hash, this->ScriptHashLength, this->ScriptHash, this->ScriptHashLength);
 	return this->ScriptHashLength;
 }
 

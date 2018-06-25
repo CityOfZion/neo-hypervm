@@ -505,7 +505,7 @@ BigInteger* BigInteger::Or(BigInteger* bi)
 		return bi->Clone();
 	}
 
-	uint32* x,*y,*z;
+	uint32* x, *y, *z;
 
 	int32 sizex = this->ToUInt32Array(x);
 	int32 sizey = bi->ToUInt32Array(y);
@@ -546,7 +546,7 @@ BigInteger* BigInteger::Xor(BigInteger* bi)
 		return bi->Clone();
 	}
 
-	uint32* x,*y,*z;
+	uint32* x, *y, *z;
 
 	int32 sizex = this->ToUInt32Array(x);
 	int32 sizey = bi->ToUInt32Array(y);
@@ -730,7 +730,7 @@ BigInteger* BigInteger::And(BigInteger* bi)
 		return new BigInteger(BigInteger::Zero);
 	}
 
-	uint32* x,*y,*z;
+	uint32* x, *y, *z;
 
 	int32 sizex = this->ToUInt32Array(x);
 	int32 sizey = bi->ToUInt32Array(y);
@@ -1156,7 +1156,7 @@ int32 BigInteger::ToByteArray(byte* output, int32 length)
 
 	if (l <= length)
 	{
-		memcpy(output, bytes, msb + 1);
+		memcpy_s(output, length, bytes, msb + 1);
 		if (needExtraByte) output[l - 1] = highByte;
 	}
 	else

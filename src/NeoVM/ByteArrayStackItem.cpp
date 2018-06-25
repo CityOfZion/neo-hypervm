@@ -12,7 +12,7 @@ ByteArrayStackItem::ByteArrayStackItem(byte* data, int32 size, bool copyPointer)
 		else
 		{
 			this->Payload = new byte[size];
-			memcpy(this->Payload, data, size);
+			memcpy_s(this->Payload, size, data, size);
 		}
 	}
 	else
@@ -32,7 +32,7 @@ int32 ByteArrayStackItem::ReadByteArray(byte* output, int32 sourceIndex, int32 c
 
 	if (l > 0)
 	{
-		memcpy(output, &this->Payload[sourceIndex], l);
+		memcpy_s(output, l, &this->Payload[sourceIndex], l);
 	}
 
 	return l;
@@ -136,7 +136,7 @@ int32 ByteArrayStackItem::Serialize(byte* data, int32 length)
 	if (this->PayloadLength > 0 && length > 0)
 	{
 		length = this->PayloadLength > length ? length : this->PayloadLength;
-		memcpy(data, this->Payload, length);
+		memcpy_s(data, length, this->Payload, length);
 
 		return length;
 	}

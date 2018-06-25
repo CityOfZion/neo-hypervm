@@ -33,6 +33,8 @@ private:
 
 	std::list<ExecutionScript*> Scripts;
 
+	void SetFault();
+
 public:
 
 	// Load scripts

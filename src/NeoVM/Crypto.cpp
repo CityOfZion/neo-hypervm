@@ -55,7 +55,7 @@ int16 Crypto::VerifySignature
 		realPubKey = new byte[65];
 		realPubKey[0] = 0x04;
 
-		memcpy(&realPubKey[1], pubKey, 64);
+		memcpy_s(&realPubKey[1], 64, pubKey, 64);
 	}
 	else if (pubKeyLength == 65)
 	{
@@ -139,7 +139,7 @@ void Crypto::ComputeHash160(byte* data, int32 length, byte* output)
 {
 	if (length <= 0)
 	{
-		memcpy(output, Crypto::EMPTY_HASH160, Crypto::HASH160_LENGTH);
+		memcpy_s(output, Crypto::HASH160_LENGTH, Crypto::EMPTY_HASH160, Crypto::HASH160_LENGTH);
 		return;
 	}
 
@@ -163,7 +163,7 @@ void Crypto::ComputeHash256(byte* data, int32 length, byte* output)
 {
 	if (length <= 0)
 	{
-		memcpy(output, Crypto::EMPTY_HASH256, Crypto::HASH256_LENGTH);
+		memcpy_s(output, Crypto::HASH256_LENGTH, Crypto::EMPTY_HASH256, Crypto::HASH256_LENGTH);
 		return;
 	}
 
@@ -182,7 +182,7 @@ void Crypto::ComputeSHA256(byte* data, int32 length, byte* output)
 {
 	if (length <= 0)
 	{
-		memcpy(output, Crypto::EMPTY_SHA256, Crypto::SHA256_LENGTH);
+		memcpy_s(output, Crypto::SHA256_LENGTH, Crypto::EMPTY_SHA256, Crypto::SHA256_LENGTH);
 		return;
 	}
 
@@ -197,7 +197,7 @@ void Crypto::ComputeSHA1(byte* data, int32 length, byte* output)
 {
 	if (length <= 0)
 	{
-		memcpy(output, Crypto::EMPTY_SHA1, Crypto::SHA1_LENGTH);
+		memcpy_s(output, Crypto::SHA1_LENGTH, Crypto::EMPTY_SHA1, Crypto::SHA1_LENGTH);
 		return;
 	}
 

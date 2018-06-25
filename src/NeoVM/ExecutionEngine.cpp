@@ -25,6 +25,11 @@ void ExecutionEngine::Clean(uint32 iteration)
 	this->ResultStack->Clear();
 }
 
+void ExecutionEngine::SetFault() 
+{
+	this->State = EVMState::FAULT;
+}
+
 // Constructor
 
 ExecutionEngine::ExecutionEngine
@@ -167,7 +172,7 @@ ExecuteOpCode:
 		if (context->Read(data, length) != length)
 		{
 			delete[](data);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -199,7 +204,7 @@ ExecuteOpCode:
 		byte length = 0;
 		if (!context->ReadUInt8(length))
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -207,7 +212,7 @@ ExecuteOpCode:
 		if (context->Read(data, length) != length)
 		{
 			delete[](data);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -219,7 +224,7 @@ ExecuteOpCode:
 		uint16 length = 0;
 		if (!context->ReadUInt16(length))
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -227,7 +232,7 @@ ExecuteOpCode:
 		if (context->Read(data, length) != length)
 		{
 			delete[](data);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -239,7 +244,7 @@ ExecuteOpCode:
 		int32 length = 0;
 		if (!context->ReadInt32(length) || length < 0 || length > MAX_ITEM_LENGTH)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -247,7 +252,7 @@ ExecuteOpCode:
 		if (context->Read(data, length) != length)
 		{
 			delete[](data);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -269,7 +274,7 @@ ExecuteOpCode:
 		int16 offset = 0;
 		if (!context->ReadInt16(offset))
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -277,7 +282,7 @@ ExecuteOpCode:
 
 		if (offset < 0 || offset > context->ScriptLength)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -290,7 +295,7 @@ ExecuteOpCode:
 		int16 offset = 0;
 		if (!context->ReadInt16(offset))
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -298,7 +303,7 @@ ExecuteOpCode:
 
 		if (offset < 0 || offset > context->ScriptLength || context->EvaluationStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -322,7 +327,7 @@ ExecuteOpCode:
 	{
 		if (context == NULL || this->InvocationStack->Count() >= MAX_INVOCATION_STACK_SIZE)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -343,27 +348,27 @@ ExecuteOpCode:
 	{
 		if (context == NULL || this->InvocationStack->Count() >= MAX_INVOCATION_STACK_SIZE)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
 		byte rvcount = 0;
 		if (!context->ReadUInt8(rvcount))
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
 		byte pcount = 0;
 		if (!context->ReadUInt8(pcount))
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
 		if (context->EvaluationStack->Count() < pcount)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -388,28 +393,28 @@ ExecuteOpCode:
 	{
 		if (this->OnLoadScript == NULL)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
 		byte rvcount = 0;
 		if (!context->ReadUInt8(rvcount))
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
 		byte pcount = 0;
 		if (!context->ReadUInt8(pcount))
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
 		int32 ec = context->EvaluationStack->Count();
 		if (ec < pcount)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -417,7 +422,7 @@ ExecuteOpCode:
 		{
 			if (context->RVCount != rvcount)
 			{
-				this->State = EVMState::FAULT;
+				this->SetFault();
 				return;
 			}
 		}
@@ -434,7 +439,7 @@ ExecuteOpCode:
 
 			if (ec < pcount + 1)
 			{
-				this->State = EVMState::FAULT;
+				this->SetFault();
 				return;
 			}
 
@@ -445,7 +450,7 @@ ExecuteOpCode:
 
 			if (size != scriptLength || it->ReadByteArray(script_hash, 0, scriptLength) != scriptLength)
 			{
-				this->State = EVMState::FAULT;
+				this->SetFault();
 				IStackItem::UnclaimAndFree(it);
 				return;
 			}
@@ -456,7 +461,7 @@ ExecuteOpCode:
 		{
 			if (context->Read(script_hash, scriptLength) != scriptLength)
 			{
-				this->State = EVMState::FAULT;
+				this->SetFault();
 				return;
 			}
 
@@ -476,7 +481,7 @@ ExecuteOpCode:
 
 		if (search && this->OnLoadScript(script_hash, isDynamicInvoke ? 0x01 : 0x00, rvcount) != 0x01)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -513,7 +518,7 @@ ExecuteOpCode:
 				if (rvcount > 0 && context->EvaluationStack->Count() < rvcount)
 				{
 					ExecutionContext::UnclaimAndFree(context);
-					this->State = EVMState::FAULT;
+					this->SetFault();
 					return;
 				}
 			}
@@ -539,7 +544,7 @@ ExecuteOpCode:
 	{
 		if (this->OnLoadScript == NULL)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -547,7 +552,7 @@ ExecuteOpCode:
 		byte script_hash[scriptLength];
 		if (context->Read(script_hash, scriptLength) != scriptLength)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -560,7 +565,7 @@ ExecuteOpCode:
 		{
 			if (context->EvaluationStack->Count() < 1)
 			{
-				this->State = EVMState::FAULT;
+				this->SetFault();
 				return;
 			}
 
@@ -568,7 +573,7 @@ ExecuteOpCode:
 			if (item->ReadByteArray(&script_hash[0], 0, scriptLength) != scriptLength)
 			{
 				IStackItem::Free(item);
-				this->State = EVMState::FAULT;
+				this->SetFault();
 				return;
 			}
 
@@ -592,7 +597,7 @@ ExecuteOpCode:
 
 		if (search && this->OnLoadScript(script_hash, isDynamicInvoke ? 0x01 : 0x00, -1) != 0x01)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -600,7 +605,7 @@ ExecuteOpCode:
 
 		if (this->InvocationStack->Count() >= MAX_INVOCATION_STACK_SIZE)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -620,7 +625,7 @@ ExecuteOpCode:
 		uint32 length = 0;
 		if (this->OnInvokeInterop == NULL || !context->ReadVarBytes(length, 252) || length == 0)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -628,14 +633,14 @@ ExecuteOpCode:
 		if (context->Read((byte*)data, length) != (int32)length)
 		{
 			delete[](data);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
 		data[length] = 0x00;
 
 		if (this->OnInvokeInterop(data, (byte)length) != 0x01)
-			this->State = EVMState::FAULT;
+			this->SetFault();
 
 		delete[](data);
 		return;
@@ -647,7 +652,7 @@ ExecuteOpCode:
 	{
 		if (context->AltStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -658,7 +663,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -669,7 +674,7 @@ ExecuteOpCode:
 	{
 		if (context->AltStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -681,7 +686,7 @@ ExecuteOpCode:
 		int32 ic = context->EvaluationStack->Count();
 		if (ic < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -691,7 +696,7 @@ ExecuteOpCode:
 		if (!it->GetInt32(n) || n < 0 || n >= ic - 1)
 		{
 			IStackItem::Free(it);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -705,7 +710,7 @@ ExecuteOpCode:
 		int32 ic = context->EvaluationStack->Count();
 		if (ic < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -715,7 +720,7 @@ ExecuteOpCode:
 		if (!it->GetInt32(n) || n < 0 || n >= ic - 1)
 		{
 			IStackItem::Free(it);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -735,7 +740,7 @@ ExecuteOpCode:
 		int32 ic = context->EvaluationStack->Count();
 		if (ic < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -745,7 +750,7 @@ ExecuteOpCode:
 		if (!it->GetInt32(n) || n <= 0 || n > ic - 1)
 		{
 			IStackItem::Free(it);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -762,7 +767,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -774,7 +779,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -785,7 +790,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -797,7 +802,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -810,7 +815,7 @@ ExecuteOpCode:
 		int32 ic = context->EvaluationStack->Count();
 		if (ic < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -820,7 +825,7 @@ ExecuteOpCode:
 		if (!it->GetInt32(n) || n < 0)
 		{
 			IStackItem::Free(it);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -828,7 +833,7 @@ ExecuteOpCode:
 
 		if (n >= ic - 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -840,7 +845,7 @@ ExecuteOpCode:
 		int32 ic = context->EvaluationStack->Count();
 		if (ic < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -850,7 +855,7 @@ ExecuteOpCode:
 		if (!it->GetInt32(n) || n < 0)
 		{
 			IStackItem::Free(it);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -858,7 +863,7 @@ ExecuteOpCode:
 
 		if (n >= ic - 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -871,7 +876,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 3)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -883,7 +888,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -895,7 +900,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -907,7 +912,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -920,7 +925,7 @@ ExecuteOpCode:
 		{
 			IStackItem::Free(x2, x1);
 
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -937,7 +942,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 3)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -947,7 +952,7 @@ ExecuteOpCode:
 		if (!it->GetInt32(count) || count < 0)
 		{
 			IStackItem::Free(it);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -958,7 +963,7 @@ ExecuteOpCode:
 		if (!it->GetInt32(index) || index < 0)
 		{
 			IStackItem::Free(it);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -970,7 +975,7 @@ ExecuteOpCode:
 		{
 			delete[]data;
 			IStackItem::Free(it);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -982,7 +987,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -992,7 +997,7 @@ ExecuteOpCode:
 		if (!it->GetInt32(count) || count < 0)
 		{
 			IStackItem::Free(it);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1004,7 +1009,7 @@ ExecuteOpCode:
 		{
 			delete[]data;
 			IStackItem::Free(it);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1016,7 +1021,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1026,7 +1031,7 @@ ExecuteOpCode:
 		if (!it->GetInt32(count) || count < 0)
 		{
 			IStackItem::Free(it);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1038,7 +1043,7 @@ ExecuteOpCode:
 		{
 			delete[]data;
 			IStackItem::Free(it);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1050,7 +1055,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1060,7 +1065,7 @@ ExecuteOpCode:
 
 		if (size < 0)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1074,7 +1079,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1084,7 +1089,7 @@ ExecuteOpCode:
 
 		if (bi == NULL)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1093,7 +1098,7 @@ ExecuteOpCode:
 
 		if (ret == NULL)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1104,7 +1109,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1121,7 +1126,7 @@ ExecuteOpCode:
 			if (i2 != NULL) delete(i2);
 			if (i1 != NULL) delete(i1);
 
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1132,7 +1137,7 @@ ExecuteOpCode:
 
 		if (ret == NULL)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1143,7 +1148,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1160,7 +1165,7 @@ ExecuteOpCode:
 			if (i2 != NULL) delete(i2);
 			if (i1 != NULL) delete(i1);
 
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1171,7 +1176,7 @@ ExecuteOpCode:
 
 		if (ret == NULL)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1182,7 +1187,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1199,7 +1204,7 @@ ExecuteOpCode:
 			if (i2 != NULL) delete(i2);
 			if (i1 != NULL) delete(i1);
 
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1210,7 +1215,7 @@ ExecuteOpCode:
 
 		if (ret == NULL)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1221,7 +1226,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1240,7 +1245,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1250,7 +1255,7 @@ ExecuteOpCode:
 
 		if (bi == NULL)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1261,7 +1266,7 @@ ExecuteOpCode:
 
 		if (ret == NULL)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1272,7 +1277,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1282,7 +1287,7 @@ ExecuteOpCode:
 
 		if (bi == NULL)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1293,7 +1298,7 @@ ExecuteOpCode:
 
 		if (ret == NULL)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1304,7 +1309,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1314,7 +1319,7 @@ ExecuteOpCode:
 
 		if (bi == NULL)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1328,7 +1333,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1338,7 +1343,7 @@ ExecuteOpCode:
 
 		if (bi == NULL)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1347,7 +1352,7 @@ ExecuteOpCode:
 
 		if (ret == NULL)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1358,7 +1363,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1368,7 +1373,7 @@ ExecuteOpCode:
 
 		if (bi == NULL)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1377,7 +1382,7 @@ ExecuteOpCode:
 
 		if (ret == NULL)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1388,7 +1393,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1403,7 +1408,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1413,7 +1418,7 @@ ExecuteOpCode:
 
 		if (i == NULL)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1427,7 +1432,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1442,7 +1447,7 @@ ExecuteOpCode:
 			if (x2 != NULL) delete(x2);
 			if (x1 != NULL) delete(x1);
 
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1452,7 +1457,7 @@ ExecuteOpCode:
 
 		if (ret == NULL)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1463,7 +1468,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1478,7 +1483,7 @@ ExecuteOpCode:
 			if (x2 != NULL) delete(x2);
 			if (x1 != NULL) delete(x1);
 
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1488,7 +1493,7 @@ ExecuteOpCode:
 
 		if (ret == NULL)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1499,7 +1504,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1514,7 +1519,7 @@ ExecuteOpCode:
 			if (x2 != NULL) delete(x2);
 			if (x1 != NULL) delete(x1);
 
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1524,7 +1529,7 @@ ExecuteOpCode:
 
 		if (ret == NULL)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1535,7 +1540,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1550,7 +1555,7 @@ ExecuteOpCode:
 			if (x2 != NULL) delete(x2);
 			if (x1 != NULL) delete(x1);
 
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1560,7 +1565,7 @@ ExecuteOpCode:
 
 		if (ret == NULL)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1571,7 +1576,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1586,7 +1591,7 @@ ExecuteOpCode:
 			if (x2 != NULL) delete(x2);
 			if (x1 != NULL) delete(x1);
 
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1596,7 +1601,7 @@ ExecuteOpCode:
 
 		if (ret == NULL)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1607,7 +1612,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1625,7 +1630,7 @@ ExecuteOpCode:
 			if (ix != NULL) delete(ix);
 			if (in != NULL) delete(in);
 
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1635,7 +1640,7 @@ ExecuteOpCode:
 
 		if (ret == NULL)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1646,7 +1651,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1664,7 +1669,7 @@ ExecuteOpCode:
 			if (ix != NULL) delete(ix);
 			if (in != NULL) delete(in);
 
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1674,7 +1679,7 @@ ExecuteOpCode:
 
 		if (ret == NULL)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1685,7 +1690,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1702,7 +1707,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1719,7 +1724,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1736,7 +1741,7 @@ ExecuteOpCode:
 			if (i2 != NULL) delete(i2);
 			if (i1 != NULL) delete(i1);
 
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1752,7 +1757,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1769,7 +1774,7 @@ ExecuteOpCode:
 			if (i2 != NULL) delete(i2);
 			if (i1 != NULL) delete(i1);
 
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1785,7 +1790,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1802,7 +1807,7 @@ ExecuteOpCode:
 			if (i2 != NULL) delete(i2);
 			if (i1 != NULL) delete(i1);
 
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1818,7 +1823,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1835,7 +1840,7 @@ ExecuteOpCode:
 			if (i2 != NULL) delete(i2);
 			if (i1 != NULL) delete(i1);
 
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1851,7 +1856,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1868,7 +1873,7 @@ ExecuteOpCode:
 			if (i2 != NULL) delete(i2);
 			if (i1 != NULL) delete(i1);
 
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1884,7 +1889,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1901,7 +1906,7 @@ ExecuteOpCode:
 			if (i2 != NULL) delete(i2);
 			if (i1 != NULL) delete(i1);
 
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1917,7 +1922,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1934,7 +1939,7 @@ ExecuteOpCode:
 			if (i2 != NULL) delete(i2);
 			if (i1 != NULL) delete(i1);
 
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1957,7 +1962,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1974,7 +1979,7 @@ ExecuteOpCode:
 			if (i2 != NULL) delete(i2);
 			if (i1 != NULL) delete(i1);
 
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -1997,7 +2002,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 3)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2017,7 +2022,7 @@ ExecuteOpCode:
 			if (ia != NULL) delete(ia);
 			if (ix != NULL) delete(ix);
 
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2035,7 +2040,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2045,7 +2050,7 @@ ExecuteOpCode:
 		if (size < 0)
 		{
 			IStackItem::Free(item);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2056,7 +2061,7 @@ ExecuteOpCode:
 		if (size < 0)
 		{
 			delete[]data;
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2071,7 +2076,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2081,7 +2086,7 @@ ExecuteOpCode:
 		if (size < 0)
 		{
 			IStackItem::Free(item);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2092,7 +2097,7 @@ ExecuteOpCode:
 		if (size < 0)
 		{
 			delete[]data;
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2107,7 +2112,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2117,7 +2122,7 @@ ExecuteOpCode:
 		if (size < 0)
 		{
 			IStackItem::Free(item);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2128,7 +2133,7 @@ ExecuteOpCode:
 		if (size < 0)
 		{
 			delete[]data;
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2143,7 +2148,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2153,7 +2158,7 @@ ExecuteOpCode:
 		if (size < 0)
 		{
 			IStackItem::Free(item);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2164,7 +2169,7 @@ ExecuteOpCode:
 		if (size < 0)
 		{
 			delete[]data;
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2179,7 +2184,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2233,7 +2238,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 3)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2284,7 +2289,7 @@ ExecuteOpCode:
 
 		if (ic < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2306,7 +2311,7 @@ ExecuteOpCode:
 
 				if (v <= 0)
 				{
-					this->State = EVMState::FAULT;
+					this->SetFault();
 				}
 				else
 				{
@@ -2322,7 +2327,7 @@ ExecuteOpCode:
 						{
 							data[i] = NULL;
 							dataL[i] = c;
-							this->State = EVMState::FAULT;
+							this->SetFault();
 							continue;
 						}
 
@@ -2351,7 +2356,7 @@ ExecuteOpCode:
 				int32 v = 0;
 				if (!item->GetInt32(v) || v < 1 || v > ic)
 				{
-					this->State = EVMState::FAULT;
+					this->SetFault();
 				}
 				else
 				{
@@ -2368,7 +2373,7 @@ ExecuteOpCode:
 						{
 							data[i] = NULL;
 							dataL[i] = c;
-							this->State = EVMState::FAULT;
+							this->SetFault();
 							continue;
 						}
 
@@ -2402,7 +2407,7 @@ ExecuteOpCode:
 
 		if (pubKeysCount <= 0 || signaturesCount <= 0 || signaturesCount > pubKeysCount)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 		}
 
 		if (this->State == EVMState::FAULT || this->OnGetMessage == NULL)
@@ -2472,7 +2477,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2505,7 +2510,7 @@ ExecuteOpCode:
 
 		if (size < 0)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 		}
 		else
 		{
@@ -2519,7 +2524,7 @@ ExecuteOpCode:
 		int32 ec = context->EvaluationStack->Count();
 		if (ec < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2529,7 +2534,7 @@ ExecuteOpCode:
 		if (!item->GetInt32(size) || size < 0 || size >(ec - 1) || size > MAX_ARRAY_SIZE)
 		{
 			IStackItem::Free(item);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2548,7 +2553,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2570,7 +2575,7 @@ ExecuteOpCode:
 		else
 		{
 			IStackItem::Free(item);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 		return;
@@ -2579,7 +2584,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2590,7 +2595,7 @@ ExecuteOpCode:
 			key->Type == EStackItemType::Struct)
 		{
 			IStackItem::Free(key);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2607,7 +2612,7 @@ ExecuteOpCode:
 			{
 				IStackItem::Free(key, item);
 
-				this->State = EVMState::FAULT;
+				this->SetFault();
 				return;
 			}
 
@@ -2630,7 +2635,7 @@ ExecuteOpCode:
 			}
 			else
 			{
-				this->State = EVMState::FAULT;
+				this->SetFault();
 			}
 			return;
 		}
@@ -2638,7 +2643,7 @@ ExecuteOpCode:
 		{
 			IStackItem::Free(key, item);
 
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 		}
@@ -2648,7 +2653,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 3)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2667,7 +2672,7 @@ ExecuteOpCode:
 		{
 			IStackItem::Free(key, value);
 
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2684,7 +2689,7 @@ ExecuteOpCode:
 			{
 				IStackItem::Free(key, item, value);
 
-				this->State = EVMState::FAULT;
+				this->SetFault();
 				return;
 			}
 
@@ -2701,7 +2706,7 @@ ExecuteOpCode:
 			{
 				// Overflow in one the MAX_ARRAY_SIZE, but is more optimized than check if exists before
 
-				this->State = EVMState::FAULT;
+				this->SetFault();
 			}
 
 			IStackItem::Free(key, value, item);
@@ -2711,7 +2716,7 @@ ExecuteOpCode:
 		{
 			IStackItem::Free(key, value, item);
 
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 		}
@@ -2720,7 +2725,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2730,7 +2735,7 @@ ExecuteOpCode:
 		if (!item->GetInt32(count) || count < 0 || count > MAX_ARRAY_SIZE)
 		{
 			IStackItem::Free(item);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2742,7 +2747,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2752,7 +2757,7 @@ ExecuteOpCode:
 		if (!item->GetInt32(count) || count < 0 || count > MAX_ARRAY_SIZE)
 		{
 			IStackItem::Free(item);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2769,7 +2774,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2791,7 +2796,7 @@ ExecuteOpCode:
 
 			if ((arr->Count() + 1) > MAX_ARRAY_SIZE)
 			{
-				this->State = EVMState::FAULT;
+				this->SetFault();
 			}
 			else
 			{
@@ -2805,7 +2810,7 @@ ExecuteOpCode:
 		{
 			IStackItem::Free(newItem, item);
 
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 		}
@@ -2815,7 +2820,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2823,7 +2828,7 @@ ExecuteOpCode:
 		if (item->Type != EStackItemType::Array && item->Type != EStackItemType::Struct)
 		{
 			IStackItem::Free(item);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2836,7 +2841,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2846,7 +2851,7 @@ ExecuteOpCode:
 			key->Type == EStackItemType::Struct)
 		{
 			IStackItem::Free(key);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2863,7 +2868,7 @@ ExecuteOpCode:
 			{
 				IStackItem::Free(key, item);
 
-				this->State = EVMState::FAULT;
+				this->SetFault();
 				return;
 			}
 
@@ -2885,7 +2890,7 @@ ExecuteOpCode:
 		{
 			IStackItem::Free(key, item);
 
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 		}
@@ -2895,7 +2900,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 2)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2905,7 +2910,7 @@ ExecuteOpCode:
 			key->Type == EStackItemType::Struct)
 		{
 			IStackItem::Free(key);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2922,7 +2927,7 @@ ExecuteOpCode:
 			{
 				IStackItem::Free(key, item);
 
-				this->State = EVMState::FAULT;
+				this->SetFault();
 				return;
 			}
 
@@ -2943,7 +2948,7 @@ ExecuteOpCode:
 		default:
 		{
 			IStackItem::Free(key, item);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 		}
@@ -2953,7 +2958,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -2974,7 +2979,7 @@ ExecuteOpCode:
 		default:
 		{
 			IStackItem::Free(item);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 		}
@@ -2984,7 +2989,7 @@ ExecuteOpCode:
 	{
 		if (context->EvaluationStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -3013,7 +3018,7 @@ ExecuteOpCode:
 		default:
 		{
 			IStackItem::Free(item);
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 		}
@@ -3025,14 +3030,14 @@ ExecuteOpCode:
 	default:
 	case EVMOpCode::THROW:
 	{
-		this->State = EVMState::FAULT;
+		this->SetFault();
 		return;
 	}
 	case EVMOpCode::THROWIFNOT:
 	{
 		if (context->EvaluationStack->Count() < 1)
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 			return;
 		}
 
@@ -3040,7 +3045,7 @@ ExecuteOpCode:
 
 		if (!item->GetBoolean())
 		{
-			this->State = EVMState::FAULT;
+			this->SetFault();
 		}
 
 		IStackItem::Free(item);

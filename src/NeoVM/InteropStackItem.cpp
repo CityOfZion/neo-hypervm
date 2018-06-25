@@ -5,7 +5,7 @@ InteropStackItem::InteropStackItem(byte* data, int32 size) :IStackItem(EStackIte
 {
 	this->Payload = new byte[size];
 
-	memcpy(this->Payload, data, size);
+	memcpy_s(this->Payload, size, data, size);
 }
 
 InteropStackItem::~InteropStackItem()
@@ -61,7 +61,7 @@ int32 InteropStackItem::Serialize(byte* data, int32 length)
 	if (this->PayloadLength > 0 && length > 0)
 	{
 		length = this->PayloadLength > length ? length : this->PayloadLength;
-		memcpy(data, this->Payload, length);
+		memcpy_s(data, length, this->Payload, length);
 
 		return length;
 	}
