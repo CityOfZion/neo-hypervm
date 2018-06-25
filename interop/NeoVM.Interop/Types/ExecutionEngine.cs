@@ -204,8 +204,16 @@ namespace NeoVM.Interop.Types
                 return NeoVM.FALSE;
 
             string method = Marshal.PtrToStringUTF8(ptr, size);
-            if (InteropService.Invoke(method, this))
-                return NeoVM.TRUE;
+
+            try
+            {
+                if (InteropService.Invoke(method, this))
+                    return NeoVM.TRUE;
+            }
+            catch
+            {
+
+            }
 
             return NeoVM.FALSE;
         }
