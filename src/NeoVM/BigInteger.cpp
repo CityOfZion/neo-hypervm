@@ -1157,7 +1157,7 @@ int32 BigInteger::ToByteArray(byte* output, int32 length)
 
 	if (l <= length)
 	{
-		memcpy_s(output, length, bytes, msb + 1);
+		memcpy(output, bytes, msb + 1);
 		if (needExtraByte) output[l - 1] = highByte;
 	}
 	else
