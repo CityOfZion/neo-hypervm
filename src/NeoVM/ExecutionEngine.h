@@ -14,6 +14,7 @@ private:
 	// Used for MessageCallback
 
 	uint32 Iteration;
+	uint64 ConsumedGas;
 
 	// Save the state of the execution
 
@@ -46,6 +47,7 @@ public:
 	// Getters
 
 	byte GetState();
+	uint64 GetConsumedGas();
 
 	ExecutionContext* GetCurrentContext();
 	ExecutionContext* GetCallingContext();
@@ -64,7 +66,9 @@ public:
 	void StepInto();
 	void StepOut();
 	void StepOver();
+
 	EVMState Execute();
+	EVMState ExecuteUntil(uint64 gas);
 
 	// Constructor
 

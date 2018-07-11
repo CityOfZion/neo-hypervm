@@ -59,6 +59,7 @@ namespace NeoVM.Interop
         internal delegate int delInt_Handle(IntPtr pointer);
         internal delegate void delVoid_Handle(IntPtr pointer);
         internal delegate byte delByte_Handle(IntPtr pointer);
+        internal delegate ulong delUInt64_Handle(IntPtr pointer);
         internal delegate IntPtr delHandle_Handle(IntPtr pointer);
         internal delegate void delVoid_RefHandle(ref IntPtr pointer);
 
@@ -70,6 +71,7 @@ namespace NeoVM.Interop
         internal delegate int delInt_HandleHandle(IntPtr handle, IntPtr item);
         internal delegate byte delByte_HandleRefInt(IntPtr item, out int size);
         internal delegate IntPtr delHandle_HandleInt(IntPtr pointer, int value);
+        internal delegate byte delByte_HandleUInt64(IntPtr pointer, ulong value);
         internal delegate void delVoid_HandleHandle(IntPtr pointer1, IntPtr pointer2);
         internal delegate byte delByte_HandleHandle(IntPtr pointer1, IntPtr pointer2);
         internal delegate IntPtr delHandle_HandleHandle(IntPtr pointer1, IntPtr pointer2);
@@ -108,10 +110,12 @@ namespace NeoVM.Interop
         internal static delInt_HandleHandleIntInt ExecutionEngine_LoadScript;
         internal static delByte_HandleIntInt ExecutionEngine_LoadCachedScript;
         internal static delByte_Handle ExecutionEngine_Execute;
+        internal static delByte_HandleUInt64 ExecutionEngine_ExecuteUntil;
         internal static delVoid_Handle ExecutionEngine_StepInto;
         internal static delVoid_Handle ExecutionEngine_StepOver;
         internal static delVoid_Handle ExecutionEngine_StepOut;
         internal static delByte_Handle ExecutionEngine_GetState;
+        internal static delUInt64_Handle ExecutionEngine_GetConsumedGas;
         internal static delVoid_HandleUInt ExecutionEngine_Clean;
         internal static delVoid_HandleOnStepIntoCallback ExecutionEngine_AddLog;
 

@@ -20,6 +20,7 @@ void ExecutionEngine::Clean(uint32 iteration)
 {
 	this->Iteration = iteration;
 	this->State = EVMState::NONE;
+	this->ConsumedGas = 0;
 
 	this->InvocationStack->Clear();
 	this->ResultStack->Clear();
@@ -37,6 +38,7 @@ ExecutionEngine::ExecutionEngine
 	InvokeInteropCallback invokeInterop, LoadScriptCallback loadScript, GetMessageCallback getMessage
 ) :
 	Iteration(0),
+	ConsumedGas(0),
 	State(EVMState::NONE),
 	Log(NULL),
 
@@ -108,12 +110,35 @@ byte ExecutionEngine::GetState()
 	return this->State;
 }
 
+uint64 ExecutionEngine::GetConsumedGas()
+{
+	return this->ConsumedGas;
+}
+
 EVMState ExecutionEngine::Execute()
 {
 	do
 	{
 		this->StepInto();
-	} while (this->State == EVMState::NONE);
+	} 
+	while (this->State == EVMState::NONE);
+
+	return this->State;
+}
+
+EVMState ExecutionEngine::ExecuteUntil(uint64 gas)
+{
+	do
+	{
+		this->StepInto();
+
+		if (this->ConsumedGas > gas)
+		{
+			this->State = EVMState::FAULT_BY_GAS;
+			break;
+		}
+	}
+	while (this->State == EVMState::NONE);
 
 	return this->State;
 }

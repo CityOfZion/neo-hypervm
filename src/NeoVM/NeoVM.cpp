@@ -118,6 +118,13 @@ byte ExecutionEngine_Execute(ExecutionEngine* engine)
 	return (byte)engine->Execute();
 }
 
+byte ExecutionEngine_ExecuteUntil(ExecutionEngine* engine, uint64 gas)
+{
+	if (engine == NULL) return 0x00;
+
+	return (byte)engine->ExecuteUntil(gas);
+}
+
 void ExecutionEngine_StepInto(ExecutionEngine* engine)
 {
 	if (engine == NULL) return;
@@ -139,11 +146,18 @@ void ExecutionEngine_StepOut(ExecutionEngine* engine)
 	engine->StepOut();
 }
 
-int32 ExecutionEngine_GetState(ExecutionEngine* engine)
+byte ExecutionEngine_GetState(ExecutionEngine* engine)
 {
 	if (engine == NULL) return 0;
 
 	return engine->GetState();
+}
+
+uint64 ExecutionEngine_GetConsumedGas(ExecutionEngine* engine)
+{
+	if (engine == NULL) return 0;
+
+	return engine->GetConsumedGas();
 }
 
 // StackItems

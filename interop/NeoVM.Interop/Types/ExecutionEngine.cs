@@ -53,6 +53,11 @@ namespace NeoVM.Interop.Types
         /// </summary>
         public override EVMState State => (EVMState)NeoVM.ExecutionEngine_GetState(Handle);
         /// <summary>
+        /// Consumed Gas
+        /// </summary>
+        public override ulong ConsumedGas => NeoVM.ExecutionEngine_GetConsumedGas(Handle);
+
+        /// <summary>
         /// Interop Cache
         /// </summary>
         internal readonly List<object> InteropCache;
@@ -260,7 +265,19 @@ namespace NeoVM.Interop.Types
         /// </summary>
         public override bool Execute()
         {
+            // HALT=TRUE
+
             return NeoVM.ExecutionEngine_Execute(Handle) == NeoVM.TRUE;
+        }
+        /// <summary>
+        /// Execute until
+        /// </summary>
+        /// <param name="gas">Gas</param>
+        public override bool ExecuteUntil(ulong gas)
+        {
+            // HALT=TRUE
+
+            return NeoVM.ExecutionEngine_ExecuteUntil(Handle, gas) == NeoVM.TRUE;
         }
         /// <summary>
         /// Step Into
@@ -268,8 +285,10 @@ namespace NeoVM.Interop.Types
         /// <param name="steps">Steps</param>
         public override void StepInto(int steps = 1)
         {
-            for (int x = 0; x < steps; x++)
+            for (var x = 0; x < steps; x++)
+            {
                 NeoVM.ExecutionEngine_StepInto(Handle);
+            }
         }
         /// <summary>
         /// Step Out
@@ -383,13 +402,18 @@ namespace NeoVM.Interop.Types
                 // Clear interop cache
 
                 foreach (var v in InteropCache)
+                {
                     if (v is IDisposable dsp)
+                    {
                         dsp.Dispose();
+                    }
+                }
 
                 InteropCache.Clear();
             }
 
             // free unmanaged resources (unmanaged objects) and override a finalizer below. set large fields to null.
+
             ResultStack.Dispose();
             NeoVM.ExecutionEngine_Free(ref Handle);
         }
