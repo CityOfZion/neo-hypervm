@@ -1,0 +1,3 @@
+[submodule "neo-sharp"]
+	path = interop/neo-sharp
+	url = https://github.com/CityOfZion/neo-sharp.git
