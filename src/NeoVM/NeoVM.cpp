@@ -305,6 +305,14 @@ int32 StackItem_Serialize(IStackItem* item, byte* output, int32 length)
 	return item == NULL ? -1 : item->Serialize(output, length);
 }
 
+void StackItem_Claim(IStackItem* item)
+{
+	if (item != NULL)
+	{
+		item->Claim();
+	}
+}
+
 EStackItemType StackItem_SerializeInfo(IStackItem* item, int32 &size)
 {
 	if (item == NULL)
@@ -313,7 +321,6 @@ EStackItemType StackItem_SerializeInfo(IStackItem* item, int32 &size)
 		return EStackItemType::None;
 	}
 
-	item->Claim();
 	size = item->GetSerializedSize();
 	return item->Type;
 }

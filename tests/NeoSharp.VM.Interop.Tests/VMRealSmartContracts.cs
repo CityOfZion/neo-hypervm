@@ -396,7 +396,12 @@ namespace NeoSharp.VM.Interop.Tests
                 // Execute
 
                 Assert.IsTrue(engine.Execute());
-                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, 0x01);
+
+                using (var item = engine.ResultStack.Pop<IntegerStackItem>())
+                {
+                    Assert.AreEqual(item.Value, 0x01);
+                }
+
                 CheckClean(engine);
                 // Vote
 
@@ -412,7 +417,12 @@ namespace NeoSharp.VM.Interop.Tests
                 // Execute
 
                 Assert.IsTrue(engine.Execute());
-                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, 0x01);
+
+                using (var item = engine.ResultStack.Pop<IntegerStackItem>())
+                {
+                    Assert.AreEqual(item.Value, 0x01);
+                }
+
                 CheckClean(engine);
 
                 // Count
@@ -429,7 +439,12 @@ namespace NeoSharp.VM.Interop.Tests
                 // Execute
 
                 Assert.IsTrue(engine.Execute());
-                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, 0x01);
+
+                using (var item = engine.ResultStack.Pop<IntegerStackItem>())
+                {
+                    Assert.AreEqual(item.Value, 0x01);
+                }
+
                 CheckClean(engine);
             }
         }

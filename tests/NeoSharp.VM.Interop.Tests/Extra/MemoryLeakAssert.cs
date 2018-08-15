@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NeoSharp.VM.Interop.Tests.Extra
 {
@@ -15,17 +14,14 @@ namespace NeoSharp.VM.Interop.Tests.Extra
         /// </summary>
         public MemoryLeakAssert()
         {
-            GC.Collect();
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-
             Memory = GetTotalMemory();
         }
 
         private long GetTotalMemory()
         {
-            //var current = Process.GetCurrentProcess();
-            //return  current.WorkingSet64;
+            GC.Collect();
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
 
             return GC.GetTotalMemory(true);
         }
@@ -35,13 +31,22 @@ namespace NeoSharp.VM.Interop.Tests.Extra
         /// </summary>
         public void Dispose()
         {
-            GC.Collect();
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-
             var after = GetTotalMemory();
+            var result = after - Memory;
+            var before = Console.ForegroundColor;
 
-            Assert.AreEqual(0L, after - Memory);
+            if (result != 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(result);
+                Console.ForegroundColor = before;
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("OK!");
+                Console.ForegroundColor = before;
+            }
         }
     }
 }

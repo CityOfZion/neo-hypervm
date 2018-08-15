@@ -32,7 +32,10 @@ namespace NeoSharp.VM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, res);
+                using (var item = engine.ResultStack.Pop<IntegerStackItem>())
+                {
+                    Assert.AreEqual(item.Value, res);
+                }
             });
         }
 
@@ -51,7 +54,10 @@ namespace NeoSharp.VM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, res);
+                using (var item = engine.ResultStack.Pop<IntegerStackItem>())
+                {
+                    Assert.AreEqual(item.Value, res);
+                }
             });
         }
 
@@ -70,7 +76,10 @@ namespace NeoSharp.VM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, res);
+                using (var item = engine.ResultStack.Pop<IntegerStackItem>())
+                {
+                    Assert.AreEqual(item.Value, res);
+                }
             });
         }
 
@@ -89,7 +98,10 @@ namespace NeoSharp.VM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, res);
+                using (var item = engine.ResultStack.Pop<IntegerStackItem>())
+                {
+                    Assert.AreEqual(item.Value, res);
+                }
             });
         }
 
@@ -108,7 +120,10 @@ namespace NeoSharp.VM.Interop.Tests
                     return;
                 }
 
-                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, res);
+                using (var item = engine.ResultStack.Pop<IntegerStackItem>())
+                {
+                    Assert.AreEqual(item.Value, res);
+                }
             });
         }
 
