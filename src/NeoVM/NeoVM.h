@@ -70,6 +70,7 @@ extern "C"
 	DllExport EStackItemType __stdcall StackItem_SerializeInfo(IStackItem* item, int32 &size);
 	DllExport int32 __stdcall StackItem_Serialize(IStackItem* item, byte* output, int32 length);
 	DllExport void __stdcall StackItem_Free(IStackItem* &item);
+	DllExport void __stdcall StackItem_Claim(IStackItem* item);
 
 	// MapStackItem
 

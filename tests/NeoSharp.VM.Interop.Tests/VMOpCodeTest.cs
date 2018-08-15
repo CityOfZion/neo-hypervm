@@ -20,10 +20,10 @@ namespace NeoSharp.VM.Interop.Tests
         {
             _VMFactory = new NeoVM();
 
-            Console.WriteLine("Native Library Info");
-            Console.WriteLine("  Path: " + NeoVM.LibraryPath);
-            Console.WriteLine("  Version: " + NeoVM.LibraryVersion);
-            Console.WriteLine("");
+            //Console.WriteLine("Native Library Info");
+            //Console.WriteLine("  Path: " + NeoVM.LibraryPath);
+            //Console.WriteLine("  Version: " + NeoVM.LibraryVersion);
+            //Console.WriteLine("");
         }
 
         /// <summary>
@@ -209,13 +209,17 @@ namespace NeoSharp.VM.Interop.Tests
 
                     // Execute
 
-                    // PUSH A
-                    engine.StepInto();
-                    Assert.AreEqual(1, engine.CurrentContext.EvaluationStack.Count);
+                    using (var currentContext = engine.CurrentContext)
+                    {
+                        // PUSH A
+                        engine.StepInto();
 
-                    // PUSH B
-                    engine.StepInto();
-                    Assert.AreEqual(2, engine.CurrentContext.EvaluationStack.Count);
+                        Assert.AreEqual(1, currentContext.EvaluationStack.Count);
+
+                        // PUSH B
+                        engine.StepInto();
+                        Assert.AreEqual(2, currentContext.EvaluationStack.Count);
+                    }
 
                     // Operand
 
@@ -276,13 +280,16 @@ namespace NeoSharp.VM.Interop.Tests
 
                     // Execute
 
-                    // PUSH A
-                    engine.StepInto();
-                    Assert.AreEqual(1, engine.CurrentContext.EvaluationStack.Count);
+                    using (var currentContext = engine.CurrentContext)
+                    {
+                        // PUSH A
+                        engine.StepInto();
+                        Assert.AreEqual(1, currentContext.EvaluationStack.Count);
 
-                    // PUSH B
-                    engine.StepInto();
-                    Assert.AreEqual(2, engine.CurrentContext.EvaluationStack.Count);
+                        // PUSH B
+                        engine.StepInto();
+                        Assert.AreEqual(2, currentContext.EvaluationStack.Count);
+                    }
 
                     // Operand
 
@@ -390,9 +397,12 @@ namespace NeoSharp.VM.Interop.Tests
 
                     // Execute
 
-                    // PUSH A
-                    engine.StepInto();
-                    Assert.AreEqual(1, engine.CurrentContext.EvaluationStack.Count);
+                    using (var currentContext = engine.CurrentContext)
+                    {
+                        // PUSH A
+                        engine.StepInto();
+                        Assert.AreEqual(1, currentContext.EvaluationStack.Count);
+                    }
 
                     // Operand
 
@@ -443,14 +453,18 @@ namespace NeoSharp.VM.Interop.Tests
             }
             else
             {
-                if (engine.CurrentContext == null)
+                var current = engine.CurrentContext;
+
+                if (current == null)
                 {
                     Assert.AreEqual(EVMState.Halt, engine.State);
                 }
                 else
                 {
-                    Assert.AreEqual(0, engine.CurrentContext.EvaluationStack.Count);
-                    Assert.AreEqual(0, engine.CurrentContext.AltStack.Count);
+                    Assert.AreEqual(0, current.EvaluationStack.Count);
+                    Assert.AreEqual(0, current.AltStack.Count);
+
+                    current.Dispose();
                 }
             }
         }

@@ -6,7 +6,7 @@ namespace NeoSharp.VM.Interop.Tests.Extra
     /// <summary>
     /// Contains two BigInteger values
     /// </summary>
-    public class BigIntegerPair : IEquatable<BigIntegerPair>
+    public struct BigIntegerPair : IEquatable<BigIntegerPair>
     {
         public readonly BigInteger A, B;
 
@@ -28,9 +28,6 @@ namespace NeoSharp.VM.Interop.Tests.Extra
         /// <returns>Return true if equals</returns>
         public bool Equals(BigIntegerPair other)
         {
-            if (other == null) return false;
-            if (other == this) return true;
-
             return other.A == A && other.B == B;
         }
 
