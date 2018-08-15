@@ -5,8 +5,8 @@ os:
 
 dist: xenial
 
+dotnet: 2.1.300
 mono: none
-dotnet: 2.1.3
 
 before_install:
  - cd scripts
