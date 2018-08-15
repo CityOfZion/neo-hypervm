@@ -189,9 +189,16 @@ ExecuteOpCode:
 
 	// Check PushBytes
 
-	if (opcode >= EVMOpCode::PUSHBYTES1 && opcode <= EVMOpCode::PUSHBYTES75)
+	if (opcode >= EVMOpCode::PUSH0 && opcode <= EVMOpCode::PUSHBYTES75)
 	{
 		byte length = (byte)opcode;
+
+		if (length == 0)
+		{
+			context->EvaluationStack->Push(new ByteArrayStackItem(NULL, 0, false));
+			return;
+		}
+
 		byte* data = new byte[length];
 
 		if (context->Read(data, length) != length)
@@ -219,11 +226,6 @@ ExecuteOpCode:
 	{
 		// Push value
 
-	case EVMOpCode::PUSH0:
-	{
-		context->EvaluationStack->Push(new ByteArrayStackItem(NULL, 0, false));
-		return;
-	}
 	case EVMOpCode::PUSHDATA1:
 	{
 		byte length = 0;
