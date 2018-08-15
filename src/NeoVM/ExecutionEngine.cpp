@@ -3081,6 +3081,9 @@ ExecutionEngine::~ExecutionEngine()
 	delete(this->InvocationStack);
 	delete(this->ResultStack);
 
+	this->InvocationStack = NULL;
+	this->ResultStack = NULL;
+
 	// Clean scripts
 
 	for (std::list<ExecutionScript*>::iterator it = this->Scripts.begin(); it != this->Scripts.end(); ++it)
