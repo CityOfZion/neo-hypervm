@@ -20,6 +20,10 @@ void ExecutionContextStack::Push(ExecutionContext* i)
 
 ExecutionContext* ExecutionContextStack::Peek(int32 index)
 {
+	if (index < 0)
+	{
+		index += this->Size;
+	}
 	if (index == 0)
 	{
 		ExecutionContext* ret = this->Stack.front();
@@ -30,10 +34,6 @@ ExecutionContext* ExecutionContextStack::Peek(int32 index)
 		}
 
 		return ret;
-	}
-	if (index < 0)
-	{
-		index += this->Size;
 	}
 	if (index < 0)
 	{
