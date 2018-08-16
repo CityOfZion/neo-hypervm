@@ -87,7 +87,7 @@ namespace NeoSharp.VM.Interop.Tests
         /// <returns>BigIntegerPair</returns>
         protected IEnumerable<BigInteger> IntSingleIteration()
         {
-            List<BigInteger> ret = new List<BigInteger>();
+            var ret = new List<BigInteger>();
 
             foreach (var bi in TestBigIntegers)
             {
@@ -102,21 +102,22 @@ namespace NeoSharp.VM.Interop.Tests
             }
 
             // Random value
-            byte[] data = new byte[Rand.Next(1, 32)];
+            var data = new byte[Rand.Next(1, 32)];
             Rand.NextBytes(data);
 
             ret.Add(new BigInteger(data));
 
             return ret.Distinct().ToArray();
         }
+
         /// <summary>
         /// Compute distinct pairs
         /// </summary>
         /// <returns>BigIntegerPair</returns>
         protected IEnumerable<BigIntegerPair> IntPairIteration()
         {
-            BigInteger[] ar = IntSingleIteration().ToArray();
-            List<BigIntegerPair> ret = new List<BigIntegerPair>();
+            var ar = IntSingleIteration().ToArray();
+            var ret = new List<BigIntegerPair>();
 
             foreach (var ba in ar) foreach (var bb in ar)
                     ret.Add(new BigIntegerPair(ba, bb));
@@ -128,6 +129,7 @@ namespace NeoSharp.VM.Interop.Tests
 
             return ret.Distinct().ToArray();
         }
+
         /// <summary>
         /// Check operand with two BigIntegers
         /// </summary>
@@ -329,6 +331,7 @@ namespace NeoSharp.VM.Interop.Tests
                 }
             }
         }
+
         /// <summary>
         /// Check operand with one BigIntegers
         /// </summary>
@@ -438,6 +441,7 @@ namespace NeoSharp.VM.Interop.Tests
                 }
             }
         }
+
         /// <summary>
         /// Check if the engine is clean
         /// </summary>

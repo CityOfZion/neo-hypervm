@@ -230,7 +230,7 @@ namespace NeoSharp.VM.Interop
             // Check Environment path
             if (!File.Exists(LibraryPath))
             {
-                string nfile = Environment.GetEnvironmentVariable("NEO_VM_PATH");
+                var nfile = Environment.GetEnvironmentVariable("NEO_VM_PATH");
 
                 if (string.IsNullOrEmpty(nfile))
                 {
