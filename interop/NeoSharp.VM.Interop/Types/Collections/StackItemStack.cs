@@ -99,7 +99,9 @@ namespace NeoSharp.VM.Interop.Types.Collections
                 return true;
             }
 
+            ret?.Dispose();
             item = default(TStackItem);
+
             return false;
         }
 
