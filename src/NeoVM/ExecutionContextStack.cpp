@@ -31,7 +31,10 @@ ExecutionContext* ExecutionContextStack::Peek(int32 index)
 
 		return ret;
 	}
-	if (index < 0) index += this->Size;
+	if (index < 0)
+	{
+		index += this->Size;
+	}
 	if (index < 0)
 	{
 		if (this->Log != NULL)
@@ -55,7 +58,11 @@ ExecutionContext* ExecutionContextStack::Peek(int32 index)
 
 ExecutionContext* ExecutionContextStack::TryPeek(int32 index)
 {
-	if (index < 0) index += this->Size;
+	if (index < 0)
+	{
+		index += this->Size;
+	}
+
 	if (this->Size <= index || index < 0)
 	{
 		if (this->Log != NULL)
@@ -90,8 +97,11 @@ ExecutionContext* ExecutionContextStack::TryPeek(int32 index)
 
 void ExecutionContextStack::Remove(int32 index)
 {
-	if (index < 0) index += this->Size;
-	
+	if (index < 0)
+	{
+		index += this->Size;
+	}
+
 	std::list<ExecutionContext*>::iterator it = this->Stack.begin();
 	if (index > 0) std::advance(it, index);
 
