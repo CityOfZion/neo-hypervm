@@ -33,8 +33,6 @@ namespace NeoSharp.VM.Interop.Tests
 
                 Assert.AreEqual(1, engine.InvocationStack.Count);
 
-                IExecutionContext context = engine.InvocationStack.Peek(0);
-
                 // Check
 
                 byte[] realHash;
@@ -45,7 +43,10 @@ namespace NeoSharp.VM.Interop.Tests
                     realHash = ripe.ComputeHash(realHash);
                 }
 
-                Assert.IsTrue(context.ScriptHash.SequenceEqual(realHash));
+                using (IExecutionContext context = engine.EntryContext)
+                {
+                    Assert.IsTrue(context.ScriptHash.SequenceEqual(realHash));
+                }
             }
         }
 

@@ -102,7 +102,7 @@ ExecutionContext* ExecutionEngine::GetCallingContext()
 
 ExecutionContext* ExecutionEngine::GetEntryContext()
 {
-	return this->InvocationStack->TryPeek(this->InvocationStack->Count() - 1);
+	return this->InvocationStack->TryPeek(-1);
 }
 
 byte ExecutionEngine::GetState()

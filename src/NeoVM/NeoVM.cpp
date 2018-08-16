@@ -322,6 +322,8 @@ EStackItemType StackItem_SerializeInfo(IStackItem* item, int32 &size)
 	}
 
 	size = item->GetSerializedSize();
+	item->Claim();
+
 	return item->Type;
 }
 
