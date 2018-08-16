@@ -6,6 +6,9 @@ namespace NeoSharp.VM.Interop.Native
 {
     internal class MacCore : LinuxCore
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public MacCore() : base(EPlatform.Mac, ".dynlib") { }
 
         /// <summary>

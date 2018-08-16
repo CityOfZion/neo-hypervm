@@ -11,7 +11,16 @@ namespace NeoSharp.VM.Interop.Native
 
         #region Constructors
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public LinuxCore() : base(EPlatform.Linux, ".so") { }
+
+        /// <summary>
+        /// Protected constructor
+        /// </summary>
+        /// <param name="platform">Platform</param>
+        /// <param name="extension">Extension</param>
         protected LinuxCore(EPlatform platform, string extension) : base(platform, extension) { }
 
         #endregion

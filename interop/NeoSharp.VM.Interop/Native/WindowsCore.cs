@@ -9,6 +9,9 @@ namespace NeoSharp.VM.Interop.Native
     {
         const string NativeLibrary = "kernel32.dll";
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public WindowsCore() : base(EPlatform.Windows, ".dll") { }
 
         #region Windows
