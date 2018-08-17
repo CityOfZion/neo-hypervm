@@ -5,7 +5,7 @@
 
 class StackItems
 {
-	Stack<IStackItem> Stack;
+	Stack<IStackItem> _stack;
 
 public:
 

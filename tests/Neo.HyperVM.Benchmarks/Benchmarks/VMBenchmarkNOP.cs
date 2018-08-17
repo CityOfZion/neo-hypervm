@@ -12,6 +12,9 @@ namespace Neo.HyperVM.Benchmarks
 
         #endregion
 
+        [Params("NOP*1000")]
+        public override string Test { get; set; }
+
         [GlobalSetup]
         public override void Setup()
         {

@@ -5,7 +5,7 @@
 
 class ExecutionContextStack
 {
-	Stack<ExecutionContext> Stack;
+	Stack<ExecutionContext> _stack;
 
 public:
 

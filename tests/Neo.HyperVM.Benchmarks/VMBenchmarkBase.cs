@@ -23,6 +23,9 @@ namespace Neo.HyperVM.Benchmarks
         protected ExecutionEngineArgs _args;
         protected NeoVM _HyperVM;
 
+        [Params(nameof(VMBenchmarkBase))]
+        public abstract string Test { get; set; }
+
         #endregion
 
         public virtual void Setup()
