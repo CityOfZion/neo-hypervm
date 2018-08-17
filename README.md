@@ -70,13 +70,13 @@ UnrollFactor=1  WarmupCount=2
 
 |            Method |   Test |      Mean |     Error |    StdDev |       Min |       Max |    Median | Rank |
 |------------------ |------- |----------:|----------:|----------:|----------:|----------:|----------:|-----:|
-|           HyperVM | NOP*1K |  11.77 us | 0.4397 us | 0.6581 us |  10.56 us |  13.13 us |  11.64 us |    1 |
-|             NeoVM | NOP*1K |  97.84 us | 0.7998 us | 1.1970 us |  95.04 us | 100.42 us |  98.02 us |    2 |
-| ApplicationEngine | NOP*1K | 176.66 us | 2.5181 us | 3.7690 us | 167.52 us | 182.41 us | 177.60 us |    3 |
+|           HyperVM | NOP*1K |  17.66 us | 1.187 us | 3.501 us |  12.27 us |  27.68 us |  17.57 us |    1 |
+|             NeoVM | NOP*1K |  80.59 us | 1.530 us | 1.761 us |  77.33 us |  83.66 us |  80.52 us |    2 |
+| ApplicationEngine | NOP*1K | 163.17 us | 2.280 us | 1.904 us | 159.16 us | 167.62 us | 162.97 us |    3 |
 | | | | | | | | | |
-|           HyperVM | (PUSH1+DROP)*1K |  93.40 us | 2.557 us | 3.828 us |  87.09 us | 101.5 us |  93.06 us |    1 |
-|             NeoVM | (PUSH1+DROP)*1K | 247.86 us | 5.845 us | 8.568 us | 236.48 us | 272.7 us | 248.16 us |    2 |
-| ApplicationEngine | (PUSH1+DROP)*1K | 437.57 us | 4.618 us | 6.624 us | 428.97 us | 450.3 us | 435.58 us |    3 |
+|           HyperVM | (PUSH1+DROP)*1K |  89.62 us | 1.791 us |  3.699 us |  82.67 us |  99.01 us |  89.50 us |    1 |
+|             NeoVM | (PUSH1+DROP)*1K | 229.47 us | 4.925 us | 14.521 us | 200.12 us | 267.15 us | 228.49 us |    2 |
+| ApplicationEngine | (PUSH1+DROP)*1K | 454.61 us | 9.058 us | 10.431 us | 436.31 us | 473.51 us | 456.10 us |    3 |
 
 *NeoVM and ApplicationEngine come form from NEO 3.0 binaries*
 
