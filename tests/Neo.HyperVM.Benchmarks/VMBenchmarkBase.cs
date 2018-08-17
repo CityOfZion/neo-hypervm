@@ -37,6 +37,11 @@ namespace Neo.HyperVM.Benchmarks
 
         public virtual void Setup()
         {
+            if (!NeoSharp.VM.Interop.NeoVM.IsLoaded)
+            {
+                NeoSharp.VM.Interop.NeoVM.TryLoadLibrary(NeoSharp.VM.Interop.NeoVM.DefaultLibraryName, out var error);
+            }
+
             _HyperVM = new NeoVM();
             _crypto = Cryptography.Crypto.Default;
 
