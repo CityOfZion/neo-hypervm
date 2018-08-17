@@ -26,7 +26,7 @@ IStackItem* StackItems::Peek(int32 index)
 IStackItem* StackItems::Remove(int32 index)
 {
 	IStackItem* it = this->_stack.Pop(index);
-	it->UnClaim();
+	if (it != NULL) it->UnClaim();
 
 	return it;
 }
@@ -40,7 +40,7 @@ void StackItems::Drop()
 IStackItem* StackItems::Pop()
 {
 	IStackItem* it = this->_stack.Pop();
-	it->UnClaim();
+	if (it != NULL) it->UnClaim();
 
 	return it;
 }
