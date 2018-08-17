@@ -1,10 +1,5 @@
 #include "StackItems.h"
 
-int32 StackItems::Count()
-{
-	return this->_stack.Count();
-}
-
 void StackItems::Push(IStackItem* it)
 {
 	it->Claim();
@@ -15,11 +10,6 @@ void StackItems::Insert(int32 index, IStackItem* it)
 {
 	it->Claim();
 	this->_stack.Insert(index, it);
-}
-
-IStackItem* StackItems::Peek(int32 index)
-{
-	return this->_stack.Peek(index);
 }
 
 IStackItem* StackItems::Remove(int32 index)
