@@ -7,10 +7,10 @@ namespace Neo.HyperVM.Benchmarks
     {
         static void Main(string[] args)
         {
-            //var c = new VMBenchmarkNOP();
+            //var c = new VMBenchmarkPUSH1();
             //c.Setup();
 
-            //for (int x = 0; x < 1000; x++)
+            //for (int x = 0; x < 10000; x++)
             //{
             //    c.HyperVM();
             //}
