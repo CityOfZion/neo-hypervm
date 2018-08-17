@@ -168,6 +168,7 @@
     <ClInclude Include="IClaimable.h" />
     <ClInclude Include="Limits.h" />
     <ClInclude Include="ExecutionScript.h" />
+    <ClInclude Include="Stack.h" />
     <ClInclude Include="Types.h" />
     <ClInclude Include="Crypto.h" />
     <ClInclude Include="ExecutionContext.h" />
@@ -200,6 +201,7 @@
     <ClCompile Include="NeoVM.cpp" />
     <ClCompile Include="ExecutionContextStack.cpp" />
     <ClCompile Include="ExecutionScript.cpp" />
+    <ClCompile Include="Stack.cpp" />
     <ClCompile Include="StackItems.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <StartupObject>Neo.HyperVM.Benchmarks.Program</StartupObject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.11.0" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\interop\NeoSharp.VM.Interop\NeoSharp.VM.Interop.csproj" />
+    <ProjectReference Include="..\..\modules\neo-sharp\src\NeoSharp.VM\NeoSharp.VM.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Neo">
+      <HintPath>libs\Neo.dll</HintPath>
+    </Reference>
+    <Reference Include="Neo.VM">
+      <HintPath>libs\Neo.VM.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

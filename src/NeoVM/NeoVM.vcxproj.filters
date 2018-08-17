@@ -113,6 +113,9 @@
     <ClInclude Include="Crypto.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
+    <ClInclude Include="Stack.h">
+      <Filter>Header Files\Types\Collections</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="NeoVM.cpp">
@@ -165,6 +168,9 @@
     </ClCompile>
     <ClCompile Include="Crypto.cpp">
       <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Stack.cpp">
+      <Filter>Source Files\Types\Collections</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

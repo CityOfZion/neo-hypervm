@@ -3,183 +3,44 @@
 
 int32 ExecutionContextStack::Count()
 {
-	return this->Size;
+	return this->Stack.Count();
 }
 
 void ExecutionContextStack::Push(ExecutionContext* i)
 {
-	this->Size++;
-	this->Stack.push_front(i);
 	i->Claim();
-
-	if (this->Log != NULL)
-	{
-		this->Log(i, this->Size - 1, ELogStackOperation::Push);
-	}
+	this->Stack.Push(i);
 }
 
 ExecutionContext* ExecutionContextStack::Peek(int32 index)
 {
-	if (index < 0)
-	{
-		index += this->Size;
-	}
-	if (index == 0)
-	{
-		ExecutionContext* ret = this->Stack.front();
-
-		if (this->Log != NULL)
-		{
-			this->Log(ret, index, ELogStackOperation::Peek);
-		}
-
-		return ret;
-	}
-	if (index < 0)
-	{
-		if (this->Log != NULL)
-		{
-			this->Log(NULL, index, ELogStackOperation::Peek);
-		}
-
-		return NULL;
-	}
-
-	std::list<ExecutionContext*>::iterator it = this->Stack.begin();
-	std::advance(it, index);
-
-	if (this->Log != NULL)
-	{
-		this->Log((ExecutionContext*)*it, index, ELogStackOperation::Peek);
-	}
-
-	return (ExecutionContext*)*it;
-}
-
-ExecutionContext* ExecutionContextStack::TryPeek(int32 index)
-{
-	if (index < 0)
-	{
-		index += this->Size;
-	}
-
-	if (this->Size <= index || index < 0)
-	{
-		if (this->Log != NULL)
-		{
-			this->Log(NULL, index, ELogStackOperation::TryPeek);
-		}
-
-		return NULL;
-	}
-	if (index == 0)
-	{
-		ExecutionContext* ret = this->Stack.front();
-
-		if (this->Log != NULL)
-		{
-			this->Log(ret, index, ELogStackOperation::TryPeek);
-		}
-
-		return ret;
-	}
-
-	std::list<ExecutionContext*>::iterator it = this->Stack.begin();
-	std::advance(it, index);
-
-	if (this->Log != NULL)
-	{
-		this->Log((ExecutionContext*)*it, index, ELogStackOperation::TryPeek);
-	}
-
-	return (ExecutionContext*)*it;
+	return this->Stack.Peek(index);
 }
 
 void ExecutionContextStack::Remove(int32 index)
 {
-	if (index < 0)
-	{
-		index += this->Size;
-	}
-
-	std::list<ExecutionContext*>::iterator it = this->Stack.begin();
-	if (index > 0) std::advance(it, index);
-
-	ExecutionContext* itr = (ExecutionContext*)*it;
-
-	this->Size--;
-	this->Stack.erase(it);
-
-	if (this->Log != NULL)
-	{
-		this->Log(itr, index, ELogStackOperation::Remove);
-	}
-
-	ExecutionContext::UnclaimAndFree(itr);
+	ExecutionContext* it = this->Stack.Pop(index);
+	ExecutionContext::UnclaimAndFree(it);
 }
 
 void ExecutionContextStack::Drop()
 {
-	ExecutionContext* it = this->Stack.front();
-
-	this->Size--;
-	this->Stack.pop_front();
-
-	if (this->Log != NULL)
-	{
-		this->Log(it, this->Size, ELogStackOperation::Drop);
-	}
-
+	ExecutionContext* it = this->Stack.Pop();
 	ExecutionContext::UnclaimAndFree(it);
-}
-
-ExecutionContext* ExecutionContextStack::Pop()
-{
-	ExecutionContext* it = this->Stack.front();
-
-	this->Size--;
-	this->Stack.pop_front();
-
-	if (this->Log != NULL)
-	{
-		this->Log(it, this->Size, ELogStackOperation::Pop);
-	}
-
-	it->UnClaim();
-	return it;
 }
 
 void ExecutionContextStack::Clear()
 {
-	if (this->Log != NULL)
+	for (int32 x = 0, count = this->Stack.Count(); x < count; x++)
 	{
-		// TODO: Make this log in right order (end to start)
-
-		int32 index = 0;
-		for (std::list<ExecutionContext*>::iterator it = this->Stack.begin(); it != this->Stack.end(); ++it)
-		{
-			ExecutionContext* ptr = (ExecutionContext*)*it;
-			this->Log(ptr, index, ELogStackOperation::Drop);
-			++index;
-
-			ExecutionContext::UnclaimAndFree(ptr);
-		}
-	}
-	else
-	{
-		for (std::list<ExecutionContext*>::iterator it = this->Stack.begin(); it != this->Stack.end(); ++it)
-		{
-			ExecutionContext* ptr = (ExecutionContext*)*it;
-			ExecutionContext::UnclaimAndFree(ptr);
-		}
+		ExecutionContext* ptr = this->Stack.Peek(x);
+		ExecutionContext::UnclaimAndFree(ptr);
 	}
 
-	this->Size = 0;
-	this->Stack.clear();
+	this->Stack.Clear();
 }
 
 ExecutionContextStack::~ExecutionContextStack()
 {
 	this->Clear();
-	this->Log = NULL;
 }
