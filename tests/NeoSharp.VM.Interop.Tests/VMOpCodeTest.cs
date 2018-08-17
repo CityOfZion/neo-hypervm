@@ -18,6 +18,8 @@ namespace NeoSharp.VM.Interop.Tests
         [TestInitialize]
         public void TestInitialize()
         {
+            Assert.IsTrue(NeoVM.IsLoaded || NeoVM.TryLoadLibrary(NeoVM.DefaultLibraryName, out var error));
+
             _VMFactory = new NeoVM();
 
             //Console.WriteLine("Native Library Info");

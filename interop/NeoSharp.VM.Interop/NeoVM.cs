@@ -16,36 +16,34 @@ namespace NeoSharp.VM.Interop
         internal const byte TRUE = 0x01;
         internal const byte FALSE = 0x00;
 
-        private const string LibraryName = "NeoVM";
-
         /// <summary>
         /// Library core
         /// </summary>
-        private readonly static CrossPlatformLibrary Core;
+        private static CrossPlatformLibrary Core;
 
         #endregion
 
         #region Public fields
 
         /// <summary>
+        /// Default library name
+        /// </summary>
+        public const string DefaultLibraryName = "NeoVM";
+
+        /// <summary>
         /// Library path
         /// </summary>
-        public readonly static string LibraryPath;
+        public static string LibraryPath { get; private set; }
 
         /// <summary>
         /// Version
         /// </summary>
-        public readonly static Version LibraryVersion;
+        public static Version LibraryVersion { get; private set; }
 
         /// <summary>
         /// Is loaded
         /// </summary>
-        public static readonly bool IsLoaded = false;
-
-        /// <summary>
-        /// Last error
-        /// </summary>
-        public static readonly string LastError;
+        public static bool IsLoaded { get; private set; }
 
         #endregion
 
@@ -182,11 +180,36 @@ namespace NeoSharp.VM.Interop
         #endregion
 
         /// <summary>
-        /// Static constructor for load NativeCoreType
+        /// Try Load library
         /// </summary>
-        static NeoVM()
+        /// <param name="error">Error</param>
+        /// <returns>Return true if is loaded</returns>
+        public static bool TryLoadLibrary(out string error)
         {
+            return TryLoadLibrary(DefaultLibraryName, out error);
+        }
+
+        /// <summary>
+        /// Try Load library
+        /// </summary>
+        /// <param name="libraryName">Library name (Default=NeoVM)</param>
+        /// <param name="error">Error</param>
+        /// <returns>Return true if is loaded</returns>
+        public static bool TryLoadLibrary(string libraryName, out string error)
+        {
+            if (IsLoaded)
+            {
+                error = "Already loaded";
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(libraryName))
+            {
+                libraryName = DefaultLibraryName;
+            }
+
             // Detect OS
+
             switch (Environment.OSVersion.Platform)
             {
                 case PlatformID.Win32NT:
@@ -213,13 +236,13 @@ namespace NeoSharp.VM.Interop
             // Check core
             if (Core == null)
             {
-                LastError = "Native library not found";
-                return;
+                error = "Native library not found";
+                return false;
             }
 
             // Load library
             LibraryPath = Path.Combine(AppContext.BaseDirectory, Core.Platform.ToString(),
-                Core.Architecture.ToString(), LibraryName + Core.LibraryExtension);
+                Core.Architecture.ToString(), libraryName + Core.LibraryExtension);
 
             // Check Environment path
             if (!File.Exists(LibraryPath))
@@ -228,22 +251,22 @@ namespace NeoSharp.VM.Interop
 
                 if (string.IsNullOrEmpty(nfile))
                 {
-                    LastError = "File not found: " + LibraryPath;
-                    return;
+                    error = "File not found: " + LibraryPath;
+                    return false;
                 }
 
                 LibraryPath = nfile;
                 if (!File.Exists(LibraryPath))
                 {
-                    LastError = "File not found: " + LibraryPath;
-                    return;
+                    error = "File not found: " + LibraryPath;
+                    return false;
                 }
             }
 
             if (!Core.LoadLibrary(LibraryPath))
             {
-                LastError = "Wrong library file: " + LibraryPath;
-                return;
+                error = "Wrong library file: " + LibraryPath;
+                return false;
             }
 
             // Static destructor
@@ -263,8 +286,8 @@ namespace NeoSharp.VM.Interop
 
                 if (del == null)
                 {
-                    LastError = "Method not found: " + fi.Name;
-                    return;
+                    error = "Method not found: " + fi.Name;
+                    return false;
                 }
 
                 fi.SetValue(null, del);
@@ -275,6 +298,9 @@ namespace NeoSharp.VM.Interop
             GetVersion(out int major, out int minor, out int build, out int revision);
             LibraryVersion = new Version(major, minor, build, revision);
             IsLoaded = true;
+
+            error = null;
+            return true;
         }
 
         /// <summary>
