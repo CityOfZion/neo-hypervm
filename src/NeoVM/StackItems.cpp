@@ -1,5 +1,4 @@
 #include "StackItems.h"
-#include "ELogStackOperation.h"
 
 int32 StackItems::Count()
 {

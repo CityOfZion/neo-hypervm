@@ -164,7 +164,6 @@
     <ClInclude Include="BigIntegerBuilder.h" />
     <ClInclude Include="BoolStackItem.h" />
     <ClInclude Include="ByteArrayStackItem.h" />
-    <ClInclude Include="ELogStackOperation.h" />
     <ClInclude Include="IClaimable.h" />
     <ClInclude Include="Limits.h" />
     <ClInclude Include="ExecutionScript.h" />

@@ -1,5 +1,4 @@
 #include "ExecutionContextStack.h"
-#include "ELogStackOperation.h"
 
 int32 ExecutionContextStack::Count()
 {
