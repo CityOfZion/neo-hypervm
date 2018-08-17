@@ -1,20 +1,9 @@
 #include "ExecutionContextStack.h"
-#include "ELogStackOperation.h"
-
-int32 ExecutionContextStack::Count()
-{
-	return this->_stack.Count();
-}
 
 void ExecutionContextStack::Push(ExecutionContext* i)
 {
 	i->Claim();
 	this->_stack.Push(i);
-}
-
-ExecutionContext* ExecutionContextStack::Peek(int32 index)
-{
-	return this->_stack.Peek(index);
 }
 
 void ExecutionContextStack::Remove(int32 index)

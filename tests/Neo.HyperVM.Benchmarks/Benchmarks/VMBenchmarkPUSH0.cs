@@ -4,7 +4,7 @@ using NeoSharp.VM;
 
 namespace Neo.HyperVM.Benchmarks
 {
-    public class VMBenchmarkPUSH1 : VMBenchmarkBase
+    public class VMBenchmarkPUSH0 : VMBenchmarkBase
     {
         #region Scripts
 
@@ -12,7 +12,7 @@ namespace Neo.HyperVM.Benchmarks
 
         #endregion
 
-        [Params("(PUSH1+DROP)*1K")]
+        [Params("(PUSH0+DROP)*1K")]
         public override string Test { get; set; }
 
         [GlobalSetup]
@@ -22,7 +22,7 @@ namespace Neo.HyperVM.Benchmarks
             {
                 for (int x = 0; x < 1000; x++)
                 {
-                    script.Emit(EVMOpCode.PUSH1);
+                    script.Emit(EVMOpCode.PUSH0);
                     script.Emit(EVMOpCode.DROP);
                 }
 

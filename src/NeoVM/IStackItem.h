@@ -8,7 +8,7 @@ class IStackItem : public IClaimable
 {
 public:
 
-	EStackItemType Type;
+	const EStackItemType Type;
 
 	// Converters
 

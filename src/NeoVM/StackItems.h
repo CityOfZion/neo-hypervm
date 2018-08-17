@@ -9,13 +9,20 @@ class StackItems
 
 public:
 
-	int32 Count();
+	inline int32 Count()
+	{
+		return this->_stack.Count();
+	}
+
+	inline IStackItem* Peek(int32 index)
+	{
+		return this->_stack.Peek(index);
+	}
 
 	IStackItem* Pop();
 	void Drop();
 	void Clear();
 	void Push(IStackItem* it);
-	IStackItem* Peek(int32 index);
 	IStackItem* Remove(int32 index);
 	void Insert(int32 index, IStackItem* it);
 	void SendTo(StackItems* stack, int32 count);

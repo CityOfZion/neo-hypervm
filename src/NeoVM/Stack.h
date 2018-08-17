@@ -7,9 +7,9 @@ class Stack
 {
 private:
 
-	int32 _size = 0;
-	int32 _itemsLength = 0;
-	T** _items = NULL;
+	int32 _size;
+	int32 _itemsLength;
+	T** _items;
 
 	void EnsureCapacity(int32 min);
 	void RealRemoveAt(int32 index);
@@ -18,7 +18,7 @@ public:
 
 	const int32 SizeOf = sizeof(void*);
 
-	int32 Count();
+	inline int32 Count() { return this->_size; }
 
 	void CopyTo(Stack<T>* stack, int32 count);
 	void SendTo(Stack<T>* stack, int32 count);
@@ -35,6 +35,6 @@ public:
 	T* Top();
 	T* Bottom();
 
-	Stack() {};
+	inline Stack() : _size(0), _itemsLength(0), _items(NULL) { }
 	~Stack();
 };

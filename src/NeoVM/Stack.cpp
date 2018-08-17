@@ -3,12 +3,6 @@
 #include "ExecutionContext.h"
 
 template <class T>
-int32 Stack<T>::Count()
-{
-	return this->_size;
-}
-
-template <class T>
 void Stack<T>::RealRemoveAt(int32 index)
 {
 	this->_size--;
@@ -129,17 +123,6 @@ void Stack<T>::EnsureCapacity(int32 min)
 		this->_items = array;
 		this->_itemsLength = num;
 	}
-}
-
-template <class T>
-void Stack<T>::Clear()
-{
-	if (this->_size == 0) return;
-
-	this->_size = 0;
-
-	delete[](this->_items);
-	this->_items = NULL;
 }
 
 template <class T>
@@ -272,10 +255,29 @@ T* Stack<T>::Bottom()
 	return this->_items[0];
 }
 
+
+template <class T>
+void Stack<T>::Clear()
+{
+	if (this->_itemsLength == 0) return;
+
+	this->_size = 0;
+	this->_itemsLength = 0;
+
+	delete[](this->_items);
+	this->_items = NULL;
+}
+
 template <class T>
 Stack<T>::~Stack()
 {
-	this->Clear();
+	if (this->_itemsLength == 0) return;
+
+	this->_size = 0;
+	this->_itemsLength = 0;
+
+	delete[](this->_items);
+	this->_items = NULL;
 }
 
 // Explicit template instantiation

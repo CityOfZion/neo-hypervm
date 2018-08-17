@@ -101,9 +101,6 @@
     <ClInclude Include="Limits.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="ELogStackOperation.h">
-      <Filter>Header Files\Enums</Filter>
-    </ClInclude>
     <ClInclude Include="ExecutionScript.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
