@@ -181,31 +181,9 @@ namespace NeoSharp.VM.Interop.Tests
             ))
             using (var engine = CreateEngine(new ExecutionEngineArgs()
             {
-                Logger = new ExecutionEngineLogger(ELogVerbosity.All)
+                Logger = new ExecutionEngineLogger(ELogVerbosity.StepInto)
             }))
             {
-                StringBuilder stackLog = new StringBuilder();
-
-                engine.Logger.OnExecutionContextChange += (stack, item, index, operation) =>
-                {
-                    stackLog.AppendLine("EXE:" + operation.ToString() + "[" + index + "]");
-                };
-
-                engine.Logger.OnEvaluationStackChange += (stack, item, index, operation) =>
-                {
-                    stackLog.AppendLine("EVA:" + operation.ToString() + "[" + index + "]");
-                };
-
-                engine.Logger.OnAltStackChange += (stack, item, index, operation) =>
-                {
-                    stackLog.AppendLine("ALT:" + operation.ToString() + "[" + index + "]");
-                };
-
-                engine.Logger.OnResultStackChange += (stack, item, index, operation) =>
-                {
-                    stackLog.AppendLine("RES:" + operation.ToString() + "[" + index + "]");
-                };
-
                 StringBuilder stackOp = new StringBuilder();
 
                 engine.Logger.OnStepInto += (context) =>
@@ -228,21 +206,6 @@ namespace NeoSharp.VM.Interop.Tests
 [0x41663051791e0cf03178508aea217ca495c24891-000001] TOALTSTACK
 [0x41663051791e0cf03178508aea217ca495c24891-000002] FROMALTSTACK
 [0x41663051791e0cf03178508aea217ca495c24891-000003] RET".Replace("\r", ""));
-
-                Assert.AreEqual(stackLog.ToString().Trim().Replace("\r", ""),
-@"EXE:Push[0]
-EXE:TryPeek[0]
-EVA:Push[0]
-EXE:TryPeek[0]
-EVA:Pop[0]
-ALT:Push[0]
-EXE:TryPeek[0]
-ALT:Pop[0]
-EVA:Push[0]
-EXE:TryPeek[0]
-EXE:Drop[0]
-RES:Insert[0]
-EVA:Drop[0]".Replace("\r", ""));
 
             }
         }

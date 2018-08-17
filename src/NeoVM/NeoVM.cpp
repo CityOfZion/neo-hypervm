@@ -191,7 +191,7 @@ IStackItem* StackItems_Peek(StackItems* stack, int32 index)
 {
 	if (stack == NULL) return NULL;
 
-	return stack->TryPeek(index);
+	return stack->Peek(index);
 }
 
 int32 StackItems_Count(StackItems* stack)
@@ -199,13 +199,6 @@ int32 StackItems_Count(StackItems* stack)
 	if (stack == NULL) return 0;
 
 	return stack->Count();
-}
-
-void StackItems_AddLog(StackItems* stack, OnStackChangeCallback callback)
-{
-	if (stack == NULL) return;
-
-	stack->Log = callback;
 }
 
 // ExecutionContextStack
@@ -225,7 +218,7 @@ ExecutionContext* ExecutionContextStack_Peek(ExecutionContextStack* stack, int32
 {
 	if (stack == NULL) return NULL;
 
-	return stack->TryPeek(index);
+	return stack->Peek(index);
 }
 
 int32 ExecutionContextStack_Count(ExecutionContextStack* stack)
@@ -233,13 +226,6 @@ int32 ExecutionContextStack_Count(ExecutionContextStack* stack)
 	if (stack == NULL) return 0;
 
 	return stack->Count();
-}
-
-void ExecutionContextStack_AddLog(ExecutionContextStack* stack, OnStackChangeCallback callback)
-{
-	if (stack == NULL) return;
-
-	stack->Log = callback;
 }
 
 // StackItem

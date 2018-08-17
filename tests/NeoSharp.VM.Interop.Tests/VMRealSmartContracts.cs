@@ -365,15 +365,6 @@ namespace NeoSharp.VM.Interop.Tests
             args.Logger.OnStepInto += (context) =>
             { Console.WriteLine(context.ToString()); };
 
-            args.Logger.OnAltStackChange += (stack, item, index, oper) =>
-            { Console.WriteLine("AltStack: " + index.ToString() + "-" + oper.ToString()); };
-
-            args.Logger.OnEvaluationStackChange += (stack, item, index, oper) =>
-            { Console.WriteLine("EvStack: " + index.ToString() + "-" + oper.ToString()); };
-
-            args.Logger.OnExecutionContextChange += (stack, item, index, oper) =>
-            { Console.WriteLine("ExeStack: " + index.ToString() + "-" + oper.ToString()); };
-
             args.InteropService.OnLog += (sender, e) =>
             { Console.WriteLine("Log: " + e.Message); };
             args.InteropService.OnNotify += (sender, e) =>

@@ -61,9 +61,6 @@ namespace NeoSharp.VM.Interop
         internal delegate void OnStepIntoCallback(IntPtr item);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        internal delegate void OnStackChangeCallback(IntPtr item, int index, byte operation);
-
-        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         internal delegate byte InvokeInteropCallback(IntPtr ptr, byte size);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
@@ -106,7 +103,6 @@ namespace NeoSharp.VM.Interop
         // Specific
 
         internal delegate void delVoid_HandleOnStepIntoCallback(IntPtr handle, OnStepIntoCallback callback);
-        internal delegate void delVoid_HandleOnStackChangeCallback(IntPtr item, OnStackChangeCallback callback);
         internal delegate IntPtr delCreateExecutionEngine
             (
             InvokeInteropCallback interopCallback, LoadScriptCallback scriptCallback, GetMessageCallback getMessageCallback,
@@ -145,12 +141,10 @@ namespace NeoSharp.VM.Interop
         internal static delHandle_Handle StackItems_Pop;
         internal static delHandle_HandleInt StackItems_Peek;
         internal static delInt_HandleInt StackItems_Drop;
-        internal static delVoid_HandleOnStackChangeCallback StackItems_AddLog;
 
         internal static delInt_Handle ExecutionContextStack_Count;
         internal static delInt_HandleInt ExecutionContextStack_Drop;
         internal static delHandle_HandleInt ExecutionContextStack_Peek;
-        internal static delVoid_HandleOnStackChangeCallback ExecutionContextStack_AddLog;
 
         internal static delHandle_ByteHandleInt StackItem_Create;
         internal static delByte_HandleRefInt StackItem_SerializeInfo;

@@ -92,17 +92,17 @@ int32 ExecutionEngine::LoadScript(byte* script, int32 scriptLength, int32 rvcoun
 
 ExecutionContext* ExecutionEngine::GetCurrentContext()
 {
-	return this->InvocationStack->TryPeek(0);
+	return this->InvocationStack->Peek(0);
 }
 
 ExecutionContext* ExecutionEngine::GetCallingContext()
 {
-	return this->InvocationStack->TryPeek(1);
+	return this->InvocationStack->Peek(1);
 }
 
 ExecutionContext* ExecutionEngine::GetEntryContext()
 {
-	return this->InvocationStack->TryPeek(-1);
+	return this->InvocationStack->Peek(-1);
 }
 
 byte ExecutionEngine::GetState()
@@ -170,7 +170,7 @@ void ExecutionEngine::StepInto()
 		return;
 	}
 
-	ExecutionContext* context = this->InvocationStack->TryPeek(0);
+	ExecutionContext* context = this->InvocationStack->Peek(0);
 
 	if (context == NULL)
 	{
@@ -351,10 +351,9 @@ ExecuteOpCode:
 		}
 
 		ExecutionContext* clone = this->LoadScript(context->Script, -1);
-		context->EvaluationStack->CopyTo(clone->EvaluationStack, -1);
+		context->EvaluationStack->SendTo(clone->EvaluationStack, -1);
 		clone->InstructionPointer = context->InstructionPointer;
 		context->InstructionPointer += 2;
-		context->EvaluationStack->Clear();
 
 		// Jump
 
@@ -385,14 +384,9 @@ ExecuteOpCode:
 		}
 
 		ExecutionContext* clone = this->LoadScript(context->Script, rvcount);
-		context->EvaluationStack->CopyTo(clone->EvaluationStack, pcount);
+		context->EvaluationStack->SendTo(clone->EvaluationStack, pcount);
 		clone->InstructionPointer = context->InstructionPointer;
 		context->InstructionPointer += 2;
-
-		for (int32 i = 0; i < pcount; i++)
-		{
-			context->EvaluationStack->Drop();
-		}
 
 		// Jump
 
@@ -493,18 +487,13 @@ ExecuteOpCode:
 		}
 
 		ExecutionContext* context_new = this->InvocationStack->Peek(0);
-		context->EvaluationStack->CopyTo(context_new->EvaluationStack, pcount);
+		context->EvaluationStack->SendTo(context_new->EvaluationStack, pcount);
 
 		if (opcode == EVMOpCode::CALL_ET || opcode == EVMOpCode::CALL_EDT)
 		{
 			this->InvocationStack->Remove(1);
 		}
-		else
-		{
-			for (int32 i = 0; i < pcount; i++)
-				context->EvaluationStack->Drop();
-		}
-
+		
 		return;
 	}
 	case EVMOpCode::RET:
@@ -533,9 +522,9 @@ ExecuteOpCode:
 			if (rvcount > 0)
 			{
 				if (this->InvocationStack->Count() == 0)
-					context->EvaluationStack->CopyTo(this->ResultStack, rvcount);
+					context->EvaluationStack->SendTo(this->ResultStack, rvcount);
 				else
-					context->EvaluationStack->CopyTo(this->GetCurrentContext()->EvaluationStack, rvcount);
+					context->EvaluationStack->SendTo(this->GetCurrentContext()->EvaluationStack, rvcount);
 			}
 
 			ExecutionContext::UnclaimAndFree(context);
@@ -610,7 +599,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack->CopyTo(this->GetCurrentContext()->EvaluationStack, -1);
+		context->EvaluationStack->SendTo(this->GetCurrentContext()->EvaluationStack, -1);
 
 		if (this->InvocationStack->Count() >= MAX_INVOCATION_STACK_SIZE)
 		{
@@ -621,10 +610,6 @@ ExecuteOpCode:
 		if (opcode == EVMOpCode::TAILCALL)
 		{
 			this->InvocationStack->Remove(1);
-		}
-		else
-		{
-			context->EvaluationStack->Clear();
 		}
 
 		return;

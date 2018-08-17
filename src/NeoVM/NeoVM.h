@@ -55,14 +55,12 @@ extern "C"
 	DllExport IStackItem* __stdcall StackItems_Peek(StackItems* stack, int32 index);
 	DllExport void __stdcall StackItems_Push(StackItems* stack, IStackItem* item);
 	DllExport int32 __stdcall StackItems_Drop(StackItems* stack, int32 count);
-	DllExport void __stdcall StackItems_AddLog(StackItems* stack, OnStackChangeCallback callback);
 
 	// ExecutionContextStack
 
 	DllExport int32 __stdcall ExecutionContextStack_Count(ExecutionContextStack* stack);
 	DllExport int32 __stdcall ExecutionContextStack_Drop(ExecutionContextStack* stack, int32 count);
 	DllExport ExecutionContext* __stdcall ExecutionContextStack_Peek(ExecutionContextStack* stack, int32 index);
-	DllExport void __stdcall ExecutionContextStack_AddLog(ExecutionContextStack* stack, OnStackChangeCallback callback);
 
 	// StackItem
 
