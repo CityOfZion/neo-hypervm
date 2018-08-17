@@ -12,7 +12,7 @@ namespace Neo.HyperVM.Benchmarks
 
         #endregion
 
-        [Params("NOP*1000")]
+        [Params("NOP*1K")]
         public override string Test { get; set; }
 
         [GlobalSetup]
@@ -32,7 +32,7 @@ namespace Neo.HyperVM.Benchmarks
         }
 
         [Benchmark]
-        public void HyperVM()
+        public override void HyperVM()
         {
             using (var engine = _HyperVM.Create(null))
             {
@@ -42,7 +42,7 @@ namespace Neo.HyperVM.Benchmarks
         }
 
         [Benchmark]
-        public void NeoVM()
+        public override void NeoVM()
         {
             using (var engine = new VM.ExecutionEngine(null, _crypto, null, null))
             {
@@ -52,7 +52,7 @@ namespace Neo.HyperVM.Benchmarks
         }
 
         [Benchmark]
-        public void NeoApplicationEngine()
+        public override void ApplicationEngine()
         {
             using (var engine = new ApplicationEngine(TriggerType.Application, null, null, Fixed8.Zero, true))
             {
