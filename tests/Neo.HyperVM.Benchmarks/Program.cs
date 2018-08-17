@@ -7,7 +7,7 @@ namespace Neo.HyperVM.Benchmarks
     {
         static void Main(string[] args)
         {
-            //var c = new VMBenchmarkPUSH1();
+            //var c = new VMBenchmarkPUSH0();
             //c.Setup();
 
             //for (int x = 0; x < 10000; x++)
@@ -17,7 +17,7 @@ namespace Neo.HyperVM.Benchmarks
 
             //return;
 
-            foreach (var type in new Type[] { typeof(VMBenchmarkNOP), typeof(VMBenchmarkPUSH1) })
+            foreach (var type in new Type[] { typeof(VMBenchmarkNOP), typeof(VMBenchmarkPUSH0) })
             {
                 var summary = BenchmarkRunner.Run(type, new AllowNonOptimized());
 
