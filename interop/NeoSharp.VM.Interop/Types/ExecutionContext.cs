@@ -64,7 +64,7 @@ namespace NeoSharp.VM.Interop.Types
                 {
                     if (NeoVM.ExecutionContext_GetScriptHash(Handle, (IntPtr)p, 0) != ScriptHashLength)
                     {
-                        throw (new AccessViolationException());
+                        throw new AccessViolationException();
                     }
                 }
 
