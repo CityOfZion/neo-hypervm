@@ -590,7 +590,7 @@ ExecuteOpCode:
 		}
 
 		byte* data = new byte[length + 1];
-		if (context->Read((byte*)data, length) != (int32)length)
+		if (context->Read(data, length) != (int32)length)
 		{
 			delete[](data);
 			this->SetFault();
