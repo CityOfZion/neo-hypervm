@@ -21,7 +21,7 @@ public:
 
 	// Constructor
 
-	IStackItem(EStackItemType type);
+	inline IStackItem(EStackItemType type) : IClaimable(), Type(type) { }
 
 	// Destructor
 

@@ -187,16 +187,6 @@ EVMOpCode ExecutionContext::ReadNextInstruction()
 	}
 }
 
-int32 ExecutionContext::GetScriptHash(byte* hash)
-{
-	return this->Script->GetScriptHash(hash);
-}
-
-void ExecutionContext::Seek(int32 position)
-{
-	this->InstructionPointer = position;
-}
-
 void ExecutionContext::Free(ExecutionContext* &item)
 {
 	if (item != NULL && item->IsUnClaimed())
@@ -213,12 +203,4 @@ void ExecutionContext::UnclaimAndFree(ExecutionContext* &item)
 		delete(item);
 		item = NULL;
 	}
-}
-
-ExecutionContext::~ExecutionContext()
-{
-	delete(this->EvaluationStack);
-	delete(this->AltStack);
-
-	ExecutionScript::UnclaimAndFree(this->Script);
 }

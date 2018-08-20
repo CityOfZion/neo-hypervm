@@ -7,28 +7,16 @@
 #include "ArrayStackItem.h"
 #include "Crypto.h"
 
-// Getters
-
-ExecutionContextStack* ExecutionEngine::GetInvocationStack() { return this->InvocationStack; }
-StackItems* ExecutionEngine::GetResultStack() { return this->ResultStack; }
-
 // Setters
-
-void ExecutionEngine::SetLogCallback(OnStepIntoCallback logCallback) { this->Log = logCallback; }
 
 void ExecutionEngine::Clean(uint32 iteration)
 {
-	this->Iteration = iteration;
-	this->State = EVMState::NONE;
-	this->ConsumedGas = 0;
+	this->_iteration = iteration;
+	this->_state = EVMState::NONE;
+	this->_consumedGas = 0;
 
 	this->InvocationStack->Clear();
 	this->ResultStack->Clear();
-}
-
-void ExecutionEngine::SetFault()
-{
-	this->State = EVMState::FAULT;
 }
 
 // Constructor
@@ -37,9 +25,9 @@ ExecutionEngine::ExecutionEngine
 (
 	InvokeInteropCallback invokeInterop, LoadScriptCallback loadScript, GetMessageCallback getMessage
 ) :
-	Iteration(0),
-	ConsumedGas(0),
-	State(EVMState::NONE),
+	_iteration(0),
+	_consumedGas(0),
+	_state(EVMState::NONE),
 	Log(NULL),
 
 	OnGetMessage(getMessage),
@@ -90,40 +78,15 @@ int32 ExecutionEngine::LoadScript(byte* script, int32 scriptLength, int32 rvcoun
 	return index;
 }
 
-ExecutionContext* ExecutionEngine::GetCurrentContext()
-{
-	return this->InvocationStack->Peek(0);
-}
-
-ExecutionContext* ExecutionEngine::GetCallingContext()
-{
-	return this->InvocationStack->Peek(1);
-}
-
-ExecutionContext* ExecutionEngine::GetEntryContext()
-{
-	return this->InvocationStack->Peek(-1);
-}
-
-byte ExecutionEngine::GetState()
-{
-	return this->State;
-}
-
-uint64 ExecutionEngine::GetConsumedGas()
-{
-	return this->ConsumedGas;
-}
-
 EVMState ExecutionEngine::Execute()
 {
 	do
 	{
 		this->StepInto();
-	} 
-	while (this->State == EVMState::NONE);
+	}
+	while (this->_state == EVMState::NONE);
 
-	return this->State;
+	return this->_state;
 }
 
 EVMState ExecutionEngine::ExecuteUntil(uint64 gas)
@@ -132,40 +95,43 @@ EVMState ExecutionEngine::ExecuteUntil(uint64 gas)
 	{
 		this->StepInto();
 
-		if (this->ConsumedGas > gas)
+		if (this->_consumedGas > gas)
 		{
-			this->State = EVMState::FAULT_BY_GAS;
+			this->_state = EVMState::FAULT_BY_GAS;
 			break;
 		}
 	}
-	while (this->State == EVMState::NONE);
+	while (this->_state == EVMState::NONE);
 
-	return this->State;
+	return this->_state;
 }
 
 void ExecutionEngine::StepOut()
 {
 	int32 c = this->InvocationStack->Count();
 
-	while (this->State == EVMState::NONE && this->InvocationStack->Count() >= c)
+	while (this->_state == EVMState::NONE && this->InvocationStack->Count() >= c)
+	{
 		this->StepInto();
+	}
 }
 
 void ExecutionEngine::StepOver()
 {
-	if (this->State != EVMState::NONE) return;
+	if (this->_state != EVMState::NONE) return;
 
 	int32 c = this->InvocationStack->Count();
 
 	do
 	{
 		this->StepInto();
-	} while (this->State == EVMState::NONE && this->InvocationStack->Count() > c);
+	} 
+	while (this->_state == EVMState::NONE && this->InvocationStack->Count() > c);
 }
 
 void ExecutionEngine::StepInto()
 {
-	if (this->State != EVMState::NONE)
+	if (this->_state != EVMState::NONE)
 	{
 		return;
 	}
@@ -174,7 +140,7 @@ void ExecutionEngine::StepInto()
 
 	if (context == NULL)
 	{
-		this->State = EVMState::HALT;
+		this->_state = EVMState::HALT;
 		return;
 	}
 
@@ -493,7 +459,7 @@ ExecuteOpCode:
 		{
 			this->InvocationStack->Remove(1);
 		}
-		
+
 		return;
 	}
 	case EVMOpCode::RET:
@@ -532,7 +498,7 @@ ExecuteOpCode:
 
 		if (this->InvocationStack->Count() == 0)
 		{
-			this->State = EVMState::HALT;
+			this->SetHalt();
 		}
 
 		return;
@@ -2202,7 +2168,7 @@ ExecuteOpCode:
 		// TODO: dangerous way to get the message
 
 		byte* msg;
-		int32 msgL = this->OnGetMessage(this->Iteration, msg);
+		int32 msgL = this->OnGetMessage(this->_iteration, msg);
 		if (msgL <= 0)
 		{
 			IStackItem::Free(ipubKey, isignature);
@@ -2406,7 +2372,7 @@ ExecuteOpCode:
 			this->SetFault();
 		}
 
-		if (this->State == EVMState::FAULT || this->OnGetMessage == NULL)
+		if (this->_state == EVMState::FAULT || this->OnGetMessage == NULL)
 		{
 			// Free
 
@@ -2417,7 +2383,7 @@ ExecuteOpCode:
 
 			// Return
 
-			if (this->State != EVMState::FAULT)
+			if (this->_state != EVMState::FAULT)
 			{
 				context->EvaluationStack->Push(new BoolStackItem(false));
 			}
@@ -2430,7 +2396,7 @@ ExecuteOpCode:
 		// TODO: dangerous way to get the message
 
 		byte* msg;
-		int32 msgL = this->OnGetMessage(this->Iteration, msg);
+		int32 msgL = this->OnGetMessage(this->_iteration, msg);
 
 		if (msgL <= 0)
 		{

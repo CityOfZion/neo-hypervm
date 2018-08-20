@@ -174,33 +174,6 @@ void Stack<T>::SendTo(Stack<T>* stack, int32 count)
 }
 
 template <class T>
-void Stack<T>::CopyTo(Stack<T>* stack, int32 count)
-{
-	if (count == -1)
-	{
-		count = this->_size;
-	}
-	else if (count > this->_size)
-	{
-		count = this->_size;
-	}
-
-	if (count == 0) return;
-
-	stack->EnsureCapacity(stack->_size + count);
-
-	for (int32 x = this->_size - count, mx = x + count; x < mx; x++)
-	{
-		T* item = this->_items[x];
-
-		if (item == NULL) break;
-
-		stack->_items[stack->_size] = item;
-		++stack->_size;
-	}
-}
-
-template <class T>
 void Stack<T>::Push(T* item)
 {
 	if (this->_size == this->_itemsLength)
@@ -234,42 +207,7 @@ T* Stack<T>::Peek(int32 index)
 }
 
 template <class T>
-T* Stack<T>::Top()
-{
-	if (this->_size == 0)
-	{
-		return NULL;
-	}
-
-	return this->_items[this->_size - 1];
-}
-
-template <class T>
-T* Stack<T>::Bottom()
-{
-	if (this->_size == 0)
-	{
-		return NULL;
-	}
-
-	return this->_items[0];
-}
-
-
-template <class T>
 void Stack<T>::Clear()
-{
-	if (this->_itemsLength == 0) return;
-
-	this->_size = 0;
-	this->_itemsLength = 0;
-
-	delete[](this->_items);
-	this->_items = NULL;
-}
-
-template <class T>
-Stack<T>::~Stack()
 {
 	if (this->_itemsLength == 0) return;
 

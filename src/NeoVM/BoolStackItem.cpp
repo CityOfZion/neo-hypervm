@@ -1,24 +1,5 @@
 #include "BoolStackItem.h"
 
-BoolStackItem::BoolStackItem(bool value) :IStackItem(EStackItemType::Bool), Value(value) { }
-BoolStackItem::~BoolStackItem() { }
-
-bool BoolStackItem::GetBoolean()
-{
-	return this->Value;
-}
-
-BigInteger* BoolStackItem::GetBigInteger()
-{
-	return new BigInteger(this->Value ? BigInteger::One : BigInteger::Zero);
-}
-
-bool BoolStackItem::GetInt32(int32 &ret)
-{
-	ret = this->Value ? 1 : 0;
-	return true;
-}
-
 bool BoolStackItem::Equals(IStackItem* it)
 {
 	if (it == this) return true;
@@ -28,7 +9,7 @@ bool BoolStackItem::Equals(IStackItem* it)
 	case EStackItemType::Bool:
 	{
 		BoolStackItem* t = (BoolStackItem*)it;
-		return this->Value == t->Value;
+		return this->_value == t->_value;
 	}
 	default:
 	{
@@ -41,7 +22,7 @@ bool BoolStackItem::Equals(IStackItem* it)
 
 			// Current true
 
-			if (this->Value)
+			if (this->_value)
 			{
 				bool ret = (data[0] == 0x01);
 				delete[](data);
@@ -53,7 +34,7 @@ bool BoolStackItem::Equals(IStackItem* it)
 			delete[](data);
 			return iz == 0;
 		}
-		case 0: return !this->Value;
+		case 0: return !this->_value;
 		default: return false;
 		}
 	}
@@ -72,7 +53,7 @@ int32 BoolStackItem::ReadByteArray(byte* output, int32 sourceIndex, int32 count)
 		return 0;
 	}
 
-	if (this->Value)
+	if (this->_value)
 	{
 		if (count == 0) return 0;
 
@@ -83,24 +64,4 @@ int32 BoolStackItem::ReadByteArray(byte* output, int32 sourceIndex, int32 count)
 	{
 		return 0;
 	}
-}
-
-int32 BoolStackItem::ReadByteArraySize()
-{
-	return this->Value ? 1 : 0;
-}
-
-// Serialize
-
-int32 BoolStackItem::Serialize(byte* data, int32 length)
-{
-	if (length <= 0) return 0;
-
-	data[0] = Value ? 0x01 : 0x00;
-	return 1;
-}
-
-int32 BoolStackItem::GetSerializedSize()
-{
-	return 1;
 }

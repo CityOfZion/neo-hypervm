@@ -12,11 +12,23 @@ public:
 
 	// Claims
 
-	void Claim();
-	bool UnClaim();
-	bool IsUnClaimed();
+	inline bool UnClaim()
+	{
+		this->_claims--;
+		return this->_claims == 0;
+	}
+
+	inline bool IsUnClaimed()
+	{
+		return this->_claims == 0;
+	}
+
+	inline void Claim()
+	{
+		this->_claims++;
+	}
 
 	// Constructor
 
-	IClaimable();
+	inline IClaimable() :_claims(0) { }
 };

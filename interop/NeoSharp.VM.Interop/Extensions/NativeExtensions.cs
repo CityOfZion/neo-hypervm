@@ -7,7 +7,7 @@ using NeoSharp.VM.Interop.Types.StackItems;
 
 namespace NeoSharp.VM.Interop.Extensions
 {
-    public unsafe static class INativeExtensions
+    public unsafe static class NativeExtensions
     {
         /// <summary>
         /// Convert native pointer to stack item
@@ -61,7 +61,10 @@ namespace NeoSharp.VM.Interop.Extensions
 
                         return new IntegerStackItem(engine, item, payload ?? (new byte[] { }));
                     }
-                case EStackItemType.Bool: return new BooleanStackItem(engine, item, payload ?? (new byte[] { }));
+                case EStackItemType.Bool:
+                    {
+                        return new BooleanStackItem(engine, item, payload);
+                    }
                 default: throw new ExternalException();
             }
         }

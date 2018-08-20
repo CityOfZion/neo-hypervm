@@ -2,32 +2,16 @@
 #include "BoolStackItem.h"
 
 ArrayStackItem::ArrayStackItem(bool isStruct) :
-	IStackItem((isStruct ? EStackItemType::Struct : EStackItemType::Array)), List(std::list<IStackItem*>())
+	IStackItem((isStruct ? EStackItemType::Struct : EStackItemType::Array)), _list(std::list<IStackItem*>())
 { }
 
 ArrayStackItem::ArrayStackItem(bool isStruct, int32 count) :
-	IStackItem((isStruct ? EStackItemType::Struct : EStackItemType::Array)), List(std::list<IStackItem*>())
+	IStackItem((isStruct ? EStackItemType::Struct : EStackItemType::Array)), _list(std::list<IStackItem*>())
 {
 	// Init size
 	for (int32 i = 0; i < count; ++i)
 		this->Add(new BoolStackItem(false));
 }
-
-ArrayStackItem::~ArrayStackItem()
-{
-	this->Clear();
-}
-
-void ArrayStackItem::Reverse()
-{
-	this->List.reverse();
-}
-
-bool ArrayStackItem::GetBoolean() { return true; }
-BigInteger* ArrayStackItem::GetBigInteger() { return NULL; }
-bool ArrayStackItem::GetInt32(int32 &ret) { return false; }
-int32 ArrayStackItem::ReadByteArray(byte* output, int32 sourceIndex, int32 count) { return -1; }
-int32 ArrayStackItem::ReadByteArraySize() { return -1; }
 
 IStackItem* ArrayStackItem::Clone()
 {
@@ -87,17 +71,12 @@ bool ArrayStackItem::Equals(IStackItem* it)
 
 // Read
 
-int32 ArrayStackItem::Count()
-{
-	return static_cast<int>(this->List.size());
-}
-
 IStackItem* ArrayStackItem::Get(int32 index)
 {
 	if (index == 0)
-		return this->List.front();
+		return this->_list.front();
 
-	std::list<IStackItem*>::iterator it = this->List.begin();
+	std::list<IStackItem*>::iterator it = this->_list.begin();
 	std::advance(it, index);
 
 	return (IStackItem*)*it;
@@ -106,7 +85,7 @@ IStackItem* ArrayStackItem::Get(int32 index)
 int32 ArrayStackItem::IndexOf(IStackItem* item)
 {
 	int32 index = 0;
-	for (std::list<IStackItem*>::iterator it = this->List.begin(); it != this->List.end(); ++it)
+	for (std::list<IStackItem*>::iterator it = this->_list.begin(); it != this->_list.end(); ++it)
 	{
 		if ((IStackItem*)*it == item)
 			return index;
@@ -120,13 +99,13 @@ int32 ArrayStackItem::IndexOf(IStackItem* item)
 
 void ArrayStackItem::Clear()
 {
-	for (std::list<IStackItem*>::iterator it = this->List.begin(); it != this->List.end(); ++it)
+	for (std::list<IStackItem*>::iterator it = this->_list.begin(); it != this->_list.end(); ++it)
 	{
 		IStackItem* ptr = (IStackItem*)*it;
 		IStackItem::UnclaimAndFree(ptr);
 	}
 
-	this->List.clear();
+	this->_list.clear();
 }
 
 void ArrayStackItem::Insert(int32 index, IStackItem* item)
@@ -136,14 +115,14 @@ void ArrayStackItem::Insert(int32 index, IStackItem* item)
 
 	if (index == 0)
 	{
-		this->List.push_front(item);
+		this->_list.push_front(item);
 	}
 	else
 	{
-		std::list<IStackItem*>::iterator it = this->List.begin();
+		std::list<IStackItem*>::iterator it = this->_list.begin();
 		std::advance(it, index);
 
-		this->List.insert(it, item);
+		this->_list.insert(it, item);
 	}
 }
 
@@ -152,24 +131,24 @@ void ArrayStackItem::Add(IStackItem* item)
 	if (item != NULL)
 		item->Claim();
 
-	this->List.push_back(item);
+	this->_list.push_back(item);
 }
 
 void ArrayStackItem::RemoveAt(int32 index)
 {
 	if (index == 0)
 	{
-		IStackItem* it = this->List.front();
-		this->List.pop_front();
+		IStackItem* it = this->_list.front();
+		this->_list.pop_front();
 		IStackItem::UnclaimAndFree(it);
 	}
 	else
 	{
-		std::list<IStackItem*>::iterator it = this->List.begin();
+		std::list<IStackItem*>::iterator it = this->_list.begin();
 		std::advance(it, index);
 
 		IStackItem* s = (IStackItem*)*it;
-		this->List.erase(it);
+		this->_list.erase(it);
 		IStackItem::UnclaimAndFree(s);
 	}
 }
@@ -181,14 +160,14 @@ void ArrayStackItem::Set(int32 index, IStackItem* item)
 
 	if (index == 0)
 	{
-		IStackItem* it = this->List.front();
-		this->List.pop_front();
+		IStackItem* it = this->_list.front();
+		this->_list.pop_front();
 		IStackItem::UnclaimAndFree(it);
-		this->List.push_front(item);
+		this->_list.push_front(item);
 	}
 	else
 	{
-		std::list<IStackItem*>::iterator it = this->List.begin();
+		std::list<IStackItem*>::iterator it = this->_list.begin();
 		std::advance(it, index);
 
 		IStackItem* s = (IStackItem*)*it;
@@ -197,8 +176,3 @@ void ArrayStackItem::Set(int32 index, IStackItem* item)
 		*it = item;
 	}
 }
-
-// Serialize
-
-int32 ArrayStackItem::Serialize(byte* data, int32 length) { return 0; }
-int32 ArrayStackItem::GetSerializedSize() { return 0; }

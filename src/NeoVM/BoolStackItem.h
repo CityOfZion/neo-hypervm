@@ -5,29 +5,54 @@ class BoolStackItem : public IStackItem
 {
 private:
 
-	bool Value;
+	bool _value;
 
 public:
 
 	// Converters
 
-	bool GetBoolean();
-	BigInteger* GetBigInteger();
-	bool GetInt32(int32 &ret);
+	inline bool GetBoolean()
+	{
+		return this->_value;
+	}
+
+	inline BigInteger* GetBigInteger()
+	{
+		return new BigInteger(this->_value ? BigInteger::One : BigInteger::Zero);
+	}
+
+	inline bool GetInt32(int32 &ret)
+	{
+		ret = this->_value ? 1 : 0;
+		return true;
+	}
+
 	int32 ReadByteArray(byte* output, int32 sourceIndex, int32 count);
-	int32 ReadByteArraySize();
+
+	inline int32 ReadByteArraySize()
+	{
+		return this->_value ? 1 : 0;
+	}
+
 	bool Equals(IStackItem* it);
 
-	// Constructor
+	// Constructor & Destructor
 
-	BoolStackItem(bool value);
-
-	// Destructor
-
-	~BoolStackItem();
+	inline BoolStackItem(bool value) :IStackItem(EStackItemType::Bool), _value(value) { }
+	inline ~BoolStackItem() { }
 
 	// Serialize
 
-	int32 Serialize(byte* data, int32 length);
-	int32 GetSerializedSize();
+	inline int32 Serialize(byte* data, int32 length)
+	{
+		if (length <= 0) return 0;
+
+		data[0] = _value ? 0x01 : 0x00;
+		return 1;
+	}
+
+	inline int32 GetSerializedSize()
+	{
+		return _value ? 1 : 0;
+	}
 };

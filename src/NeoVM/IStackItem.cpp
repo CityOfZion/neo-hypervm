@@ -1,9 +1,5 @@
 #include "IStackItem.h"
 
-// Constructor
-
-IStackItem::IStackItem(EStackItemType type) : IClaimable(), Type(type) { }
-
 // Methods
 
 void IStackItem::Free(IStackItem* &item)
