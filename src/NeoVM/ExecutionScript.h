@@ -35,6 +35,7 @@ public:
 	inline ~ExecutionScript()
 	{
 		delete(this->Content);
+		this->Content = NULL;
 	}
 
 	// Claims
