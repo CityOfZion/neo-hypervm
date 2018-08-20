@@ -29,8 +29,8 @@ private:
 
 	// Stacks
 
-	StackItems* ResultStack;
-	ExecutionContextStack* InvocationStack;
+	StackItems ResultStack;
+	ExecutionContextStack InvocationStack;
 
 	std::list<ExecutionScript*> Scripts;
 
@@ -61,27 +61,27 @@ public:
 
 	inline ExecutionContextStack* GetInvocationStack()
 	{
-		return this->InvocationStack;
+		return &this->InvocationStack;
 	}
 
 	inline StackItems* GetResultStack()
 	{
-		return this->ResultStack;
+		return &this->ResultStack;
 	}
 
 	inline ExecutionContext* GetCurrentContext()
 	{
-		return this->InvocationStack->Peek(0);
+		return this->InvocationStack.Peek(0);
 	}
 
 	inline ExecutionContext* GetCallingContext()
 	{
-		return this->InvocationStack->Peek(1);
+		return this->InvocationStack.Peek(1);
 	}
 
 	inline ExecutionContext* GetEntryContext()
 	{
-		return this->InvocationStack->Peek(-1);
+		return this->InvocationStack.Peek(-1);
 	}
 
 	inline uint64 GetConsumedGas()
