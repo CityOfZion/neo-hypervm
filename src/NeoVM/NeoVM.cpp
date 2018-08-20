@@ -45,8 +45,8 @@ void ExecutionContext_Claim(ExecutionContext* context, StackItems* &evStack, Sta
 {
 	if (context == NULL) return;
 
-	evStack = context->EvaluationStack;
-	altStack = context->AltStack;
+	evStack = &context->EvaluationStack;
+	altStack = &context->AltStack;
 
 	context->Claim();
 }

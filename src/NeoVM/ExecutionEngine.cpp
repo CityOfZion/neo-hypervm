@@ -15,8 +15,8 @@ void ExecutionEngine::Clean(uint32 iteration)
 	this->_state = EVMState::NONE;
 	this->_consumedGas = 0;
 
-	this->InvocationStack->Clear();
-	this->ResultStack->Clear();
+	this->InvocationStack.Clear();
+	this->ResultStack.Clear();
 }
 
 // Constructor
@@ -33,15 +33,14 @@ ExecutionEngine::ExecutionEngine
 	OnGetMessage(getMessage),
 	OnLoadScript(loadScript),
 	OnInvokeInterop(invokeInterop),
-
-	ResultStack(new StackItems()),
-	InvocationStack(new ExecutionContextStack())
+	ResultStack(),
+	InvocationStack()
 { }
 
 ExecutionContext* ExecutionEngine::LoadScript(ExecutionScript* script, int32 rvcount)
 {
 	ExecutionContext* context = new ExecutionContext(script, 0, rvcount);
-	this->InvocationStack->Push(context);
+	this->InvocationStack.Push(context);
 	return context;
 }
 
@@ -60,7 +59,7 @@ bool ExecutionEngine::LoadScript(byte scriptIndex, int32 rvcount)
 	if (sc == NULL) return false;
 
 	ExecutionContext* context = new ExecutionContext(sc, 0, rvcount);
-	this->InvocationStack->Push(context);
+	this->InvocationStack.Push(context);
 	return true;
 }
 
@@ -74,7 +73,7 @@ int32 ExecutionEngine::LoadScript(byte* script, int32 scriptLength, int32 rvcoun
 	Scripts.push_back(sc);
 
 	ExecutionContext* context = new ExecutionContext(sc, 0, rvcount);
-	this->InvocationStack->Push(context);
+	this->InvocationStack.Push(context);
 	return index;
 }
 
@@ -108,9 +107,9 @@ EVMState ExecutionEngine::ExecuteUntil(uint64 gas)
 
 void ExecutionEngine::StepOut()
 {
-	int32 c = this->InvocationStack->Count();
+	int32 c = this->InvocationStack.Count();
 
-	while (this->_state == EVMState::NONE && this->InvocationStack->Count() >= c)
+	while (this->_state == EVMState::NONE && this->InvocationStack.Count() >= c)
 	{
 		this->StepInto();
 	}
@@ -120,13 +119,13 @@ void ExecutionEngine::StepOver()
 {
 	if (this->_state != EVMState::NONE) return;
 
-	int32 c = this->InvocationStack->Count();
+	int32 c = this->InvocationStack.Count();
 
 	do
 	{
 		this->StepInto();
 	} 
-	while (this->_state == EVMState::NONE && this->InvocationStack->Count() > c);
+	while (this->_state == EVMState::NONE && this->InvocationStack.Count() > c);
 }
 
 void ExecutionEngine::StepInto()
@@ -136,7 +135,7 @@ void ExecutionEngine::StepInto()
 		return;
 	}
 
-	ExecutionContext* context = this->InvocationStack->Peek(0);
+	ExecutionContext* context = this->InvocationStack.Peek(0);
 
 	if (context == NULL)
 	{
@@ -161,7 +160,7 @@ ExecuteOpCode:
 
 		if (length == 0)
 		{
-			context->EvaluationStack->Push(new ByteArrayStackItem(NULL, 0, false));
+			context->EvaluationStack.Push(new ByteArrayStackItem(NULL, 0, false));
 			return;
 		}
 
@@ -174,7 +173,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack->Push(new ByteArrayStackItem(data, length, true));
+		context->EvaluationStack.Push(new ByteArrayStackItem(data, length, true));
 		return;
 	}
 
@@ -182,7 +181,7 @@ ExecuteOpCode:
 
 	else if (opcode >= EVMOpCode::PUSH1 && opcode <= EVMOpCode::PUSH16)
 	{
-		context->EvaluationStack->Push(new IntegerStackItem((opcode - EVMOpCode::PUSH1) + 1));
+		context->EvaluationStack.Push(new IntegerStackItem((opcode - EVMOpCode::PUSH1) + 1));
 		return;
 	}
 
@@ -209,7 +208,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack->Push(new ByteArrayStackItem(data, length, true));
+		context->EvaluationStack.Push(new ByteArrayStackItem(data, length, true));
 		return;
 	}
 	case EVMOpCode::PUSHDATA2:
@@ -229,7 +228,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack->Push(new ByteArrayStackItem(data, length, true));
+		context->EvaluationStack.Push(new ByteArrayStackItem(data, length, true));
 		return;
 	}
 	case EVMOpCode::PUSHDATA4:
@@ -249,13 +248,13 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack->Push(new ByteArrayStackItem(data, length, true));
+		context->EvaluationStack.Push(new ByteArrayStackItem(data, length, true));
 		return;
 	}
 	case EVMOpCode::PUSHM1:
 	{
 		BigInteger* bi = new BigInteger(BigInteger::MinusOne);
-		context->EvaluationStack->Push(new IntegerStackItem(bi));
+		context->EvaluationStack.Push(new IntegerStackItem(bi));
 		return;
 	}
 
@@ -294,13 +293,13 @@ ExecuteOpCode:
 
 		offset = context->InstructionPointer + offset - 3;
 
-		if (offset < 0 || offset > context->ScriptLength || context->EvaluationStack->Count() < 1)
+		if (offset < 0 || offset > context->ScriptLength || context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* bitem = context->EvaluationStack->Pop();
+		IStackItem* bitem = context->EvaluationStack.Pop();
 
 		if ((opcode == EVMOpCode::JMPIF) == bitem->GetBoolean())
 			context->InstructionPointer = offset;
@@ -310,14 +309,14 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::CALL:
 	{
-		if (context == NULL || this->InvocationStack->Count() >= MAX_INVOCATION_STACK_SIZE)
+		if (context == NULL || this->InvocationStack.Count() >= MAX_INVOCATION_STACK_SIZE)
 		{
 			this->SetFault();
 			return;
 		}
 
 		ExecutionContext* clone = this->LoadScript(context->Script, -1);
-		context->EvaluationStack->SendTo(clone->EvaluationStack, -1);
+		context->EvaluationStack.SendTo(&clone->EvaluationStack, -1);
 		clone->InstructionPointer = context->InstructionPointer;
 		context->InstructionPointer += 2;
 
@@ -330,7 +329,7 @@ ExecuteOpCode:
 	// Stack isolation (NEP8)
 	case EVMOpCode::CALL_I:
 	{
-		if (context == NULL || this->InvocationStack->Count() >= MAX_INVOCATION_STACK_SIZE)
+		if (context == NULL || this->InvocationStack.Count() >= MAX_INVOCATION_STACK_SIZE)
 		{
 			this->SetFault();
 			return;
@@ -343,14 +342,14 @@ ExecuteOpCode:
 			return;
 		}
 
-		if (context->EvaluationStack->Count() < pcount)
+		if (context->EvaluationStack.Count() < pcount)
 		{
 			this->SetFault();
 			return;
 		}
 
 		ExecutionContext* clone = this->LoadScript(context->Script, rvcount);
-		context->EvaluationStack->SendTo(clone->EvaluationStack, pcount);
+		context->EvaluationStack.SendTo(&clone->EvaluationStack, pcount);
 		clone->InstructionPointer = context->InstructionPointer;
 		context->InstructionPointer += 2;
 
@@ -378,7 +377,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		int32 ec = context->EvaluationStack->Count();
+		int32 ec = context->EvaluationStack.Count();
 		if (ec < pcount)
 		{
 			this->SetFault();
@@ -412,7 +411,7 @@ ExecuteOpCode:
 
 			// Get hash from the evaluation stack
 
-			IStackItem* it = context->EvaluationStack->Pop();
+			IStackItem* it = context->EvaluationStack.Pop();
 			int32 size = it->ReadByteArraySize();
 
 			if (size != scriptLength || it->ReadByteArray(script_hash, 0, scriptLength) != scriptLength)
@@ -452,12 +451,12 @@ ExecuteOpCode:
 			return;
 		}
 
-		ExecutionContext* context_new = this->InvocationStack->Peek(0);
-		context->EvaluationStack->SendTo(context_new->EvaluationStack, pcount);
+		ExecutionContext* context_new = this->InvocationStack.Peek(0);
+		context->EvaluationStack.SendTo(&context_new->EvaluationStack, pcount);
 
 		if (opcode == EVMOpCode::CALL_ET || opcode == EVMOpCode::CALL_EDT)
 		{
-			this->InvocationStack->Remove(1);
+			this->InvocationStack.Remove(1);
 		}
 
 		return;
@@ -467,17 +466,17 @@ ExecuteOpCode:
 		if (context != NULL)
 		{
 			context->Claim();
-			this->InvocationStack->Drop();
+			this->InvocationStack.Drop();
 
 			int32 rvcount = context->RVCount;
 
 			if (rvcount == -1)
 			{
-				rvcount = context->EvaluationStack->Count();
+				rvcount = context->EvaluationStack.Count();
 			}
 			else
 			{
-				if (rvcount > 0 && context->EvaluationStack->Count() < rvcount)
+				if (rvcount > 0 && context->EvaluationStack.Count() < rvcount)
 				{
 					ExecutionContext::UnclaimAndFree(context);
 					this->SetFault();
@@ -487,16 +486,16 @@ ExecuteOpCode:
 
 			if (rvcount > 0)
 			{
-				if (this->InvocationStack->Count() == 0)
-					context->EvaluationStack->SendTo(this->ResultStack, rvcount);
+				if (this->InvocationStack.Count() == 0)
+					context->EvaluationStack.SendTo(&this->ResultStack, rvcount);
 				else
-					context->EvaluationStack->SendTo(this->GetCurrentContext()->EvaluationStack, rvcount);
+					context->EvaluationStack.SendTo(&this->GetCurrentContext()->EvaluationStack, rvcount);
 			}
 
 			ExecutionContext::UnclaimAndFree(context);
 		}
 
-		if (this->InvocationStack->Count() == 0)
+		if (this->InvocationStack.Count() == 0)
 		{
 			this->SetHalt();
 		}
@@ -527,13 +526,13 @@ ExecuteOpCode:
 		bool search = true;
 		if (isDynamicInvoke)
 		{
-			if (context->EvaluationStack->Count() < 1)
+			if (context->EvaluationStack.Count() < 1)
 			{
 				this->SetFault();
 				return;
 			}
 
-			IStackItem* item = context->EvaluationStack->Pop();
+			IStackItem* item = context->EvaluationStack.Pop();
 			if (item->ReadByteArray(&script_hash[0], 0, scriptLength) != scriptLength)
 			{
 				IStackItem::Free(item);
@@ -565,9 +564,9 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack->SendTo(this->GetCurrentContext()->EvaluationStack, -1);
+		context->EvaluationStack.SendTo(&this->GetCurrentContext()->EvaluationStack, -1);
 
-		if (this->InvocationStack->Count() >= MAX_INVOCATION_STACK_SIZE)
+		if (this->InvocationStack.Count() >= MAX_INVOCATION_STACK_SIZE)
 		{
 			this->SetFault();
 			return;
@@ -575,7 +574,7 @@ ExecuteOpCode:
 
 		if (opcode == EVMOpCode::TAILCALL)
 		{
-			this->InvocationStack->Remove(1);
+			this->InvocationStack.Remove(1);
 		}
 
 		return;
@@ -612,47 +611,47 @@ ExecuteOpCode:
 
 	case EVMOpCode::DUPFROMALTSTACK:
 	{
-		if (context->AltStack->Count() < 1)
+		if (context->AltStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
-		context->EvaluationStack->Push(context->AltStack->Peek(0));
+		context->EvaluationStack.Push(context->AltStack.Peek(0));
 		return;
 	}
 	case EVMOpCode::TOALTSTACK:
 	{
-		if (context->EvaluationStack->Count() < 1)
+		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
-		context->AltStack->Push(context->EvaluationStack->Pop());
+		context->AltStack.Push(context->EvaluationStack.Pop());
 		return;
 	}
 	case EVMOpCode::FROMALTSTACK:
 	{
-		if (context->AltStack->Count() < 1)
+		if (context->AltStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
-		context->EvaluationStack->Push(context->AltStack->Pop());
+		context->EvaluationStack.Push(context->AltStack.Pop());
 		return;
 	}
 	case EVMOpCode::XDROP:
 	{
-		int32 ic = context->EvaluationStack->Count();
+		int32 ic = context->EvaluationStack.Count();
 		if (ic < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* it = context->EvaluationStack->Pop();
+		IStackItem* it = context->EvaluationStack.Pop();
 
 		int32 n = 0;
 		if (!it->GetInt32(n) || n < 0 || n >= ic - 1)
@@ -663,13 +662,13 @@ ExecuteOpCode:
 		}
 
 		IStackItem::Free(it);
-		it = context->EvaluationStack->Remove(n);
+		it = context->EvaluationStack.Remove(n);
 		IStackItem::Free(it);
 		return;
 	}
 	case EVMOpCode::XSWAP:
 	{
-		int32 ic = context->EvaluationStack->Count();
+		int32 ic = context->EvaluationStack.Count();
 		if (ic < 1)
 		{
 			this->SetFault();
@@ -677,7 +676,7 @@ ExecuteOpCode:
 		}
 
 		int32 n = 0;
-		IStackItem* it = context->EvaluationStack->Pop();
+		IStackItem* it = context->EvaluationStack.Pop();
 
 		if (!it->GetInt32(n) || n < 0 || n >= ic - 1)
 		{
@@ -689,17 +688,17 @@ ExecuteOpCode:
 		IStackItem::Free(it);
 		if (n == 0) return;
 
-		IStackItem* xn = context->EvaluationStack->Peek(n);
+		IStackItem* xn = context->EvaluationStack.Peek(n);
 
-		it = context->EvaluationStack->Remove(0);
-		context->EvaluationStack->Insert(0, xn);
-		context->EvaluationStack->Remove(n);
-		context->EvaluationStack->Insert(n, it);
+		it = context->EvaluationStack.Remove(0);
+		context->EvaluationStack.Insert(0, xn);
+		context->EvaluationStack.Remove(n);
+		context->EvaluationStack.Insert(n, it);
 		return;
 	}
 	case EVMOpCode::XTUCK:
 	{
-		int32 ic = context->EvaluationStack->Count();
+		int32 ic = context->EvaluationStack.Count();
 		if (ic < 1)
 		{
 			this->SetFault();
@@ -707,7 +706,7 @@ ExecuteOpCode:
 		}
 
 		int32 n = 0;
-		IStackItem* it = context->EvaluationStack->Pop();
+		IStackItem* it = context->EvaluationStack.Pop();
 
 		if (!it->GetInt32(n) || n <= 0 || n > ic - 1)
 		{
@@ -717,64 +716,64 @@ ExecuteOpCode:
 		}
 
 		IStackItem::Free(it);
-		context->EvaluationStack->Insert(n, context->EvaluationStack->Peek(0));
+		context->EvaluationStack.Insert(n, context->EvaluationStack.Peek(0));
 		return;
 	}
 	case EVMOpCode::DEPTH:
 	{
-		context->EvaluationStack->Push(new IntegerStackItem(context->EvaluationStack->Count()));
+		context->EvaluationStack.Push(new IntegerStackItem(context->EvaluationStack.Count()));
 		return;
 	}
 	case EVMOpCode::DROP:
 	{
-		if (context->EvaluationStack->Count() < 1)
+		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* it = context->EvaluationStack->Pop();
+		IStackItem* it = context->EvaluationStack.Pop();
 		IStackItem::Free(it);
 		return;
 	}
 	case EVMOpCode::DUP:
 	{
-		if (context->EvaluationStack->Count() < 1)
+		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
-		context->EvaluationStack->Push(context->EvaluationStack->Peek(0));
+		context->EvaluationStack.Push(context->EvaluationStack.Peek(0));
 		return;
 	}
 	case EVMOpCode::NIP:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* x1 = context->EvaluationStack->Remove(1);
+		IStackItem* x1 = context->EvaluationStack.Remove(1);
 		IStackItem::Free(x1);
 		return;
 	}
 	case EVMOpCode::OVER:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* x1 = context->EvaluationStack->Peek(1);
-		context->EvaluationStack->Push(x1);
+		IStackItem* x1 = context->EvaluationStack.Peek(1);
+		context->EvaluationStack.Push(x1);
 		return;
 	}
 	case EVMOpCode::PICK:
 	{
-		int32 ic = context->EvaluationStack->Count();
+		int32 ic = context->EvaluationStack.Count();
 		if (ic < 1)
 		{
 			this->SetFault();
@@ -782,7 +781,7 @@ ExecuteOpCode:
 		}
 
 		int32 n = 0;
-		IStackItem* it = context->EvaluationStack->Pop();
+		IStackItem* it = context->EvaluationStack.Pop();
 
 		if (!it->GetInt32(n) || n < 0)
 		{
@@ -799,12 +798,12 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack->Push(context->EvaluationStack->Peek(n));
+		context->EvaluationStack.Push(context->EvaluationStack.Peek(n));
 		return;
 	}
 	case EVMOpCode::ROLL:
 	{
-		int32 ic = context->EvaluationStack->Count();
+		int32 ic = context->EvaluationStack.Count();
 		if (ic < 1)
 		{
 			this->SetFault();
@@ -812,7 +811,7 @@ ExecuteOpCode:
 		}
 
 		int32 n = 0;
-		IStackItem* it = context->EvaluationStack->Pop();
+		IStackItem* it = context->EvaluationStack.Pop();
 
 		if (!it->GetInt32(n) || n < 0)
 		{
@@ -831,55 +830,55 @@ ExecuteOpCode:
 
 		if (n == 0) return;
 
-		context->EvaluationStack->Push(context->EvaluationStack->Remove(n));
+		context->EvaluationStack.Push(context->EvaluationStack.Remove(n));
 		return;
 	}
 	case EVMOpCode::ROT:
 	{
-		if (context->EvaluationStack->Count() < 3)
+		if (context->EvaluationStack.Count() < 3)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* x1 = context->EvaluationStack->Remove(2);
-		context->EvaluationStack->Push(x1);
+		IStackItem* x1 = context->EvaluationStack.Remove(2);
+		context->EvaluationStack.Push(x1);
 		return;
 	}
 	case EVMOpCode::SWAP:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* x1 = context->EvaluationStack->Remove(1);
-		context->EvaluationStack->Push(x1);
+		IStackItem* x1 = context->EvaluationStack.Remove(1);
+		context->EvaluationStack.Push(x1);
 		return;
 	}
 	case EVMOpCode::TUCK:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* x1 = context->EvaluationStack->Peek(0);
-		context->EvaluationStack->Insert(2, x1);
+		IStackItem* x1 = context->EvaluationStack.Peek(0);
+		context->EvaluationStack.Insert(2, x1);
 		return;
 	}
 	case EVMOpCode::CAT:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* x2 = context->EvaluationStack->Pop();
-		IStackItem* x1 = context->EvaluationStack->Pop();
+		IStackItem* x2 = context->EvaluationStack.Pop();
+		IStackItem* x1 = context->EvaluationStack.Pop();
 		int32 size2 = x2->ReadByteArraySize();
 		int32 size1 = x1->ReadByteArraySize();
 
@@ -897,19 +896,19 @@ ExecuteOpCode:
 
 		IStackItem::Free(x2, x1);
 
-		context->EvaluationStack->Push(new ByteArrayStackItem(data, size1 + size2, true));
+		context->EvaluationStack.Push(new ByteArrayStackItem(data, size1 + size2, true));
 		return;
 	}
 	case EVMOpCode::SUBSTR:
 	{
-		if (context->EvaluationStack->Count() < 3)
+		if (context->EvaluationStack.Count() < 3)
 		{
 			this->SetFault();
 			return;
 		}
 
 		int32 count = 0;
-		IStackItem* it = context->EvaluationStack->Pop();
+		IStackItem* it = context->EvaluationStack.Pop();
 
 		if (!it->GetInt32(count) || count < 0)
 		{
@@ -919,7 +918,7 @@ ExecuteOpCode:
 		}
 
 		IStackItem::Free(it);
-		it = context->EvaluationStack->Pop();
+		it = context->EvaluationStack.Pop();
 		int32 index = 0;
 
 		if (!it->GetInt32(index) || index < 0)
@@ -930,7 +929,7 @@ ExecuteOpCode:
 		}
 
 		IStackItem::Free(it);
-		it = context->EvaluationStack->Pop();
+		it = context->EvaluationStack.Pop();
 
 		byte* data = new byte[count];
 		if (it->ReadByteArray(&data[0], index, count) != count)
@@ -942,19 +941,19 @@ ExecuteOpCode:
 		}
 
 		IStackItem::Free(it);
-		context->EvaluationStack->Push(new ByteArrayStackItem(data, count, true));
+		context->EvaluationStack.Push(new ByteArrayStackItem(data, count, true));
 		return;
 	}
 	case EVMOpCode::LEFT:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
 		int32 count = 0;
-		IStackItem* it = context->EvaluationStack->Pop();
+		IStackItem* it = context->EvaluationStack.Pop();
 
 		if (!it->GetInt32(count) || count < 0)
 		{
@@ -964,7 +963,7 @@ ExecuteOpCode:
 		}
 
 		IStackItem::Free(it);
-		it = context->EvaluationStack->Pop();
+		it = context->EvaluationStack.Pop();
 
 		byte* data = new byte[count];
 		if (it->ReadByteArray(&data[0], 0, count) != count)
@@ -976,19 +975,19 @@ ExecuteOpCode:
 		}
 
 		IStackItem::Free(it);
-		context->EvaluationStack->Push(new ByteArrayStackItem(data, count, true));
+		context->EvaluationStack.Push(new ByteArrayStackItem(data, count, true));
 		return;
 	}
 	case EVMOpCode::RIGHT:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
 		int32 count = 0;
-		IStackItem* it = context->EvaluationStack->Pop();
+		IStackItem* it = context->EvaluationStack.Pop();
 
 		if (!it->GetInt32(count) || count < 0)
 		{
@@ -998,7 +997,7 @@ ExecuteOpCode:
 		}
 
 		IStackItem::Free(it);
-		it = context->EvaluationStack->Pop();
+		it = context->EvaluationStack.Pop();
 
 		byte* data = new byte[count];
 		if (it->ReadByteArray(&data[0], it->ReadByteArraySize() - count, count) != count)
@@ -1010,18 +1009,18 @@ ExecuteOpCode:
 		}
 
 		IStackItem::Free(it);
-		context->EvaluationStack->Push(new ByteArrayStackItem(data, count, true));
+		context->EvaluationStack.Push(new ByteArrayStackItem(data, count, true));
 		return;
 	}
 	case EVMOpCode::SIZE:
 	{
-		if (context->EvaluationStack->Count() < 1)
+		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 		int32 size = item->ReadByteArraySize();
 		IStackItem::Free(item);
 
@@ -1031,7 +1030,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack->Push(new IntegerStackItem(size));
+		context->EvaluationStack.Push(new IntegerStackItem(size));
 		return;
 	}
 
@@ -1039,13 +1038,13 @@ ExecuteOpCode:
 
 	case EVMOpCode::INVERT:
 	{
-		if (context->EvaluationStack->Count() < 1)
+		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 		BigInteger* bi = item->GetBigInteger();
 		IStackItem::Free(item);
 
@@ -1064,19 +1063,19 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack->Push(new IntegerStackItem(ret));
+		context->EvaluationStack.Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::AND:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* x2 = context->EvaluationStack->Pop();
-		IStackItem* x1 = context->EvaluationStack->Pop();
+		IStackItem* x2 = context->EvaluationStack.Pop();
+		IStackItem* x1 = context->EvaluationStack.Pop();
 
 		BigInteger* i2 = x2->GetBigInteger();
 		BigInteger* i1 = x1->GetBigInteger();
@@ -1103,19 +1102,19 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack->Push(new IntegerStackItem(ret));
+		context->EvaluationStack.Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::OR:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* x2 = context->EvaluationStack->Pop();
-		IStackItem* x1 = context->EvaluationStack->Pop();
+		IStackItem* x2 = context->EvaluationStack.Pop();
+		IStackItem* x1 = context->EvaluationStack.Pop();
 
 		BigInteger* i2 = x2->GetBigInteger();
 		BigInteger* i1 = x1->GetBigInteger();
@@ -1142,19 +1141,19 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack->Push(new IntegerStackItem(ret));
+		context->EvaluationStack.Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::XOR:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* x2 = context->EvaluationStack->Pop();
-		IStackItem* x1 = context->EvaluationStack->Pop();
+		IStackItem* x2 = context->EvaluationStack.Pop();
+		IStackItem* x1 = context->EvaluationStack.Pop();
 
 		BigInteger* i2 = x2->GetBigInteger();
 		BigInteger* i1 = x1->GetBigInteger();
@@ -1181,21 +1180,21 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack->Push(new IntegerStackItem(ret));
+		context->EvaluationStack.Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::EQUAL:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* x2 = context->EvaluationStack->Pop();
-		IStackItem* x1 = context->EvaluationStack->Pop();
+		IStackItem* x2 = context->EvaluationStack.Pop();
+		IStackItem* x1 = context->EvaluationStack.Pop();
 
-		context->EvaluationStack->Push(new BoolStackItem(x1->Equals(x2)));
+		context->EvaluationStack.Push(new BoolStackItem(x1->Equals(x2)));
 
 		IStackItem::Free(x2, x1);
 		return;
@@ -1205,13 +1204,13 @@ ExecuteOpCode:
 
 	case EVMOpCode::INC:
 	{
-		if (context->EvaluationStack->Count() < 1)
+		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 		BigInteger* bi = item->GetBigInteger();
 		IStackItem::Free(item);
 
@@ -1232,18 +1231,18 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack->Push(new IntegerStackItem(ret));
+		context->EvaluationStack.Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::DEC:
 	{
-		if (context->EvaluationStack->Count() < 1)
+		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 		BigInteger* bi = item->GetBigInteger();
 		IStackItem::Free(item);
 
@@ -1264,18 +1263,18 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack->Push(new IntegerStackItem(ret));
+		context->EvaluationStack.Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::SIGN:
 	{
-		if (context->EvaluationStack->Count() < 1)
+		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 		BigInteger* bi = item->GetBigInteger();
 		IStackItem::Free(item);
 
@@ -1288,18 +1287,18 @@ ExecuteOpCode:
 		int32 ret = bi->GetSign();
 		delete(bi);
 
-		context->EvaluationStack->Push(new IntegerStackItem(ret));
+		context->EvaluationStack.Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::NEGATE:
 	{
-		if (context->EvaluationStack->Count() < 1)
+		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 		BigInteger* bi = item->GetBigInteger();
 		IStackItem::Free(item);
 
@@ -1318,18 +1317,18 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack->Push(new IntegerStackItem(ret));
+		context->EvaluationStack.Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::ABS:
 	{
-		if (context->EvaluationStack->Count() < 1)
+		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 		BigInteger* bi = item->GetBigInteger();
 		IStackItem::Free(item);
 
@@ -1348,33 +1347,33 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack->Push(new IntegerStackItem(ret));
+		context->EvaluationStack.Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::NOT:
 	{
-		if (context->EvaluationStack->Count() < 1)
+		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 		BoolStackItem* bnew = new BoolStackItem(!item->GetBoolean());
 		IStackItem::Free(item);
 
-		context->EvaluationStack->Push(bnew);
+		context->EvaluationStack.Push(bnew);
 		return;
 	}
 	case EVMOpCode::NZ:
 	{
-		if (context->EvaluationStack->Count() < 1)
+		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* x = context->EvaluationStack->Pop();
+		IStackItem* x = context->EvaluationStack.Pop();
 		BigInteger* i = x->GetBigInteger();
 		IStackItem::Free(x);
 
@@ -1387,19 +1386,19 @@ ExecuteOpCode:
 		IStackItem* ret = new BoolStackItem(i->CompareTo(BigInteger::Zero) != 0);
 		delete(i);
 
-		context->EvaluationStack->Push(ret);
+		context->EvaluationStack.Push(ret);
 		return;
 	}
 	case EVMOpCode::ADD:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* i2 = context->EvaluationStack->Pop();
-		IStackItem* i1 = context->EvaluationStack->Pop();
+		IStackItem* i2 = context->EvaluationStack.Pop();
+		IStackItem* i1 = context->EvaluationStack.Pop();
 		BigInteger* x2 = i2->GetBigInteger();
 		BigInteger* x1 = i1->GetBigInteger();
 		IStackItem::Free(i2, i1);
@@ -1423,19 +1422,19 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack->Push(new IntegerStackItem(ret));
+		context->EvaluationStack.Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::SUB:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* i2 = context->EvaluationStack->Pop();
-		IStackItem* i1 = context->EvaluationStack->Pop();
+		IStackItem* i2 = context->EvaluationStack.Pop();
+		IStackItem* i1 = context->EvaluationStack.Pop();
 		BigInteger* x2 = i2->GetBigInteger();
 		BigInteger* x1 = i1->GetBigInteger();
 		IStackItem::Free(i2, i1);
@@ -1459,19 +1458,19 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack->Push(new IntegerStackItem(ret));
+		context->EvaluationStack.Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::MUL:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* i2 = context->EvaluationStack->Pop();
-		IStackItem* i1 = context->EvaluationStack->Pop();
+		IStackItem* i2 = context->EvaluationStack.Pop();
+		IStackItem* i1 = context->EvaluationStack.Pop();
 		BigInteger* x2 = i2->GetBigInteger();
 		BigInteger* x1 = i1->GetBigInteger();
 		IStackItem::Free(i2, i1);
@@ -1495,19 +1494,19 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack->Push(new IntegerStackItem(ret));
+		context->EvaluationStack.Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::DIV:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* i2 = context->EvaluationStack->Pop();
-		IStackItem* i1 = context->EvaluationStack->Pop();
+		IStackItem* i2 = context->EvaluationStack.Pop();
+		IStackItem* i1 = context->EvaluationStack.Pop();
 		BigInteger* x2 = i2->GetBigInteger();
 		BigInteger* x1 = i1->GetBigInteger();
 		IStackItem::Free(i2, i1);
@@ -1531,19 +1530,19 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack->Push(new IntegerStackItem(ret));
+		context->EvaluationStack.Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::MOD:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* i2 = context->EvaluationStack->Pop();
-		IStackItem* i1 = context->EvaluationStack->Pop();
+		IStackItem* i2 = context->EvaluationStack.Pop();
+		IStackItem* i1 = context->EvaluationStack.Pop();
 		BigInteger* x2 = i2->GetBigInteger();
 		BigInteger* x1 = i1->GetBigInteger();
 		IStackItem::Free(i2, i1);
@@ -1567,19 +1566,19 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack->Push(new IntegerStackItem(ret));
+		context->EvaluationStack.Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::SHL:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* n = context->EvaluationStack->Pop();
-		IStackItem* x = context->EvaluationStack->Pop();
+		IStackItem* n = context->EvaluationStack.Pop();
+		IStackItem* x = context->EvaluationStack.Pop();
 
 		BigInteger* in = n->GetBigInteger();
 		BigInteger* ix = x->GetBigInteger();
@@ -1606,19 +1605,19 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack->Push(new IntegerStackItem(ret));
+		context->EvaluationStack.Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::SHR:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* n = context->EvaluationStack->Pop();
-		IStackItem* x = context->EvaluationStack->Pop();
+		IStackItem* n = context->EvaluationStack.Pop();
+		IStackItem* x = context->EvaluationStack.Pop();
 
 		BigInteger* in = n->GetBigInteger();
 		BigInteger* ix = x->GetBigInteger();
@@ -1645,53 +1644,53 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack->Push(new IntegerStackItem(ret));
+		context->EvaluationStack.Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::BOOLAND:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* x2 = context->EvaluationStack->Pop();
-		IStackItem* x1 = context->EvaluationStack->Pop();
+		IStackItem* x2 = context->EvaluationStack.Pop();
+		IStackItem* x1 = context->EvaluationStack.Pop();
 
 		BoolStackItem* ret = new BoolStackItem(x1->GetBoolean() && x2->GetBoolean());
 		IStackItem::Free(x2, x1);
 
-		context->EvaluationStack->Push(ret);
+		context->EvaluationStack.Push(ret);
 		return;
 	}
 	case EVMOpCode::BOOLOR:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* x2 = context->EvaluationStack->Pop();
-		IStackItem* x1 = context->EvaluationStack->Pop();
+		IStackItem* x2 = context->EvaluationStack.Pop();
+		IStackItem* x1 = context->EvaluationStack.Pop();
 
 		BoolStackItem* ret = new BoolStackItem(x1->GetBoolean() || x2->GetBoolean());
 		IStackItem::Free(x2, x1);
 
-		context->EvaluationStack->Push(ret);
+		context->EvaluationStack.Push(ret);
 		return;
 	}
 	case EVMOpCode::NUMEQUAL:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* x2 = context->EvaluationStack->Pop();
-		IStackItem* x1 = context->EvaluationStack->Pop();
+		IStackItem* x2 = context->EvaluationStack.Pop();
+		IStackItem* x1 = context->EvaluationStack.Pop();
 
 		BigInteger* i2 = x2->GetBigInteger();
 		BigInteger* i1 = x1->GetBigInteger();
@@ -1712,19 +1711,19 @@ ExecuteOpCode:
 		delete(i2);
 		delete(i1);
 
-		context->EvaluationStack->Push(ret);
+		context->EvaluationStack.Push(ret);
 		return;
 	}
 	case EVMOpCode::NUMNOTEQUAL:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* x2 = context->EvaluationStack->Pop();
-		IStackItem* x1 = context->EvaluationStack->Pop();
+		IStackItem* x2 = context->EvaluationStack.Pop();
+		IStackItem* x1 = context->EvaluationStack.Pop();
 
 		BigInteger* i2 = x2->GetBigInteger();
 		BigInteger* i1 = x1->GetBigInteger();
@@ -1745,19 +1744,19 @@ ExecuteOpCode:
 		delete(i2);
 		delete(i1);
 
-		context->EvaluationStack->Push(ret);
+		context->EvaluationStack.Push(ret);
 		return;
 	}
 	case EVMOpCode::LT:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* x2 = context->EvaluationStack->Pop();
-		IStackItem* x1 = context->EvaluationStack->Pop();
+		IStackItem* x2 = context->EvaluationStack.Pop();
+		IStackItem* x1 = context->EvaluationStack.Pop();
 
 		BigInteger* i2 = x2->GetBigInteger();
 		BigInteger* i1 = x1->GetBigInteger();
@@ -1778,19 +1777,19 @@ ExecuteOpCode:
 		delete(i1);
 		delete(i2);
 
-		context->EvaluationStack->Push(ret);
+		context->EvaluationStack.Push(ret);
 		return;
 	}
 	case EVMOpCode::GT:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* x2 = context->EvaluationStack->Pop();
-		IStackItem* x1 = context->EvaluationStack->Pop();
+		IStackItem* x2 = context->EvaluationStack.Pop();
+		IStackItem* x1 = context->EvaluationStack.Pop();
 
 		BigInteger* i2 = x2->GetBigInteger();
 		BigInteger* i1 = x1->GetBigInteger();
@@ -1811,19 +1810,19 @@ ExecuteOpCode:
 		delete(i2);
 		delete(i1);
 
-		context->EvaluationStack->Push(ret);
+		context->EvaluationStack.Push(ret);
 		return;
 	}
 	case EVMOpCode::LTE:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* x2 = context->EvaluationStack->Pop();
-		IStackItem* x1 = context->EvaluationStack->Pop();
+		IStackItem* x2 = context->EvaluationStack.Pop();
+		IStackItem* x1 = context->EvaluationStack.Pop();
 
 		BigInteger* i2 = x2->GetBigInteger();
 		BigInteger* i1 = x1->GetBigInteger();
@@ -1844,19 +1843,19 @@ ExecuteOpCode:
 		delete(i2);
 		delete(i1);
 
-		context->EvaluationStack->Push(ret);
+		context->EvaluationStack.Push(ret);
 		return;
 	}
 	case EVMOpCode::GTE:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* x2 = context->EvaluationStack->Pop();
-		IStackItem* x1 = context->EvaluationStack->Pop();
+		IStackItem* x2 = context->EvaluationStack.Pop();
+		IStackItem* x1 = context->EvaluationStack.Pop();
 
 		BigInteger* i2 = x2->GetBigInteger();
 		BigInteger* i1 = x1->GetBigInteger();
@@ -1877,19 +1876,19 @@ ExecuteOpCode:
 		delete(i2);
 		delete(i1);
 
-		context->EvaluationStack->Push(ret);
+		context->EvaluationStack.Push(ret);
 		return;
 	}
 	case EVMOpCode::MIN:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* x2 = context->EvaluationStack->Pop();
-		IStackItem* x1 = context->EvaluationStack->Pop();
+		IStackItem* x2 = context->EvaluationStack.Pop();
+		IStackItem* x1 = context->EvaluationStack.Pop();
 
 		BigInteger* i2 = x2->GetBigInteger();
 		BigInteger* i1 = x1->GetBigInteger();
@@ -1917,19 +1916,19 @@ ExecuteOpCode:
 			ret = new IntegerStackItem(i1);
 		}
 
-		context->EvaluationStack->Push(ret);
+		context->EvaluationStack.Push(ret);
 		return;
 	}
 	case EVMOpCode::MAX:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* x2 = context->EvaluationStack->Pop();
-		IStackItem* x1 = context->EvaluationStack->Pop();
+		IStackItem* x2 = context->EvaluationStack.Pop();
+		IStackItem* x1 = context->EvaluationStack.Pop();
 
 		BigInteger* i2 = x2->GetBigInteger();
 		BigInteger* i1 = x1->GetBigInteger();
@@ -1957,20 +1956,20 @@ ExecuteOpCode:
 			ret = new IntegerStackItem(i2);
 		}
 
-		context->EvaluationStack->Push(ret);
+		context->EvaluationStack.Push(ret);
 		return;
 	}
 	case EVMOpCode::WITHIN:
 	{
-		if (context->EvaluationStack->Count() < 3)
+		if (context->EvaluationStack.Count() < 3)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* b = context->EvaluationStack->Pop();
-		IStackItem* a = context->EvaluationStack->Pop();
-		IStackItem* x = context->EvaluationStack->Pop();
+		IStackItem* b = context->EvaluationStack.Pop();
+		IStackItem* a = context->EvaluationStack.Pop();
+		IStackItem* x = context->EvaluationStack.Pop();
 
 		BigInteger* ib = b->GetBigInteger();
 		BigInteger* ia = a->GetBigInteger();
@@ -1988,7 +1987,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack->Push(new BoolStackItem(ia->CompareTo(ix) <= 0 && ix->CompareTo(ib) < 0));
+		context->EvaluationStack.Push(new BoolStackItem(ia->CompareTo(ix) <= 0 && ix->CompareTo(ib) < 0));
 
 		delete(ib);
 		delete(ia);
@@ -2000,13 +1999,13 @@ ExecuteOpCode:
 
 	case EVMOpCode::SHA1:
 	{
-		if (context->EvaluationStack->Count() < 1)
+		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 		int32 size = item->ReadByteArraySize();
 
 		if (size < 0)
@@ -2031,18 +2030,18 @@ ExecuteOpCode:
 		Crypto::ComputeSHA1(data, size, hash);
 		delete[]data;
 
-		context->EvaluationStack->Push(new ByteArrayStackItem(hash, Crypto::SHA1_LENGTH, true));
+		context->EvaluationStack.Push(new ByteArrayStackItem(hash, Crypto::SHA1_LENGTH, true));
 		return;
 	}
 	case EVMOpCode::SHA256:
 	{
-		if (context->EvaluationStack->Count() < 1)
+		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 		int32 size = item->ReadByteArraySize();
 
 		if (size < 0)
@@ -2067,18 +2066,18 @@ ExecuteOpCode:
 		Crypto::ComputeSHA256(data, size, hash);
 		delete[]data;
 
-		context->EvaluationStack->Push(new ByteArrayStackItem(hash, Crypto::SHA256_LENGTH, true));
+		context->EvaluationStack.Push(new ByteArrayStackItem(hash, Crypto::SHA256_LENGTH, true));
 		return;
 	}
 	case EVMOpCode::HASH160:
 	{
-		if (context->EvaluationStack->Count() < 1)
+		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 		int32 size = item->ReadByteArraySize();
 
 		if (size < 0)
@@ -2103,18 +2102,18 @@ ExecuteOpCode:
 		Crypto::ComputeHash160(data, size, hash);
 		delete[]data;
 
-		context->EvaluationStack->Push(new ByteArrayStackItem(hash, Crypto::HASH160_LENGTH, true));
+		context->EvaluationStack.Push(new ByteArrayStackItem(hash, Crypto::HASH160_LENGTH, true));
 		return;
 	}
 	case EVMOpCode::HASH256:
 	{
-		if (context->EvaluationStack->Count() < 1)
+		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 		int32 size = item->ReadByteArraySize();
 
 		if (size < 0)
@@ -2139,19 +2138,19 @@ ExecuteOpCode:
 		Crypto::ComputeHash256(data, size, hash);
 		delete[]data;
 
-		context->EvaluationStack->Push(new ByteArrayStackItem(hash, Crypto::HASH256_LENGTH, true));
+		context->EvaluationStack.Push(new ByteArrayStackItem(hash, Crypto::HASH256_LENGTH, true));
 		return;
 	}
 	case EVMOpCode::CHECKSIG:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* ipubKey = context->EvaluationStack->Pop();
-		IStackItem* isignature = context->EvaluationStack->Pop();
+		IStackItem* ipubKey = context->EvaluationStack.Pop();
+		IStackItem* isignature = context->EvaluationStack.Pop();
 
 		int32 pubKeySize = ipubKey->ReadByteArraySize();
 		int32 signatureSize = isignature->ReadByteArraySize();
@@ -2159,7 +2158,7 @@ ExecuteOpCode:
 		if (this->OnGetMessage == NULL || pubKeySize < 33 || signatureSize < 32)
 		{
 			IStackItem::Free(ipubKey, isignature);
-			context->EvaluationStack->Push(new BoolStackItem(false));
+			context->EvaluationStack.Push(new BoolStackItem(false));
 			return;
 		}
 
@@ -2172,7 +2171,7 @@ ExecuteOpCode:
 		if (msgL <= 0)
 		{
 			IStackItem::Free(ipubKey, isignature);
-			context->EvaluationStack->Push(new BoolStackItem(false));
+			context->EvaluationStack.Push(new BoolStackItem(false));
 			return;
 		}
 
@@ -2193,20 +2192,20 @@ ExecuteOpCode:
 
 		IStackItem::Free(ipubKey, isignature);
 
-		context->EvaluationStack->Push(new BoolStackItem(ret == 0x01));
+		context->EvaluationStack.Push(new BoolStackItem(ret == 0x01));
 		return;
 	}
 	case EVMOpCode::VERIFY:
 	{
-		if (context->EvaluationStack->Count() < 3)
+		if (context->EvaluationStack.Count() < 3)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* ipubKey = context->EvaluationStack->Pop();
-		IStackItem* isignature = context->EvaluationStack->Pop();
-		IStackItem* imsg = context->EvaluationStack->Pop();
+		IStackItem* ipubKey = context->EvaluationStack.Pop();
+		IStackItem* isignature = context->EvaluationStack.Pop();
+		IStackItem* imsg = context->EvaluationStack.Pop();
 
 		int32 pubKeySize = ipubKey->ReadByteArraySize();
 		int32 signatureSize = isignature->ReadByteArraySize();
@@ -2215,7 +2214,7 @@ ExecuteOpCode:
 		if (pubKeySize < 33 || signatureSize < 32 || msgSize < 0)
 		{
 			IStackItem::Free(ipubKey, isignature, imsg);
-			context->EvaluationStack->Push(new BoolStackItem(false));
+			context->EvaluationStack.Push(new BoolStackItem(false));
 			return;
 		}
 
@@ -2242,12 +2241,12 @@ ExecuteOpCode:
 
 		IStackItem::Free(imsg, ipubKey, isignature);
 
-		context->EvaluationStack->Push(new BoolStackItem(ret == 0x01));
+		context->EvaluationStack.Push(new BoolStackItem(ret == 0x01));
 		return;
 	}
 	case EVMOpCode::CHECKMULTISIG:
 	{
-		int32 ic = context->EvaluationStack->Count();
+		int32 ic = context->EvaluationStack.Count();
 
 		if (ic < 2)
 		{
@@ -2263,7 +2262,7 @@ ExecuteOpCode:
 
 		for (byte x = 0; x < 2; ++x)
 		{
-			IStackItem* item = context->EvaluationStack->Pop();
+			IStackItem* item = context->EvaluationStack.Pop();
 			ic--;
 
 			if (item->Type == EStackItemType::Array || item->Type == EStackItemType::Struct)
@@ -2327,7 +2326,7 @@ ExecuteOpCode:
 
 					for (int32 i = 0; i < v; ++i)
 					{
-						IStackItem* ret = context->EvaluationStack->Pop();
+						IStackItem* ret = context->EvaluationStack.Pop();
 						ic--;
 
 						int32 c = ret->ReadByteArraySize();
@@ -2385,7 +2384,7 @@ ExecuteOpCode:
 
 			if (this->_state != EVMState::FAULT)
 			{
-				context->EvaluationStack->Push(new BoolStackItem(false));
+				context->EvaluationStack.Push(new BoolStackItem(false));
 			}
 
 			return;
@@ -2405,7 +2404,7 @@ ExecuteOpCode:
 			if (pubKeysL != NULL)	delete[](pubKeysL);
 			if (signaturesL != NULL)delete[](signaturesL);
 
-			context->EvaluationStack->Push(new BoolStackItem(false));
+			context->EvaluationStack.Push(new BoolStackItem(false));
 			return;
 		}
 
@@ -2429,7 +2428,7 @@ ExecuteOpCode:
 		if (pubKeysL != NULL)	delete[](pubKeysL);
 		if (signaturesL != NULL)delete[](signaturesL);
 
-		context->EvaluationStack->Push(new BoolStackItem(fSuccess));
+		context->EvaluationStack.Push(new BoolStackItem(fSuccess));
 		return;
 	}
 
@@ -2437,14 +2436,14 @@ ExecuteOpCode:
 
 	case EVMOpCode::ARRAYSIZE:
 	{
-		if (context->EvaluationStack->Count() < 1)
+		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
 		int32 size;
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 
 		switch (item->Type)
 		{
@@ -2476,14 +2475,14 @@ ExecuteOpCode:
 		}
 		else
 		{
-			context->EvaluationStack->Push(new IntegerStackItem(size));
+			context->EvaluationStack.Push(new IntegerStackItem(size));
 		}
 
 		return;
 	}
 	case EVMOpCode::PACK:
 	{
-		int32 ec = context->EvaluationStack->Count();
+		int32 ec = context->EvaluationStack.Count();
 		if (ec < 1)
 		{
 			this->SetFault();
@@ -2491,7 +2490,7 @@ ExecuteOpCode:
 		}
 
 		int32 size = 0;
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 
 		if (!item->GetInt32(size) || size < 0 || size >(ec - 1) || size > MAX_ARRAY_SIZE)
 		{
@@ -2505,21 +2504,21 @@ ExecuteOpCode:
 
 		for (int32 i = 0; i < size; ++i)
 		{
-			items->Add(context->EvaluationStack->Pop());
+			items->Add(context->EvaluationStack.Pop());
 		}
 
-		context->EvaluationStack->Push(items);
+		context->EvaluationStack.Push(items);
 		return;
 	}
 	case EVMOpCode::UNPACK:
 	{
-		if (context->EvaluationStack->Count() < 1)
+		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 
 		if (item->Type == EStackItemType::Array)
 		{
@@ -2528,11 +2527,11 @@ ExecuteOpCode:
 
 			for (int32 i = count - 1; i >= 0; i--)
 			{
-				context->EvaluationStack->Push(array->Get(i));
+				context->EvaluationStack.Push(array->Get(i));
 			}
 
 			IStackItem::Free(item);
-			context->EvaluationStack->Push(new IntegerStackItem(count));
+			context->EvaluationStack.Push(new IntegerStackItem(count));
 		}
 		else
 		{
@@ -2544,13 +2543,13 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::PICKITEM:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* key = context->EvaluationStack->Pop();
+		IStackItem* key = context->EvaluationStack.Pop();
 
 		if (key->Type == EStackItemType::Map ||
 			key->Type == EStackItemType::Array ||
@@ -2561,7 +2560,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 		switch (item->Type)
 		{
 		case EStackItemType::Array:
@@ -2579,7 +2578,7 @@ ExecuteOpCode:
 			}
 
 			IStackItem* ret = arr->Get(index);
-			context->EvaluationStack->Push(ret);
+			context->EvaluationStack.Push(ret);
 			IStackItem::Free(key, item);
 			return;
 		}
@@ -2593,7 +2592,7 @@ ExecuteOpCode:
 
 			if (val != NULL)
 			{
-				context->EvaluationStack->Push(val);
+				context->EvaluationStack.Push(val);
 			}
 			else
 			{
@@ -2613,13 +2612,13 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::SETITEM:
 	{
-		if (context->EvaluationStack->Count() < 3)
+		if (context->EvaluationStack.Count() < 3)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* value = context->EvaluationStack->Pop();
+		IStackItem* value = context->EvaluationStack.Pop();
 		if (value->Type == EStackItemType::Struct)
 		{
 			IStackItem* clone = ((ArrayStackItem*)value)->Clone();
@@ -2627,7 +2626,7 @@ ExecuteOpCode:
 			value = clone;
 		}
 
-		IStackItem* key = context->EvaluationStack->Pop();
+		IStackItem* key = context->EvaluationStack.Pop();
 		if (key->Type == EStackItemType::Map ||
 			key->Type == EStackItemType::Array ||
 			key->Type == EStackItemType::Struct)
@@ -2638,7 +2637,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 		switch (item->Type)
 		{
 		case EStackItemType::Array:
@@ -2685,14 +2684,14 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::NEWARRAY:
 	{
-		if (context->EvaluationStack->Count() < 1)
+		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
 		int32 count = 0;
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 
 		if (!item->GetInt32(count) || count < 0 || count > MAX_ARRAY_SIZE)
 		{
@@ -2702,19 +2701,19 @@ ExecuteOpCode:
 		}
 
 		IStackItem::Free(item);
-		context->EvaluationStack->Push(new ArrayStackItem(false, count));
+		context->EvaluationStack.Push(new ArrayStackItem(false, count));
 		return;
 	}
 	case EVMOpCode::NEWSTRUCT:
 	{
-		if (context->EvaluationStack->Count() < 1)
+		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
 		int32 count = 0;
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 
 		if (!item->GetInt32(count) || count < 0 || count > MAX_ARRAY_SIZE)
 		{
@@ -2724,23 +2723,23 @@ ExecuteOpCode:
 		}
 
 		IStackItem::Free(item);
-		context->EvaluationStack->Push(new ArrayStackItem(true, count));
+		context->EvaluationStack.Push(new ArrayStackItem(true, count));
 		return;
 	}
 	case EVMOpCode::NEWMAP:
 	{
-		context->EvaluationStack->Push(new MapStackItem());
+		context->EvaluationStack.Push(new MapStackItem());
 		return;
 	}
 	case EVMOpCode::APPEND:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* newItem = context->EvaluationStack->Pop();
+		IStackItem* newItem = context->EvaluationStack.Pop();
 		if (newItem->Type == EStackItemType::Struct)
 		{
 			IStackItem* clone = ((ArrayStackItem*)newItem)->Clone();
@@ -2748,7 +2747,7 @@ ExecuteOpCode:
 			newItem = clone;
 		}
 
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 		switch (item->Type)
 		{
 		case EStackItemType::Array:
@@ -2780,13 +2779,13 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::REVERSE:
 	{
-		if (context->EvaluationStack->Count() < 1)
+		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 		if (item->Type != EStackItemType::Array && item->Type != EStackItemType::Struct)
 		{
 			IStackItem::Free(item);
@@ -2801,13 +2800,13 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::REMOVE:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* key = context->EvaluationStack->Pop();
+		IStackItem* key = context->EvaluationStack.Pop();
 		if (key->Type == EStackItemType::Map ||
 			key->Type == EStackItemType::Array ||
 			key->Type == EStackItemType::Struct)
@@ -2817,7 +2816,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 		switch (item->Type)
 		{
 		case EStackItemType::Array:
@@ -2860,13 +2859,13 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::HASKEY:
 	{
-		if (context->EvaluationStack->Count() < 2)
+		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* key = context->EvaluationStack->Pop();
+		IStackItem* key = context->EvaluationStack.Pop();
 		if (key->Type == EStackItemType::Map ||
 			key->Type == EStackItemType::Array ||
 			key->Type == EStackItemType::Struct)
@@ -2876,7 +2875,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 		switch (item->Type)
 		{
 		case EStackItemType::Array:
@@ -2893,7 +2892,7 @@ ExecuteOpCode:
 				return;
 			}
 
-			context->EvaluationStack->Push(new BoolStackItem(index < arr->Count()));
+			context->EvaluationStack.Push(new BoolStackItem(index < arr->Count()));
 
 			IStackItem::Free(key, item);
 			return;
@@ -2902,7 +2901,7 @@ ExecuteOpCode:
 		{
 			MapStackItem* arr = (MapStackItem*)item;
 
-			context->EvaluationStack->Push(new BoolStackItem(arr->Get(key) != NULL));
+			context->EvaluationStack.Push(new BoolStackItem(arr->Get(key) != NULL));
 
 			IStackItem::Free(key, item);
 			return;
@@ -2918,13 +2917,13 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::KEYS:
 	{
-		if (context->EvaluationStack->Count() < 1)
+		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 		switch (item->Type)
 		{
 		case EStackItemType::Map:
@@ -2933,7 +2932,7 @@ ExecuteOpCode:
 
 			ArrayStackItem* ap = new ArrayStackItem(false);
 			arr->FillKeys(ap);
-			context->EvaluationStack->Push(ap);
+			context->EvaluationStack.Push(ap);
 
 			IStackItem::Free(item);
 			return;
@@ -2949,20 +2948,20 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::VALUES:
 	{
-		if (context->EvaluationStack->Count() < 1)
+		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 		switch (item->Type)
 		{
 		case EStackItemType::Array:
 		case EStackItemType::Struct:
 		{
 			ArrayStackItem* arr = (ArrayStackItem*)item;
-			context->EvaluationStack->Push(arr->Clone());
+			context->EvaluationStack.Push(arr->Clone());
 			IStackItem::Free(item);
 			return;
 		}
@@ -2972,7 +2971,7 @@ ExecuteOpCode:
 
 			ArrayStackItem* ap = new ArrayStackItem(false);
 			arr->FillValues(ap);
-			context->EvaluationStack->Push(ap);
+			context->EvaluationStack.Push(ap);
 
 			IStackItem::Free(item);
 			return;
@@ -2997,13 +2996,13 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::THROWIFNOT:
 	{
-		if (context->EvaluationStack->Count() < 1)
+		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
 			return;
 		}
 
-		IStackItem* item = context->EvaluationStack->Pop();
+		IStackItem* item = context->EvaluationStack.Pop();
 
 		if (!item->GetBoolean())
 		{
@@ -3029,11 +3028,8 @@ ExecutionEngine::~ExecutionEngine()
 
 	// Clean stacks
 
-	delete(this->InvocationStack);
-	delete(this->ResultStack);
-
-	this->InvocationStack = NULL;
-	this->ResultStack = NULL;
+	this->InvocationStack.Clear();
+	this->ResultStack.Clear();
 
 	// Clean scripts
 

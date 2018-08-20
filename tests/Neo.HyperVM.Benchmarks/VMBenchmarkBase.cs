@@ -42,7 +42,7 @@ namespace Neo.HyperVM.Benchmarks
         [Benchmark]
         public virtual void HyperVM()
         {
-            using (var engine = _HyperVM.Create(null))
+            using (var engine = new NeoSharp.VM.Interop.Types.ExecutionEngine(null))
             {
                 engine.LoadScript(_script);
                 engine.Execute();

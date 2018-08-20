@@ -7,8 +7,8 @@ ExecutionContext::ExecutionContext(ExecutionScript* script, int32 instructorPoin
 	RVCount(rvcount),
 	Script(script),
 	InstructionPointer(instructorPointer),
-	AltStack(new StackItems()),
-	EvaluationStack(new StackItems())
+	AltStack(),
+	EvaluationStack()
 {
 	script->Claim();
 }

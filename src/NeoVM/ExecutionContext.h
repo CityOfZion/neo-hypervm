@@ -21,8 +21,8 @@ public:
 
 	// Stacks
 
-	StackItems* AltStack;
-	StackItems* EvaluationStack;
+	StackItems AltStack;
+	StackItems EvaluationStack;
 
 	// Reads
 
@@ -62,8 +62,8 @@ public:
 
 	inline ~ExecutionContext()
 	{
-		delete(this->EvaluationStack);
-		delete(this->AltStack);
+		this->EvaluationStack.Clear();
+		this->AltStack.Clear();
 
 		ExecutionScript::UnclaimAndFree(this->Script);
 	}
