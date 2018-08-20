@@ -22,8 +22,8 @@ void IStackItem::Free(IStackItem* &itemA, IStackItem* &itemB, IStackItem* &itemC
 
 		Free(itemA);
 
-		itemB = NULL;
-		itemC = NULL;
+		itemB = itemA;
+		itemC = itemA;
 		return;
 	}
 
@@ -34,7 +34,7 @@ void IStackItem::Free(IStackItem* &itemA, IStackItem* &itemB, IStackItem* &itemC
 		Free(itemA);
 		Free(itemC);
 
-		itemB = NULL;
+		itemB = itemA;
 		return;
 	}
 
@@ -45,7 +45,7 @@ void IStackItem::Free(IStackItem* &itemA, IStackItem* &itemB, IStackItem* &itemC
 		Free(itemB);
 		Free(itemA);
 
-		itemC = NULL;
+		itemC = itemB;
 		return;
 	}
 
@@ -56,7 +56,7 @@ void IStackItem::Free(IStackItem* &itemA, IStackItem* &itemB, IStackItem* &itemC
 		Free(itemA);
 		Free(itemB);
 
-		itemC = NULL;
+		itemC = itemA;
 		return;
 	}
 
