@@ -19,8 +19,8 @@ namespace Neo.HyperVM.Benchmarks
 
             foreach (var type in new Type[]
             {
-                typeof(VMBenchmarkSHA1),
                 typeof(VMBenchmarkVERIFY),
+                typeof(VMBenchmarkSHA1),
                 typeof(VMBenchmarkNOP),
                 typeof(VMBenchmarkPUSH0)
             })
