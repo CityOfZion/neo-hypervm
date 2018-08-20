@@ -6,22 +6,31 @@ class ArrayStackItem : public IStackItem
 {
 private:
 
-	std::list<IStackItem*> List;
+	std::list<IStackItem*> _list;
 
 public:
 
 	// Converters
 
-	bool GetBoolean();
-	void Reverse();
-	BigInteger* GetBigInteger();
-	bool GetInt32(int32 &ret);
+	inline bool GetBoolean() { return true; }
+	inline BigInteger* GetBigInteger() { return NULL; }
+	inline bool GetInt32(int32 &ret) { return false; }
+	inline int32 ReadByteArray(byte* output, int32 sourceIndex, int32 count) { return -1; }
+	inline int32 ReadByteArraySize() { return -1; }
+
+	inline void Reverse()
+	{
+		this->_list.reverse();
+	}
+
 	IStackItem* Clone();
-	int32 ReadByteArray(byte* output, int32 sourceIndex, int32 count);
-	int32 ReadByteArraySize();
 	bool Equals(IStackItem* it);
 
-	int32 Count();
+	inline int32 Count()
+	{
+		return static_cast<int>(this->_list.size());
+	}
+
 	void Clear();
 	IStackItem* Get(int32 index);
 	void Add(IStackItem* item);
@@ -37,10 +46,13 @@ public:
 
 	// Destructor
 
-	~ArrayStackItem();
+	inline ~ArrayStackItem()
+	{
+		this->Clear();
+	}
 
 	// Serialize
 
-	int32 Serialize(byte* data, int32 length);
-	int32 GetSerializedSize();
+	inline int32 Serialize(byte* data, int32 length) { return 0; }
+	inline int32 GetSerializedSize() { return 0; }
 };

@@ -1,23 +1,8 @@
 #include "MapStackItem.h"
 
-MapStackItem::MapStackItem() :IStackItem(EStackItemType::Map), Dictionary(std::map<IStackItem*, IStackItem*>()) { }
-
-MapStackItem::~MapStackItem() { this->Clear(); }
-
-int32 MapStackItem::Count()
-{
-	return static_cast<int>(this->Dictionary.size());
-}
-
-bool MapStackItem::GetBoolean() { return true; }
-BigInteger* MapStackItem::GetBigInteger() { return NULL; }
-bool MapStackItem::GetInt32(int32 &ret) { return false; }
-int32 MapStackItem::ReadByteArray(byte* output, int32 sourceIndex, int32 count) { return -1; }
-int32 MapStackItem::ReadByteArraySize() { return -1; }
-
 bool MapStackItem::Remove(IStackItem* &key)
 {
-	for (std::map<IStackItem*, IStackItem*>::iterator it = this->Dictionary.begin(); it != this->Dictionary.end(); ++it)
+	for (std::map<IStackItem*, IStackItem*>::iterator it = this->_dictionary.begin(); it != this->_dictionary.end(); ++it)
 	{
 		if (!it->first->Equals(key)) continue;
 
@@ -32,7 +17,7 @@ bool MapStackItem::Remove(IStackItem* &key)
 
 		// Remove
 
-		this->Dictionary.erase(ckey);
+		this->_dictionary.erase(ckey);
 
 		// Free
 
@@ -48,7 +33,7 @@ bool MapStackItem::Remove(IStackItem* &key)
 
 void MapStackItem::Clear()
 {
-	for (std::map<IStackItem*, IStackItem*>::iterator it = this->Dictionary.begin(); it != this->Dictionary.end(); ++it)
+	for (std::map<IStackItem*, IStackItem*>::iterator it = this->_dictionary.begin(); it != this->_dictionary.end(); ++it)
 	{
 		IStackItem* key = it->first;
 		IStackItem* value = it->second;
@@ -57,17 +42,12 @@ void MapStackItem::Clear()
 		IStackItem::UnclaimAndFree(value);
 	}
 
-	this->Dictionary.clear();
-}
-
-bool MapStackItem::Equals(IStackItem* it)
-{
-	return (it == this);
+	this->_dictionary.clear();
 }
 
 IStackItem* MapStackItem::Get(IStackItem* key)
 {
-	for (std::map<IStackItem*, IStackItem*>::iterator it = this->Dictionary.begin(); it != this->Dictionary.end(); ++it)
+	for (std::map<IStackItem*, IStackItem*>::iterator it = this->_dictionary.begin(); it != this->_dictionary.end(); ++it)
 	{
 		if (!it->first->Equals(key)) continue;
 		return it->second;
@@ -79,7 +59,7 @@ IStackItem* MapStackItem::Get(IStackItem* key)
 IStackItem* MapStackItem::GetKey(int index)
 {
 	int32 ix = 0;
-	for (std::map<IStackItem*, IStackItem*>::iterator it = this->Dictionary.begin(); it != this->Dictionary.end(); ++it, ++ix)
+	for (std::map<IStackItem*, IStackItem*>::iterator it = this->_dictionary.begin(); it != this->_dictionary.end(); ++it, ++ix)
 	{
 		if (ix == index)
 		{
@@ -93,7 +73,7 @@ IStackItem* MapStackItem::GetKey(int index)
 IStackItem* MapStackItem::GetValue(int index)
 {
 	int32 ix = 0;
-	for (std::map<IStackItem*, IStackItem*>::iterator it = this->Dictionary.begin(); it != this->Dictionary.end(); ++it, ++ix)
+	for (std::map<IStackItem*, IStackItem*>::iterator it = this->_dictionary.begin(); it != this->_dictionary.end(); ++it, ++ix)
 	{
 		if (ix == index)
 		{
@@ -106,7 +86,7 @@ IStackItem* MapStackItem::GetValue(int index)
 
 void MapStackItem::FillKeys(ArrayStackItem* arr)
 {
-	for (std::map<IStackItem*, IStackItem*>::iterator it = this->Dictionary.begin(); it != this->Dictionary.end(); ++it)
+	for (std::map<IStackItem*, IStackItem*>::iterator it = this->_dictionary.begin(); it != this->_dictionary.end(); ++it)
 	{
 		if (it->first->Type == EStackItemType::Struct)
 		{
@@ -121,7 +101,7 @@ void MapStackItem::FillKeys(ArrayStackItem* arr)
 
 void MapStackItem::FillValues(ArrayStackItem* arr)
 {
-	for (std::map<IStackItem*, IStackItem*>::iterator it = this->Dictionary.begin(); it != this->Dictionary.end(); ++it)
+	for (std::map<IStackItem*, IStackItem*>::iterator it = this->_dictionary.begin(); it != this->_dictionary.end(); ++it)
 	{
 		if (it->second->Type == EStackItemType::Struct)
 		{
@@ -136,7 +116,7 @@ void MapStackItem::FillValues(ArrayStackItem* arr)
 
 bool MapStackItem::Set(IStackItem* key, IStackItem* value)
 {
-	for (std::map<IStackItem*, IStackItem*>::iterator it = this->Dictionary.begin(); it != this->Dictionary.end(); ++it)
+	for (std::map<IStackItem*, IStackItem*>::iterator it = this->_dictionary.begin(); it != this->_dictionary.end(); ++it)
 	{
 		if (!it->first->Equals(key)) continue;
 
@@ -153,12 +133,6 @@ bool MapStackItem::Set(IStackItem* key, IStackItem* value)
 	key->Claim();
 	value->Claim();
 
-	this->Dictionary.emplace(key, value);
+	this->_dictionary.emplace(key, value);
 	return true;
 }
-
-// Serialize
-
-int32 MapStackItem::Serialize(byte* data, int32 length) { return 0; }
-
-int32 MapStackItem::GetSerializedSize() { return 0; }

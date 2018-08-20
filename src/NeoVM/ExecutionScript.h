@@ -9,7 +9,7 @@ private:
 
 	// Is Script hash calculated?
 
-	bool IsScriptHashCalculated;
+	bool _isScriptHashCalculated;
 
 public:
 
@@ -32,7 +32,10 @@ public:
 
 	// Destructor
 
-	~ExecutionScript();
+	inline ~ExecutionScript()
+	{
+		delete(this->Content);
+	}
 
 	// Claims
 

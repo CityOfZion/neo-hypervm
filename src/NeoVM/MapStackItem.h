@@ -8,23 +8,32 @@ class MapStackItem : public IStackItem
 {
 private:
 
-	std::map<IStackItem*, IStackItem*> Dictionary;
+	std::map<IStackItem*, IStackItem*> _dictionary;
 
 public:
 
 	// Converters
 
-	bool GetBoolean();
-	BigInteger* GetBigInteger();
-	bool GetInt32(int32 &ret);
-	int32 ReadByteArray(byte* output, int32 sourceIndex, int32 count);
-	int32 ReadByteArraySize();
+	inline bool GetBoolean() { return true; }
+	inline BigInteger* GetBigInteger() { return NULL; }
+	inline bool GetInt32(int32 &ret) { return false; }
+	inline int32 ReadByteArray(byte* output, int32 sourceIndex, int32 count) { return -1; }
+	inline int32 ReadByteArraySize() { return -1; }
+
 	void Clear();
-	bool Equals(IStackItem* it);
+	
+	inline bool Equals(IStackItem* it)
+	{
+		return (it == this);
+	}
 
 	// Map Methods
 
-	int32 Count();
+	inline int32 Count()
+	{
+		return static_cast<int>(this->_dictionary.size());
+	}
+	
 	bool Set(IStackItem* key, IStackItem* value);
 	IStackItem* Get(IStackItem* key);
 	bool Remove(IStackItem* &key);
@@ -33,16 +42,14 @@ public:
 	IStackItem* GetKey(int index);
 	IStackItem* GetValue(int index);
 
-	// Constructor
+	// Constructor & Destructor
 
-	MapStackItem();
+	inline MapStackItem() :IStackItem(EStackItemType::Map), _dictionary(std::map<IStackItem*, IStackItem*>()) { }
 
-	// Destructor
-
-	~MapStackItem();
+	inline ~MapStackItem() { this->Clear(); }
 
 	// Serialize
 
-	int32 Serialize(byte* data, int32 length);
-	int32 GetSerializedSize();
+	inline int32 Serialize(byte* data, int32 length) { return 0; }
+	inline int32 GetSerializedSize() { return 0; }
 };

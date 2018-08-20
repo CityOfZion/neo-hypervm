@@ -5,6 +5,8 @@
 
 class ExecutionContextStack
 {
+private:
+
 	Stack<ExecutionContext> _stack;
 
 public:
@@ -19,10 +21,37 @@ public:
 		return this->_stack.Peek(index);
 	}
 
-	void Drop();
-	void Clear();
-	void Remove(int32 index);
-	void Push(ExecutionContext* i);
-	
-	~ExecutionContextStack();
+	inline void Push(ExecutionContext* i)
+	{
+		i->Claim();
+		this->_stack.Push(i);
+	}
+
+	inline void Remove(int32 index)
+	{
+		ExecutionContext* it = this->_stack.Pop(index);
+		ExecutionContext::UnclaimAndFree(it);
+	}
+
+	inline void Drop()
+	{
+		ExecutionContext* it = this->_stack.Pop();
+		ExecutionContext::UnclaimAndFree(it);
+	}
+
+	inline void Clear()
+	{
+		for (int32 x = 0, count = this->_stack.Count(); x < count; x++)
+		{
+			ExecutionContext* ptr = this->_stack.Peek(x);
+			ExecutionContext::UnclaimAndFree(ptr);
+		}
+
+		this->_stack.Clear();
+	}
+
+	inline ~ExecutionContextStack()
+	{
+		this->Clear();
+	}
 };

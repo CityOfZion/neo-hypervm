@@ -192,16 +192,13 @@
     <ClCompile Include="Crypto.cpp" />
     <ClCompile Include="ExecutionContext.cpp" />
     <ClCompile Include="ExecutionEngine.cpp" />
-    <ClCompile Include="IClaimable.cpp" />
     <ClCompile Include="IntegerStackItem.cpp" />
     <ClCompile Include="InteropStackItem.cpp" />
     <ClCompile Include="IStackItem.cpp" />
     <ClCompile Include="MapStackItem.cpp" />
     <ClCompile Include="NeoVM.cpp" />
-    <ClCompile Include="ExecutionContextStack.cpp" />
     <ClCompile Include="ExecutionScript.cpp" />
     <ClCompile Include="Stack.cpp" />
-    <ClCompile Include="StackItems.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

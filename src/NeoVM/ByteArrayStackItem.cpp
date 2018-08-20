@@ -1,23 +1,23 @@
 #include "ByteArrayStackItem.h"
 #include <string.h>
 
-ByteArrayStackItem::ByteArrayStackItem(byte* data, int32 size, bool copyPointer) :IStackItem(EStackItemType::ByteArray), PayloadLength(size)
+ByteArrayStackItem::ByteArrayStackItem(byte* data, int32 size, bool copyPointer) :IStackItem(EStackItemType::ByteArray), _payloadLength(size)
 {
 	if (size > 0 && data != NULL)
 	{
 		if (copyPointer)
 		{
-			this->Payload = data;
+			this->_payload = data;
 		}
 		else
 		{
-			this->Payload = new byte[size];
-			memcpy(this->Payload, data, size);
+			this->_payload = new byte[size];
+			memcpy(this->_payload, data, size);
 		}
 	}
 	else
 	{
-		this->Payload = NULL;
+		this->_payload = NULL;
 	}
 }
 
@@ -28,56 +28,14 @@ int32 ByteArrayStackItem::ReadByteArray(byte* output, int32 sourceIndex, int32 c
 		return -1;
 	}
 
-	int32 l = count > this->PayloadLength - sourceIndex ? this->PayloadLength - sourceIndex : count;
+	int32 l = count > this->_payloadLength - sourceIndex ? this->_payloadLength - sourceIndex : count;
 
 	if (l > 0)
 	{
-		memcpy(output, &this->Payload[sourceIndex], l);
+		memcpy(output, &this->_payload[sourceIndex], l);
 	}
 
 	return l;
-}
-
-int32 ByteArrayStackItem::ReadByteArraySize()
-{
-	return this->PayloadLength;
-}
-
-ByteArrayStackItem::~ByteArrayStackItem()
-{
-	if (this->Payload == NULL)
-		return;
-
-	delete[](this->Payload);
-	this->Payload = NULL;
-}
-
-bool ByteArrayStackItem::GetBoolean()
-{
-	for (int32 x = 0; x < this->PayloadLength; ++x)
-		if (this->Payload[x] != 0x00)
-			return true;
-
-	return false;
-}
-
-BigInteger* ByteArrayStackItem::GetBigInteger()
-{
-	if (this->PayloadLength == 0)
-		return new BigInteger(BigInteger::Zero);
-
-	return new BigInteger(this->Payload, this->PayloadLength);
-}
-
-bool ByteArrayStackItem::GetInt32(int32 &ret)
-{
-	BigInteger* bi = this->GetBigInteger();
-	if (bi == NULL) return false;
-
-	bool bret = bi->ToInt32(ret);
-	delete(bi);
-
-	return bret;
 }
 
 bool ByteArrayStackItem::Equals(IStackItem* it)
@@ -89,10 +47,10 @@ bool ByteArrayStackItem::Equals(IStackItem* it)
 	case EStackItemType::ByteArray:
 	{
 		ByteArrayStackItem* t = (ByteArrayStackItem*)it;
-		if (t->PayloadLength != this->PayloadLength) return false;
+		if (t->_payloadLength != this->_payloadLength) return false;
 
-		for (int x = t->PayloadLength - 1; x >= 0; x--)
-			if (t->Payload[x] != this->Payload[x])
+		for (int x = t->_payloadLength - 1; x >= 0; x--)
+			if (t->_payload[x] != this->_payload[x])
 				return false;
 
 		return true;
@@ -105,19 +63,19 @@ bool ByteArrayStackItem::Equals(IStackItem* it)
 			return false;
 
 		if (iz == 0)
-			return this->PayloadLength == 0;
+			return this->_payloadLength == 0;
 
 		byte* data = new byte[iz];
 		iz = it->ReadByteArray(data, 0, iz);
 
-		if (iz != this->PayloadLength)
+		if (iz != this->_payloadLength)
 		{
 			delete[](data);
 			return false;
 		}
 
 		for (int x = 0; x < iz; ++x)
-			if (data[x] != this->Payload[x])
+			if (data[x] != this->_payload[x])
 			{
 				delete[](data);
 				return false;
@@ -133,18 +91,13 @@ bool ByteArrayStackItem::Equals(IStackItem* it)
 
 int32 ByteArrayStackItem::Serialize(byte* data, int32 length)
 {
-	if (this->PayloadLength > 0 && length > 0)
+	if (this->_payloadLength > 0 && length > 0)
 	{
-		length = this->PayloadLength > length ? length : this->PayloadLength;
-		memcpy(data, this->Payload, length);
+		length = this->_payloadLength > length ? length : this->_payloadLength;
+		memcpy(data, this->_payload, length);
 
 		return length;
 	}
 
 	return 0;
-}
-
-int32 ByteArrayStackItem::GetSerializedSize()
-{
-	return this->PayloadLength;
 }

@@ -41,11 +41,18 @@ public:
 
 	EVMOpCode GetNextInstruction();
 	EVMOpCode ReadNextInstruction();
-	void Seek(int32 position);
+
+	inline void Seek(int32 position)
+	{
+		this->InstructionPointer = position;
+	}
 
 	// Get script hash
 
-	int32 GetScriptHash(byte* hash);
+	inline int32 GetScriptHash(byte* hash)
+	{
+		return this->Script->GetScriptHash(hash);
+	}
 
 	// Constructor
 
@@ -53,7 +60,13 @@ public:
 
 	// Destructor
 
-	~ExecutionContext();
+	inline ~ExecutionContext()
+	{
+		delete(this->EvaluationStack);
+		delete(this->AltStack);
+
+		ExecutionScript::UnclaimAndFree(this->Script);
+	}
 
 	// Claims
 

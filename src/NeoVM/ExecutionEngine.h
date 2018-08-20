@@ -13,12 +13,12 @@ private:
 
 	// Used for MessageCallback
 
-	uint32 Iteration;
-	uint64 ConsumedGas;
+	uint32 _iteration;
+	uint64 _consumedGas;
 
 	// Save the state of the execution
 
-	EVMState State;
+	EVMState _state;
 
 	// Callback Interoperability
 
@@ -34,7 +34,15 @@ private:
 
 	std::list<ExecutionScript*> Scripts;
 
-	void SetFault();
+	inline void SetHalt()
+	{
+		this->_state = EVMState::HALT;
+	}
+
+	inline void SetFault()
+	{
+		this->_state = EVMState::FAULT;
+	}
 
 public:
 
@@ -46,19 +54,48 @@ public:
 
 	// Getters
 
-	byte GetState();
-	uint64 GetConsumedGas();
+	inline byte GetState()
+	{
+		return this->_state;
+	}
 
-	ExecutionContext* GetCurrentContext();
-	ExecutionContext* GetCallingContext();
-	ExecutionContext* GetEntryContext();
+	inline ExecutionContextStack* GetInvocationStack()
+	{
+		return this->InvocationStack;
+	}
 
-	ExecutionContextStack* GetInvocationStack();
-	StackItems* GetResultStack();
+	inline StackItems* GetResultStack()
+	{
+		return this->ResultStack;
+	}
+
+	inline ExecutionContext* GetCurrentContext()
+	{
+		return this->InvocationStack->Peek(0);
+	}
+
+	inline ExecutionContext* GetCallingContext()
+	{
+		return this->InvocationStack->Peek(1);
+	}
+
+	inline ExecutionContext* GetEntryContext()
+	{
+		return this->InvocationStack->Peek(-1);
+	}
+
+	inline uint64 GetConsumedGas()
+	{
+		return this->_consumedGas;
+	}
 
 	// Setters
 
-	void SetLogCallback(OnStepIntoCallback logCallback);
+	inline void SetLogCallback(OnStepIntoCallback logCallback)
+	{
+		this->Log = logCallback;
+	}
+
 	void Clean(uint32 iteration);
 
 	// Run

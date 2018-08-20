@@ -4,7 +4,7 @@
 
 ExecutionScript::ExecutionScript(byte* script, int32 scriptLength) :
 	IClaimable(),
-	IsScriptHashCalculated(false),
+	_isScriptHashCalculated(false),
 	ScriptLength(scriptLength)
 {
 	// Copy script
@@ -15,11 +15,11 @@ ExecutionScript::ExecutionScript(byte* script, int32 scriptLength) :
 
 int32 ExecutionScript::GetScriptHash(byte* hash)
 {
-	if (!this->IsScriptHashCalculated)
+	if (!this->_isScriptHashCalculated)
 	{
 		// Compute script hash
 
-		this->IsScriptHashCalculated = true;
+		this->_isScriptHashCalculated = true;
 		Crypto::ComputeHash160(this->Content, this->ScriptLength, &this->ScriptHash[0]);
 	}
 
@@ -31,11 +31,11 @@ bool ExecutionScript::IsTheSameHash(byte* hash, int32 length)
 {
 	if (length != ScriptHashLength) return false;
 
-	if (!this->IsScriptHashCalculated)
+	if (!this->_isScriptHashCalculated)
 	{
 		// Compute script hash
 
-		this->IsScriptHashCalculated = true;
+		this->_isScriptHashCalculated = true;
 		Crypto::ComputeHash160(this->Content, this->ScriptLength, &this->ScriptHash[0]);
 	}
 
@@ -62,9 +62,4 @@ void ExecutionScript::UnclaimAndFree(ExecutionScript* &item)
 		delete(item);
 		item = NULL;
 	}
-}
-
-ExecutionScript::~ExecutionScript()
-{
-	delete(this->Content);
 }

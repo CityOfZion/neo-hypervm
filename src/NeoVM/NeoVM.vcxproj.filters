@@ -121,9 +121,6 @@
     <ClCompile Include="ExecutionEngine.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="StackItems.cpp">
-      <Filter>Source Files\Types\Collections</Filter>
-    </ClCompile>
     <ClCompile Include="BoolStackItem.cpp">
       <Filter>Source Files\Types\StackItems</Filter>
     </ClCompile>
@@ -145,9 +142,6 @@
     <ClCompile Include="MapStackItem.cpp">
       <Filter>Source Files\Types\StackItems</Filter>
     </ClCompile>
-    <ClCompile Include="ExecutionContextStack.cpp">
-      <Filter>Source Files\Types\Collections</Filter>
-    </ClCompile>
     <ClCompile Include="BigInteger.cpp">
       <Filter>Source Files\Types</Filter>
     </ClCompile>
@@ -159,9 +153,6 @@
     </ClCompile>
     <ClCompile Include="ExecutionScript.cpp">
       <Filter>Source Files\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="IClaimable.cpp">
-      <Filter>Source Files\Interfaces</Filter>
     </ClCompile>
     <ClCompile Include="Crypto.cpp">
       <Filter>Source Files\Engine</Filter>
