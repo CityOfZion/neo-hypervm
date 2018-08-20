@@ -140,7 +140,7 @@ void ExecutionEngine::StepInto()
 
 	if (context == NULL)
 	{
-		this->_state = EVMState::HALT;
+		this->SetHalt();
 		return;
 	}
 
