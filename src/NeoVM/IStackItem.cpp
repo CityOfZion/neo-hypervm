@@ -76,6 +76,9 @@ void IStackItem::Free(IStackItem* &itemA, IStackItem* &itemB)
 		if (itemB == itemA)
 		{
 			itemB = NULL;
+			delete(itemA);
+			itemA = NULL;
+			return;
 		}
 
 		delete(itemA);
