@@ -175,7 +175,7 @@ int32 StackItems_Drop(StackItems* stack, int32 count)
 
 IStackItem* StackItems_Pop(StackItems* stack)
 {
-	if (stack == NULL || stack->Count() <= 0) return NULL;
+	if (stack == NULL) return NULL;
 
 	return stack->Pop();
 }
