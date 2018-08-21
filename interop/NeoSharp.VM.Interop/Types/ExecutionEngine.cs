@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using NeoSharp.VM.Interop.Types.Collections;
 using NeoSharp.VM.Interop.Types.StackItems;
@@ -10,7 +11,7 @@ namespace NeoSharp.VM.Interop.Types
     public unsafe class ExecutionEngine : IExecutionEngine
     {
         #region Private fields
-        
+
         // This delegates are required for native calls, 
         // otherwise is disposed and produce a memory error
 
@@ -52,27 +53,47 @@ namespace NeoSharp.VM.Interop.Types
         /// <summary>
         /// Is Disposed
         /// </summary>
-        public override bool IsDisposed => Handle == IntPtr.Zero;
+        public override bool IsDisposed
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return Handle == IntPtr.Zero; }
+        }
 
         /// <summary>
         /// Invocation Stack
         /// </summary>
-        public override IStack<IExecutionContext> InvocationStack => _InvocationStack;
+        public override IStack<IExecutionContext> InvocationStack
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return _InvocationStack; }
+        }
 
         /// <summary>
         /// Result Stack
         /// </summary>
-        public override IStackItemsStack ResultStack => _ResultStack;
+        public override IStackItemsStack ResultStack
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return _ResultStack; }
+        }
 
         /// <summary>
         /// Virtual Machine State
         /// </summary>
-        public override EVMState State => (EVMState)NeoVM.ExecutionEngine_GetState(Handle);
+        public override EVMState State
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return (EVMState)NeoVM.ExecutionEngine_GetState(Handle); }
+        }
 
         /// <summary>
         /// Consumed Gas
         /// </summary>
-        public override ulong ConsumedGas => NeoVM.ExecutionEngine_GetConsumedGas(Handle);
+        public override ulong ConsumedGas
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return NeoVM.ExecutionEngine_GetConsumedGas(Handle); }
+        }
 
         #endregion
 

@@ -39,8 +39,25 @@ public:
 
 	// Get/Read next instruction
 
-	EVMOpCode GetNextInstruction();
-	EVMOpCode ReadNextInstruction();
+	inline EVMOpCode GetNextInstruction()
+	{
+		if (this->InstructionPointer >= this->ScriptLength)
+		{
+			return EVMOpCode::RET;
+		}
+
+		return (EVMOpCode)this->Script->Content[this->InstructionPointer];
+	}
+
+	inline EVMOpCode ReadNextInstruction()
+	{
+		if (this->InstructionPointer >= this->ScriptLength)
+		{
+			return EVMOpCode::RET;
+		}
+
+		return (EVMOpCode)this->Script->Content[this->InstructionPointer++];
+	}
 
 	inline void Seek(int32 position)
 	{

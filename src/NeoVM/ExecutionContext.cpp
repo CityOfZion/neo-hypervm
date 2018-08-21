@@ -154,37 +154,11 @@ int32 ExecutionContext::Read(byte* data, int32 length)
 	for (int32 x = 0; x < length && this->InstructionPointer < this->ScriptLength; ++x)
 	{
 		data[x] = this->Script->Content[this->InstructionPointer];
-		this->InstructionPointer++;
-		read++;
+		++this->InstructionPointer;
+		++read;
 	}
 
 	return read;
-}
-
-EVMOpCode ExecutionContext::GetNextInstruction()
-{
-	if (this->InstructionPointer >= this->ScriptLength)
-	{
-		return EVMOpCode::RET;
-	}
-	else
-	{
-		return (EVMOpCode)this->Script->Content[this->InstructionPointer];
-	}
-}
-
-EVMOpCode ExecutionContext::ReadNextInstruction()
-{
-	if (this->InstructionPointer >= this->ScriptLength)
-	{
-		return EVMOpCode::RET;
-	}
-	else
-	{
-		EVMOpCode ret = (EVMOpCode)this->Script->Content[this->InstructionPointer];
-		this->InstructionPointer++;
-		return ret;
-	}
 }
 
 void ExecutionContext::Free(ExecutionContext* &item)

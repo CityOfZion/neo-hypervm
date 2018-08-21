@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using NeoSharp.VM.Interop.Extensions;
 using NeoSharp.VM.Interop.Native;
@@ -22,7 +23,11 @@ namespace NeoSharp.VM.Interop.Types.Collections
         /// <summary>
         /// Return the number of items in the stack
         /// </summary>
-        public override int Count => NeoVM.StackItems_Count(_handle);
+        public override int Count
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return NeoVM.StackItems_Count(_handle); }
+        }
 
         /// <summary>
         /// Drop object from the stack
