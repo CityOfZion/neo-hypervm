@@ -42,6 +42,19 @@ private:
 		this->_state = EVMState::FAULT;
 	}
 
+public:
+
+	// Stacks
+
+	StackItems ResultStack;
+	ExecutionContextStack InvocationStack;
+
+	// Load scripts
+
+	ExecutionContext* LoadScript(ExecutionScript* script, int32 rvcount);
+	int32 LoadScript(byte* script, int32 scriptLength, int32 rvcount);
+	bool LoadScript(byte scriptIndex, int32 rvcount);
+
 	inline bool AddGasCost()
 	{
 		if ((this->_consumedGas += 1) > this->_maxGas)
@@ -63,19 +76,6 @@ private:
 
 		return true;
 	}
-
-public:
-
-	// Stacks
-
-	StackItems ResultStack;
-	ExecutionContextStack InvocationStack;
-
-	// Load scripts
-
-	ExecutionContext* LoadScript(ExecutionScript* script, int32 rvcount);
-	int32 LoadScript(byte* script, int32 scriptLength, int32 rvcount);
-	bool LoadScript(byte scriptIndex, int32 rvcount);
 
 	// Getters
 

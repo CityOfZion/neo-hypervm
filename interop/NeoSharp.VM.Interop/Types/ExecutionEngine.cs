@@ -263,6 +263,15 @@ namespace NeoSharp.VM.Interop.Types
         #region Execution
 
         /// <summary>
+        /// Increase gas
+        /// </summary>
+        /// <param name="gas">Gas</param>
+        public override bool IncreaseGas(uint gas)
+        {
+            return NeoVM.ExecutionEngine_IncreaseGas(Handle, gas) == 0x01;
+        }
+
+        /// <summary>
         /// Clean Execution engine state
         /// </summary>
         /// <param name="iteration">Iteration</param>
