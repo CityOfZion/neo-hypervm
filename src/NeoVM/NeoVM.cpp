@@ -111,18 +111,11 @@ byte ExecutionEngine_LoadCachedScript(ExecutionEngine* engine, int32 scriptIndex
 	return engine->LoadScript(scriptIndex, rvcount) ? 0x01 : 0x00;
 }
 
-byte ExecutionEngine_Execute(ExecutionEngine* engine)
+byte ExecutionEngine_Execute(ExecutionEngine* engine, uint64 gas)
 {
 	if (engine == NULL) return 0x00;
 
-	return (byte)engine->Execute();
-}
-
-byte ExecutionEngine_ExecuteUntil(ExecutionEngine* engine, uint64 gas)
-{
-	if (engine == NULL) return 0x00;
-
-	return (byte)engine->ExecuteUntil(gas);
+	return (byte)engine->Execute(gas);
 }
 
 void ExecutionEngine_StepInto(ExecutionEngine* engine)

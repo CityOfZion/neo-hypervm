@@ -272,24 +272,14 @@ namespace NeoSharp.VM.Interop.Types
         }
 
         /// <summary>
-        /// Execute
-        /// </summary>
-        public override bool Execute()
-        {
-            // HALT=TRUE
-
-            return NeoVM.ExecutionEngine_Execute(Handle) == NeoVM.TRUE;
-        }
-
-        /// <summary>
         /// Execute until
         /// </summary>
         /// <param name="gas">Gas</param>
-        public override bool ExecuteUntil(ulong gas)
+        public override bool Execute(ulong gas = ulong.MaxValue)
         {
             // HALT=TRUE
 
-            return NeoVM.ExecutionEngine_ExecuteUntil(Handle, gas) == NeoVM.TRUE;
+            return NeoVM.ExecutionEngine_Execute(Handle, gas) == NeoVM.TRUE;
         }
 
         /// <summary>
