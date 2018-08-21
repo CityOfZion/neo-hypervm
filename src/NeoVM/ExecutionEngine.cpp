@@ -564,13 +564,13 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack.SendTo(&this->GetCurrentContext()->EvaluationStack, -1);
-
 		if (this->InvocationStack.Count() >= MAX_INVOCATION_STACK_SIZE)
 		{
 			this->SetFault();
 			return;
 		}
+
+		context->EvaluationStack.SendTo(&this->GetCurrentContext()->EvaluationStack, -1);
 
 		if (opcode == EVMOpCode::TAILCALL)
 		{
@@ -1220,6 +1220,13 @@ ExecuteOpCode:
 			return;
 		}
 
+		if (bi->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
+		{
+			delete(bi);
+			this->SetFault();
+			return;
+		}
+
 		BigInteger* add = new BigInteger(BigInteger::One);
 		BigInteger* ret = bi->Add(add);
 		delete(add);
@@ -1227,6 +1234,13 @@ ExecuteOpCode:
 
 		if (ret == NULL)
 		{
+			this->SetFault();
+			return;
+		}
+
+		if (ret->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
+		{
+			delete(ret);
 			this->SetFault();
 			return;
 		}
@@ -1252,6 +1266,13 @@ ExecuteOpCode:
 			return;
 		}
 
+		if (bi->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
+		{
+			delete(bi);
+			this->SetFault();
+			return;
+		}
+
 		BigInteger* add = new BigInteger(BigInteger::One);
 		BigInteger* ret = bi->Sub(add);
 		delete(add);
@@ -1259,6 +1280,13 @@ ExecuteOpCode:
 
 		if (ret == NULL)
 		{
+			this->SetFault();
+			return;
+		}
+
+		if (ret->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
+		{
+			delete(ret);
 			this->SetFault();
 			return;
 		}
@@ -1403,7 +1431,9 @@ ExecuteOpCode:
 		BigInteger* x1 = i1->GetBigInteger();
 		IStackItem::Free(i2, i1);
 
-		if (x2 == NULL || x1 == NULL)
+		if (x2 == NULL || x1 == NULL ||
+			x2->ToByteArraySize() > MAX_BIGINTEGER_SIZE ||
+			x1->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
 		{
 			if (x2 != NULL) delete(x2);
 			if (x1 != NULL) delete(x1);
@@ -1418,6 +1448,13 @@ ExecuteOpCode:
 
 		if (ret == NULL)
 		{
+			this->SetFault();
+			return;
+		}
+
+		if (ret->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
+		{
+			delete(ret);
 			this->SetFault();
 			return;
 		}
@@ -1439,7 +1476,9 @@ ExecuteOpCode:
 		BigInteger* x1 = i1->GetBigInteger();
 		IStackItem::Free(i2, i1);
 
-		if (x2 == NULL || x1 == NULL)
+		if (x2 == NULL || x1 == NULL ||
+			x2->ToByteArraySize() > MAX_BIGINTEGER_SIZE ||
+			x1->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
 		{
 			if (x2 != NULL) delete(x2);
 			if (x1 != NULL) delete(x1);
@@ -1454,6 +1493,13 @@ ExecuteOpCode:
 
 		if (ret == NULL)
 		{
+			this->SetFault();
+			return;
+		}
+
+		if (ret->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
+		{
+			delete(ret);
 			this->SetFault();
 			return;
 		}
@@ -1475,7 +1521,9 @@ ExecuteOpCode:
 		BigInteger* x1 = i1->GetBigInteger();
 		IStackItem::Free(i2, i1);
 
-		if (x2 == NULL || x1 == NULL)
+		if (x2 == NULL || x1 == NULL ||
+			x1->ToByteArraySize() > MAX_BIGINTEGER_SIZE ||
+			x2->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
 		{
 			if (x2 != NULL) delete(x2);
 			if (x1 != NULL) delete(x1);
@@ -1490,6 +1538,13 @@ ExecuteOpCode:
 
 		if (ret == NULL)
 		{
+			this->SetFault();
+			return;
+		}
+
+		if (ret->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
+		{
+			delete(ret);
 			this->SetFault();
 			return;
 		}
@@ -1511,7 +1566,9 @@ ExecuteOpCode:
 		BigInteger* x1 = i1->GetBigInteger();
 		IStackItem::Free(i2, i1);
 
-		if (x2 == NULL || x1 == NULL)
+		if (x2 == NULL || x1 == NULL ||
+			x1->ToByteArraySize() > MAX_BIGINTEGER_SIZE ||
+			x2->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
 		{
 			if (x2 != NULL) delete(x2);
 			if (x1 != NULL) delete(x1);
@@ -1547,7 +1604,9 @@ ExecuteOpCode:
 		BigInteger* x1 = i1->GetBigInteger();
 		IStackItem::Free(i2, i1);
 
-		if (x2 == NULL || x1 == NULL)
+		if (x2 == NULL || x1 == NULL ||
+			x1->ToByteArraySize() > MAX_BIGINTEGER_SIZE ||
+			x2->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
 		{
 			if (x2 != NULL) delete(x2);
 			if (x1 != NULL) delete(x1);
@@ -1605,6 +1664,13 @@ ExecuteOpCode:
 			return;
 		}
 
+		if (ret->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
+		{
+			delete(ret);
+			this->SetFault();
+			return;
+		}
+
 		context->EvaluationStack.Push(new IntegerStackItem(ret));
 		return;
 	}
@@ -1640,6 +1706,13 @@ ExecuteOpCode:
 
 		if (ret == NULL)
 		{
+			this->SetFault();
+			return;
+		}
+
+		if (ret->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
+		{
+			delete(ret);
 			this->SetFault();
 			return;
 		}

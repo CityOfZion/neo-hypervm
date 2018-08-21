@@ -16,6 +16,10 @@ namespace NeoSharp.VM.Interop.Tests
         /// Min value for SHL-SHR
         /// </summary>
         const int MIN_SHL_SHR = -MAX_SHL_SHR;
+        /// <summary>
+        /// Set the max size allowed size for BigInteger
+        /// </summary>
+        const int MAX_BIGINTEGER_SIZE = 32;
 
         [TestMethod]
         public void INC()
@@ -209,7 +213,17 @@ namespace NeoSharp.VM.Interop.Tests
             {
                 BigInteger res;
 
-                try { res = (a + b); }
+                try
+                {
+                    res = (a + b);
+
+                    if (a.ToByteArray().Length > MAX_BIGINTEGER_SIZE ||
+                        b.ToByteArray().Length > MAX_BIGINTEGER_SIZE ||
+                        res.ToByteArray().Length > MAX_BIGINTEGER_SIZE)
+                    {
+                        throw new ArgumentException();
+                    }
+                }
                 catch
                 {
                     Assert.AreEqual(engine.State, EVMState.Fault);
@@ -231,7 +245,17 @@ namespace NeoSharp.VM.Interop.Tests
             {
                 BigInteger res;
 
-                try { res = (a - b); }
+                try
+                {
+                    res = (a - b);
+
+                    if (a.ToByteArray().Length > MAX_BIGINTEGER_SIZE ||
+                        b.ToByteArray().Length > MAX_BIGINTEGER_SIZE ||
+                        res.ToByteArray().Length > MAX_BIGINTEGER_SIZE)
+                    {
+                        throw new ArgumentException();
+                    }
+                }
                 catch
                 {
                     Assert.AreEqual(engine.State, EVMState.Fault);
@@ -253,7 +277,17 @@ namespace NeoSharp.VM.Interop.Tests
             {
                 BigInteger res;
 
-                try { res = (a * b); }
+                try
+                {
+                    res = (a * b);
+
+                    if (a.ToByteArray().Length > MAX_BIGINTEGER_SIZE ||
+                        b.ToByteArray().Length > MAX_BIGINTEGER_SIZE ||
+                        res.ToByteArray().Length > MAX_BIGINTEGER_SIZE)
+                    {
+                        throw new ArgumentException();
+                    }
+                }
                 catch
                 {
                     Assert.AreEqual(engine.State, EVMState.Fault);
@@ -297,7 +331,17 @@ namespace NeoSharp.VM.Interop.Tests
             {
                 BigInteger res;
 
-                try { res = (a % b); }
+                try
+                {
+                    res = (a % b);
+
+                    if (a.ToByteArray().Length > MAX_BIGINTEGER_SIZE ||
+                        b.ToByteArray().Length > MAX_BIGINTEGER_SIZE ||
+                        res.ToByteArray().Length > MAX_BIGINTEGER_SIZE)
+                    {
+                        throw new ArgumentException();
+                    }
+                }
                 catch
                 {
                     Assert.AreEqual(engine.State, EVMState.Fault);
@@ -327,6 +371,13 @@ namespace NeoSharp.VM.Interop.Tests
                     }
 
                     ishift = (int)shift;
+
+                    if (bi.ToByteArray().Length > MAX_BIGINTEGER_SIZE ||
+                       (bi << ishift).ToByteArray().Length > MAX_BIGINTEGER_SIZE)
+                    {
+                        throw new ArgumentException();
+                    }
+
                 }
                 catch
                 {
@@ -357,6 +408,12 @@ namespace NeoSharp.VM.Interop.Tests
                     }
 
                     ishift = (int)shift;
+
+                    if (bi.ToByteArray().Length > MAX_BIGINTEGER_SIZE ||
+                       (bi >> ishift).ToByteArray().Length > MAX_BIGINTEGER_SIZE)
+                    {
+                        throw new ArgumentException();
+                    }
                 }
                 catch
                 {
