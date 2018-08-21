@@ -69,8 +69,8 @@ ExecutionEngine* ExecutionEngine_Create
 {
 	ExecutionEngine* engine = new ExecutionEngine(interopCallback, getScriptCallback, getMessageCallback);
 
-	invStack = engine->GetInvocationStack();
-	resStack = engine->GetResultStack();
+	invStack = &engine->InvocationStack;
+	resStack = &engine->ResultStack;
 
 	return engine;
 }
