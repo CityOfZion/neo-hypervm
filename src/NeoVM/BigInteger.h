@@ -61,6 +61,7 @@ private:
 	int32 _sign;
 	uint32* _bits;
 	int32 _bitsSize;
+	int32 _cachedSize;
 
 	static bool GetPartsForBitManipulation(BigInteger* x, uint32* &xd, int32 &xl);
 	static void DangerousMakeTwosComplement(uint32* d, int32 dSize);

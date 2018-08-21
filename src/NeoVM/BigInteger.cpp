@@ -9,12 +9,52 @@ const BigInteger BigInteger::One = BigInteger(1);
 const BigInteger BigInteger::Zero = BigInteger(0);
 const BigInteger BigInteger::MinusOne = BigInteger(-1);
 
-BigInteger::BigInteger(int32 value) : _sign(value), _bits(NULL), _bitsSize(0)
+BigInteger::BigInteger(uint32 value) : _cachedSize(-1)
+{
+	if (value <= Int32MaxValue)
+	{
+		this->_sign = (int32)value;
+		this->_bits = NULL;
+		this->_bitsSize = 0;
+	}
+	else
+	{
+		this->_sign = +1;
+		this->_bits = new uint32[1]{ value };
+		this->_bitsSize = 1;
+	}
+
+	// AssertValid();
+}
+
+BigInteger::BigInteger(int32 sign, uint32* rgu, int32 rguSize) : _cachedSize(-1)
+{
+	this->_sign = sign;
+
+	if (rgu == NULL || rguSize <= 0)
+	{
+		this->_bits = NULL;
+		this->_bitsSize = 0;
+
+		// AssertValid();
+		return;
+	}
+
+	this->_bitsSize = rguSize;
+	this->_bits = new uint32[rguSize];
+
+	for (int32 x = 0; x < rguSize; ++x)
+		this->_bits[x] = rgu[x];
+
+	// AssertValid();
+}
+
+BigInteger::BigInteger(int32 value) : _sign(value), _bits(NULL), _bitsSize(0), _cachedSize(-1)
 {
 	// AssertValid();
 }
 
-BigInteger::BigInteger(BigInteger* value) : _sign(value->_sign)
+BigInteger::BigInteger(BigInteger* value) : _sign(value->_sign), _cachedSize(-1)
 {
 	if (value->_bits == NULL || value->_bitsSize <= 0)
 	{
@@ -33,7 +73,7 @@ BigInteger::BigInteger(BigInteger* value) : _sign(value->_sign)
 	// AssertValid();
 }
 
-BigInteger::BigInteger(const BigInteger &value) : _sign(value._sign)
+BigInteger::BigInteger(const BigInteger &value) : _sign(value._sign), _cachedSize(-1)
 {
 	if (value._bits == NULL || value._bitsSize <= 0)
 	{
@@ -52,7 +92,7 @@ BigInteger::BigInteger(const BigInteger &value) : _sign(value._sign)
 	// AssertValid();
 }
 
-BigInteger::BigInteger(uint32* value, int32 valueSize, bool negative) :_sign(0), _bits(NULL), _bitsSize(0)
+BigInteger::BigInteger(uint32* value, int32 valueSize, bool negative) :_sign(0), _bits(NULL), _bitsSize(0), _cachedSize(-1)
 {
 	if (value == NULL)
 	{
@@ -93,7 +133,7 @@ BigInteger::BigInteger(uint32* value, int32 valueSize, bool negative) :_sign(0),
 	// AssertValid();
 }
 
-BigInteger::BigInteger(uint32* value, int32 size) :_sign(0), _bits(NULL), _bitsSize(0)
+BigInteger::BigInteger(uint32* value, int32 size) :_sign(0), _bits(NULL), _bitsSize(0), _cachedSize(-1)
 {
 	if (value == NULL)
 	{
@@ -208,7 +248,7 @@ BigInteger::BigInteger(uint32* value, int32 size) :_sign(0), _bits(NULL), _bitsS
 	//AssertValid();
 }
 
-BigInteger::BigInteger(byte* value, int32 byteCount) : _sign(0), _bits(NULL), _bitsSize(0)
+BigInteger::BigInteger(byte* value, int32 byteCount) : _sign(0), _bits(NULL), _bitsSize(0), _cachedSize(-1)
 {
 	if (byteCount <= 0 || value == NULL)
 	{
@@ -1023,56 +1063,93 @@ int32 BigInteger::GetSign()
 	return (this->_sign >> (BigInteger::kcbitUint - 1)) - (-this->_sign >> (BigInteger::kcbitUint - 1));
 }
 
-BigInteger::BigInteger(uint32 value)
-{
-	if (value <= Int32MaxValue)
-	{
-		this->_sign = (int32)value;
-		this->_bits = NULL;
-		this->_bitsSize = 0;
-	}
-	else
-	{
-		this->_sign = +1;
-		this->_bits = new uint32[1]{ value };
-		this->_bitsSize = 1;
-	}
-
-	// AssertValid();
-}
-
-BigInteger::BigInteger(int32 sign, uint32* rgu, int32 rguSize)
-{
-	this->_sign = sign;
-
-	if (rgu == NULL || rguSize <= 0)
-	{
-		this->_bits = NULL;
-		this->_bitsSize = 0;
-
-		// AssertValid();
-		return;
-	}
-
-	this->_bitsSize = rguSize;
-	this->_bits = new uint32[rguSize];
-
-	for (int32 x = 0; x < rguSize; ++x)
-		this->_bits[x] = rgu[x];
-
-	// AssertValid();
-}
-
 int32 BigInteger::ToByteArraySize()
 {
-	// TODO: Is not the exactly size of ToByteArray
+	if (_cachedSize != -1)
+	{
+		return _cachedSize;
+	}
+
+	if (this->_bitsSize == 0 && _sign == 0)
+	{
+		_cachedSize = 1;
+		return 1;
+	}
+
+	// We could probably make this more efficient by eliminating one of the passes.
+	// The current code does one pass for uint array -> byte array conversion,
+	// and then another pass to remove unneeded bytes at the top of the array.
+
+	int32 dwordsSize;
+	byte highByte;
+	uint32* dwords;
 
 	if (this->_bitsSize == 0)
 	{
-		return  _sign == 0 ? 1 : 5;
+		dwords = new uint32[1]{ (uint32)_sign };
+		dwordsSize = 1;
+		highByte = (byte)((_sign < 0) ? 0xff : 0x00);
+	}
+	else if (_sign == -1)
+	{
+		dwordsSize = this->_bitsSize;
+
+		if (this->_bits != NULL)
+		{
+			// Clone
+			dwords = new uint32[dwordsSize];
+			for (int32 x = 0; x < dwordsSize; ++x)
+				dwords[x] = this->_bits[x];
+
+			this->DangerousMakeTwosComplement(dwords, dwordsSize);  // mutates dwords
+		}
+		else
+		{
+			dwords = NULL;
+		}
+
+		highByte = 0xff;
+	}
+	else
+	{
+		dwords = this->_bits;
+		dwordsSize = this->_bitsSize;
+		highByte = 0x00;
 	}
 
-	return (this->_bitsSize * 4) + 1;
+	byte* bytes = new byte[4 * dwordsSize]/*()*/;
+	int32 curByte = 0;
+
+	uint32 dword;
+	for (int32 i = 0; i < dwordsSize; ++i)
+	{
+		dword = dwords[i];
+		for (int32 j = 0; j < 4; j++)
+		{
+			bytes[curByte++] = (byte)(dword & 0xff);
+			dword >>= 8;
+		}
+	}
+
+	// find highest significant byte
+	int32 msb;
+	for (msb = (4 * dwordsSize) - 1; msb > 0; msb--)
+	{
+		if (bytes[msb] != highByte) break;
+	}
+
+	// ensure high bit is 0 if positive, 1 if negative
+	bool needExtraByte = (bytes[msb] & 0x80) != (highByte & 0x80);
+
+	_cachedSize = msb + 1 + (needExtraByte ? 1 : 0);
+
+	// Free memory
+
+	delete[] bytes;
+	if (dwords != this->_bits)
+		delete[]dwords;
+
+	return _cachedSize;
 }
 
 int32 BigInteger::ToByteArray(byte* output, int32 length)
