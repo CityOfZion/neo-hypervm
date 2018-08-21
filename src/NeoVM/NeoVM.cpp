@@ -111,6 +111,13 @@ byte ExecutionEngine_LoadCachedScript(ExecutionEngine* engine, int32 scriptIndex
 	return engine->LoadScript(scriptIndex, rvcount) ? 0x01 : 0x00;
 }
 
+byte ExecutionEngine_IncreaseGas(ExecutionEngine* engine, uint32 gas)
+{
+	if (engine == NULL) return 0x00;
+
+	return engine->AddGasCost(gas) ? 0x01 : 0x00;
+}
+
 byte ExecutionEngine_Execute(ExecutionEngine* engine, uint64 gas)
 {
 	if (engine == NULL) return 0x00;
