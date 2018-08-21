@@ -74,6 +74,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
             _handle = handle;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte[] GetNativeByteArray() => Value ? TRUE : FALSE_0;
 
         #region IDisposable Support

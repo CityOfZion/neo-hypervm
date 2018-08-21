@@ -90,6 +90,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
             _handle = handle;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte[] GetNativeByteArray() => BitHelper.GetBytes(_objKey);
 
         #region IDisposable Support
