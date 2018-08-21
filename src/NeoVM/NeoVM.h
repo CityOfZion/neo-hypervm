@@ -39,8 +39,7 @@ extern "C"
 	DllExport void __stdcall ExecutionEngine_Clean(ExecutionEngine* engine, uint32 iteration);
 	DllExport int32 __stdcall ExecutionEngine_LoadScript(ExecutionEngine* engine, byte* script, int32 scriptLength, int32 rvcount);
 	DllExport byte __stdcall ExecutionEngine_LoadCachedScript(ExecutionEngine* engine, int32 scriptIndex, int32 rvcount);
-	DllExport byte __stdcall ExecutionEngine_Execute(ExecutionEngine* engine);
-	DllExport byte __stdcall ExecutionEngine_ExecuteUntil(ExecutionEngine* engine, uint64 gas);
+	DllExport byte __stdcall ExecutionEngine_Execute(ExecutionEngine* engine, uint64 gas);
 	DllExport void __stdcall ExecutionEngine_StepInto(ExecutionEngine* engine);
 	DllExport void __stdcall ExecutionEngine_StepOver(ExecutionEngine* engine);
 	DllExport void __stdcall ExecutionEngine_StepOut(ExecutionEngine* engine);

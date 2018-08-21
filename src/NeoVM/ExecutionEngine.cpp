@@ -79,20 +79,7 @@ int32 ExecutionEngine::LoadScript(byte* script, int32 scriptLength, int32 rvcoun
 	return index;
 }
 
-EVMState ExecutionEngine::Execute()
-{
-	this->_maxGas = 0xFFFFFFFFFFFFFFFF;
-
-	do
-	{
-		this->StepInto();
-	}
-	while (this->_state == EVMState::NONE);
-
-	return this->_state;
-}
-
-EVMState ExecutionEngine::ExecuteUntil(uint64 gas)
+EVMState ExecutionEngine::Execute(uint64 gas)
 {
 	this->_maxGas = gas;
 

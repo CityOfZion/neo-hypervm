@@ -119,8 +119,7 @@ public:
 	void StepOut();
 	void StepOver();
 
-	EVMState Execute();
-	EVMState ExecuteUntil(uint64 gas);
+	EVMState Execute(uint64 gas);
 
 	// Constructor
 

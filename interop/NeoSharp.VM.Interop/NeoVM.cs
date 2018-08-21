@@ -124,8 +124,7 @@ namespace NeoSharp.VM.Interop
         internal static delVoid_RefHandle ExecutionEngine_Free;
         internal static delInt_HandleHandleIntInt ExecutionEngine_LoadScript;
         internal static delByte_HandleIntInt ExecutionEngine_LoadCachedScript;
-        internal static delByte_Handle ExecutionEngine_Execute;
-        internal static delByte_HandleUInt64 ExecutionEngine_ExecuteUntil;
+        internal static delByte_HandleUInt64 ExecutionEngine_Execute;
         internal static delVoid_Handle ExecutionEngine_StepInto;
         internal static delVoid_Handle ExecutionEngine_StepOver;
         internal static delVoid_Handle ExecutionEngine_StepOut;
