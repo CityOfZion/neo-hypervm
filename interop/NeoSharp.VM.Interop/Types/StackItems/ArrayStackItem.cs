@@ -176,6 +176,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
 
         #endregion
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte[] GetNativeByteArray() => null;
 
         #region IDisposable Support

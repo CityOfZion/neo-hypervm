@@ -194,6 +194,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
 
         public override byte[] ToByteArray() => throw new NotImplementedException();
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte[] GetNativeByteArray() => null;
 
         #region IDisposable Support
