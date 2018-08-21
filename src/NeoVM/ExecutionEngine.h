@@ -15,6 +15,7 @@ private:
 
 	uint32 _iteration;
 	uint64 _consumedGas;
+	uint64 _maxGas;
 
 	// Save the state of the execution
 
@@ -39,6 +40,28 @@ private:
 	inline void SetFault()
 	{
 		this->_state = EVMState::FAULT;
+	}
+
+	inline bool AddGasCost()
+	{
+		if ((this->_consumedGas += 1) > this->_maxGas)
+		{
+			this->_state = EVMState::FAULT_BY_GAS;
+			return false;
+		}
+
+		return true;
+	}
+
+	inline bool AddGasCost(uint32 cost)
+	{
+		if ((this->_consumedGas += cost) > this->_maxGas)
+		{
+			this->_state = EVMState::FAULT_BY_GAS;
+			return false;
+		}
+
+		return true;
 	}
 
 public:
