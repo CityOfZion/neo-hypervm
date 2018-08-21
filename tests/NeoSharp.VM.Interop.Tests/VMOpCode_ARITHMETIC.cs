@@ -279,14 +279,14 @@ namespace NeoSharp.VM.Interop.Tests
 
                 try
                 {
-                    res = (a * b);
-
                     if (a.ToByteArray().Length > MAX_BIGINTEGER_SIZE ||
                         b.ToByteArray().Length > MAX_BIGINTEGER_SIZE ||
-                        res.ToByteArray().Length > MAX_BIGINTEGER_SIZE)
+                        a.ToByteArray().Length + b.ToByteArray().Length > MAX_BIGINTEGER_SIZE)
                     {
                         throw new ArgumentException();
                     }
+
+                    res = a * b;
                 }
                 catch
                 {

@@ -14,6 +14,7 @@ void ExecutionEngine::Clean(uint32 iteration)
 	this->_iteration = iteration;
 	this->_state = EVMState::NONE;
 	this->_consumedGas = 0;
+	this->_maxGas = 0xFFFFFFFFFFFFFFFF;
 
 	this->InvocationStack.Clear();
 	this->ResultStack.Clear();
@@ -27,6 +28,7 @@ ExecutionEngine::ExecutionEngine
 ) :
 	_iteration(0),
 	_consumedGas(0),
+	_maxGas(0xFFFFFFFFFFFFFFFF),
 	_state(EVMState::NONE),
 	Log(NULL),
 
@@ -79,6 +81,8 @@ int32 ExecutionEngine::LoadScript(byte* script, int32 scriptLength, int32 rvcoun
 
 EVMState ExecutionEngine::Execute()
 {
+	this->_maxGas = 0xFFFFFFFFFFFFFFFF;
+
 	do
 	{
 		this->StepInto();
@@ -90,15 +94,11 @@ EVMState ExecutionEngine::Execute()
 
 EVMState ExecutionEngine::ExecuteUntil(uint64 gas)
 {
+	this->_maxGas = gas;
+
 	do
 	{
 		this->StepInto();
-
-		if (this->_consumedGas > gas)
-		{
-			this->_state = EVMState::FAULT_BY_GAS;
-			break;
-		}
 	}
 	while (this->_state == EVMState::NONE);
 
@@ -124,7 +124,7 @@ void ExecutionEngine::StepOver()
 	do
 	{
 		this->StepInto();
-	} 
+	}
 	while (this->_state == EVMState::NONE && this->InvocationStack.Count() > c);
 }
 
@@ -164,6 +164,11 @@ ExecuteOpCode:
 			return;
 		}
 
+		if (!this->AddGasCost()) 
+		{
+			return;
+		}
+
 		byte* data = new byte[length];
 
 		if (context->Read(data, length) != length)
@@ -193,6 +198,11 @@ ExecuteOpCode:
 
 	case EVMOpCode::PUSHDATA1:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		byte length = 0;
 		if (!context->ReadUInt8(length))
 		{
@@ -213,6 +223,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::PUSHDATA2:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		uint16 length = 0;
 		if (!context->ReadUInt16(length))
 		{
@@ -233,6 +248,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::PUSHDATA4:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		int32 length = 0;
 		if (!context->ReadInt32(length) || length < 0 || length > MAX_ITEM_LENGTH)
 		{
@@ -253,6 +273,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::PUSHM1:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		BigInteger* bi = new BigInteger(BigInteger::MinusOne);
 		context->EvaluationStack.Push(new IntegerStackItem(bi));
 		return;
@@ -263,6 +288,11 @@ ExecuteOpCode:
 	case EVMOpCode::NOP: return;
 	case EVMOpCode::JMP:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		int16 offset = 0;
 		if (!context->ReadInt16(offset))
 		{
@@ -284,6 +314,11 @@ ExecuteOpCode:
 	case EVMOpCode::JMPIF:
 	case EVMOpCode::JMPIFNOT:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		int16 offset = 0;
 		if (!context->ReadInt16(offset))
 		{
@@ -309,6 +344,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::CALL:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context == NULL || this->InvocationStack.Count() >= MAX_INVOCATION_STACK_SIZE)
 		{
 			this->SetFault();
@@ -329,6 +369,11 @@ ExecuteOpCode:
 	// Stack isolation (NEP8)
 	case EVMOpCode::CALL_I:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context == NULL || this->InvocationStack.Count() >= MAX_INVOCATION_STACK_SIZE)
 		{
 			this->SetFault();
@@ -364,6 +409,11 @@ ExecuteOpCode:
 	case EVMOpCode::CALL_ET:
 	case EVMOpCode::CALL_EDT:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (this->OnLoadScript == NULL)
 		{
 			this->SetFault();
@@ -463,6 +513,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::RET:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context != NULL)
 		{
 			context->Claim();
@@ -505,6 +560,11 @@ ExecuteOpCode:
 	case EVMOpCode::APPCALL:
 	case EVMOpCode::TAILCALL:
 	{
+		if (!this->AddGasCost(10))
+		{
+			return;
+		}
+
 		if (this->OnLoadScript == NULL)
 		{
 			this->SetFault();
@@ -581,6 +641,13 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::SYSCALL:
 	{
+		// TODO: GAS COST https://github.com/neo-project/neo/blob/b5926fe88d25c8aab2028c0ff7acad2c1d982bad/neo/SmartContract/ApplicationEngine.cs#L383
+
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		uint32 length = 0;
 		if (this->OnInvokeInterop == NULL || !context->ReadVarBytes(length, 252) || length == 0)
 		{
@@ -611,6 +678,11 @@ ExecuteOpCode:
 
 	case EVMOpCode::DUPFROMALTSTACK:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->AltStack.Count() < 1)
 		{
 			this->SetFault();
@@ -622,6 +694,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::TOALTSTACK:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
@@ -633,6 +710,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::FROMALTSTACK:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->AltStack.Count() < 1)
 		{
 			this->SetFault();
@@ -644,6 +726,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::XDROP:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		int32 ic = context->EvaluationStack.Count();
 		if (ic < 1)
 		{
@@ -668,6 +755,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::XSWAP:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		int32 ic = context->EvaluationStack.Count();
 		if (ic < 1)
 		{
@@ -698,6 +790,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::XTUCK:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		int32 ic = context->EvaluationStack.Count();
 		if (ic < 1)
 		{
@@ -721,11 +818,21 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::DEPTH:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		context->EvaluationStack.Push(new IntegerStackItem(context->EvaluationStack.Count()));
 		return;
 	}
 	case EVMOpCode::DROP:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
@@ -738,6 +845,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::DUP:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
@@ -749,6 +861,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::NIP:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -761,6 +878,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::OVER:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -773,6 +895,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::PICK:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		int32 ic = context->EvaluationStack.Count();
 		if (ic < 1)
 		{
@@ -803,6 +930,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::ROLL:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		int32 ic = context->EvaluationStack.Count();
 		if (ic < 1)
 		{
@@ -835,6 +967,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::ROT:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 3)
 		{
 			this->SetFault();
@@ -847,6 +984,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::SWAP:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -859,6 +1001,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::TUCK:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -871,6 +1018,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::CAT:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -901,6 +1053,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::SUBSTR:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 3)
 		{
 			this->SetFault();
@@ -946,6 +1103,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::LEFT:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -980,6 +1142,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::RIGHT:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -1014,6 +1181,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::SIZE:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
@@ -1038,6 +1210,11 @@ ExecuteOpCode:
 
 	case EVMOpCode::INVERT:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
@@ -1068,6 +1245,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::AND:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -1107,6 +1289,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::OR:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -1146,6 +1333,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::XOR:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -1185,6 +1377,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::EQUAL:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -1204,6 +1401,11 @@ ExecuteOpCode:
 
 	case EVMOpCode::INC:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
@@ -1250,6 +1452,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::DEC:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
@@ -1296,6 +1503,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::SIGN:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
@@ -1320,6 +1532,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::NEGATE:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
@@ -1350,6 +1567,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::ABS:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
@@ -1380,6 +1602,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::NOT:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
@@ -1395,6 +1622,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::NZ:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
@@ -1419,6 +1651,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::ADD:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -1464,6 +1701,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::SUB:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -1509,6 +1751,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::MUL:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -1521,9 +1768,12 @@ ExecuteOpCode:
 		BigInteger* x1 = i1->GetBigInteger();
 		IStackItem::Free(i2, i1);
 
-		if (x2 == NULL || x1 == NULL ||
+		if (
+			x2 == NULL || x1 == NULL ||
 			x1->ToByteArraySize() > MAX_BIGINTEGER_SIZE ||
-			x2->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
+			x2->ToByteArraySize() > MAX_BIGINTEGER_SIZE ||
+			x2->ToByteArraySize() + x1->ToByteArraySize() > MAX_BIGINTEGER_SIZE
+			)
 		{
 			if (x2 != NULL) delete(x2);
 			if (x1 != NULL) delete(x1);
@@ -1542,18 +1792,16 @@ ExecuteOpCode:
 			return;
 		}
 
-		if (ret->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
-		{
-			delete(ret);
-			this->SetFault();
-			return;
-		}
-
 		context->EvaluationStack.Push(new IntegerStackItem(ret));
 		return;
 	}
 	case EVMOpCode::DIV:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -1592,6 +1840,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::MOD:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -1630,6 +1883,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::SHL:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -1676,6 +1934,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::SHR:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -1722,6 +1985,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::BOOLAND:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -1739,6 +2007,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::BOOLOR:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -1756,6 +2029,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::NUMEQUAL:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -1789,6 +2067,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::NUMNOTEQUAL:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -1822,6 +2105,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::LT:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -1855,6 +2143,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::GT:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -1888,6 +2181,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::LTE:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -1921,6 +2219,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::GTE:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -1954,6 +2257,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::MIN:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -1994,6 +2302,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::MAX:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -2034,6 +2347,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::WITHIN:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 3)
 		{
 			this->SetFault();
@@ -2072,6 +2390,11 @@ ExecuteOpCode:
 
 	case EVMOpCode::SHA1:
 	{
+		if (!this->AddGasCost(10))
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
@@ -2108,6 +2431,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::SHA256:
 	{
+		if (!this->AddGasCost(10))
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
@@ -2144,6 +2472,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::HASH160:
 	{
+		if (!this->AddGasCost(20))
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
@@ -2180,6 +2513,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::HASH256:
 	{
+		if (!this->AddGasCost(20))
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
@@ -2216,6 +2554,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::CHECKSIG:
 	{
+		if (!this->AddGasCost(100))
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -2270,6 +2613,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::VERIFY:
 	{
+		if (!this->AddGasCost(100))
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 3)
 		{
 			this->SetFault();
@@ -2444,7 +2792,9 @@ ExecuteOpCode:
 			this->SetFault();
 		}
 
-		if (this->_state == EVMState::FAULT || this->OnGetMessage == NULL)
+		this->AddGasCost(100 * signaturesCount);
+
+		if (this->_state != EVMState::NONE || this->OnGetMessage == NULL)
 		{
 			// Free
 
@@ -2455,7 +2805,7 @@ ExecuteOpCode:
 
 			// Return
 
-			if (this->_state != EVMState::FAULT)
+			if (this->_state == EVMState::NONE)
 			{
 				context->EvaluationStack.Push(new BoolStackItem(false));
 			}
@@ -2509,6 +2859,11 @@ ExecuteOpCode:
 
 	case EVMOpCode::ARRAYSIZE:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
@@ -2555,6 +2910,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::PACK:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		int32 ec = context->EvaluationStack.Count();
 		if (ec < 1)
 		{
@@ -2585,6 +2945,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::UNPACK:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
@@ -2616,6 +2981,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::PICKITEM:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -2685,6 +3055,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::SETITEM:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 3)
 		{
 			this->SetFault();
@@ -2757,6 +3132,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::NEWARRAY:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
@@ -2779,6 +3159,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::NEWSTRUCT:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
@@ -2801,11 +3186,21 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::NEWMAP:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		context->EvaluationStack.Push(new MapStackItem());
 		return;
 	}
 	case EVMOpCode::APPEND:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -2852,6 +3247,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::REVERSE:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
@@ -2873,6 +3273,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::REMOVE:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -2932,6 +3337,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::HASKEY:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 2)
 		{
 			this->SetFault();
@@ -2990,6 +3400,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::KEYS:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
@@ -3021,6 +3436,11 @@ ExecuteOpCode:
 	}
 	case EVMOpCode::VALUES:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
@@ -3064,11 +3484,21 @@ ExecuteOpCode:
 	default:
 	case EVMOpCode::THROW:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		this->SetFault();
 		return;
 	}
 	case EVMOpCode::THROWIFNOT:
 	{
+		if (!this->AddGasCost())
+		{
+			return;
+		}
+
 		if (context->EvaluationStack.Count() < 1)
 		{
 			this->SetFault();
