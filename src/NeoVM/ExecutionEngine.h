@@ -29,9 +29,6 @@ private:
 
 	// Stacks
 
-	StackItems ResultStack;
-	ExecutionContextStack InvocationStack;
-
 	std::list<ExecutionScript*> Scripts;
 
 	inline void SetHalt()
@@ -46,6 +43,11 @@ private:
 
 public:
 
+	// Stacks
+
+	StackItems ResultStack;
+	ExecutionContextStack InvocationStack;
+
 	// Load scripts
 
 	ExecutionContext* LoadScript(ExecutionScript* script, int32 rvcount);
@@ -57,16 +59,6 @@ public:
 	inline byte GetState()
 	{
 		return this->_state;
-	}
-
-	inline ExecutionContextStack* GetInvocationStack()
-	{
-		return &this->InvocationStack;
-	}
-
-	inline StackItems* GetResultStack()
-	{
-		return &this->ResultStack;
 	}
 
 	inline ExecutionContext* GetCurrentContext()
