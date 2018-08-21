@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using NeoSharp.VM.Interop.Types.Collections;
 using Newtonsoft.Json;
 
@@ -34,23 +35,36 @@ namespace NeoSharp.VM.Interop.Types
         /// <summary>
         /// Is Disposed
         /// </summary>
-        public override bool IsDisposed => Handle == IntPtr.Zero;
+        public override bool IsDisposed
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return Handle == IntPtr.Zero; }
+        }
 
         /// <summary>
         /// Next instruction
         /// </summary>
-        public override EVMOpCode NextInstruction => (EVMOpCode)NeoVM.ExecutionContext_GetNextInstruction(Handle);
+        public override EVMOpCode NextInstruction
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return (EVMOpCode)NeoVM.ExecutionContext_GetNextInstruction(Handle); }
+        }
 
         /// <summary>
         /// Get Instruction pointer
         /// </summary>
-        public override int InstructionPointer => NeoVM.ExecutionContext_GetInstructionPointer(Handle);
+        public override int InstructionPointer
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return NeoVM.ExecutionContext_GetInstructionPointer(Handle); }
+        }
 
         /// <summary>
         /// Script Hash
         /// </summary>
         public override byte[] ScriptHash
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
                 if (_ScriptHash != null)
@@ -75,12 +89,20 @@ namespace NeoSharp.VM.Interop.Types
         /// <summary>
         /// AltStack
         /// </summary>
-        public override IStackItemsStack AltStack => _AltStack;
+        public override IStackItemsStack AltStack
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return _AltStack; }
+        }
 
         /// <summary>
         /// EvaluationStack
         /// </summary>
-        public override IStackItemsStack EvaluationStack => _EvaluationStack;
+        public override IStackItemsStack EvaluationStack
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return _EvaluationStack; }
+        }
 
         #endregion
 
