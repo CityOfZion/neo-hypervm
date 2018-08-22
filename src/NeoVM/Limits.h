@@ -26,10 +26,7 @@ const int32 MAX_ARRAY_SIZE = 1024;
 /// Set the max size allowed size for BigInteger
 /// </summary>
 const int32 MAX_BIGINTEGER_SIZE = 32;
-
-// TODO: InvocationStack.Sum(p => p.EvaluationStack.Count + p.AltStack.Count) > MaxStackSize) return false;
-
-///// <summary>
-///// Set the max Stack Size
-///// </summary>
-//const int32 MAX_STACK_SIZE = 2 * 1024;
+/// <summary>
+/// Set the max Stack Size
+/// </summary>
+const int32 MAX_STACK_SIZE = 2 * 1024;

@@ -5,7 +5,7 @@ namespace Neo.HyperVM.Benchmarks
 {
     public class VMBenchmarkSHA1 : VMBenchmarkBase
     {
-        [Params("PUSHBYTES1+0x01+SHA1+DROP")]
+        [Params("SHA1")]
         public override string OpCodes { get; set; }
 
         [GlobalSetup]

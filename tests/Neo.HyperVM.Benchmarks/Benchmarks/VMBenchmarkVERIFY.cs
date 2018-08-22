@@ -5,7 +5,7 @@ namespace Neo.HyperVM.Benchmarks
 {
     public class VMBenchmarkVERIFY : VMBenchmarkBase
     {
-        [Params("VERIFY+THROWIFNOT")]
+        [Params("VERIFY")]
         public override string OpCodes { get; set; }
 
         [GlobalSetup]
