@@ -14,11 +14,11 @@ ArrayStackItem::ArrayStackItem(IStackItemCounter* counter, bool isStruct) :
 
 IStackItem* ArrayStackItem::Clone()
 {
-	ArrayStackItem* ret = new ArrayStackItem(_counter, this->Type == EStackItemType::Struct);
+	auto ret = new ArrayStackItem(_counter, this->Type == EStackItemType::Struct);
 
 	for (int32 x = 0, m = this->Count(); x < m; ++x)
 	{
-		IStackItem* i = this->Get(x);
+		auto i = this->Get(x);
 
 		if (i->Type == EStackItemType::Struct)
 			ret->Add(((ArrayStackItem*)i)->Clone());
@@ -75,7 +75,7 @@ IStackItem* ArrayStackItem::Get(int32 index)
 	if (index == 0)
 		return this->_list.front();
 
-	std::list<IStackItem*>::iterator it = this->_list.begin();
+	auto it = this->_list.begin();
 	std::advance(it, index);
 
 	return (IStackItem*)*it;
@@ -84,7 +84,7 @@ IStackItem* ArrayStackItem::Get(int32 index)
 int32 ArrayStackItem::IndexOf(IStackItem* item)
 {
 	int32 index = 0;
-	for (std::list<IStackItem*>::iterator it = this->_list.begin(); it != this->_list.end(); ++it)
+	for (auto it = this->_list.begin(); it != this->_list.end(); ++it)
 	{
 		if ((IStackItem*)*it == item)
 			return index;
