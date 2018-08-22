@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NeoSharp.VM.Helpers;
+using NeoSharp.VM.Extensions;
 using NeoSharp.VM.Interop.Tests.Crypto;
 using NeoSharp.VM.Interop.Tests.Extra;
 using NeoSharp.VM.Interop.Types.StackItems;
@@ -18,9 +18,9 @@ namespace NeoSharp.VM.Interop.Tests
 
             public Verify(string msg, string sig, string pk)
             {
-                Message = BitHelper.FromHexString(msg);
-                Signature = BitHelper.FromHexString(sig);
-                PublicKey = BitHelper.FromHexString(pk);
+                Message = msg.FromHexString();
+                Signature = sig.FromHexString();
+                PublicKey = pk.FromHexString();
             }
         }
 

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using NeoSharp.VM.Helpers;
+using NeoSharp.VM.Extensions;
 using NeoSharp.VM.Interop.Extensions;
 using NeoSharp.VM.Interop.Native;
 using Newtonsoft.Json;
@@ -91,7 +91,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public byte[] GetNativeByteArray() => BitHelper.GetBytes(_objKey);
+        public byte[] GetNativeByteArray() => _objKey.GetBytes();
 
         #region IDisposable Support
 

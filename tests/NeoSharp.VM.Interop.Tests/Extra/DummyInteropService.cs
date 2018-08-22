@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
-using NeoSharp.VM.Helpers;
+using NeoSharp.VM.Extensions;
 using NeoSharp.VM.Interop.Tests.Helpers;
 using NeoSharp.VM.Interop.Types.StackItems;
 
@@ -241,7 +241,7 @@ namespace NeoSharp.VM.Interop.Tests.Extra
             {
                 if (context == null) return false;
 
-                string id = BitHelper.ToHexString(context.ScriptHash);
+                var id = context.ScriptHash.ToHexString();
                 if (!Storages.TryGetValue(id, out DummyStorageContext stContext))
                 {
                     stContext = new DummyStorageContext(id, context.ScriptHash);
@@ -275,9 +275,9 @@ namespace NeoSharp.VM.Interop.Tests.Extra
                     {
                         if (!it.CanConvertToByteArray) return false;
 
-                        byte[] key = it.ToByteArray();
+                        var key = it.ToByteArray();
 
-                        if (stContext.Storage.TryGetValue(BitHelper.ToHexString(key), out byte[] value))
+                        if (stContext.Storage.TryGetValue(key.ToHexString(), out byte[] value))
                         {
                             using (var ret = engine.CreateByteArray(value))
                                 context.EvaluationStack.Push(ret);
@@ -314,8 +314,8 @@ namespace NeoSharp.VM.Interop.Tests.Extra
                     using (it)
                     {
                         if (!it.CanConvertToByteArray) return false;
-                        byte[] key = it.ToByteArray();
-                        stContext.Storage.Remove(BitHelper.ToHexString(key));
+                        var key = it.ToByteArray();
+                        stContext.Storage.Remove(key.ToHexString());
                     }
                 }
             }
@@ -360,7 +360,7 @@ namespace NeoSharp.VM.Interop.Tests.Extra
                         value = it.ToByteArray();
                     }
 
-                    stContext.Storage[BitHelper.ToHexString(key)] = value;
+                    stContext.Storage[key.ToHexString()] = value;
                 }
             }
 

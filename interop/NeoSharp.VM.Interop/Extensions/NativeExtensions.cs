@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using NeoSharp.VM.Helpers;
+using NeoSharp.VM.Extensions;
 using NeoSharp.VM.Interop.Native;
 using NeoSharp.VM.Interop.Types;
 using NeoSharp.VM.Interop.Types.StackItems;
@@ -48,7 +48,7 @@ namespace NeoSharp.VM.Interop.Extensions
                     {
                         // Extract object
 
-                        return new InteropStackItem(engine, item, BitHelper.ToInt32(payload, 0));
+                        return new InteropStackItem(engine, item, payload.ToInt32(0));
                     }
                 case EStackItemType.ByteArray: return new ByteArrayStackItem(engine, item, payload ?? (new byte[] { }));
                 case EStackItemType.Integer:
