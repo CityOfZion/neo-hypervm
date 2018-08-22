@@ -31,6 +31,7 @@ public:
 		_counter(counter),
 		Type(type)
 	{
+		// TODO: Count the stack items
 		// _counter->ItemCounterInc();
 	}
 

@@ -256,7 +256,7 @@ IStackItem* StackItem_Create(ExecutionEngine* engine, EStackItemType type, byte*
 
 		if (size == 1)
 		{
-			it = new BoolStackItem(engine, data[0] != 0x00);
+			it = engine->CreateBool(data[0] != 0x00);
 		}
 		else
 		{
@@ -274,16 +274,16 @@ IStackItem* StackItem_Create(ExecutionEngine* engine, EStackItemType type, byte*
 					break;
 				}
 
-			it = new BoolStackItem(engine, ret);
+			it = engine->CreateBool(ret);
 		}
 		break;
 	}
-	case EStackItemType::Integer: { it = new IntegerStackItem(engine, data, size); break; }
-	case EStackItemType::ByteArray: { it = new ByteArrayStackItem(engine, data, size, false); break; }
-	case EStackItemType::Interop: { it = new InteropStackItem(engine, data, size); break; }
-	case EStackItemType::Array: { it = new ArrayStackItem(engine); break; }
-	case EStackItemType::Struct: { it = new ArrayStackItem(engine, true); break; }
-	case EStackItemType::Map: { it = new MapStackItem(engine); break; }
+	case EStackItemType::Integer: { it = engine->CreateInteger(data, size); break; }
+	case EStackItemType::ByteArray: { it = engine->CreateByteArray(data, size, false); break; }
+	case EStackItemType::Interop: { it = engine->CreateInterop(data, size); break; }
+	case EStackItemType::Array: { it = engine->CreateArray(); break; }
+	case EStackItemType::Struct: { it = engine->CreateStruct(); break; }
+	case EStackItemType::Map: { it = engine->CreateMap(); break; }
 	}
 
 	it->Claim();

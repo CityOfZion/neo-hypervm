@@ -11,11 +11,23 @@ private:
 
 public:
 
+	inline void ItemCounterClean()
+	{
+		_items = 0;
+	}
+
 	inline bool ItemCounterInc()
 	{
 		return _maxItems >= ++_items;
 	}
-	
+
+	inline bool ItemCounterInc(int32 count)
+	{
+		_items += count;
+
+		return _maxItems >= _items;
+	}
+
 	inline void ItemCounterDec()
 	{
 		--_items;
