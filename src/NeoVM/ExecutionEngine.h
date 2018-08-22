@@ -6,8 +6,9 @@
 #include "StackItems.h"
 #include "ExecutionContextStack.h"
 #include "EVMState.h"
+#include "IStackItemCounter.h"
 
-class ExecutionEngine
+class ExecutionEngine : public IStackItemCounter
 {
 private:
 

@@ -59,17 +59,17 @@ public:
 
 	// Constructor
 
-	ByteArrayStackItem(byte* data, int32 length, bool copyPointer);
+	ByteArrayStackItem(IStackItemCounter* counter, byte* data, int32 length, bool copyPointer);
 
 	// Destructor
 
 	inline ~ByteArrayStackItem()
 	{
-		if (this->_payload == NULL)
-			return;
-
-		delete[](this->_payload);
-		this->_payload = NULL;
+		if (this->_payload != NULL)
+		{
+			delete[](this->_payload);
+			this->_payload = NULL;
+		}
 	}
 
 	// Serialize

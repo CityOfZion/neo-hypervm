@@ -1,4 +1,6 @@
 #pragma once
+
+#include "IStackItemCounter.h"
 #include "IStackItem.h"
 #include <list>
 
@@ -41,8 +43,9 @@ public:
 
 	// Constructor
 
-	ArrayStackItem(bool isStruct);
-	ArrayStackItem(bool isStruct, int32 count);
+	ArrayStackItem(IStackItemCounter* counter);
+	ArrayStackItem(IStackItemCounter* counter, bool isStruct);
+	ArrayStackItem(IStackItemCounter* counter, bool isStruct, int32 count);
 
 	// Destructor
 

@@ -79,12 +79,12 @@ namespace NeoSharp.VM.Interop.Extensions
 
             if (data == null || data.Length == 0)
             {
-                return NeoVM.StackItem_Create((byte)item.Type, IntPtr.Zero, 0);
+                return NeoVM.StackItem_Create(item.NativeEngine.Handle, (byte)item.Type, IntPtr.Zero, 0);
             }
 
             fixed (byte* p = data)
             {
-                return NeoVM.StackItem_Create((byte)item.Type, (IntPtr)p, data.Length);
+                return NeoVM.StackItem_Create(item.NativeEngine.Handle, (byte)item.Type, (IntPtr)p, data.Length);
             }
         }
     }

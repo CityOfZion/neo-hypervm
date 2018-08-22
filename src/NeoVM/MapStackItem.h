@@ -21,7 +21,7 @@ public:
 	inline int32 ReadByteArraySize() { return -1; }
 
 	void Clear();
-	
+
 	inline bool Equals(IStackItem* it)
 	{
 		return (it == this);
@@ -33,7 +33,7 @@ public:
 	{
 		return static_cast<int>(this->_dictionary.size());
 	}
-	
+
 	bool Set(IStackItem* key, IStackItem* value);
 	IStackItem* Get(IStackItem* key);
 	bool Remove(IStackItem* &key);
@@ -44,9 +44,15 @@ public:
 
 	// Constructor & Destructor
 
-	inline MapStackItem() :IStackItem(EStackItemType::Map), _dictionary(std::map<IStackItem*, IStackItem*>()) { }
+	inline MapStackItem(IStackItemCounter* counter) :
+		IStackItem(counter, EStackItemType::Map),
+		_dictionary(std::map<IStackItem*, IStackItem*>())
+	{ }
 
-	inline ~MapStackItem() { this->Clear(); }
+	inline ~MapStackItem()
+	{
+		this->Clear();
+	}
 
 	// Serialize
 

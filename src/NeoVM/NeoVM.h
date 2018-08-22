@@ -64,7 +64,7 @@ extern "C"
 
 	// StackItem
 
-	DllExport IStackItem* __stdcall StackItem_Create(EStackItemType type, byte* data, int32 size);
+	DllExport IStackItem* __stdcall StackItem_Create(ExecutionEngine* engine, EStackItemType type, byte* data, int32 size);
 	DllExport EStackItemType __stdcall StackItem_SerializeInfo(IStackItem* item, int32 &size);
 	DllExport int32 __stdcall StackItem_Serialize(IStackItem* item, byte* output, int32 length);
 	DllExport void __stdcall StackItem_Free(IStackItem* &item);

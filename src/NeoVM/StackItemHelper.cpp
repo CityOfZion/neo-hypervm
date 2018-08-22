@@ -1,8 +1,6 @@
-#include "IStackItem.h"
+#include "StackItemHelper.h"
 
-// Methods
-
-void IStackItem::Free(IStackItem* &item)
+void StackItemHelper::Free(IStackItem* &item)
 {
 	if (item != NULL && item->IsUnClaimed())
 	{
@@ -14,7 +12,7 @@ void IStackItem::Free(IStackItem* &item)
 	}
 }
 
-void IStackItem::Free(IStackItem* &itemA, IStackItem* &itemB, IStackItem* &itemC)
+void StackItemHelper::Free(IStackItem* &itemA, IStackItem* &itemB, IStackItem* &itemC)
 {
 	if (itemA != NULL && itemA == itemB && itemB == itemC)
 	{
@@ -67,7 +65,7 @@ void IStackItem::Free(IStackItem* &itemA, IStackItem* &itemB, IStackItem* &itemC
 	if (itemC != NULL) Free(itemC);
 }
 
-void IStackItem::Free(IStackItem* &itemA, IStackItem* &itemB)
+void StackItemHelper::Free(IStackItem* &itemA, IStackItem* &itemB)
 {
 	if (itemA != NULL && itemA->IsUnClaimed())
 	{
@@ -92,7 +90,7 @@ void IStackItem::Free(IStackItem* &itemA, IStackItem* &itemB)
 	}
 }
 
-void IStackItem::UnclaimAndFree(IStackItem* &item)
+void StackItemHelper::UnclaimAndFree(IStackItem* &item)
 {
 	if (item != NULL && item->UnClaim())
 	{

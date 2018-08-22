@@ -46,13 +46,16 @@ public:
 
 	// Constructor
 
-	inline IntegerStackItem(byte* data, int32 size) :IStackItem(EStackItemType::Integer),
-		_value(data, size) {}
+	inline IntegerStackItem(IStackItemCounter* counter, byte* data, int32 size) :
+		IStackItem(counter, EStackItemType::Integer),
+		_value(data, size) { }
 
-	inline IntegerStackItem(int32 value) : IStackItem(EStackItemType::Integer),
-		_value(value) {}
+	inline IntegerStackItem(IStackItemCounter* counter, int32 value) :
+		IStackItem(counter, EStackItemType::Integer),
+		_value(value) { }
 
-	inline IntegerStackItem(BigInteger* &value) : IStackItem(EStackItemType::Integer),
+	inline IntegerStackItem(IStackItemCounter* counter, BigInteger* &value) :
+		IStackItem(counter, EStackItemType::Integer),
 		_value(value)
 	{
 		// TODO: I don't like this, should be used the same pointer

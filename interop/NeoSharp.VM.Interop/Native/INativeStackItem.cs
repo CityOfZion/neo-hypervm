@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using NeoSharp.VM.Interop.Types;
 using Newtonsoft.Json;
 
 namespace NeoSharp.VM.Interop.Native
@@ -11,6 +12,16 @@ namespace NeoSharp.VM.Interop.Native
         /// </summary>
         [JsonIgnore]
         IntPtr Handle
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+        }
+
+        /// <summary>
+        /// Native engine
+        /// </summary>
+        [JsonIgnore]
+        ExecutionEngine NativeEngine
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get;

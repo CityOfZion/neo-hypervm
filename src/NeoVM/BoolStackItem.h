@@ -38,7 +38,13 @@ public:
 
 	// Constructor & Destructor
 
-	inline BoolStackItem(bool value) :IStackItem(EStackItemType::Bool), _value(value) { }
+	inline BoolStackItem(IStackItemCounter* counter, bool value) :
+		IStackItem(counter, EStackItemType::Bool), 
+		_value(value) 
+	{
+
+	}
+
 	inline ~BoolStackItem() { }
 
 	// Serialize
