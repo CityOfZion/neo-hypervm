@@ -89,7 +89,7 @@ namespace NeoSharp.VM.Interop.Types
         /// <summary>
         /// Consumed Gas
         /// </summary>
-        public override ulong ConsumedGas
+        public override uint ConsumedGas
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return NeoVM.ExecutionEngine_GetConsumedGas(Handle); }
@@ -284,7 +284,7 @@ namespace NeoSharp.VM.Interop.Types
         /// Execute until
         /// </summary>
         /// <param name="gas">Gas</param>
-        public override bool Execute(ulong gas = ulong.MaxValue)
+        public override bool Execute(uint gas = uint.MaxValue)
         {
             // HALT=TRUE
 

@@ -74,7 +74,7 @@ namespace NeoSharp.VM.Interop
         internal delegate int delInt_Handle(IntPtr pointer);
         internal delegate void delVoid_Handle(IntPtr pointer);
         internal delegate byte delByte_Handle(IntPtr pointer);
-        internal delegate ulong delUInt64_Handle(IntPtr pointer);
+        internal delegate uint delUInt32_Handle(IntPtr pointer);
         internal delegate IntPtr delHandle_Handle(IntPtr pointer);
         internal delegate void delVoid_RefHandle(ref IntPtr pointer);
 
@@ -125,12 +125,12 @@ namespace NeoSharp.VM.Interop
         internal static delVoid_RefHandle ExecutionEngine_Free;
         internal static delInt_HandleHandleIntInt ExecutionEngine_LoadScript;
         internal static delByte_HandleIntInt ExecutionEngine_LoadCachedScript;
-        internal static delByte_HandleUInt64 ExecutionEngine_Execute;
+        internal static delByte_HandleUInt32 ExecutionEngine_Execute;
         internal static delVoid_Handle ExecutionEngine_StepInto;
         internal static delVoid_Handle ExecutionEngine_StepOver;
         internal static delVoid_Handle ExecutionEngine_StepOut;
         internal static delByte_Handle ExecutionEngine_GetState;
-        internal static delUInt64_Handle ExecutionEngine_GetConsumedGas;
+        internal static delUInt32_Handle ExecutionEngine_GetConsumedGas;
         internal static delVoid_HandleUInt ExecutionEngine_Clean;
         internal static delByte_HandleUInt32 ExecutionEngine_IncreaseGas;
         internal static delVoid_HandleOnStepIntoCallback ExecutionEngine_AddLog;
