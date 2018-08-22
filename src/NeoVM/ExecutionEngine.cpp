@@ -14,7 +14,7 @@ void ExecutionEngine::Clean(uint32 iteration)
 	this->_iteration = iteration;
 	this->_state = EVMState::NONE;
 	this->_consumedGas = 0;
-	this->_maxGas = 0xFFFFFFFFFFFFFFFF;
+	this->_maxGas = 0xFFFFFFFF;
 
 	this->InvocationStack.Clear();
 	this->ResultStack.Clear();
@@ -28,7 +28,7 @@ ExecutionEngine::ExecutionEngine
 ) :
 	_iteration(0),
 	_consumedGas(0),
-	_maxGas(0xFFFFFFFFFFFFFFFF),
+	_maxGas(0xFFFFFFFF),
 	_state(EVMState::NONE),
 	Log(NULL),
 
