@@ -79,7 +79,7 @@ int32 ExecutionEngine::LoadScript(byte* script, int32 scriptLength, int32 rvcoun
 	return index;
 }
 
-EVMState ExecutionEngine::Execute(uint64 gas)
+EVMState ExecutionEngine::Execute(uint32 gas)
 {
 	this->_maxGas = gas;
 
@@ -2988,7 +2988,9 @@ ExecuteOpCode:
 			return;
 		}
 
+		IStackItem* ret = NULL;
 		IStackItem* item = context->EvaluationStack.Pop();
+
 		switch (item->Type)
 		{
 		case EStackItemType::Array:
@@ -2999,43 +3001,39 @@ ExecuteOpCode:
 			int32 index = 0;
 			if (!key->GetInt32(index) || index < 0 || index >= arr->Count())
 			{
-				IStackItem::Free(key, item);
-
-				this->SetFault();
-				return;
+				break;
 			}
 
-			IStackItem* ret = arr->Get(index);
-			context->EvaluationStack.Push(ret);
-			IStackItem::Free(key, item);
-			return;
+			ret = arr->Get(index);
+			break;
 		}
 		case EStackItemType::Map:
 		{
 			MapStackItem* map = (MapStackItem*)item;
-
-			IStackItem* val = map->Get(key);
-
-			IStackItem::Free(key, item);
-
-			if (val != NULL)
-			{
-				context->EvaluationStack.Push(val);
-			}
-			else
-			{
-				this->SetFault();
-			}
-			return;
+			ret = map->Get(key);
+			break;
 		}
-		default:
+		default: break;
+		}
+
+		if (ret != NULL) 
+		{
+			if (ret->Type == EStackItemType::Struct) 
+			{
+				IStackItem* clone = ((ArrayStackItem*)ret)->Clone();
+				IStackItem::Free(ret);
+				ret= clone;
+			}
+
+			context->EvaluationStack.Push(ret);
+			IStackItem::Free(key, item);
+		}
+		else 
 		{
 			IStackItem::Free(key, item);
-
 			this->SetFault();
-			return;
 		}
-		}
+
 		return;
 	}
 	case EVMOpCode::SETITEM:

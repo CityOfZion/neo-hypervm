@@ -118,7 +118,7 @@ byte ExecutionEngine_IncreaseGas(ExecutionEngine* engine, uint32 gas)
 	return engine->AddGasCost(gas) ? 0x01 : 0x00;
 }
 
-byte ExecutionEngine_Execute(ExecutionEngine* engine, uint64 gas)
+byte ExecutionEngine_Execute(ExecutionEngine* engine, uint32 gas)
 {
 	if (engine == NULL) return 0x00;
 
@@ -153,7 +153,7 @@ byte ExecutionEngine_GetState(ExecutionEngine* engine)
 	return engine->GetState();
 }
 
-uint64 ExecutionEngine_GetConsumedGas(ExecutionEngine* engine)
+uint32 ExecutionEngine_GetConsumedGas(ExecutionEngine* engine)
 {
 	if (engine == NULL) return 0;
 

@@ -14,8 +14,8 @@ private:
 	// Used for MessageCallback
 
 	uint32 _iteration;
-	uint64 _consumedGas;
-	uint64 _maxGas;
+	uint32 _consumedGas;
+	uint32 _maxGas;
 
 	// Save the state of the execution
 
@@ -99,7 +99,7 @@ public:
 		return this->InvocationStack.Peek(-1);
 	}
 
-	inline uint64 GetConsumedGas()
+	inline uint32 GetConsumedGas()
 	{
 		return this->_consumedGas;
 	}
@@ -119,7 +119,7 @@ public:
 	void StepOut();
 	void StepOver();
 
-	EVMState Execute(uint64 gas);
+	EVMState Execute(uint32 gas);
 
 	// Constructor
 
