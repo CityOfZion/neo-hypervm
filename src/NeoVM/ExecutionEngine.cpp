@@ -44,7 +44,7 @@ ExecutionEngine::ExecutionEngine
 
 ExecutionContext* ExecutionEngine::LoadScript(ExecutionScript* script, int32 rvcount)
 {
-	ExecutionContext* context = new ExecutionContext(script, 0, rvcount);
+	auto context = new ExecutionContext(script, 0, rvcount);
 	this->InvocationStack.Push(context);
 	return context;
 }
@@ -63,7 +63,7 @@ bool ExecutionEngine::LoadScript(byte scriptIndex, int32 rvcount)
 
 	if (sc == NULL) return false;
 
-	ExecutionContext* context = new ExecutionContext(sc, 0, rvcount);
+	auto context = new ExecutionContext(sc, 0, rvcount);
 	this->InvocationStack.Push(context);
 	return true;
 }
@@ -72,12 +72,12 @@ int32 ExecutionEngine::LoadScript(byte* script, int32 scriptLength, int32 rvcoun
 {
 	int32 index = Scripts.size();
 
-	ExecutionScript* sc = new ExecutionScript(script, scriptLength);
+	auto sc = new ExecutionScript(script, scriptLength);
 	sc->Claim();
 
 	Scripts.push_back(sc);
 
-	ExecutionContext* context = new ExecutionContext(sc, 0, rvcount);
+	auto context = new ExecutionContext(sc, 0, rvcount);
 	this->InvocationStack.Push(context);
 	return index;
 }
@@ -526,8 +526,8 @@ ExecuteOpCode:
 			return;
 		}
 
-		auto context_new = this->InvocationStack.Peek(0);
-		context->EvaluationStack.SendTo(&context_new->EvaluationStack, pcount);
+		auto contextnew = this->InvocationStack.Peek(0);
+		context->EvaluationStack.SendTo(&contextnew->EvaluationStack, pcount);
 
 		if (opcode == EVMOpCode::CALL_ET || opcode == EVMOpCode::CALL_EDT)
 		{
