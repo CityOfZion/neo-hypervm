@@ -39,8 +39,11 @@
     <Filter Include="Header Files\Interfaces">
       <UniqueIdentifier>{1e2ed381-3b6c-430a-9ce9-62958a86d546}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Interfaces">
-      <UniqueIdentifier>{4ee6fc87-9061-44f3-b1f3-c479acef0cd3}</UniqueIdentifier>
+    <Filter Include="Header Files\Helpers">
+      <UniqueIdentifier>{8dad1684-f545-41e0-a6f2-8ef51c85fbed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Helpers">
+      <UniqueIdentifier>{07945358-4fc3-4b28-a8b3-608fa246c78a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -113,6 +116,12 @@
     <ClInclude Include="Stack.h">
       <Filter>Header Files\Types\Collections</Filter>
     </ClInclude>
+    <ClInclude Include="StackItemHelper.h">
+      <Filter>Header Files\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="IStackItemCounter.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="NeoVM.cpp">
@@ -145,9 +154,6 @@
     <ClCompile Include="BigInteger.cpp">
       <Filter>Source Files\Types</Filter>
     </ClCompile>
-    <ClCompile Include="IStackItem.cpp">
-      <Filter>Source Files\Interfaces</Filter>
-    </ClCompile>
     <ClCompile Include="BigIntegerBuilder.cpp">
       <Filter>Source Files\Types</Filter>
     </ClCompile>
@@ -159,6 +165,9 @@
     </ClCompile>
     <ClCompile Include="Stack.cpp">
       <Filter>Source Files\Types\Collections</Filter>
+    </ClCompile>
+    <ClCompile Include="StackItemHelper.cpp">
+      <Filter>Source Files\Helpers</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

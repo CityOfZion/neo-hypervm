@@ -2,6 +2,7 @@
 
 #include "IStackItem.h"
 #include "Stack.h"
+#include "StackItemHelper.h"
 
 class StackItems
 {
@@ -42,7 +43,7 @@ public:
 	inline void Drop()
 	{
 		IStackItem* it = this->_stack.Pop();
-		IStackItem::UnclaimAndFree(it);
+		StackItemHelper::UnclaimAndFree(it);
 	}
 
 	inline IStackItem* Pop()
@@ -58,7 +59,7 @@ public:
 		for (int32 x = 0, count = this->_stack.Count(); x < count; x++)
 		{
 			IStackItem* ptr = this->_stack.Peek(x);
-			IStackItem::UnclaimAndFree(ptr);
+			StackItemHelper::UnclaimAndFree(ptr);
 		}
 
 		this->_stack.Clear();

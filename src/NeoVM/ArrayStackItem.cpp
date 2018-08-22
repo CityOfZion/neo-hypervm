@@ -1,21 +1,32 @@
 #include "ArrayStackItem.h"
 #include "BoolStackItem.h"
+#include "StackItemHelper.h"
 
-ArrayStackItem::ArrayStackItem(bool isStruct) :
-	IStackItem((isStruct ? EStackItemType::Struct : EStackItemType::Array)), _list(std::list<IStackItem*>())
+ArrayStackItem::ArrayStackItem(IStackItemCounter* counter) :
+	IStackItem(counter, EStackItemType::Array),
+	_list(std::list<IStackItem*>())
 { }
 
-ArrayStackItem::ArrayStackItem(bool isStruct, int32 count) :
-	IStackItem((isStruct ? EStackItemType::Struct : EStackItemType::Array)), _list(std::list<IStackItem*>())
+ArrayStackItem::ArrayStackItem(IStackItemCounter* counter, bool isStruct) :
+	IStackItem(counter, (isStruct ? EStackItemType::Struct : EStackItemType::Array)),
+	_list(std::list<IStackItem*>())
+{ }
+
+ArrayStackItem::ArrayStackItem(IStackItemCounter* counter, bool isStruct, int32 count) :
+	IStackItem(counter, (isStruct ? EStackItemType::Struct : EStackItemType::Array)),
+	_list(std::list<IStackItem*>())
 {
 	// Init size
+
 	for (int32 i = 0; i < count; ++i)
-		this->Add(new BoolStackItem(false));
+	{
+		this->Add(new BoolStackItem(counter, false));
+	}
 }
 
 IStackItem* ArrayStackItem::Clone()
 {
-	ArrayStackItem* ret = new ArrayStackItem(this->Type == EStackItemType::Struct);
+	ArrayStackItem* ret = new ArrayStackItem(_counter, this->Type == EStackItemType::Struct);
 
 	for (int32 x = 0, m = this->Count(); x < m; ++x)
 	{
@@ -102,7 +113,7 @@ void ArrayStackItem::Clear()
 	for (std::list<IStackItem*>::iterator it = this->_list.begin(); it != this->_list.end(); ++it)
 	{
 		IStackItem* ptr = (IStackItem*)*it;
-		IStackItem::UnclaimAndFree(ptr);
+		StackItemHelper::UnclaimAndFree(ptr);
 	}
 
 	this->_list.clear();
@@ -140,7 +151,7 @@ void ArrayStackItem::RemoveAt(int32 index)
 	{
 		IStackItem* it = this->_list.front();
 		this->_list.pop_front();
-		IStackItem::UnclaimAndFree(it);
+		StackItemHelper::UnclaimAndFree(it);
 	}
 	else
 	{
@@ -149,7 +160,7 @@ void ArrayStackItem::RemoveAt(int32 index)
 
 		IStackItem* s = (IStackItem*)*it;
 		this->_list.erase(it);
-		IStackItem::UnclaimAndFree(s);
+		StackItemHelper::UnclaimAndFree(s);
 	}
 }
 
@@ -162,7 +173,7 @@ void ArrayStackItem::Set(int32 index, IStackItem* item)
 	{
 		IStackItem* it = this->_list.front();
 		this->_list.pop_front();
-		IStackItem::UnclaimAndFree(it);
+		StackItemHelper::UnclaimAndFree(it);
 		this->_list.push_front(item);
 	}
 	else
@@ -171,7 +182,7 @@ void ArrayStackItem::Set(int32 index, IStackItem* item)
 		std::advance(it, index);
 
 		IStackItem* s = (IStackItem*)*it;
-		IStackItem::UnclaimAndFree(s);
+		StackItemHelper::UnclaimAndFree(s);
 
 		*it = item;
 	}

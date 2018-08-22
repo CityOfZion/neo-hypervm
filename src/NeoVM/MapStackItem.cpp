@@ -1,4 +1,5 @@
 #include "MapStackItem.h"
+#include "StackItemHelper.h"
 
 bool MapStackItem::Remove(IStackItem* &key)
 {
@@ -22,7 +23,7 @@ bool MapStackItem::Remove(IStackItem* &key)
 		// Free
 
 		bool equal = ckey == key;
-		IStackItem::Free(ckey, value);
+		StackItemHelper::Free(ckey, value);
 		if (equal) key = ckey;
 
 		return true;
@@ -38,8 +39,8 @@ void MapStackItem::Clear()
 		IStackItem* key = it->first;
 		IStackItem* value = it->second;
 
-		IStackItem::UnclaimAndFree(key);
-		IStackItem::UnclaimAndFree(value);
+		StackItemHelper::UnclaimAndFree(key);
+		StackItemHelper::UnclaimAndFree(value);
 	}
 
 	this->_dictionary.clear();
@@ -123,7 +124,7 @@ bool MapStackItem::Set(IStackItem* key, IStackItem* value)
 		IStackItem* v = it->second;
 		if (v == value) return false;
 
-		IStackItem::UnclaimAndFree(v);
+		StackItemHelper::UnclaimAndFree(v);
 
 		value->Claim();
 		it->second = value;

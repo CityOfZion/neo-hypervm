@@ -23,6 +23,17 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         #region Public fields
 
         /// <summary>
+        /// Native engine
+        /// </summary>
+        public ExecutionEngine NativeEngine
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private set;
+        }
+
+        /// <summary>
         /// Native Handle
         /// </summary>
         [JsonIgnore]
@@ -60,6 +71,8 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <param name="data">Data</param>
         internal InteropStackItem(ExecutionEngine engine, object data) : base(engine, data)
         {
+            NativeEngine = engine;
+
             // Search
 
             _objKey = engine.InteropCache.IndexOf(data);
@@ -86,6 +99,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         internal InteropStackItem(ExecutionEngine engine, IntPtr handle, int objKey) :
             base(engine, engine.InteropCache[objKey])
         {
+            NativeEngine = engine;
             _objKey = objKey;
             _handle = handle;
         }

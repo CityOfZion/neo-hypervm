@@ -20,6 +20,17 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         #region Public fields
 
         /// <summary>
+        /// Native engine
+        /// </summary>
+        public ExecutionEngine NativeEngine
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private set;
+        }
+
+        /// <summary>
         /// Native Handle
         /// </summary>
         [JsonIgnore]
@@ -57,6 +68,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <param name="data">Data</param>
         internal ByteArrayStackItem(ExecutionEngine engine, byte[] data) : base(engine, data)
         {
+            NativeEngine = engine;
             _handle = this.CreateNativeItem();
         }
 
@@ -68,6 +80,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <param name="value">Raw value</param>
         internal ByteArrayStackItem(ExecutionEngine engine, IntPtr handle, byte[] value) : base(engine, value)
         {
+            NativeEngine = engine;
             _handle = handle;
         }
 

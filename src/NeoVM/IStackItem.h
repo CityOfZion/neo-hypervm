@@ -1,11 +1,16 @@
 #pragma once
 
+#include "IStackItemCounter.h"
 #include "EStackItemType.h"
 #include "BigInteger.h"
 #include "IClaimable.h"
 
 class IStackItem : public IClaimable
 {
+protected:
+
+	IStackItemCounter* _counter;
+
 public:
 
 	const EStackItemType Type;
@@ -21,19 +26,28 @@ public:
 
 	// Constructor
 
-	inline IStackItem(EStackItemType type) : IClaimable(), Type(type) { }
+	inline IStackItem(IStackItemCounter* counter, EStackItemType type) :
+		IClaimable(),
+		_counter(counter),
+		Type(type)
+	{
+		// _counter->ItemCounterInc();
+	}
 
 	// Destructor
 
-	virtual ~IStackItem() { };
+	virtual ~IStackItem()
+	{
+		if (_counter != NULL) 
+		{
+			// TODO: Fail when dispose counter before this
 
-	// Claims
+			// _counter->ItemCounterDec();
+		}
 
-	static void Free(IStackItem* &item);
-	static void Free(IStackItem* &itemA, IStackItem* &itemB);
-	static void Free(IStackItem* &itemA, IStackItem* &itemB, IStackItem* &itemC);
-	static void UnclaimAndFree(IStackItem* &item);
-	
+		_counter = NULL;
+	};
+
 	// Serialize
 
 	virtual int32 Serialize(byte* data, int32 length) = 0;

@@ -165,9 +165,11 @@
     <ClInclude Include="BoolStackItem.h" />
     <ClInclude Include="ByteArrayStackItem.h" />
     <ClInclude Include="IClaimable.h" />
+    <ClInclude Include="IStackItemCounter.h" />
     <ClInclude Include="Limits.h" />
     <ClInclude Include="ExecutionScript.h" />
     <ClInclude Include="Stack.h" />
+    <ClInclude Include="StackItemHelper.h" />
     <ClInclude Include="Types.h" />
     <ClInclude Include="Crypto.h" />
     <ClInclude Include="ExecutionContext.h" />
@@ -194,11 +196,11 @@
     <ClCompile Include="ExecutionEngine.cpp" />
     <ClCompile Include="IntegerStackItem.cpp" />
     <ClCompile Include="InteropStackItem.cpp" />
-    <ClCompile Include="IStackItem.cpp" />
     <ClCompile Include="MapStackItem.cpp" />
     <ClCompile Include="NeoVM.cpp" />
     <ClCompile Include="ExecutionScript.cpp" />
     <ClCompile Include="Stack.cpp" />
+    <ClCompile Include="StackItemHelper.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -27,6 +27,15 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         #region Public fields
 
         /// <summary>
+        /// Native engine
+        /// </summary>
+        public ExecutionEngine NativeEngine
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return Engine; }
+        }
+
+        /// <summary>
         /// Native Handle
         /// </summary>
         [JsonIgnore]

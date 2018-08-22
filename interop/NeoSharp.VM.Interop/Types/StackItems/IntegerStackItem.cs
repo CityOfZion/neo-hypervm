@@ -21,6 +21,17 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         #region Public fields
 
         /// <summary>
+        /// Native engine
+        /// </summary>
+        public ExecutionEngine NativeEngine
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private set;
+        }
+
+        /// <summary>
         /// Native Handle
         /// </summary>
         [JsonIgnore]
@@ -58,6 +69,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <param name="data">Data</param>
         internal IntegerStackItem(ExecutionEngine engine, int data) : base(engine, new BigInteger(data))
         {
+            NativeEngine = engine;
             _handle = this.CreateNativeItem();
         }
 
@@ -68,6 +80,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <param name="data">Data</param>
         internal IntegerStackItem(ExecutionEngine engine, long data) : base(engine, new BigInteger(data))
         {
+            NativeEngine = engine;
             _handle = this.CreateNativeItem();
         }
 
@@ -78,6 +91,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <param name="data">Data</param>
         internal IntegerStackItem(ExecutionEngine engine, byte[] data) : base(engine, new BigInteger(data))
         {
+            NativeEngine = engine;
             _handle = this.CreateNativeItem();
         }
 
@@ -88,6 +102,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <param name="data">Data</param>
         internal IntegerStackItem(ExecutionEngine engine, BigInteger data) : base(engine, data)
         {
+            NativeEngine = engine;
             _handle = this.CreateNativeItem();
         }
 
@@ -100,6 +115,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         internal IntegerStackItem(ExecutionEngine engine, IntPtr handle, byte[] value) :
             base(engine, new BigInteger(value))
         {
+            NativeEngine = engine;
             _handle = handle;
         }
 

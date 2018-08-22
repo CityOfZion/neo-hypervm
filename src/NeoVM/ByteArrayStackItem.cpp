@@ -1,7 +1,9 @@
 #include "ByteArrayStackItem.h"
 #include <string.h>
 
-ByteArrayStackItem::ByteArrayStackItem(byte* data, int32 size, bool copyPointer) :IStackItem(EStackItemType::ByteArray), _payloadLength(size)
+ByteArrayStackItem::ByteArrayStackItem(IStackItemCounter* counter, byte* data, int32 size, bool copyPointer) :
+	IStackItem(counter, EStackItemType::ByteArray),
+	_payloadLength(size)
 {
 	if (size > 0 && data != NULL)
 	{

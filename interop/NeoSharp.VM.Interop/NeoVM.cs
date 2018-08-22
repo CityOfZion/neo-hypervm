@@ -92,7 +92,7 @@ namespace NeoSharp.VM.Interop
         internal delegate byte delByte_HandleHandle(IntPtr pointer1, IntPtr pointer2);
         internal delegate IntPtr delHandle_HandleHandle(IntPtr pointer1, IntPtr pointer2);
         internal delegate byte delByte_HandleIntInt(IntPtr handle, int index, int index2);
-        internal delegate IntPtr delHandle_ByteHandleInt(byte type, IntPtr data, int size);
+        internal delegate IntPtr delHandle_HandleByteHandleInt(IntPtr handle, byte type, IntPtr data, int size);
         internal delegate void delVoid_HandleIntByte(IntPtr handle, int index, byte dispose);
         internal delegate int delInt_HandleHandleInt(IntPtr pointer1, IntPtr pointer2, int value);
         internal delegate void delVoid_HandleHandleInt(IntPtr pointer1, IntPtr pointer2, int value);
@@ -145,7 +145,7 @@ namespace NeoSharp.VM.Interop
         internal static delInt_HandleInt ExecutionContextStack_Drop;
         internal static delHandle_HandleInt ExecutionContextStack_Peek;
 
-        internal static delHandle_ByteHandleInt StackItem_Create;
+        internal static delHandle_HandleByteHandleInt StackItem_Create;
         internal static delByte_HandleRefInt StackItem_SerializeInfo;
         internal static delInt_HandleHandleInt StackItem_Serialize;
         internal static delVoid_RefHandle StackItem_Free;

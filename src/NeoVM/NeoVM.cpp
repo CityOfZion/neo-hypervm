@@ -232,13 +232,18 @@ int32 ExecutionContextStack_Count(ExecutionContextStack* stack)
 
 void StackItem_Free(IStackItem*& item)
 {
-	IStackItem::UnclaimAndFree(item);
+	StackItemHelper::UnclaimAndFree(item);
 	item = NULL;
 }
 
-IStackItem* StackItem_Create(EStackItemType type, byte* data, int32 size)
+IStackItem* StackItem_Create(ExecutionEngine* engine, EStackItemType type, byte* data, int32 size)
 {
-	IStackItem* it = NULL;
+	if (engine == NULL) 
+	{
+		return NULL;
+	}
+
+	IStackItem* it;
 
 	switch (type)
 	{
@@ -251,8 +256,7 @@ IStackItem* StackItem_Create(EStackItemType type, byte* data, int32 size)
 
 		if (size == 1)
 		{
-			it = new BoolStackItem(data[0] != 0x00);
-			break;
+			it = new BoolStackItem(engine, data[0] != 0x00);
 		}
 		else
 		{
@@ -270,19 +274,19 @@ IStackItem* StackItem_Create(EStackItemType type, byte* data, int32 size)
 					break;
 				}
 
-			it = new BoolStackItem(ret);
-			break;
+			it = new BoolStackItem(engine, ret);
 		}
+		break;
 	}
-	case EStackItemType::Integer: { it = new IntegerStackItem(data, size); break; }
-	case EStackItemType::ByteArray: { it = new ByteArrayStackItem(data, size, false); break; }
-	case EStackItemType::Interop: { it = new InteropStackItem(data, size); break; }
-	case EStackItemType::Array:
-	case EStackItemType::Struct: { it = new ArrayStackItem(type == EStackItemType::Struct); break; }
-	case EStackItemType::Map: { it = new MapStackItem(); break; }
+	case EStackItemType::Integer: { it = new IntegerStackItem(engine, data, size); break; }
+	case EStackItemType::ByteArray: { it = new ByteArrayStackItem(engine, data, size, false); break; }
+	case EStackItemType::Interop: { it = new InteropStackItem(engine, data, size); break; }
+	case EStackItemType::Array: { it = new ArrayStackItem(engine); break; }
+	case EStackItemType::Struct: { it = new ArrayStackItem(engine, true); break; }
+	case EStackItemType::Map: { it = new MapStackItem(engine); break; }
 	}
 
-	if (it != NULL) it->Claim();
+	it->Claim();
 	return it;
 }
 

@@ -31,8 +31,8 @@ public:
 
 	// Constructor
 
-	inline InteropStackItem(byte* data, int32 length)
-		:IStackItem(EStackItemType::Interop), _payloadLength(length)
+	inline InteropStackItem(IStackItemCounter* counter, byte* data, int32 length)
+		:IStackItem(counter, EStackItemType::Interop), _payloadLength(length)
 	{
 		this->_payload = new byte[length];
 
@@ -43,10 +43,11 @@ public:
 
 	inline ~InteropStackItem()
 	{
-		if (this->_payload == NULL) return;
-
-		delete[](this->_payload);
-		this->_payload = NULL;
+		if (this->_payload != NULL)
+		{
+			delete[](this->_payload);
+			this->_payload = NULL;
+		}
 	}
 
 	// Serialize
