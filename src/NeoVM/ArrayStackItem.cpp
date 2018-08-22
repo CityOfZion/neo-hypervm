@@ -12,18 +12,6 @@ ArrayStackItem::ArrayStackItem(IStackItemCounter* counter, bool isStruct) :
 	_list(std::list<IStackItem*>())
 { }
 
-ArrayStackItem::ArrayStackItem(IStackItemCounter* counter, bool isStruct, int32 count) :
-	IStackItem(counter, (isStruct ? EStackItemType::Struct : EStackItemType::Array)),
-	_list(std::list<IStackItem*>())
-{
-	// Init size
-
-	for (int32 i = 0; i < count; ++i)
-	{
-		this->Add(new BoolStackItem(counter, false));
-	}
-}
-
 IStackItem* ArrayStackItem::Clone()
 {
 	ArrayStackItem* ret = new ArrayStackItem(_counter, this->Type == EStackItemType::Struct);

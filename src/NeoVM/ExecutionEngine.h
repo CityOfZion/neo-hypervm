@@ -7,6 +7,12 @@
 #include "ExecutionContextStack.h"
 #include "EVMState.h"
 #include "IStackItemCounter.h"
+#include "MapStackItem.h"
+#include "ArrayStackItem.h"
+#include "BoolStackItem.h"
+#include "IntegerStackItem.h"
+#include "ByteArrayStackItem.h"
+#include "InteropStackItem.h"
 
 class ExecutionEngine : public IStackItemCounter
 {
@@ -121,6 +127,143 @@ public:
 	void StepOver();
 
 	EVMState Execute(uint32 gas);
+
+	// Creators
+
+	inline MapStackItem* CreateMap()
+	{
+		if (!this->ItemCounterInc())
+		{
+			this->_state = EVMState::FAULT;
+			return NULL;
+		}
+
+		return new MapStackItem(this);
+	}
+
+	inline IntegerStackItem* CreateInteger(int32 value)
+	{
+		if (!this->ItemCounterInc())
+		{
+			this->_state = EVMState::FAULT;
+			return NULL;
+		}
+
+		return new IntegerStackItem(this, value);
+	}
+
+	inline IntegerStackItem* CreateInteger(BigInteger *value)
+	{
+		if (!this->ItemCounterInc())
+		{
+			this->_state = EVMState::FAULT;
+			return NULL;
+		}
+
+		return new IntegerStackItem(this, value);
+	}
+
+	inline IntegerStackItem* CreateInteger(byte* data, int32 length)
+	{
+		if (!this->ItemCounterInc())
+		{
+			this->_state = EVMState::FAULT;
+			return NULL;
+		}
+
+		return new IntegerStackItem(this, data, length);
+	}
+
+	inline InteropStackItem* CreateInterop(byte* data, int32 length)
+	{
+		if (!this->ItemCounterInc())
+		{
+			this->_state = EVMState::FAULT;
+			return NULL;
+		}
+
+		return new InteropStackItem(this, data, length);
+	}
+
+	inline ByteArrayStackItem* CreateByteArray(byte* data, int32 length, bool copyPointer)
+	{
+		if (!this->ItemCounterInc())
+		{
+			this->_state = EVMState::FAULT;
+			return NULL;
+		}
+
+		return new ByteArrayStackItem(this, data, length, copyPointer);
+	}
+
+	inline BoolStackItem* CreateBool(bool value)
+	{
+		if (!this->ItemCounterInc())
+		{
+			this->_state = EVMState::FAULT;
+			return NULL;
+		}
+
+		return new BoolStackItem(this, value);
+	}
+
+	inline ArrayStackItem* CreateArray()
+	{
+		if (!this->ItemCounterInc())
+		{
+			this->_state = EVMState::FAULT;
+			return NULL;
+		}
+
+		return new ArrayStackItem(this);
+	}
+
+	inline ArrayStackItem* CreateStruct()
+	{
+		if (!this->ItemCounterInc())
+		{
+			this->_state = EVMState::FAULT;
+			return NULL;
+		}
+
+		return new ArrayStackItem(this, true);
+	}
+
+	inline ArrayStackItem* CreateArray(int32 count)
+	{
+		if (!this->ItemCounterInc(count + 1))
+		{
+			this->_state = EVMState::FAULT;
+			return NULL;
+		}
+
+		ArrayStackItem * ret = new ArrayStackItem(this, false);
+
+		for (int32 i = 0; i < count; ++i)
+		{
+			ret->Add(new BoolStackItem(this, false));
+		}
+
+		return ret;
+	}
+
+	inline ArrayStackItem* CreateStruct(int32 count)
+	{
+		if (!this->ItemCounterInc(count + 1))
+		{
+			this->_state = EVMState::FAULT;
+			return NULL;
+		}
+
+		ArrayStackItem * ret = new ArrayStackItem(this, true);
+
+		for (int32 i = 0; i < count; ++i)
+		{
+			ret->Add(new BoolStackItem(this, false));
+		}
+
+		return ret;
+	}
 
 	// Constructor
 
