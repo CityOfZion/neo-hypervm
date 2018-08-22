@@ -33,14 +33,7 @@ bool ArrayStackItem::Equals(IStackItem* it)
 {
 	if (it == this) return true;
 
-	// Array must be equal
-
-	if (this->Type == EStackItemType::Array)
-	{
-		return false;
-	}
-
-	// Different type
+	// Different type (Array must be equal pointer)
 
 	if (it->Type != EStackItemType::Struct)
 	{
@@ -50,7 +43,7 @@ bool ArrayStackItem::Equals(IStackItem* it)
 	// Different size
 
 	int32 c = this->Count();
-	ArrayStackItem* arr = (ArrayStackItem*)it;
+	auto arr = (ArrayStackItem*)it;
 
 	if (arr->Count() != c)
 	{
