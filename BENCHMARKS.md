@@ -34,7 +34,7 @@ Intel Core i7-6700HQ CPU 2.60GHz (Skylake), 1 CPU, 8 logical and 4 physical core
 |             NeoVM | PUSH0+DROP |        1000 | 272.53 us | 11.613 us | 32.756 us | 260.33 us | 234.83 us | 376.89 us |    2 |
 | ApplicationEngine | PUSH0+DROP |        1000 | 482.80 us |  9.946 us | 16.342 us | 475.53 us | 465.78 us | 532.22 us |    3 |
 
-*NeoVM and ApplicationEngine come form from NEO 3.0 binaries*
+*NeoVM and ApplicationEngine come form NEO 3.0 binaries*
 
 ### Other
 There is a `Makefile` in the root of the project. To build the `VM` source:
