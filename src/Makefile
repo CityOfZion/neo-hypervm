@@ -1,10 +1,10 @@
-TARGET_EXEC ?= NeoVM.so
+TARGET_EXEC ?= Neo.HyperVM.so
 
 ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 LIBS_DIR ?= $(ROOT_DIR)/../build/libs
 BUILD_DIR ?= ./bin
-SRC_DIRS ?= ./NeoVM
+SRC_DIRS ?= ./Neo.HyperVM
 
 SRCS := $(shell find $(SRC_DIRS) -name *.cpp -or -name *.c -or -name *.s)
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
