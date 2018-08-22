@@ -54,6 +54,9 @@ cmd /c mklink NeoVM.dll C:\neo-hypervm\src\NeoVM\x64\Debug\NeoVM.dll
 
 You can see the benchmarks [here](https://github.com/CityOfZion/neo-hypervm/blob/development/BENCHMARKS.md)
 
+### Other
+There is a `Makefile` in the root of the project. To build the `VM` source:
+
 ```
 make
 ```
