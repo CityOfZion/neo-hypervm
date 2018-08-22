@@ -30,6 +30,9 @@ Intel Core i7-6700HQ CPU 2.60GHz (Skylake), 1 CPU, 8 logical and 4 physical core
 |             NeoVM |     NOP |        1000 | 101.07 us | 1.2668 us | 1.1230 us |  99.89 us | 103.42 us | 100.79 us |    2 |
 | ApplicationEngine |     NOP |        1000 | 198.10 us | 3.7617 us | 3.6945 us | 191.56 us | 204.89 us | 198.66 us |    3 |
 | | | | | | | | | | |
+|           HyperVM | PUSH0+DROP |        1000 |  82.24 us |  1.615 us |  2.562 us |  82.15 us |  79.07 us |  88.77 us |    1 |
+|             NeoVM | PUSH0+DROP |        1000 | 272.53 us | 11.613 us | 32.756 us | 260.33 us | 234.83 us | 376.89 us |    2 |
+| ApplicationEngine | PUSH0+DROP |        1000 | 482.80 us |  9.946 us | 16.342 us | 475.53 us | 465.78 us | 532.22 us |    3 |
 
 *NeoVM and ApplicationEngine come form from NEO 3.0 binaries*
 
