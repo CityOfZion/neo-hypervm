@@ -1,6 +1,7 @@
 #include "ArrayStackItem.h"
 #include "BoolStackItem.h"
 #include "StackItemHelper.h"
+#include "Stack.h"
 
 ArrayStackItem::ArrayStackItem(IStackItemCounter* counter) :
 	IStackItem(counter, EStackItemType::Array),
@@ -16,14 +17,33 @@ IStackItem* ArrayStackItem::Clone()
 {
 	auto ret = new ArrayStackItem(_counter, this->Type == EStackItemType::Struct);
 
-	for (int32 x = 0, m = this->Count(); x < m; ++x)
-	{
-		auto i = this->Get(x);
+	Stack<IStackItem> queue;
 
-		if (i->Type == EStackItemType::Struct)
-			ret->Add(((ArrayStackItem*)i)->Clone());
-		else
-			ret->Add(i);
+	queue.Push(this);
+	queue.Push(ret);
+
+	while (queue.Count() > 0)
+	{
+		auto a = (ArrayStackItem*)queue.Pop();
+		auto b = (ArrayStackItem*)queue.Pop();
+
+		for (int32 x = 0, m = b->Count(); x < m; ++x)
+		{
+			auto sb = b->Get(x);
+
+			if (sb->Type == EStackItemType::Struct)
+			{
+				auto sa = new ArrayStackItem(_counter, true);
+				a->Add(sa);
+
+				queue.Insert(queue.Count(), sa);
+				queue.Insert(queue.Count(), sb);
+			}
+			else
+			{
+				a->Add(sb);
+			}
+		}
 	}
 
 	return ret;
