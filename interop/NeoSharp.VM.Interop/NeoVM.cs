@@ -28,7 +28,7 @@ namespace NeoSharp.VM.Interop
         /// <summary>
         /// Default library name
         /// </summary>
-        public const string DefaultLibraryName = "NeoVM";
+        public const string DefaultLibraryName = "Neo.HyperVM";
 
         /// <summary>
         /// Library path
