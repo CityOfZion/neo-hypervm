@@ -37,7 +37,11 @@ namespace NeoSharp.VM.Interop.Tests
             Console.WriteLine(g2);
 
             // **************************************************
-
+            if (!NeoVM.TryLoadLibrary("Neo.HyperVM", out string error))
+            {
+                Console.WriteLine("Library load error. {0}", error);
+                return;
+            }
             Console.WriteLine("Native Library Info");
             Console.WriteLine("  Path: " + NeoVM.LibraryPath);
             Console.WriteLine("  Version: " + NeoVM.LibraryVersion);

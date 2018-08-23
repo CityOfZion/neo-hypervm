@@ -242,7 +242,7 @@ namespace NeoSharp.VM.Interop
             }
 
             // Load library
-            LibraryPath = Path.Combine(AppContext.BaseDirectory, Core.Platform.ToString(),
+            LibraryPath = Path.Combine(AppContext.BaseDirectory, "native",
                 Core.Architecture.ToString(), libraryName + Core.LibraryExtension);
 
             // Check Environment path
