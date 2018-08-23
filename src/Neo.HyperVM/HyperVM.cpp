@@ -1,4 +1,4 @@
-#include "NeoVM.h"
+#include "HyperVM.h"
 #include "BoolStackItem.h"
 #include "IntegerStackItem.h"
 #include "ByteArrayStackItem.h"
