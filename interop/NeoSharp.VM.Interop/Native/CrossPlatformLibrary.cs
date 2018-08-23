@@ -9,7 +9,7 @@ namespace NeoSharp.VM.Interop.Interfaces
         /// <summary>
         /// Architecture
         /// </summary>
-        public readonly EArchitecture Architecture = IntPtr.Size == 8 ? EArchitecture.x64 : EArchitecture.x86;
+        public readonly EArchitecture Architecture = IntPtr.Size == 8 ? EArchitecture.amd64 : EArchitecture.i386;
 
         /// <summary>
         /// Platform
