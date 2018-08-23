@@ -23,7 +23,7 @@
 
 # Projects
 
-* NeoVM - C++ Native Virtual Machine
+* Neo.HyperVM - C++ Native Virtual Machine
 * NeoVM.Interop - Interoperability for C# calls
 * NeoVM.Interop.Tests - Unit Tests
 
@@ -45,9 +45,9 @@ mkdir x86
 mkdir x64
 
 cd x86
-cmd /c mklink NeoVM.dll C:\neo-hypervm\src\NeoVM\Win32\Debug\NeoVM.dll
+cmd /c mklink Neo.HyperVM.dll C:\neo-hypervm\src\Neo.HyperVM\Win32\Debug\Neo.HyperVM.dll
 cd ../x64
-cmd /c mklink NeoVM.dll C:\neo-hypervm\src\NeoVM\x64\Debug\NeoVM.dll
+cmd /c mklink Neo.HyperVM.dll C:\neo-hypervm\src\Neo.HyperVM\x64\Debug\NeoVM.dll
 ```
 
 ### Benchmarks
