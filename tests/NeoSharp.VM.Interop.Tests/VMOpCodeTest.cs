@@ -134,8 +134,7 @@ namespace NeoSharp.VM.Interop.Tests
         /// </summary>
         /// <param name="operand">Operand</param>
         /// <param name="check">Check</param>
-        protected void InternalTestBigInteger(EVMOpCode operand,
-            Func<BigIntegerPair, object> check)
+        protected void InternalTestBigInteger(EVMOpCode operand, Func<BigIntegerPair, object> check)
         {
             // Test without push
 
@@ -178,7 +177,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                     Assert.IsTrue(engine.Execute());
 
-                    using(var i = engine.ResultStack.Pop<BooleanStackItem>())
+                    using (var i = engine.ResultStack.Pop<BooleanStackItem>())
                     {
                         Assert.AreEqual(i.Value, false);
                     }
@@ -236,16 +235,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                         using (var it = engine.ResultStack.Pop())
                         {
-                            var val = it.GetRawObject();
-
-                            if (val is byte[] buf)
-                            {
-                                CollectionAssert.AreEqual((byte[])ret, buf);
-                            }
-                            else
-                            {
-                                Assert.AreEqual(ret, val);
-                            }
+                            CheckValue(it, ret);
                         }
 
                         // RET
