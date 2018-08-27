@@ -9,7 +9,7 @@ namespace NeoSharp.VM.Interop.Interfaces
         /// <summary>
         /// Architecture
         /// </summary>
-        public readonly EArchitecture Architecture = IntPtr.Size == 8 ? EArchitecture.x64 : EArchitecture.x86;
+        public readonly EArchitecture Architecture = IntPtr.Size == 8 ? EArchitecture.amd64 : EArchitecture.i386;
 
         /// <summary>
         /// Platform
@@ -73,7 +73,7 @@ namespace NeoSharp.VM.Interop.Interfaces
         public bool LoadLibrary(string fileName)
         {
             if (_nativeHandle != IntPtr.Zero)
-                throw (new NotSupportedException("Library is already loaded"));
+                throw new NotSupportedException("Library is already loaded");
 
             if (!InternalLoadLibrary(fileName, out IntPtr h))
             {
@@ -92,7 +92,7 @@ namespace NeoSharp.VM.Interop.Interfaces
         public bool FreeLibrary()
         {
             if (_nativeHandle == IntPtr.Zero)
-                throw (new NotSupportedException("Library not loaded"));
+                throw new NotSupportedException("Library not loaded");
 
             if (InternalFreeLibrary())
             {

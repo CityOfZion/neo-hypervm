@@ -5,11 +5,11 @@
         /// <summary>
         /// x86
         /// </summary>
-        x86 = 0,
+        i386 = 0,
 
         /// <summary>
         /// x64
         /// </summary>
-        x64 = 1
+        amd64 = 1
     }
 }

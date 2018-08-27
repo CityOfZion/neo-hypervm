@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NeoSharp.VM.Interop.Tests", "tests\NeoSharp.VM.Interop.Tests\NeoSharp.VM.Interop.Tests.csproj", "{D3A0AE0D-E4B6-4246-AA6B-D87967CC467D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NeoVM", "src\NeoVM\NeoVM.vcxproj", "{DEFBCE64-AD40-4A45-8A3C-415F9466EEA2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Neo.HyperVM", "src\Neo.HyperVM\Neo.HyperVM.vcxproj", "{DEFBCE64-AD40-4A45-8A3C-415F9466EEA2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{F7B78C35-3D43-481D-9217-66EAFE31625A}"
 EndProject

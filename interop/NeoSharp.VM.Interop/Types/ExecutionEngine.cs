@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using NeoSharp.VM.Interop.Types.Collections;
 using NeoSharp.VM.Interop.Types.StackItems;
@@ -10,35 +11,35 @@ namespace NeoSharp.VM.Interop.Types
     public unsafe class ExecutionEngine : IExecutionEngine
     {
         #region Private fields
-        
+
         // This delegates are required for native calls, 
         // otherwise is disposed and produce a memory error
 
-        private readonly NeoVM.OnStepIntoCallback _InternalOnStepInto;
+        private readonly NeoVM.OnStepIntoCallback _internalOnStepInto;
 
-        private readonly NeoVM.InvokeInteropCallback _InternalInvokeInterop;
-        private readonly NeoVM.LoadScriptCallback _InternalLoadScript;
-        private readonly NeoVM.GetMessageCallback _InternalGetMessage;
+        private readonly NeoVM.InvokeInteropCallback _internalInvokeInterop;
+        private readonly NeoVM.LoadScriptCallback _internalLoadScript;
+        private readonly NeoVM.GetMessageCallback _internalGetMessage;
 
         /// <summary>
         /// Native handle
         /// </summary>
-        private IntPtr Handle;
+        private IntPtr _handle;
 
         /// <summary>
         /// Last message
         /// </summary>
-        private byte[] LastMessage;
+        private byte[] _lastMessage;
 
         /// <summary>
         /// Result stack
         /// </summary>
-        private readonly IStackItemsStack _ResultStack;
+        private readonly IStackItemsStack _resultStack;
 
         /// <summary>
         /// Invocation stack
         /// </summary>
-        private readonly IStack<IExecutionContext> _InvocationStack;
+        private readonly IStack<IExecutionContext> _invocationStack;
 
         /// <summary>
         /// Interop Cache
@@ -50,29 +51,58 @@ namespace NeoSharp.VM.Interop.Types
         #region Public fields
 
         /// <summary>
+        /// Native handle
+        /// </summary>
+        public IntPtr Handle
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return _handle; }
+        }
+
+        /// <summary>
         /// Is Disposed
         /// </summary>
-        public override bool IsDisposed => Handle == IntPtr.Zero;
+        public override bool IsDisposed
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return _handle == IntPtr.Zero; }
+        }
 
         /// <summary>
         /// Invocation Stack
         /// </summary>
-        public override IStack<IExecutionContext> InvocationStack => _InvocationStack;
+        public override IStack<IExecutionContext> InvocationStack
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return _invocationStack; }
+        }
 
         /// <summary>
         /// Result Stack
         /// </summary>
-        public override IStackItemsStack ResultStack => _ResultStack;
+        public override IStackItemsStack ResultStack
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return _resultStack; }
+        }
 
         /// <summary>
         /// Virtual Machine State
         /// </summary>
-        public override EVMState State => (EVMState)NeoVM.ExecutionEngine_GetState(Handle);
+        public override EVMState State
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return (EVMState)NeoVM.ExecutionEngine_GetState(_handle); }
+        }
 
         /// <summary>
         /// Consumed Gas
         /// </summary>
-        public override ulong ConsumedGas => NeoVM.ExecutionEngine_GetConsumedGas(Handle);
+        public override uint ConsumedGas
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return NeoVM.ExecutionEngine_GetConsumedGas(_handle); }
+        }
 
         #endregion
 
@@ -84,27 +114,27 @@ namespace NeoSharp.VM.Interop.Types
         {
             InteropCache = new List<object>();
 
-            _InternalInvokeInterop = new NeoVM.InvokeInteropCallback(InternalInvokeInterop);
-            _InternalLoadScript = new NeoVM.LoadScriptCallback(InternalLoadScript);
-            _InternalGetMessage = new NeoVM.GetMessageCallback(InternalGetMessage);
+            _internalInvokeInterop = new NeoVM.InvokeInteropCallback(InternalInvokeInterop);
+            _internalLoadScript = new NeoVM.LoadScriptCallback(InternalLoadScript);
+            _internalGetMessage = new NeoVM.GetMessageCallback(InternalGetMessage);
 
-            Handle = NeoVM.ExecutionEngine_Create
+            _handle = NeoVM.ExecutionEngine_Create
                 (
-                _InternalInvokeInterop, _InternalLoadScript, _InternalGetMessage,
+                _internalInvokeInterop, _internalLoadScript, _internalGetMessage,
                 out IntPtr invHandle, out IntPtr resHandle
                 );
 
-            if (Handle == IntPtr.Zero) throw new ExternalException();
+            if (_handle == IntPtr.Zero) throw new ExternalException();
 
-            _InvocationStack = new ExecutionContextStack(this, invHandle);
-            _ResultStack = new StackItemStack(this, resHandle);
+            _invocationStack = new ExecutionContextStack(this, invHandle);
+            _resultStack = new StackItemStack(this, resHandle);
 
             if (Logger != null)
             {
                 if (Logger.Verbosity.HasFlag(ELogVerbosity.StepInto))
                 {
-                    _InternalOnStepInto = new NeoVM.OnStepIntoCallback(InternalOnStepInto);
-                    NeoVM.ExecutionEngine_AddLog(Handle, _InternalOnStepInto);
+                    _internalOnStepInto = new NeoVM.OnStepIntoCallback(InternalOnStepInto);
+                    NeoVM.ExecutionEngine_AddLog(_handle, _internalOnStepInto);
                 }
             }
         }
@@ -138,14 +168,14 @@ namespace NeoSharp.VM.Interop.Types
                 {
                     // Prevent dispose
 
-                    LastMessage = script;
+                    _lastMessage = script;
 
-                    fixed (byte* p = LastMessage)
+                    fixed (byte* p = _lastMessage)
                     {
                         output = (IntPtr)p;
                     }
 
-                    return LastMessage.Length;
+                    return _lastMessage.Length;
                 }
             }
 
@@ -176,7 +206,7 @@ namespace NeoSharp.VM.Interop.Types
 
             fixed (byte* p = script)
             {
-                NeoVM.ExecutionEngine_LoadScript(Handle, (IntPtr)p, script.Length, rvcount);
+                NeoVM.ExecutionEngine_LoadScript(_handle, (IntPtr)p, script.Length, rvcount);
             }
 
             return NeoVM.TRUE;
@@ -223,7 +253,7 @@ namespace NeoSharp.VM.Interop.Types
         {
             fixed (byte* p = script)
             {
-                return NeoVM.ExecutionEngine_LoadScript(Handle, (IntPtr)p, script.Length, -1);
+                return NeoVM.ExecutionEngine_LoadScript(_handle, (IntPtr)p, script.Length, -1);
             }
         }
 
@@ -234,7 +264,7 @@ namespace NeoSharp.VM.Interop.Types
         /// <returns>True if is loaded</returns>
         public override bool LoadScript(int scriptIndex)
         {
-            return NeoVM.ExecutionEngine_LoadCachedScript(Handle, scriptIndex, -1) == NeoVM.TRUE;
+            return NeoVM.ExecutionEngine_LoadCachedScript(_handle, scriptIndex, -1) == NeoVM.TRUE;
         }
 
         #endregion
@@ -242,33 +272,32 @@ namespace NeoSharp.VM.Interop.Types
         #region Execution
 
         /// <summary>
+        /// Increase gas
+        /// </summary>
+        /// <param name="gas">Gas</param>
+        public override bool IncreaseGas(uint gas)
+        {
+            return NeoVM.ExecutionEngine_IncreaseGas(_handle, gas) == 0x01;
+        }
+
+        /// <summary>
         /// Clean Execution engine state
         /// </summary>
         /// <param name="iteration">Iteration</param>
         public override void Clean(uint iteration = 0)
         {
-            NeoVM.ExecutionEngine_Clean(Handle, iteration);
-        }
-
-        /// <summary>
-        /// Execute
-        /// </summary>
-        public override bool Execute()
-        {
-            // HALT=TRUE
-
-            return NeoVM.ExecutionEngine_Execute(Handle) == NeoVM.TRUE;
+            NeoVM.ExecutionEngine_Clean(_handle, iteration);
         }
 
         /// <summary>
         /// Execute until
         /// </summary>
         /// <param name="gas">Gas</param>
-        public override bool ExecuteUntil(ulong gas)
+        public override bool Execute(uint gas = uint.MaxValue)
         {
             // HALT=TRUE
 
-            return NeoVM.ExecutionEngine_ExecuteUntil(Handle, gas) == NeoVM.TRUE;
+            return NeoVM.ExecutionEngine_Execute(_handle, gas) == NeoVM.TRUE;
         }
 
         /// <summary>
@@ -279,7 +308,7 @@ namespace NeoSharp.VM.Interop.Types
         {
             for (var x = 0; x < steps; x++)
             {
-                NeoVM.ExecutionEngine_StepInto(Handle);
+                NeoVM.ExecutionEngine_StepInto(_handle);
             }
         }
 
@@ -288,7 +317,7 @@ namespace NeoSharp.VM.Interop.Types
         /// </summary>
         public override void StepOut()
         {
-            NeoVM.ExecutionEngine_StepOut(Handle);
+            NeoVM.ExecutionEngine_StepOut(_handle);
         }
 
         /// <summary>
@@ -296,7 +325,7 @@ namespace NeoSharp.VM.Interop.Types
         /// </summary>
         public override void StepOver()
         {
-            NeoVM.ExecutionEngine_StepOver(Handle);
+            NeoVM.ExecutionEngine_StepOver(_handle);
         }
 
         #endregion
@@ -398,7 +427,7 @@ namespace NeoSharp.VM.Interop.Types
 
         protected override void Dispose(bool disposing)
         {
-            if (Handle == IntPtr.Zero) return;
+            if (_handle == IntPtr.Zero) return;
 
             if (disposing)
             {
@@ -417,10 +446,10 @@ namespace NeoSharp.VM.Interop.Types
 
             // free unmanaged resources (unmanaged objects) and override a finalizer below. set large fields to null.
 
-            _ResultStack.Dispose();
-            _InvocationStack.Dispose();
+            _resultStack.Dispose();
+            _invocationStack.Dispose();
 
-            NeoVM.ExecutionEngine_Free(ref Handle);
+            NeoVM.ExecutionEngine_Free(ref _handle);
         }
 
         #endregion

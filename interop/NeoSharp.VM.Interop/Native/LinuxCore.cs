@@ -30,9 +30,9 @@ namespace NeoSharp.VM.Interop.Native
         // https://stackoverflow.com/questions/13461989/p-invoke-to-dynamically-loaded-library-on-mono
         // http://dimitry-i.blogspot.com.es/2013/01/mononet-how-to-dynamically-load-native.html
 
-        const int RTLD_LAZY = 1;
+        // const int RTLD_LAZY = 1;
         const int RTLD_NOW = 2;
-        const int RTLD_GLOBAL = 8;
+        // const int RTLD_GLOBAL = 8;
 
         [DllImport(NativeLibrary)]
         private static extern IntPtr dlopen(string fileName, int flags);
@@ -63,8 +63,7 @@ namespace NeoSharp.VM.Interop.Native
 
             var res = dlsym(_nativeHandle, name);
 
-            if (res != IntPtr.Zero)
-                return res;
+            if (res != IntPtr.Zero) return res;
 
             var errPtr = dlerror();
 
@@ -82,13 +81,12 @@ namespace NeoSharp.VM.Interop.Native
 
             handle = dlopen(fileName, RTLD_NOW);
 
-            if (handle != IntPtr.Zero)
-                return true;
+            if (handle != IntPtr.Zero) return true;
 
             var errPtr = dlerror();
 
             if (errPtr != IntPtr.Zero)
-                throw new Exception("dlsym: " + Marshal.PtrToStringAnsi(errPtr));
+                throw new Exception("dlopen: " + Marshal.PtrToStringAnsi(errPtr));
 
             return false;
         }

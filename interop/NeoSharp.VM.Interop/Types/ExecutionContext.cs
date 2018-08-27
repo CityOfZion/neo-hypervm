@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using NeoSharp.VM.Interop.Types.Collections;
 using Newtonsoft.Json;
 
@@ -11,19 +12,28 @@ namespace NeoSharp.VM.Interop.Types
         // This delegates are required for native calls, 
         // otherwise is disposed and produce a memory error
 
-        private byte[] _ScriptHash;
+        private byte[] _scriptHash;
 
-        private readonly IStackItemsStack _AltStack;
-        private readonly IStackItemsStack _EvaluationStack;
+        private readonly IStackItemsStack _altStack;
+        private readonly IStackItemsStack _evaluationStack;
 
         /// <summary>
         /// Native handle
         /// </summary>
-        private IntPtr Handle;
+        private IntPtr _handle;
 
         #endregion
 
         #region Public fields
+
+        /// <summary>
+        /// Native handle
+        /// </summary>
+        public IntPtr Handle
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return _handle; }
+        }
 
         /// <summary>
         /// Engine
@@ -34,53 +44,74 @@ namespace NeoSharp.VM.Interop.Types
         /// <summary>
         /// Is Disposed
         /// </summary>
-        public override bool IsDisposed => Handle == IntPtr.Zero;
+        public override bool IsDisposed
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return _handle == IntPtr.Zero; }
+        }
 
         /// <summary>
         /// Next instruction
         /// </summary>
-        public override EVMOpCode NextInstruction => (EVMOpCode)NeoVM.ExecutionContext_GetNextInstruction(Handle);
+        public override EVMOpCode NextInstruction
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return (EVMOpCode)NeoVM.ExecutionContext_GetNextInstruction(_handle); }
+        }
 
         /// <summary>
         /// Get Instruction pointer
         /// </summary>
-        public override int InstructionPointer => NeoVM.ExecutionContext_GetInstructionPointer(Handle);
+        public override int InstructionPointer
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return NeoVM.ExecutionContext_GetInstructionPointer(_handle); }
+        }
 
         /// <summary>
         /// Script Hash
         /// </summary>
         public override byte[] ScriptHash
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                if (_ScriptHash != null)
+                if (_scriptHash != null)
                 {
-                    return _ScriptHash;
+                    return _scriptHash;
                 }
 
-                _ScriptHash = new byte[ScriptHashLength];
+                _scriptHash = new byte[ScriptHashLength];
 
-                fixed (byte* p = _ScriptHash)
+                fixed (byte* p = _scriptHash)
                 {
-                    if (NeoVM.ExecutionContext_GetScriptHash(Handle, (IntPtr)p, 0) != ScriptHashLength)
+                    if (NeoVM.ExecutionContext_GetScriptHash(_handle, (IntPtr)p, 0) != ScriptHashLength)
                     {
-                        throw (new AccessViolationException());
+                        throw new AccessViolationException();
                     }
                 }
 
-                return _ScriptHash;
+                return _scriptHash;
             }
         }
 
         /// <summary>
         /// AltStack
         /// </summary>
-        public override IStackItemsStack AltStack => _AltStack;
+        public override IStackItemsStack AltStack
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return _altStack; }
+        }
 
         /// <summary>
         /// EvaluationStack
         /// </summary>
-        public override IStackItemsStack EvaluationStack => _EvaluationStack;
+        public override IStackItemsStack EvaluationStack
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return _evaluationStack; }
+        }
 
         #endregion
 
@@ -91,26 +122,26 @@ namespace NeoSharp.VM.Interop.Types
         /// <param name="handle">Handle</param>
         internal ExecutionContext(ExecutionEngine engine, IntPtr handle) : base(engine)
         {
-            Handle = handle;
+            _handle = handle;
             Engine = engine;
-            NeoVM.ExecutionContext_Claim(Handle, out IntPtr evHandle, out IntPtr altHandle);
+            NeoVM.ExecutionContext_Claim(_handle, out IntPtr evHandle, out IntPtr altHandle);
 
-            _AltStack = new StackItemStack(Engine, altHandle);
-            _EvaluationStack = new StackItemStack(Engine, evHandle);
+            _altStack = new StackItemStack(Engine, altHandle);
+            _evaluationStack = new StackItemStack(Engine, evHandle);
         }
 
         #region IDisposable Support
 
         protected override void Dispose(bool disposing)
         {
-            if (Handle == IntPtr.Zero) return;
+            if (_handle == IntPtr.Zero) return;
 
             // free unmanaged resources (unmanaged objects) and override a finalizer below. set large fields to null.
 
-            _AltStack.Dispose();
-            _EvaluationStack.Dispose();
+            _altStack.Dispose();
+            _evaluationStack.Dispose();
 
-            NeoVM.ExecutionContext_Free(ref Handle);
+            NeoVM.ExecutionContext_Free(ref _handle);
         }
 
         #endregion
