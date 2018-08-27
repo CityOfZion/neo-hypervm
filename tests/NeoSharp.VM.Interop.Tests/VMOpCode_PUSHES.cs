@@ -27,7 +27,10 @@ namespace NeoSharp.VM.Interop.Tests
 
                 // Check
 
-                Assert.IsTrue(engine.ResultStack.Pop<ByteArrayStackItem>().Value.Length == 0);
+                using (var it = engine.ResultStack.Pop<ByteArrayStackItem>())
+                {
+                    Assert.IsTrue(it.Value.Length == 0);
+                }
 
                 CheckClean(engine);
             }
@@ -61,7 +64,10 @@ namespace NeoSharp.VM.Interop.Tests
 
                         // Check
 
-                        Assert.IsTrue(engine.ResultStack.Pop<ByteArrayStackItem>().Value.SequenceEqual(data));
+                        using (var it = engine.ResultStack.Pop<ByteArrayStackItem>())
+                        {
+                            Assert.IsTrue(it.Value.SequenceEqual(data));
+                        }
 
                         CheckClean(engine);
                     }
@@ -109,10 +115,13 @@ namespace NeoSharp.VM.Interop.Tests
 
                     // Check
 
-                    Assert.IsTrue(engine.ResultStack.Pop<ByteArrayStackItem>().Value.SequenceEqual(new byte[]
+                    using (var it = engine.ResultStack.Pop<ByteArrayStackItem>())
                     {
-                    0x01,0x02,0x03,0x04
-                    }));
+                        Assert.IsTrue(it.Value.SequenceEqual(new byte[]
+                        {
+                            0x01,0x02,0x03,0x04
+                        }));
+                    }
 
                     CheckClean(engine);
                 }
@@ -161,10 +170,13 @@ namespace NeoSharp.VM.Interop.Tests
 
                     // Check
 
-                    Assert.IsTrue(engine.ResultStack.Pop<ByteArrayStackItem>().Value.SequenceEqual(new byte[]
+                    using (var it = engine.ResultStack.Pop<ByteArrayStackItem>())
                     {
-                    0x01,0x02,0x03,0x04
-                    }));
+                        Assert.IsTrue(it.Value.SequenceEqual(new byte[]
+                        {
+                            0x01,0x02,0x03,0x04
+                        }));
+                    }
 
                     CheckClean(engine);
                 }
@@ -241,10 +253,13 @@ namespace NeoSharp.VM.Interop.Tests
 
                     // Check
 
-                    Assert.IsTrue(engine.ResultStack.Pop<ByteArrayStackItem>().Value.SequenceEqual(new byte[]
+                    using (var it = engine.ResultStack.Pop<ByteArrayStackItem>())
                     {
-                    0x01,0x02,0x03,0x04
-                    }));
+                        Assert.IsTrue(it.Value.SequenceEqual(new byte[]
+                        {
+                            0x01,0x02,0x03,0x04
+                        }));
+                    }
 
                     CheckClean(engine);
                 }
@@ -290,7 +305,10 @@ namespace NeoSharp.VM.Interop.Tests
 
                 // Check
 
-                Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, -1);
+                using (var it = engine.ResultStack.Pop<IntegerStackItem>())
+                {
+                    Assert.AreEqual(-1, it.Value);
+                }
 
                 CheckClean(engine);
             }
@@ -326,7 +344,11 @@ namespace NeoSharp.VM.Interop.Tests
                 for (int x = 16; x >= 1; x--)
                 {
                     Assert.AreEqual(x, engine.ResultStack.Count);
-                    Assert.AreEqual(engine.ResultStack.Pop<IntegerStackItem>().Value, x);
+
+                    using (var it = engine.ResultStack.Pop<IntegerStackItem>())
+                    {
+                        Assert.AreEqual(x, it.Value);
+                    }
                 }
 
                 CheckClean(engine);

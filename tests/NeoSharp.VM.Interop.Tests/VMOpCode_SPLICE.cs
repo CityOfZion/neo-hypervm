@@ -31,7 +31,12 @@ namespace NeoSharp.VM.Interop.Tests
                 // Check
 
                 Assert.AreEqual(engine.InvocationStack.Count, 1);
-                Assert.AreEqual(engine.CurrentContext.EvaluationStack.Pop<IntegerStackItem>().Value, 11);
+
+                using (var currenctContext = engine.CurrentContext)
+                using (var it = currenctContext.EvaluationStack.Pop<IntegerStackItem>())
+                {
+                    Assert.AreEqual(11, it.Value);
+                }
 
                 CheckClean(engine, false);
             }
@@ -57,7 +62,12 @@ namespace NeoSharp.VM.Interop.Tests
                 // Check
 
                 Assert.AreEqual(engine.InvocationStack.Count, 1);
-                Assert.AreEqual(engine.CurrentContext.EvaluationStack.Pop<IntegerStackItem>().Value, 4);
+
+                using (var currenctContext = engine.CurrentContext)
+                using (var it = currenctContext.EvaluationStack.Pop<IntegerStackItem>())
+                {
+                    Assert.AreEqual(4, it.Value);
+                }
 
                 CheckClean(engine, false);
             }
@@ -105,7 +115,10 @@ namespace NeoSharp.VM.Interop.Tests
 
                 // Check
 
-                Assert.IsTrue(engine.ResultStack.Pop<ByteArrayStackItem>().Value.SequenceEqual(new byte[] { 0x00, 0x01, 0x02 }));
+                using (var it = engine.ResultStack.Pop<ByteArrayStackItem>())
+                {
+                    Assert.IsTrue(it.Value.SequenceEqual(new byte[] { 0x00, 0x01, 0x02 }));
+                }
 
                 CheckClean(engine);
             }
@@ -135,7 +148,12 @@ namespace NeoSharp.VM.Interop.Tests
                 // Check
 
                 Assert.AreEqual(engine.InvocationStack.Count, 1);
-                Assert.AreEqual(engine.CurrentContext.EvaluationStack.Pop<IntegerStackItem>().Value, 11);
+
+                using (var currenctContext = engine.CurrentContext)
+                using (var it = currenctContext.EvaluationStack.Pop<IntegerStackItem>())
+                {
+                    Assert.AreEqual(11, it.Value);
+                }
 
                 CheckClean(engine, false);
             }
@@ -161,7 +179,12 @@ namespace NeoSharp.VM.Interop.Tests
                 // Check
 
                 Assert.AreEqual(engine.InvocationStack.Count, 1);
-                Assert.AreEqual(engine.CurrentContext.EvaluationStack.Pop<IntegerStackItem>().Value, 4);
+
+                using (var currenctContext = engine.CurrentContext)
+                using (var it = currenctContext.EvaluationStack.Pop<IntegerStackItem>())
+                {
+                    Assert.AreEqual(4, it.Value);
+                }
 
                 CheckClean(engine, false);
             }
@@ -209,7 +232,10 @@ namespace NeoSharp.VM.Interop.Tests
 
                 // Check
 
-                Assert.IsTrue(engine.ResultStack.Pop<ByteArrayStackItem>().Value.SequenceEqual(new byte[] { 0x07, 0x08, 0x09 }));
+                using (var it = engine.ResultStack.Pop<ByteArrayStackItem>())
+                {
+                    Assert.IsTrue(it.Value.SequenceEqual(new byte[] { 0x07, 0x08, 0x09 }));
+                }
 
                 CheckClean(engine);
             }
@@ -284,8 +310,15 @@ namespace NeoSharp.VM.Interop.Tests
 
                 // Check
 
-                Assert.IsTrue(engine.ResultStack.Pop<IntegerStackItem>().Value == 2);
-                Assert.IsTrue(engine.ResultStack.Pop<IntegerStackItem>().Value == 1);
+                using (var it = engine.ResultStack.Pop<IntegerStackItem>())
+                {
+                    Assert.AreEqual(2, it.Value);
+                }
+
+                using (var it = engine.ResultStack.Pop<IntegerStackItem>())
+                {
+                    Assert.AreEqual(1, it.Value);
+                }
 
                 CheckClean(engine);
             }
@@ -315,8 +348,19 @@ namespace NeoSharp.VM.Interop.Tests
                 // Check
 
                 Assert.AreEqual(engine.InvocationStack.Count, 1);
-                Assert.AreEqual(engine.CurrentContext.EvaluationStack.Pop<IntegerStackItem>().Value, 3);
-                Assert.AreEqual(engine.CurrentContext.EvaluationStack.Pop<IntegerStackItem>().Value, 2);
+
+                using (var currenctContext = engine.CurrentContext)
+                {
+                    using (var it = currenctContext.EvaluationStack.Pop<IntegerStackItem>())
+                    {
+                        Assert.AreEqual(3, it.Value);
+                    }
+
+                    using (var it = currenctContext.EvaluationStack.Pop<IntegerStackItem>())
+                    {
+                        Assert.AreEqual(2, it.Value);
+                    }
+                }
 
                 CheckClean(engine, false);
             }
@@ -343,8 +387,19 @@ namespace NeoSharp.VM.Interop.Tests
                 // Check
 
                 Assert.AreEqual(engine.InvocationStack.Count, 1);
-                Assert.AreEqual(engine.CurrentContext.EvaluationStack.Pop<IntegerStackItem>().Value, 2);
-                Assert.AreEqual(engine.CurrentContext.EvaluationStack.Pop<IntegerStackItem>().Value, 1);
+
+                using (var currenctContext = engine.CurrentContext)
+                {
+                    using (var it = currenctContext.EvaluationStack.Pop<IntegerStackItem>())
+                    {
+                        Assert.AreEqual(2, it.Value);
+                    }
+
+                    using (var it = currenctContext.EvaluationStack.Pop<IntegerStackItem>())
+                    {
+                        Assert.AreEqual(1, it.Value);
+                    }
+                }
 
                 CheckClean(engine, false);
             }
@@ -371,7 +426,12 @@ namespace NeoSharp.VM.Interop.Tests
                 // Check
 
                 Assert.AreEqual(engine.InvocationStack.Count, 1);
-                Assert.AreEqual(engine.CurrentContext.EvaluationStack.Pop<IntegerStackItem>().Value, 1);
+
+                using (var currentContext = engine.CurrentContext)
+                using (var it = currentContext.EvaluationStack.Pop<IntegerStackItem>())
+                {
+                    Assert.AreEqual(1, it.Value);
+                }
 
                 CheckClean(engine, false);
             }
@@ -421,7 +481,10 @@ namespace NeoSharp.VM.Interop.Tests
 
                 // Check
 
-                Assert.IsTrue(engine.ResultStack.Pop<ByteArrayStackItem>().Value.SequenceEqual(new byte[] { 0x02, 0x03, 0x04 }));
+                using (var it = engine.ResultStack.Pop<ByteArrayStackItem>())
+                {
+                    Assert.IsTrue(it.Value.SequenceEqual(new byte[] { 0x02, 0x03, 0x04 }));
+                }
 
                 CheckClean(engine);
             }
@@ -517,7 +580,10 @@ namespace NeoSharp.VM.Interop.Tests
 
                 // Check
 
-                Assert.IsTrue(engine.ResultStack.Pop<ByteArrayStackItem>().Value.SequenceEqual(new byte[] { 0x01, 0x02, 0x03 }));
+                using (var it = engine.ResultStack.Pop<ByteArrayStackItem>())
+                {
+                    Assert.IsTrue(it.Value.SequenceEqual(new byte[] { 0x01, 0x02, 0x03 }));
+                }
 
                 CheckClean(engine);
             }

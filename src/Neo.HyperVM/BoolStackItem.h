@@ -38,7 +38,7 @@ public:
 
 	// Constructor & Destructor
 
-	inline BoolStackItem(IStackItemCounter* counter, bool value) :
+	inline BoolStackItem(volatile IStackItemCounter* &counter, bool value) :
 		IStackItem(counter, EStackItemType::Bool), 
 		_value(value) 
 	{

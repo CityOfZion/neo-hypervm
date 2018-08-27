@@ -13,4 +13,4 @@ echo "************************"
 echo "**      UNIT TEST     **"
 echo "************************"
 
-dotnet test NeoSharp.VM.Interop.Tests
+dotnet test NeoSharp.VM.Interop.Tests --verbosity n

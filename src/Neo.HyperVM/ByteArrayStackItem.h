@@ -39,7 +39,7 @@ public:
 			return true;
 		}
 
-		BigInteger* bi = new BigInteger(this->_payload, this->_payloadLength);
+		auto bi = new BigInteger(this->_payload, this->_payloadLength);
 		if (bi == NULL) return false;
 
 		bool bret = bi->ToInt32(ret);
@@ -59,7 +59,7 @@ public:
 
 	// Constructor
 
-	ByteArrayStackItem(IStackItemCounter* counter, byte* data, int32 length, bool copyPointer);
+	ByteArrayStackItem(volatile IStackItemCounter* &counter, byte* data, int32 length, bool copyPointer);
 
 	// Destructor
 

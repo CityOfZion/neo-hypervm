@@ -27,103 +27,51 @@ namespace NeoSharp.VM.Interop.Tests
         [TestMethod]
         public void SHA1()
         {
-            InternalTestBigInteger(EVMOpCode.SHA1, (engine, a, cancel) =>
+            InternalTestBigInteger(EVMOpCode.SHA1, (a) =>
             {
-                byte[] hash;
-
-                try
+                using (var sha = System.Security.Cryptography.SHA1.Create())
                 {
-                    using (var sha = System.Security.Cryptography.SHA1.Create())
-                    {
-                        hash = sha.ComputeHash(a == 0 ? new byte[] { } : a.ToByteArray());
-                    }
+                    return sha.ComputeHash(a == 0 ? new byte[] { } : a.ToByteArray());
                 }
-                catch
-                {
-                    Assert.AreEqual(engine.State, EVMState.Fault);
-                    cancel.Cancel = true;
-                    return;
-                }
-
-                Assert.IsTrue(engine.ResultStack.Pop<ByteArrayStackItem>().Value.SequenceEqual(hash));
             });
         }
 
         [TestMethod]
         public void SHA256()
         {
-            InternalTestBigInteger(EVMOpCode.SHA256, (engine, a, cancel) =>
+            InternalTestBigInteger(EVMOpCode.SHA256, (a) =>
             {
-                byte[] hash;
-
-                try
+                using (var sha = System.Security.Cryptography.SHA256.Create())
                 {
-                    using (var sha = System.Security.Cryptography.SHA256.Create())
-                    {
-                        hash = sha.ComputeHash(a == 0 ? new byte[] { } : a.ToByteArray());
-                    }
+                    return sha.ComputeHash(a == 0 ? new byte[] { } : a.ToByteArray());
                 }
-                catch
-                {
-                    Assert.AreEqual(engine.State, EVMState.Fault);
-                    cancel.Cancel = true;
-                    return;
-                }
-
-                Assert.IsTrue(engine.ResultStack.Pop<ByteArrayStackItem>().Value.SequenceEqual(hash));
             });
         }
 
         [TestMethod]
         public void HASH160()
         {
-            InternalTestBigInteger(EVMOpCode.HASH160, (engine, a, cancel) =>
+            InternalTestBigInteger(EVMOpCode.HASH160, (a) =>
             {
-                byte[] hash;
-
-                try
+                using (var sha = System.Security.Cryptography.SHA256.Create())
+                using (var ripe = new RIPEMD160Managed())
                 {
-                    using (var sha = System.Security.Cryptography.SHA256.Create())
-                    using (var ripe = new RIPEMD160Managed())
-                    {
-                        hash = sha.ComputeHash(a == 0 ? new byte[] { } : a.ToByteArray());
-                        hash = ripe.ComputeHash(hash);
-                    }
+                    var hash = sha.ComputeHash(a == 0 ? new byte[] { } : a.ToByteArray());
+                    return ripe.ComputeHash(hash);
                 }
-                catch
-                {
-                    Assert.AreEqual(engine.State, EVMState.Fault);
-                    cancel.Cancel = true;
-                    return;
-                }
-
-                Assert.IsTrue(engine.ResultStack.Pop<ByteArrayStackItem>().Value.SequenceEqual(hash));
             });
         }
 
         [TestMethod]
         public void HASH256()
         {
-            InternalTestBigInteger(EVMOpCode.HASH256, (engine, a, cancel) =>
+            InternalTestBigInteger(EVMOpCode.HASH256, (a) =>
             {
-                byte[] hash;
-
-                try
+                using (var sha = System.Security.Cryptography.SHA256.Create())
                 {
-                    using (var sha = System.Security.Cryptography.SHA256.Create())
-                    {
-                        hash = sha.ComputeHash(a == 0 ? new byte[] { } : a.ToByteArray());
-                        hash = sha.ComputeHash(hash);
-                    }
+                    var hash = sha.ComputeHash(a == 0 ? new byte[] { } : a.ToByteArray());
+                    return sha.ComputeHash(hash);
                 }
-                catch
-                {
-                    Assert.AreEqual(engine.State, EVMState.Fault);
-                    cancel.Cancel = true;
-                    return;
-                }
-
-                Assert.IsTrue(engine.ResultStack.Pop<ByteArrayStackItem>().Value.SequenceEqual(hash));
             });
         }
 
@@ -149,7 +97,13 @@ namespace NeoSharp.VM.Interop.Tests
 
                 // Check
 
-                Assert.AreEqual(engine.CurrentContext.EvaluationStack.Pop<IntegerStackItem>().Value, 0x05);
+                using (var currentContext = engine.CurrentContext)
+                {
+                    using (var i = currentContext.EvaluationStack.Pop<IntegerStackItem>())
+                    {
+                        Assert.AreEqual(i.Value, 0x05);
+                    }
+                }
 
                 CheckClean(engine, false);
             }
@@ -187,7 +141,10 @@ namespace NeoSharp.VM.Interop.Tests
 
                 // Check
 
-                Assert.IsFalse(engine.ResultStack.Pop<BooleanStackItem>().Value);
+                using (var i = engine.ResultStack.Pop<BooleanStackItem>())
+                {
+                    Assert.IsFalse(i.Value);
+                }
 
                 CheckClean(engine, false);
             }
@@ -212,7 +169,10 @@ namespace NeoSharp.VM.Interop.Tests
 
                 // Check
 
-                Assert.IsFalse(engine.ResultStack.Pop<BooleanStackItem>().Value);
+                using (var i = engine.ResultStack.Pop<BooleanStackItem>())
+                {
+                    Assert.IsFalse(i.Value);
+                }
 
                 CheckClean(engine, false);
             }
@@ -268,7 +228,10 @@ namespace NeoSharp.VM.Interop.Tests
 
                         // Check
 
-                        Assert.AreEqual(ok, engine.ResultStack.Pop<BooleanStackItem>().Value);
+                        using (var i = engine.ResultStack.Pop<BooleanStackItem>())
+                        {
+                            Assert.AreEqual(ok, i.Value);
+                        }
 
                         CheckClean(engine, false);
                     }
@@ -296,7 +259,13 @@ namespace NeoSharp.VM.Interop.Tests
 
                 // Check
 
-                Assert.AreEqual(engine.CurrentContext.EvaluationStack.Pop<IntegerStackItem>().Value, 0x05);
+                using (var currentContext = engine.CurrentContext)
+                {
+                    using (var i = currentContext.EvaluationStack.Pop<IntegerStackItem>())
+                    {
+                        Assert.AreEqual(i.Value, 0x05);
+                    }
+                }
 
                 CheckClean(engine, false);
             }
@@ -322,7 +291,10 @@ namespace NeoSharp.VM.Interop.Tests
 
                 // Check
 
-                Assert.IsFalse(engine.ResultStack.Pop<BooleanStackItem>().Value);
+                using (var i = engine.ResultStack.Pop<BooleanStackItem>())
+                {
+                    Assert.IsFalse(i.Value);
+                }
 
                 CheckClean(engine, false);
             }
@@ -382,7 +354,10 @@ namespace NeoSharp.VM.Interop.Tests
 
                         // Check
 
-                        Assert.AreEqual(ok, engine.ResultStack.Pop<BooleanStackItem>().Value);
+                        using (var i = engine.ResultStack.Pop<BooleanStackItem>())
+                        {
+                            Assert.AreEqual(ok, i.Value);
+                        }
 
                         CheckClean(engine, false);
                     }
@@ -410,7 +385,13 @@ namespace NeoSharp.VM.Interop.Tests
 
                 // Check
 
-                Assert.AreEqual(engine.CurrentContext.EvaluationStack.Pop<IntegerStackItem>().Value, 0x05);
+                using (var currentContext = engine.CurrentContext)
+                {
+                    using (var i = currentContext.EvaluationStack.Pop<IntegerStackItem>())
+                    {
+                        Assert.AreEqual(i.Value, 0x05);
+                    }
+                }
 
                 CheckClean(engine, false);
             }
@@ -547,7 +528,13 @@ namespace NeoSharp.VM.Interop.Tests
 
                 // Check
 
-                engine.CurrentContext.EvaluationStack.Pop<ByteArrayStackItem>().Dispose();
+                using (var currentContext = engine.CurrentContext)
+                {
+                    using (var i = currentContext.EvaluationStack.Pop<ByteArrayStackItem>())
+                    {
+                        // Nothing to do
+                    }
+                }
 
                 CheckClean(engine, false);
             }
@@ -644,7 +631,10 @@ namespace NeoSharp.VM.Interop.Tests
 
                                 // Check
 
-                                Assert.AreEqual(ok && withMessage, engine.ResultStack.Pop<BooleanStackItem>().Value);
+                                using (var i = engine.ResultStack.Pop<BooleanStackItem>())
+                                {
+                                    Assert.AreEqual(ok && withMessage, i.Value);
+                                }
 
                                 CheckClean(engine, false);
                             }

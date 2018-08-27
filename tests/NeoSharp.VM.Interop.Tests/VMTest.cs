@@ -67,14 +67,32 @@ namespace NeoSharp.VM.Interop.Tests
                 using (var context = engine.CurrentContext)
                 {
                     engine.StepInto();
+
                     Assert.IsTrue(context.EvaluationStack.Count == 1);
-                    Assert.IsTrue(context.EvaluationStack.Peek<ByteArrayStackItem>(0).Value.Length == 0);
+
+                    using (var it = context.EvaluationStack.Peek<ByteArrayStackItem>(0))
+                    {
+                        Assert.IsTrue(it.Value.Length == 0);
+                    }
+
                     engine.StepInto();
+
                     Assert.IsTrue(context.EvaluationStack.Count == 1);
-                    Assert.IsTrue(context.EvaluationStack.Peek<BooleanStackItem>(0).Value);
+
+                    using (var it = context.EvaluationStack.Peek<BooleanStackItem>(0))
+                    {
+                        Assert.IsTrue(it.Value);
+                    }
+
                     engine.StepInto();
+
                     Assert.IsTrue(context.EvaluationStack.Count == 1);
-                    Assert.IsTrue(!context.EvaluationStack.Peek<BooleanStackItem>(0).Value);
+
+                    using (var it = context.EvaluationStack.Peek<BooleanStackItem>(0))
+                    {
+                        Assert.IsFalse(it.Value);
+                    }
+
                     engine.Execute();
                 }
 
@@ -161,7 +179,10 @@ namespace NeoSharp.VM.Interop.Tests
 
                         // Check result
 
-                        Assert.IsTrue(engine.ResultStack.TryPop(out bool var) && var);
+                        using (var it = engine.ResultStack.Pop<BooleanStackItem>())
+                        {
+                            Assert.IsTrue(it.Value);
+                        }
                     }
                 }
             });
@@ -207,8 +228,42 @@ namespace NeoSharp.VM.Interop.Tests
 [0x41663051791e0cf03178508aea217ca495c24891-000001] TOALTSTACK
 [0x41663051791e0cf03178508aea217ca495c24891-000002] FROMALTSTACK
 [0x41663051791e0cf03178508aea217ca495c24891-000003] RET".Replace("\r", ""));
-
             }
+        }
+
+        /// <summary>
+        /// This test try to prevent double free
+        /// </summary>
+        [TestMethod]
+        public void TestFreeEngineBefore()
+        {
+            IExecutionContext context;
+            IStackItem item;
+
+            using (var script = new ScriptBuilder(EVMOpCode.PUSH1))
+            using (var engine = CreateEngine(null))
+            {
+                // Load script
+
+                engine.LoadScript(script);
+
+                // Compute hash
+
+                engine.StepInto();
+                context = engine.CurrentContext;
+
+                Assert.IsTrue(engine.Execute());
+
+                item = engine.ResultStack.Peek();
+            }
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
+            // Check
+
+            item.Dispose();
+            context.Dispose();
         }
 
         /// <summary>
@@ -278,6 +333,7 @@ namespace NeoSharp.VM.Interop.Tests
         public void TestArrayStackItem()
         {
             using (var engine = CreateEngine(null))
+            {
                 for (int x = 0; x < 2; x++)
                 {
                     bool isStruct = x == 1;
@@ -300,6 +356,7 @@ namespace NeoSharp.VM.Interop.Tests
                                 // Check empty
 
                                 Assert.AreEqual(0, ar.Count);
+
                                 // Add and check count
 
                                 ar.Add(btest);
@@ -369,8 +426,15 @@ namespace NeoSharp.VM.Interop.Tests
                         // Add 1,2,3
 
                         {
-                            var art = new IStackItem[] { engine.CreateInteger(1), engine.CreateInteger(2), engine.CreateInteger(3) };
+                            var art = new IStackItem[]
+                            {
+                                engine.CreateInteger(1),
+                                engine.CreateInteger(2),
+                                engine.CreateInteger(3)
+                            };
+
                             ar.Add(art);
+
                             foreach (var it in art) it.Dispose();
                         }
 
@@ -405,6 +469,7 @@ namespace NeoSharp.VM.Interop.Tests
                             Assert.AreEqual(iau.Value, 3);
                     }
                 }
+            }
         }
 
         /// <summary>
@@ -428,7 +493,9 @@ namespace NeoSharp.VM.Interop.Tests
                     // Test Equal key and value
 
                     using (var b = engine.CreateBool(true))
+                    {
                         ar[b] = b;
+                    }
 
                     Assert.AreEqual(1, ar.Count);
 
@@ -446,25 +513,33 @@ namespace NeoSharp.VM.Interop.Tests
 
                     using (var b = engine.CreateBool(true))
                     using (var bi = engine.CreateInteger(1))
+                    {
                         ar[b] = bi;
+                    }
 
                     Assert.AreEqual(1, ar.Count);
 
                     using (var b = engine.CreateBool(true))
                     using (var bi = engine.CreateInteger(2))
+                    {
                         ar[b] = bi;
+                    }
 
                     Assert.AreEqual(1, ar.Count);
 
                     using (var b = engine.CreateBool(true))
                     using (var bi = ar[b])
+                    {
                         Assert.IsTrue(bi is IntegerStackItem ii && ii.Value == 2);
+                    }
 
                     // Test get keys
 
                     using (var b = engine.CreateBool(false))
                     using (var bi = engine.CreateInteger(5))
+                    {
                         ar[b] = bi;
+                    }
 
                     Assert.AreEqual(2, ar.Count);
 
@@ -619,7 +694,6 @@ namespace NeoSharp.VM.Interop.Tests
                 using (var it = engine.CreateBool(false))
                     CheckItem(engine, it);
 
-
                 // Check ByteArray
 
                 for (int x = 0; x < 100; x++)
@@ -630,7 +704,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                 // Check Interops
 
-                Dictionary<string, string> dic = new Dictionary<string, string>()
+                var dic = new Dictionary<string, string>()
                     {
                         {"key","value" }
                     };
@@ -641,7 +715,7 @@ namespace NeoSharp.VM.Interop.Tests
                 // Check disposed object
 
                 {
-                    DisposableDummy dis = new DisposableDummy();
+                    var dis = new DisposableDummy();
                     using (var it = engine.CreateInterop(dis))
                         CheckItem(engine, it);
 
@@ -653,7 +727,9 @@ namespace NeoSharp.VM.Interop.Tests
                 GC.WaitForPendingFinalizers();
 
                 using (var id = engine.ResultStack.Pop<InteropStackItem>())
+                {
                     Assert.IsTrue(id != null && id.Value is DisposableDummy dd && !dd.IsDisposed);
+                }
             }
         }
 
