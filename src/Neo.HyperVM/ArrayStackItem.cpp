@@ -51,6 +51,7 @@ IStackItem* ArrayStackItem::Clone()
 
 bool ArrayStackItem::Equals(IStackItem* it)
 {
+	if (it == NULL) return false;
 	if (it == this) return true;
 
 	// Different type (Array must be equal pointer)
@@ -60,22 +61,50 @@ bool ArrayStackItem::Equals(IStackItem* it)
 		return false;
 	}
 
-	// Different size
+	// Init stacks
 
-	int32 c = this->Count();
-	auto arr = (ArrayStackItem*)it;
+	Stack<IStackItem> stack1;
+	Stack<IStackItem> stack2;
 
-	if (arr->Count() != c)
-	{
-		return false;
-	}
+	stack1.Push(this);
+	stack2.Push(it);
 
 	// Check sequence
 
-	for (int32 x = 0; x < c; ++x)
+	while (stack1.Count() > 0)
 	{
-		if (!this->Get(x)->Equals(arr->Get(x)))
-			return false;
+		auto a = stack1.Pop();
+		auto b = stack2.Pop();
+
+		if (a->Type == EStackItemType::Struct)
+		{
+			if (a == b) continue;
+
+			auto sa = (ArrayStackItem*)a;
+
+			if (b->Type != EStackItemType::Struct) return false;
+
+			auto sb = (ArrayStackItem*)b;
+
+			int32 sac = sa->Count();
+			int32 sbc = sb->Count();
+			
+			if (sac != sbc) return false;
+
+			for (int32 x = 0; x < sac; x++) 
+			{
+				stack1.Push(sa->Get(x));
+			}
+
+			for (int32 x = 0; x < sbc; x++)
+			{
+				stack2.Push(sb->Get(x));
+			}
+		}
+		else
+		{
+			if (!a->Equals(b)) return false;
+		}
 	}
 
 	return true;
