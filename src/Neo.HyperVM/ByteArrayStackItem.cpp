@@ -1,7 +1,7 @@
 #include "ByteArrayStackItem.h"
 #include <string.h>
 
-ByteArrayStackItem::ByteArrayStackItem(volatile IStackItemCounter* &counter, byte* data, int32 size, bool copyPointer) :
+ByteArrayStackItem::ByteArrayStackItem(IStackItemCounter* counter, byte* data, int32 size, bool copyPointer) :
 	IStackItem(counter, EStackItemType::ByteArray),
 	_payloadLength(size)
 {

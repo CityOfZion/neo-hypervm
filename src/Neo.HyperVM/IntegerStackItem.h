@@ -46,15 +46,15 @@ public:
 
 	// Constructor
 
-	inline IntegerStackItem(volatile IStackItemCounter* &counter, byte* data, int32 size) :
+	inline IntegerStackItem(IStackItemCounter* counter, byte* data, int32 size) :
 		IStackItem(counter, EStackItemType::Integer),
 		_value(data, size) { }
 
-	inline IntegerStackItem(volatile IStackItemCounter* &counter, int32 value) :
+	inline IntegerStackItem(IStackItemCounter* counter, int32 value) :
 		IStackItem(counter, EStackItemType::Integer),
 		_value(value) { }
 
-	inline IntegerStackItem(volatile IStackItemCounter* &counter, BigInteger* &value) :
+	inline IntegerStackItem(IStackItemCounter* counter, BigInteger* &value) :
 		IStackItem(counter, EStackItemType::Integer),
 		_value(value)
 	{

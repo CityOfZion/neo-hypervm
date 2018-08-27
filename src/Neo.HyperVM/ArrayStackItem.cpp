@@ -3,12 +3,12 @@
 #include "StackItemHelper.h"
 #include "Stack.h"
 
-ArrayStackItem::ArrayStackItem(volatile IStackItemCounter* &counter) :
+ArrayStackItem::ArrayStackItem(IStackItemCounter* counter) :
 	IStackItem(counter, EStackItemType::Array),
 	_list(std::list<IStackItem*>())
 { }
 
-ArrayStackItem::ArrayStackItem(volatile IStackItemCounter* &counter, bool isStruct) :
+ArrayStackItem::ArrayStackItem(IStackItemCounter* counter, bool isStruct) :
 	IStackItem(counter, (isStruct ? EStackItemType::Struct : EStackItemType::Array)),
 	_list(std::list<IStackItem*>())
 { }
