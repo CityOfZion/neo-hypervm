@@ -155,7 +155,7 @@ void ExecutionEngine::StepInto()
 		return;
 	}
 
-	ExecutionContext* context = this->InvocationStack.Peek(0);
+	auto context = this->InvocationStack.Peek(0);
 
 	if (context == NULL)
 	{
