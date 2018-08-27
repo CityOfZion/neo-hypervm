@@ -14,7 +14,7 @@
 #include "ByteArrayStackItem.h"
 #include "InteropStackItem.h"
 
-class ExecutionEngine : public IStackItemCounter
+class ExecutionEngine
 {
 private:
 
@@ -23,7 +23,7 @@ private:
 	uint32 _iteration;
 	uint32 _consumedGas;
 	uint32 _maxGas;
-	volatile IStackItemCounter *_counter;
+	IStackItemCounter *_counter;
 
 	// Save the state of the execution
 
@@ -133,7 +133,7 @@ public:
 
 	inline MapStackItem* CreateMap()
 	{
-		if (!this->ItemCounterInc())
+		if (!this->_counter->ItemCounterInc())
 		{
 			this->_state = EVMState::FAULT;
 			return NULL;
@@ -144,7 +144,7 @@ public:
 
 	inline IntegerStackItem* CreateInteger(int32 value)
 	{
-		if (!this->ItemCounterInc())
+		if (!this->_counter->ItemCounterInc())
 		{
 			this->_state = EVMState::FAULT;
 			return NULL;
@@ -155,7 +155,7 @@ public:
 
 	inline IntegerStackItem* CreateInteger(BigInteger *value)
 	{
-		if (!this->ItemCounterInc())
+		if (!this->_counter->ItemCounterInc())
 		{
 			this->_state = EVMState::FAULT;
 			return NULL;
@@ -166,7 +166,7 @@ public:
 
 	inline IntegerStackItem* CreateInteger(byte* data, int32 length)
 	{
-		if (!this->ItemCounterInc())
+		if (!this->_counter->ItemCounterInc())
 		{
 			this->_state = EVMState::FAULT;
 			return NULL;
@@ -177,7 +177,7 @@ public:
 
 	inline InteropStackItem* CreateInterop(byte* data, int32 length)
 	{
-		if (!this->ItemCounterInc())
+		if (!this->_counter->ItemCounterInc())
 		{
 			this->_state = EVMState::FAULT;
 			return NULL;
@@ -188,7 +188,7 @@ public:
 
 	inline ByteArrayStackItem* CreateByteArray(byte* data, int32 length, bool copyPointer)
 	{
-		if (!this->ItemCounterInc())
+		if (!this->_counter->ItemCounterInc())
 		{
 			this->_state = EVMState::FAULT;
 			return NULL;
@@ -199,7 +199,7 @@ public:
 
 	inline BoolStackItem* CreateBool(bool value)
 	{
-		if (!this->ItemCounterInc())
+		if (!this->_counter->ItemCounterInc())
 		{
 			this->_state = EVMState::FAULT;
 			return NULL;
@@ -210,7 +210,7 @@ public:
 
 	inline ArrayStackItem* CreateArray()
 	{
-		if (!this->ItemCounterInc())
+		if (!this->_counter->ItemCounterInc())
 		{
 			this->_state = EVMState::FAULT;
 			return NULL;
@@ -221,7 +221,7 @@ public:
 
 	inline ArrayStackItem* CreateStruct()
 	{
-		if (!this->ItemCounterInc())
+		if (!this->_counter->ItemCounterInc())
 		{
 			this->_state = EVMState::FAULT;
 			return NULL;
@@ -232,7 +232,7 @@ public:
 
 	inline ArrayStackItem* CreateArray(int32 count)
 	{
-		if (!this->ItemCounterInc(count + 1))
+		if (!this->_counter->ItemCounterInc(count + 1))
 		{
 			this->_state = EVMState::FAULT;
 			return NULL;
@@ -250,7 +250,7 @@ public:
 
 	inline ArrayStackItem* CreateStruct(int32 count)
 	{
-		if (!this->ItemCounterInc(count + 1))
+		if (!this->_counter->ItemCounterInc(count + 1))
 		{
 			this->_state = EVMState::FAULT;
 			return NULL;

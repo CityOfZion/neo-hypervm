@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Types.h"
+#include "IClaimable.h"
 
-class IStackItemCounter
+class IStackItemCounter : public IClaimable
 {
 private:
 
@@ -33,5 +34,5 @@ public:
 		--this->_items;
 	}
 
-	inline IStackItemCounter(int32 maxItems) :_items(0), _maxItems(maxItems) {}
+	inline IStackItemCounter(int32 maxItems) : IClaimable(), _items(0), _maxItems(maxItems) {}
 };

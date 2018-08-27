@@ -9,7 +9,7 @@ class IStackItem : public IClaimable
 {
 protected:
 
-	volatile IStackItemCounter* &_counter;
+	IStackItemCounter* _counter;
 
 public:
 
@@ -31,24 +31,27 @@ public:
 
 	// Constructor
 
-	inline IStackItem(volatile IStackItemCounter* &counter, EStackItemType type) :
+	inline IStackItem(IStackItemCounter* counter, EStackItemType type) :
 		IClaimable(),
 		_counter(counter),
 		Type(type)
 	{
-		// Already counted
-		// _counter->ItemCounterInc();
+		this->_counter->Claim();
 	}
 
 	// Destructor
 
 	virtual ~IStackItem()
 	{
-		if (this->_counter != NULL)
+		if (this->_counter->UnClaim())
 		{
-			// TODO: Fail when dispose counter before this, for this reason the pointer is a reference pointer
+			// Fail when dispose counter before this, for this reason the pointer is a reference pointer
 
-			// ((IStackItemCounter*)this->_counter)->ItemCounterDec();
+			delete(this->_counter);
+		}
+		else
+		{
+			this->_counter->ItemCounterDec();
 		}
 	};
 };

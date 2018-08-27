@@ -59,7 +59,7 @@ public:
 
 	// Constructor
 
-	ByteArrayStackItem(volatile IStackItemCounter* &counter, byte* data, int32 length, bool copyPointer);
+	ByteArrayStackItem(IStackItemCounter* counter, byte* data, int32 length, bool copyPointer);
 
 	// Destructor
 

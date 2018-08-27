@@ -43,8 +43,8 @@ public:
 
 	// Constructor
 
-	ArrayStackItem(volatile IStackItemCounter* &counter);
-	ArrayStackItem(volatile IStackItemCounter* &counter, bool isStruct);
+	ArrayStackItem(IStackItemCounter* counter);
+	ArrayStackItem(IStackItemCounter* counter, bool isStruct);
 
 	// Destructor
 

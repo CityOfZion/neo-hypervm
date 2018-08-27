@@ -20,7 +20,7 @@ void ExecutionEngine::Clean(uint32 iteration)
 	this->InvocationStack.Clear();
 	this->ResultStack.Clear();
 
-	this->ItemCounterClean();
+	this->_counter->ItemCounterClean();
 }
 
 // Constructor
@@ -29,11 +29,10 @@ ExecutionEngine::ExecutionEngine
 (
 	InvokeInteropCallback invokeInterop, LoadScriptCallback loadScript, GetMessageCallback getMessage
 ) :
-	IStackItemCounter(MAX_STACK_SIZE),
 	_iteration(0),
 	_consumedGas(0),
 	_maxGas(0xFFFFFFFF),
-	_counter(NULL),
+	_counter(new IStackItemCounter(MAX_STACK_SIZE)),
 	_state(EVMState::NONE),
 	Log(NULL),
 
@@ -43,7 +42,34 @@ ExecutionEngine::ExecutionEngine
 	ResultStack(),
 	InvocationStack()
 {
-	this->_counter = this;
+	_counter->Claim();
+}
+
+// Destructor
+
+ExecutionEngine::~ExecutionEngine()
+{
+	// Clean callbacks
+
+	if (this->_counter->UnClaim())
+	{
+		delete(this->_counter);
+	}
+
+	// Clean stacks
+
+	this->InvocationStack.Clear();
+	this->ResultStack.Clear();
+
+	// Clean scripts
+
+	for (auto it = this->Scripts.begin(); it != this->Scripts.end(); ++it)
+	{
+		auto ptr = (ExecutionScript*)*it;
+		ExecutionScript::UnclaimAndFree(ptr);
+	}
+
+	this->Scripts.clear();
 }
 
 ExecutionContext* ExecutionEngine::LoadScript(ExecutionScript* script, int32 rvcount)
@@ -93,8 +119,7 @@ EVMState ExecutionEngine::Execute(uint32 gas)
 	do
 	{
 		this->StepInto();
-	}
-	while (this->_state == EVMState::NONE);
+	} while (this->_state == EVMState::NONE);
 
 	return this->_state;
 }
@@ -118,8 +143,7 @@ void ExecutionEngine::StepOver()
 	do
 	{
 		this->StepInto();
-	}
-	while (this->_state == EVMState::NONE && this->InvocationStack.Count() > c);
+	} while (this->_state == EVMState::NONE && this->InvocationStack.Count() > c);
 }
 
 void ExecutionEngine::StepInto()
@@ -3786,32 +3810,4 @@ ExecuteOpCode:
 		return;
 	}
 	}
-}
-
-// Destructor
-
-ExecutionEngine::~ExecutionEngine()
-{
-	// Clean callbacks
-
-	this->OnLoadScript = NULL;
-	this->OnInvokeInterop = NULL;
-	this->OnGetMessage = NULL;
-	this->Log = NULL;
-	this->_counter = NULL;	// Need to set to NULL to ensure that is not used by `IStackItem.h`
-
-	// Clean stacks
-
-	this->InvocationStack.Clear();
-	this->ResultStack.Clear();
-
-	// Clean scripts
-
-	for (std::list<ExecutionScript*>::iterator it = this->Scripts.begin(); it != this->Scripts.end(); ++it)
-	{
-		ExecutionScript* ptr = (ExecutionScript*)*it;
-		ExecutionScript::UnclaimAndFree(ptr);
-	}
-
-	this->Scripts.clear();
 }
