@@ -85,7 +85,7 @@ bool ExecutionEngine::LoadScript(byte scriptIndex, int32 rvcount)
 
 	if (this->Scripts.size() > scriptIndex)
 	{
-		std::list<ExecutionScript*>::iterator it = this->Scripts.begin();
+		auto it = this->Scripts.begin();
 		std::advance(it, scriptIndex);
 
 		sc = (ExecutionScript*)*it;
@@ -119,7 +119,8 @@ EVMState ExecutionEngine::Execute(uint32 gas)
 	do
 	{
 		this->StepInto();
-	} while (this->_state == EVMState::NONE);
+	} 
+	while (this->_state == EVMState::NONE);
 
 	return this->_state;
 }
@@ -143,7 +144,8 @@ void ExecutionEngine::StepOver()
 	do
 	{
 		this->StepInto();
-	} while (this->_state == EVMState::NONE && this->InvocationStack.Count() > c);
+	} 
+	while (this->_state == EVMState::NONE && this->InvocationStack.Count() > c);
 }
 
 void ExecutionEngine::StepInto()
