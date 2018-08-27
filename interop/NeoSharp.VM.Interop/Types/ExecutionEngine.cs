@@ -44,7 +44,7 @@ namespace NeoSharp.VM.Interop.Types
         /// <summary>
         /// Interop Cache
         /// </summary>
-        internal readonly List<object> InteropCache;
+        private readonly List<object> _interopCache;
 
         #endregion
 
@@ -112,7 +112,7 @@ namespace NeoSharp.VM.Interop.Types
         /// <param name="e">Arguments</param>
         public ExecutionEngine(ExecutionEngineArgs e) : base(e)
         {
-            InteropCache = new List<object>();
+            _interopCache = new List<object>();
 
             _internalInvokeInterop = new NeoVM.InvokeInteropCallback(InternalInvokeInterop);
             _internalLoadScript = new NeoVM.LoadScriptCallback(InternalLoadScript);
@@ -137,6 +137,16 @@ namespace NeoSharp.VM.Interop.Types
                     NeoVM.ExecutionEngine_AddLog(_handle, _internalOnStepInto);
                 }
             }
+        }
+
+        /// <summary>
+        /// Get interop object
+        /// </summary>
+        /// <param name="objKey">Object key</param>
+        /// <returns>Object</returns>
+        internal object GetInteropObject(int objKey)
+        {
+            return _interopCache[objKey];
         }
 
         /// <summary>
@@ -373,7 +383,17 @@ namespace NeoSharp.VM.Interop.Types
         /// <param name="obj">Object</param>
         public override IInteropStackItem CreateInterop(object obj)
         {
-            return new InteropStackItem(this, obj);
+            var objKey = _interopCache.IndexOf(obj);
+
+            // New
+
+            if (objKey == -1)
+            {
+                objKey = _interopCache.Count;
+                _interopCache.Add(obj);
+            }
+
+            return new InteropStackItem(this, obj, objKey);
         }
 
         /// <summary>
@@ -433,7 +453,7 @@ namespace NeoSharp.VM.Interop.Types
             {
                 // Clear interop cache
 
-                foreach (var v in InteropCache)
+                foreach (var v in _interopCache)
                 {
                     if (v is IDisposable dsp)
                     {
@@ -441,7 +461,7 @@ namespace NeoSharp.VM.Interop.Types
                     }
                 }
 
-                InteropCache.Clear();
+                _interopCache.Clear();
             }
 
             // free unmanaged resources (unmanaged objects) and override a finalizer below. set large fields to null.

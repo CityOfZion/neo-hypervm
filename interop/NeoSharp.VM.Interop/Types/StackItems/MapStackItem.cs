@@ -16,12 +16,6 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// </summary>
         private IntPtr _handle;
 
-        /// <summary>
-        /// Engine
-        /// </summary>
-        [JsonIgnore]
-        private readonly new ExecutionEngine Engine;
-
         #endregion
 
         #region Public fields
@@ -29,10 +23,11 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <summary>
         /// Native engine
         /// </summary>
+        [JsonIgnore]
         public ExecutionEngine NativeEngine
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return Engine; }
+            get;
         }
 
         public override bool CanConvertToByteArray
@@ -96,7 +91,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <param name="value">Value</param>
         internal MapStackItem(ExecutionEngine engine, Dictionary<IStackItem, IStackItem> value) : base(engine)
         {
-            Engine = engine;
+            NativeEngine = engine;
             _handle = this.CreateNativeItem();
 
             if (value == null) return;
@@ -112,7 +107,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <param name="handle">Handle</param>
         internal MapStackItem(ExecutionEngine engine, IntPtr handle) : base(engine)
         {
-            Engine = engine;
+            NativeEngine = engine;
             _handle = handle;
         }
 
@@ -121,38 +116,27 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         #region Write
 
         public override bool Remove(IStackItem key)
-        {
-            return NeoVM.MapStackItem_Remove(_handle, key == null ? IntPtr.Zero : ((INativeStackItem)key).Handle) == NeoVM.TRUE;
-        }
+            => NeoVM.MapStackItem_Remove(_handle, key == null ? IntPtr.Zero : ((INativeStackItem)key).Handle) == NeoVM.TRUE;
 
-        public override void Set(KeyValuePair<IStackItem, IStackItem> item)
-        {
-            Set(item.Key, item.Value);
-        }
+        public override void Set(KeyValuePair<IStackItem, IStackItem> item) => Set(item.Key, item.Value);
 
-        public override void Set(IStackItem key, IStackItem value)
-        {
+        public override void Set(IStackItem key, IStackItem value) =>
+
             NeoVM.MapStackItem_Set
                 (
                 _handle,
                 key == null ? IntPtr.Zero : ((INativeStackItem)key).Handle,
                 value == null ? IntPtr.Zero : ((INativeStackItem)value).Handle
                 );
-        }
 
-        public override void Clear()
-        {
-            NeoVM.MapStackItem_Clear(_handle);
-        }
+        public override void Clear() => NeoVM.MapStackItem_Clear(_handle);
 
         #endregion
 
         #region Read
 
         public override bool ContainsKey(IStackItem key)
-        {
-            return NeoVM.MapStackItem_Get(_handle, key == null ? IntPtr.Zero : ((INativeStackItem)key).Handle) != IntPtr.Zero;
-        }
+            => NeoVM.MapStackItem_Get(_handle, key == null ? IntPtr.Zero : ((INativeStackItem)key).Handle) != IntPtr.Zero;
 
         public override bool TryGetValue(IStackItem key, out IStackItem value)
         {
@@ -164,7 +148,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
                 return false;
             }
 
-            value = Engine.ConvertFromNative(ret);
+            value = NativeEngine.ConvertFromNative(ret);
             return true;
         }
 
@@ -176,7 +160,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         {
             for (int x = 0, c = Count; x < c; x++)
             {
-                yield return Engine.ConvertFromNative(NeoVM.MapStackItem_GetKey(_handle, x));
+                yield return NativeEngine.ConvertFromNative(NeoVM.MapStackItem_GetKey(_handle, x));
             }
         }
 
@@ -184,7 +168,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         {
             for (int x = 0, c = Count; x < c; x++)
             {
-                yield return Engine.ConvertFromNative(NeoVM.MapStackItem_GetValue(_handle, x));
+                yield return NativeEngine.ConvertFromNative(NeoVM.MapStackItem_GetValue(_handle, x));
             }
         }
 
@@ -192,8 +176,8 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         {
             for (int x = 0, c = Count; x < c; x++)
             {
-                var key = Engine.ConvertFromNative(NeoVM.MapStackItem_GetKey(_handle, x));
-                var value = Engine.ConvertFromNative(NeoVM.MapStackItem_GetValue(_handle, x));
+                var key = NativeEngine.ConvertFromNative(NeoVM.MapStackItem_GetKey(_handle, x));
+                var value = NativeEngine.ConvertFromNative(NeoVM.MapStackItem_GetValue(_handle, x));
 
                 yield return new KeyValuePair<IStackItem, IStackItem>(key, value);
             }

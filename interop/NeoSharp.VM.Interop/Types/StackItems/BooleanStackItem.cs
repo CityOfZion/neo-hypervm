@@ -24,6 +24,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <summary>
         /// Native engine
         /// </summary>
+        [JsonIgnore]
         public ExecutionEngine NativeEngine
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -25,6 +25,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <summary>
         /// Native engine
         /// </summary>
+        [JsonIgnore]
         public ExecutionEngine NativeEngine
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -69,21 +70,14 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="data">Data</param>
-        internal InteropStackItem(ExecutionEngine engine, object data) : base(engine, data)
+        /// <param name="objKey">Object key</param>
+        internal InteropStackItem(ExecutionEngine engine, object data, int objKey) : base(engine, data)
         {
             NativeEngine = engine;
 
             // Search
 
-            _objKey = engine.InteropCache.IndexOf(data);
-
-            // New
-
-            if (_objKey == -1)
-            {
-                _objKey = engine.InteropCache.Count;
-                engine.InteropCache.Add(data);
-            }
+            _objKey = objKey;
 
             // Create native item
 
@@ -97,7 +91,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <param name="handle">Handle</param>
         /// <param name="objKey">Object key</param>
         internal InteropStackItem(ExecutionEngine engine, IntPtr handle, int objKey) :
-            base(engine, engine.InteropCache[objKey])
+            base(engine, engine.GetInteropObject(objKey))
         {
             NativeEngine = engine;
             _objKey = objKey;

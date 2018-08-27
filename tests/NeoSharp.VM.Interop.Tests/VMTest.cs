@@ -36,14 +36,14 @@ namespace NeoSharp.VM.Interop.Tests
                 // Check
 
                 byte[] realHash;
-                using (SHA256 sha = SHA256.Create())
-                using (RIPEMD160Managed ripe = new RIPEMD160Managed())
+                using (var sha = SHA256.Create())
+                using (var ripe = new RIPEMD160Managed())
                 {
                     realHash = sha.ComputeHash(script);
                     realHash = ripe.ComputeHash(realHash);
                 }
 
-                using (IExecutionContext context = engine.EntryContext)
+                using (var context = engine.EntryContext)
                 {
                     Assert.IsTrue(context.ScriptHash.SequenceEqual(realHash));
                 }
@@ -185,7 +185,7 @@ namespace NeoSharp.VM.Interop.Tests
                 Logger = new ExecutionEngineLogger(ELogVerbosity.StepInto)
             }))
             {
-                StringBuilder stackOp = new StringBuilder();
+                var stackOp = new StringBuilder();
 
                 engine.Logger.OnStepInto += (context) =>
                 {
@@ -339,7 +339,7 @@ namespace NeoSharp.VM.Interop.Tests
                         IArrayStackItem ar2;
 
                         {
-                            IStackItem[] art = new IStackItem[] { engine.CreateBool(true), engine.CreateBool(false) };
+                            var art = new IStackItem[] { engine.CreateBool(true), engine.CreateBool(false) };
                             ar2 = engine.CreateArray(art);
                             foreach (var it in art) it.Dispose();
                         }
@@ -369,7 +369,7 @@ namespace NeoSharp.VM.Interop.Tests
                         // Add 1,2,3
 
                         {
-                            IStackItem[] art = new IStackItem[] { engine.CreateInteger(1), engine.CreateInteger(2), engine.CreateInteger(3) };
+                            var art = new IStackItem[] { engine.CreateInteger(1), engine.CreateInteger(2), engine.CreateInteger(3) };
                             ar.Add(art);
                             foreach (var it in art) it.Dispose();
                         }
@@ -468,12 +468,12 @@ namespace NeoSharp.VM.Interop.Tests
 
                     Assert.AreEqual(2, ar.Count);
 
-                    List<bool> keys = new List<bool> { true, false };
+                    var keys = new List<bool> { true, false };
                     foreach (var i in ar.Keys)
                     {
                         Assert.IsTrue(i is BooleanStackItem);
 
-                        BooleanStackItem bb = (BooleanStackItem)i;
+                        var bb = (BooleanStackItem)i;
                         keys.Remove(bb.Value);
 
                         i.Dispose();
@@ -483,13 +483,13 @@ namespace NeoSharp.VM.Interop.Tests
 
                     // Test get values
 
-                    List<BigInteger> values = new List<BigInteger>() { 2, 5 };
+                    var values = new List<BigInteger>() { 2, 5 };
 
                     foreach (var i in ar.Values)
                     {
                         Assert.IsTrue(i is IntegerStackItem);
 
-                        IntegerStackItem bb = (IntegerStackItem)i;
+                        var bb = (IntegerStackItem)i;
                         values.Remove(bb.Value);
 
                         i.Dispose();
@@ -507,7 +507,7 @@ namespace NeoSharp.VM.Interop.Tests
                         Assert.IsTrue(i.Key is BooleanStackItem);
                         Assert.IsTrue(i.Value is IntegerStackItem);
 
-                        BooleanStackItem bb = (BooleanStackItem)i.Key;
+                        var bb = (BooleanStackItem)i.Key;
                         int ix = keys.IndexOf(bb.Value);
 
                         keys.RemoveAt(ix);
