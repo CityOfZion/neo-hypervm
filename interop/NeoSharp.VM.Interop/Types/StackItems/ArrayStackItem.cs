@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using NeoSharp.VM.Interop.Extensions;
 using NeoSharp.VM.Interop.Native;
 using Newtonsoft.Json;
@@ -26,26 +27,51 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         #region Public fields
 
         /// <summary>
+        /// Native engine
+        /// </summary>
+        public ExecutionEngine NativeEngine
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return Engine; }
+        }
+
+        /// <summary>
         /// Native Handle
         /// </summary>
         [JsonIgnore]
-        public IntPtr Handle => _handle;
+        public IntPtr Handle
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return _handle; }
+        }
 
         /// <summary>
         /// Is Disposed
         /// </summary>
         [JsonIgnore]
-        public override bool IsDisposed => _handle == IntPtr.Zero;
+        public override bool IsDisposed
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return _handle == IntPtr.Zero; }
+        }
 
         /// <summary>
         /// Count
         /// </summary>
-        public override int Count => NeoVM.ArrayStackItem_Count(_handle);
+        public override int Count
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return NeoVM.ArrayStackItem_Count(_handle); }
+        }
 
         /// <summary>
         /// Type
         /// </summary>
-        public new EStackItemType Type => base.Type;
+        public new EStackItemType Type
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return base.Type; }
+        }
 
         /// <summary>
         /// Index
@@ -54,7 +80,9 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <returns>Returns the StackItem element</returns>
         public override IStackItem this[int index]
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return Engine.ConvertFromNative(NeoVM.ArrayStackItem_Get(_handle, index)); }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set { Set(index, value); }
         }
 
@@ -157,6 +185,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
 
         #endregion
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte[] GetNativeByteArray() => null;
 
         #region IDisposable Support

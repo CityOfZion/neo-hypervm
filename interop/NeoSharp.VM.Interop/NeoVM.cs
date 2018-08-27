@@ -28,7 +28,7 @@ namespace NeoSharp.VM.Interop
         /// <summary>
         /// Default library name
         /// </summary>
-        public const string DefaultLibraryName = "NeoVM";
+        public const string DefaultLibraryName = "Neo.HyperVM";
 
         /// <summary>
         /// Library path
@@ -74,7 +74,7 @@ namespace NeoSharp.VM.Interop
         internal delegate int delInt_Handle(IntPtr pointer);
         internal delegate void delVoid_Handle(IntPtr pointer);
         internal delegate byte delByte_Handle(IntPtr pointer);
-        internal delegate ulong delUInt64_Handle(IntPtr pointer);
+        internal delegate uint delUInt32_Handle(IntPtr pointer);
         internal delegate IntPtr delHandle_Handle(IntPtr pointer);
         internal delegate void delVoid_RefHandle(ref IntPtr pointer);
 
@@ -86,12 +86,13 @@ namespace NeoSharp.VM.Interop
         internal delegate int delInt_HandleHandle(IntPtr handle, IntPtr item);
         internal delegate byte delByte_HandleRefInt(IntPtr item, out int size);
         internal delegate IntPtr delHandle_HandleInt(IntPtr pointer, int value);
+        internal delegate byte delByte_HandleUInt32(IntPtr pointer, uint value);
         internal delegate byte delByte_HandleUInt64(IntPtr pointer, ulong value);
         internal delegate void delVoid_HandleHandle(IntPtr pointer1, IntPtr pointer2);
         internal delegate byte delByte_HandleHandle(IntPtr pointer1, IntPtr pointer2);
         internal delegate IntPtr delHandle_HandleHandle(IntPtr pointer1, IntPtr pointer2);
         internal delegate byte delByte_HandleIntInt(IntPtr handle, int index, int index2);
-        internal delegate IntPtr delHandle_ByteHandleInt(byte type, IntPtr data, int size);
+        internal delegate IntPtr delHandle_HandleByteHandleInt(IntPtr handle, byte type, IntPtr data, int size);
         internal delegate void delVoid_HandleIntByte(IntPtr handle, int index, byte dispose);
         internal delegate int delInt_HandleHandleInt(IntPtr pointer1, IntPtr pointer2, int value);
         internal delegate void delVoid_HandleHandleInt(IntPtr pointer1, IntPtr pointer2, int value);
@@ -124,14 +125,14 @@ namespace NeoSharp.VM.Interop
         internal static delVoid_RefHandle ExecutionEngine_Free;
         internal static delInt_HandleHandleIntInt ExecutionEngine_LoadScript;
         internal static delByte_HandleIntInt ExecutionEngine_LoadCachedScript;
-        internal static delByte_Handle ExecutionEngine_Execute;
-        internal static delByte_HandleUInt64 ExecutionEngine_ExecuteUntil;
+        internal static delByte_HandleUInt32 ExecutionEngine_Execute;
         internal static delVoid_Handle ExecutionEngine_StepInto;
         internal static delVoid_Handle ExecutionEngine_StepOver;
         internal static delVoid_Handle ExecutionEngine_StepOut;
         internal static delByte_Handle ExecutionEngine_GetState;
-        internal static delUInt64_Handle ExecutionEngine_GetConsumedGas;
+        internal static delUInt32_Handle ExecutionEngine_GetConsumedGas;
         internal static delVoid_HandleUInt ExecutionEngine_Clean;
+        internal static delByte_HandleUInt32 ExecutionEngine_IncreaseGas;
         internal static delVoid_HandleOnStepIntoCallback ExecutionEngine_AddLog;
 
         internal static delInt_Handle StackItems_Count;
@@ -144,7 +145,7 @@ namespace NeoSharp.VM.Interop
         internal static delInt_HandleInt ExecutionContextStack_Drop;
         internal static delHandle_HandleInt ExecutionContextStack_Peek;
 
-        internal static delHandle_ByteHandleInt StackItem_Create;
+        internal static delHandle_HandleByteHandleInt StackItem_Create;
         internal static delByte_HandleRefInt StackItem_SerializeInfo;
         internal static delInt_HandleHandleInt StackItem_Serialize;
         internal static delVoid_RefHandle StackItem_Free;
@@ -241,7 +242,7 @@ namespace NeoSharp.VM.Interop
             }
 
             // Load library
-            LibraryPath = Path.Combine(AppContext.BaseDirectory, Core.Platform.ToString(),
+            LibraryPath = Path.Combine(AppContext.BaseDirectory, "native",
                 Core.Architecture.ToString(), libraryName + Core.LibraryExtension);
 
             // Check Environment path

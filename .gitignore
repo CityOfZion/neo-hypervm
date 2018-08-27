@@ -16,6 +16,7 @@
 *.userprefs
 
 # Build results
+BenchmarkDotNet.Artifacts/
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/

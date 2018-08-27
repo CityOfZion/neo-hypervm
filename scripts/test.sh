@@ -5,9 +5,7 @@ SCRIPTPATH=$(dirname "$SCRIPT")
 
 cd $SCRIPTPATH/../tests/
 
-# TODO: Change local path
-
-export NEO_VM_PATH=$SCRIPTPATH/../src/bin/NeoVM.so
+export NEO_VM_PATH=$SCRIPTPATH/../src/bin/Neo.HyperVM.so
 
 echo "************************"
 echo "**      UNIT TEST     **"

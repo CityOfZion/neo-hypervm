@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Mathematics;
+using Neo.SmartContract;
 using NeoSharp.VM;
 using NeoSharp.VM.Interop;
 
@@ -13,6 +14,12 @@ namespace Neo.HyperVM.Benchmarks
     [RPlotExporter, RankColumn(NumeralSystem.Arabic)]
     public abstract class VMBenchmarkBase
     {
+        #region Scripts
+
+        protected byte[] _script;
+
+        #endregion
+
         #region Neo params
 
         protected VM.ICrypto _crypto;
@@ -24,16 +31,43 @@ namespace Neo.HyperVM.Benchmarks
         protected ExecutionEngineArgs _args;
         protected NeoVM _HyperVM;
 
+        [Params(1000)]
+        public virtual int Repetitions { get; set; }
+
         [Params(nameof(VMBenchmarkBase))]
-        public abstract string Test { get; set; }
+        public abstract string OpCodes { get; set; }
 
         #endregion
 
-        public abstract void HyperVM();
+        [Benchmark]
+        public virtual void HyperVM()
+        {
+            using (var engine = new NeoSharp.VM.Interop.Types.ExecutionEngine(null))
+            {
+                engine.LoadScript(_script);
+                engine.Execute();
+            }
+        }
 
-        public abstract void NeoVM();
+        [Benchmark]
+        public virtual void NeoVM()
+        {
+            using (var engine = new VM.ExecutionEngine(null, _crypto, null, null))
+            {
+                engine.LoadScript(_script, -1);
+                engine.Execute();
+            }
+        }
 
-        public abstract void ApplicationEngine();
+        [Benchmark]
+        public virtual void ApplicationEngine()
+        {
+            using (var engine = new ApplicationEngine(TriggerType.Application, null, null, Fixed8.Zero, true))
+            {
+                engine.LoadScript(_script, -1);
+                engine.Execute();
+            }
+        }
 
         public virtual void Setup()
         {

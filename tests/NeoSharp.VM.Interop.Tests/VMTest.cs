@@ -107,7 +107,7 @@ namespace NeoSharp.VM.Interop.Tests
         [TestMethod]
         public void TestParallel()
         {
-            ExecutionEngineArgs args = new ExecutionEngineArgs()
+            var args = new ExecutionEngineArgs()
             {
                 ScriptTable = new DummyScriptTable
                     (
@@ -118,7 +118,7 @@ namespace NeoSharp.VM.Interop.Tests
 
             // 5 Scripts
 
-            List<IExecutionEngine> engines = new List<IExecutionEngine>()
+            var engines = new List<IExecutionEngine>()
             {
                 CreateEngine(args),
                 CreateEngine(args),
@@ -134,35 +134,36 @@ namespace NeoSharp.VM.Interop.Tests
 
             Parallel.ForEach(engines, (engine) =>
             {
-                for (ushort x = 0; x < 1000; x++)
+                using (engine)
                 {
-                    // Load script
-
-                    engine.Clean(x);
-
-                    using (var script = new ScriptBuilder())
+                    for (ushort x = 0; x < 1000; x++)
                     {
-                        script.EmitPush(x);
-                        script.EmitPush(x);
-                        script.EmitAppCall(new byte[]
+                        // Load script
+
+                        engine.Clean(x);
+
+                        using (var script = new ScriptBuilder())
                         {
+                            script.EmitPush(x);
+                            script.EmitPush(x);
+                            script.EmitAppCall(new byte[]
+                            {
                             0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0A,
                             0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1A,
-                        });
+                            });
 
-                        engine.LoadScript(script);
+                            engine.LoadScript(script);
+                        }
+
+                        // Execute
+
+                        Assert.IsTrue(engine.Execute());
+
+                        // Check result
+
+                        Assert.IsTrue(engine.ResultStack.TryPop(out bool var) && var);
                     }
-
-                    // Execute
-
-                    Assert.IsTrue(engine.Execute());
-
-                    // Check result
-
-                    Assert.IsTrue(engine.ResultStack.Pop<BooleanStackItem>().Value);
                 }
-
-                engine.Dispose();
             });
         }
 

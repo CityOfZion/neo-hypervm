@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Runtime;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace NeoSharp.VM.Interop.Tests
@@ -37,7 +36,11 @@ namespace NeoSharp.VM.Interop.Tests
             Console.WriteLine(g2);
 
             // **************************************************
-
+            if (!NeoVM.TryLoadLibrary(NeoVM.DefaultLibraryName, out string error))
+            {
+                Console.WriteLine("Library load error. {0}", error);
+                return;
+            }
             Console.WriteLine("Native Library Info");
             Console.WriteLine("  Path: " + NeoVM.LibraryPath);
             Console.WriteLine("  Version: " + NeoVM.LibraryVersion);
