@@ -23,6 +23,7 @@ private:
 	uint32 _iteration;
 	uint32 _consumedGas;
 	uint32 _maxGas;
+	volatile IStackItemCounter *_counter;
 
 	// Save the state of the execution
 
@@ -138,7 +139,7 @@ public:
 			return NULL;
 		}
 
-		return new MapStackItem(this);
+		return new MapStackItem(_counter);
 	}
 
 	inline IntegerStackItem* CreateInteger(int32 value)
@@ -149,7 +150,7 @@ public:
 			return NULL;
 		}
 
-		return new IntegerStackItem(this, value);
+		return new IntegerStackItem(_counter, value);
 	}
 
 	inline IntegerStackItem* CreateInteger(BigInteger *value)
@@ -160,7 +161,7 @@ public:
 			return NULL;
 		}
 
-		return new IntegerStackItem(this, value);
+		return new IntegerStackItem(_counter, value);
 	}
 
 	inline IntegerStackItem* CreateInteger(byte* data, int32 length)
@@ -171,7 +172,7 @@ public:
 			return NULL;
 		}
 
-		return new IntegerStackItem(this, data, length);
+		return new IntegerStackItem(_counter, data, length);
 	}
 
 	inline InteropStackItem* CreateInterop(byte* data, int32 length)
@@ -182,7 +183,7 @@ public:
 			return NULL;
 		}
 
-		return new InteropStackItem(this, data, length);
+		return new InteropStackItem(_counter, data, length);
 	}
 
 	inline ByteArrayStackItem* CreateByteArray(byte* data, int32 length, bool copyPointer)
@@ -193,7 +194,7 @@ public:
 			return NULL;
 		}
 
-		return new ByteArrayStackItem(this, data, length, copyPointer);
+		return new ByteArrayStackItem(_counter, data, length, copyPointer);
 	}
 
 	inline BoolStackItem* CreateBool(bool value)
@@ -204,7 +205,7 @@ public:
 			return NULL;
 		}
 
-		return new BoolStackItem(this, value);
+		return new BoolStackItem(_counter, value);
 	}
 
 	inline ArrayStackItem* CreateArray()
@@ -215,7 +216,7 @@ public:
 			return NULL;
 		}
 
-		return new ArrayStackItem(this);
+		return new ArrayStackItem(_counter);
 	}
 
 	inline ArrayStackItem* CreateStruct()
@@ -226,7 +227,7 @@ public:
 			return NULL;
 		}
 
-		return new ArrayStackItem(this, true);
+		return new ArrayStackItem(_counter, true);
 	}
 
 	inline ArrayStackItem* CreateArray(int32 count)
@@ -237,11 +238,11 @@ public:
 			return NULL;
 		}
 
-		ArrayStackItem * ret = new ArrayStackItem(this, false);
+		auto ret = new ArrayStackItem(_counter, false);
 
 		for (int32 i = 0; i < count; ++i)
 		{
-			ret->Add(new BoolStackItem(this, false));
+			ret->Add(new BoolStackItem(_counter, false));
 		}
 
 		return ret;
@@ -255,11 +256,11 @@ public:
 			return NULL;
 		}
 
-		ArrayStackItem * ret = new ArrayStackItem(this, true);
+		auto ret = new ArrayStackItem(_counter, true);
 
 		for (int32 i = 0; i < count; ++i)
 		{
-			ret->Add(new BoolStackItem(this, false));
+			ret->Add(new BoolStackItem(_counter, false));
 		}
 
 		return ret;

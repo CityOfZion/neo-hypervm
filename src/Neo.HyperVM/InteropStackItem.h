@@ -31,7 +31,7 @@ public:
 
 	// Constructor
 
-	inline InteropStackItem(IStackItemCounter* counter, byte* data, int32 length)
+	inline InteropStackItem(volatile IStackItemCounter* &counter, byte* data, int32 length)
 		:IStackItem(counter, EStackItemType::Interop), _payloadLength(length)
 	{
 		this->_payload = new byte[length];

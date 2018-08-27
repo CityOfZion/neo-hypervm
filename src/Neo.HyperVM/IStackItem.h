@@ -9,7 +9,7 @@ class IStackItem : public IClaimable
 {
 protected:
 
-	IStackItemCounter* _counter;
+	volatile IStackItemCounter* &_counter;
 
 public:
 
@@ -24,14 +24,19 @@ public:
 	virtual int32 ReadByteArraySize() = 0;
 	virtual int32 ReadByteArray(byte* output, int32 sourceIndex, int32 count) = 0;
 
+	// Serialize
+
+	virtual int32 Serialize(byte* data, int32 length) = 0;
+	virtual int32 GetSerializedSize() = 0;
+
 	// Constructor
 
-	inline IStackItem(IStackItemCounter* counter, EStackItemType type) :
+	inline IStackItem(volatile IStackItemCounter* &counter, EStackItemType type) :
 		IClaimable(),
 		_counter(counter),
 		Type(type)
 	{
-		// TODO: Count the stack items
+		// Already counted
 		// _counter->ItemCounterInc();
 	}
 
@@ -39,18 +44,11 @@ public:
 
 	virtual ~IStackItem()
 	{
-		if (_counter != NULL) 
+		if (this->_counter != NULL)
 		{
-			// TODO: Fail when dispose counter before this
+			// TODO: Fail when dispose counter before this, for this reason the pointer is a reference pointer
 
-			// _counter->ItemCounterDec();
+			// ((IStackItemCounter*)this->_counter)->ItemCounterDec();
 		}
-
-		_counter = NULL;
 	};
-
-	// Serialize
-
-	virtual int32 Serialize(byte* data, int32 length) = 0;
-	virtual int32 GetSerializedSize() = 0;
 };

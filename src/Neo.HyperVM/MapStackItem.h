@@ -44,7 +44,7 @@ public:
 
 	// Constructor & Destructor
 
-	inline MapStackItem(IStackItemCounter* counter) :
+	inline MapStackItem(volatile IStackItemCounter* &counter) :
 		IStackItem(counter, EStackItemType::Map),
 		_dictionary(std::map<IStackItem*, IStackItem*>())
 	{ }

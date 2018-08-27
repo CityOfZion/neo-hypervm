@@ -13,24 +13,24 @@ public:
 
 	inline void ItemCounterClean()
 	{
-		_items = 0;
+		this->_items = 0;
 	}
 
 	inline bool ItemCounterInc()
 	{
-		return _maxItems >= ++_items;
+		return this->_maxItems >= ++this->_items;
 	}
 
 	inline bool ItemCounterInc(int32 count)
 	{
-		_items += count;
+		this->_items += count;
 
-		return _maxItems >= _items;
+		return this->_maxItems >= this->_items;
 	}
 
 	inline void ItemCounterDec()
 	{
-		--_items;
+		--this->_items;
 	}
 
 	inline IStackItemCounter(int32 maxItems) :_items(0), _maxItems(maxItems) {}

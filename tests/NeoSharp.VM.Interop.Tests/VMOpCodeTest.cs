@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -12,7 +10,6 @@ namespace NeoSharp.VM.Interop.Tests
 {
     public class VMOpCodeTest
     {
-        private const bool CalculateNumericalTimes = false;
         private IVMFactory _VMFactory;
 
         [TestInitialize]
@@ -137,7 +134,8 @@ namespace NeoSharp.VM.Interop.Tests
         /// </summary>
         /// <param name="operand">Operand</param>
         /// <param name="check">Check</param>
-        protected void InternalTestBigInteger(EVMOpCode operand, Action<IExecutionEngine, BigInteger, BigInteger, CancelEventArgs> check)
+        protected void InternalTestBigInteger(EVMOpCode operand,
+            Func<BigIntegerPair, object> check)
         {
             // Test without push
 
@@ -179,7 +177,11 @@ namespace NeoSharp.VM.Interop.Tests
                     // Equal command don't FAULT here
 
                     Assert.IsTrue(engine.Execute());
-                    Assert.AreEqual(engine.ResultStack.Pop<BooleanStackItem>().Value, false);
+
+                    using(var i = engine.ResultStack.Pop<BooleanStackItem>())
+                    {
+                        Assert.AreEqual(i.Value, false);
+                    }
                 }
                 else
                 {
@@ -191,8 +193,6 @@ namespace NeoSharp.VM.Interop.Tests
                 CheckClean(engine, false);
             }
 
-            Stopwatch sw = new Stopwatch();
-
             // Test with push
 
             foreach (var pair in IntPairIteration())
@@ -202,7 +202,7 @@ namespace NeoSharp.VM.Interop.Tests
                 {
                     // Make the script
 
-                    foreach (BigInteger bb in new BigInteger[] { pair.A, pair.B })
+                    foreach (var bb in new BigInteger[] { pair.A, pair.B })
                         script.EmitPush(bb);
 
                     script.Emit(operand, EVMOpCode.RET);
@@ -227,41 +227,39 @@ namespace NeoSharp.VM.Interop.Tests
 
                     // Operand
 
-                    CancelEventArgs cancel = new CancelEventArgs(false);
-
-#pragma warning disable CS0162
-                    if (CalculateNumericalTimes)
-                    {
-                        sw.Restart();
-                    }
-#pragma warning restore
-
                     engine.StepInto();
                     engine.StepInto();
 
-                    check(engine, pair.A, pair.B, cancel);
-
-#pragma warning disable CS0162
-                    if (CalculateNumericalTimes)
+                    try
                     {
-                        sw.Stop();
-                        Console.WriteLine("[" + sw.Elapsed.ToString() + "] " + pair.A + " " + operand.ToString() + " " + pair.B);
+                        var ret = check(pair);
+
+                        using (var it = engine.ResultStack.Pop())
+                        {
+                            var val = it.GetRawObject();
+
+                            if (val is byte[] buf)
+                            {
+                                CollectionAssert.AreEqual((byte[])ret, buf);
+                            }
+                            else
+                            {
+                                Assert.AreEqual(ret, val);
+                            }
+                        }
+
+                        // RET
+
+                        Assert.AreEqual(EVMState.Halt, engine.State);
+                        CheckClean(engine);
                     }
-#pragma warning restore
-
-                    if (cancel.Cancel)
+                    catch
                     {
+                        // RET
+
+                        Assert.AreEqual(EVMState.Fault, engine.State);
                         CheckClean(engine, false);
-                        continue;
                     }
-
-                    // RET
-
-                    Assert.AreEqual(EVMState.Halt, engine.State);
-
-                    // Check
-
-                    CheckClean(engine);
                 }
             }
 
@@ -297,40 +295,49 @@ namespace NeoSharp.VM.Interop.Tests
 
                     // Operand
 
-                    CancelEventArgs cancel = new CancelEventArgs(false);
-
-#pragma warning disable CS0162
-                    if (CalculateNumericalTimes)
-                    {
-                        sw.Restart();
-                    }
-#pragma warning restore
-
                     engine.StepInto(2);
-                    check(engine, i, i, cancel);
 
-#pragma warning disable CS0162
-                    if (CalculateNumericalTimes)
+                    try
                     {
-                        sw.Stop();
-                        Console.WriteLine("[" + sw.Elapsed.ToString() + "] " + i + " " + operand.ToString() + " " + i);
+                        var ret = check(new BigIntegerPair(i, i));
+
+                        using (var it = engine.ResultStack.Pop())
+                        {
+                            CheckValue(it, ret);
+                        }
+
+                        // RET
+
+                        Assert.AreEqual(EVMState.Halt, engine.State);
+                        CheckClean(engine);
                     }
-#pragma warning restore
-
-                    if (cancel.Cancel)
+                    catch
                     {
+                        // RET
+
+                        Assert.AreEqual(EVMState.Fault, engine.State);
                         CheckClean(engine, false);
-                        continue;
                     }
-
-                    // RET
-                    engine.StepInto();
-                    Assert.AreEqual(EVMState.Halt, engine.State);
-
-                    // Check
-
-                    CheckClean(engine);
                 }
+            }
+        }
+
+        private void CheckValue(IStackItem it, object ret)
+        {
+            if (ret is BigInteger bi)
+            {
+                Assert.IsTrue(it is IntegerStackItem);
+                Assert.AreEqual(bi, ((IntegerStackItem)it).Value);
+            }
+            else if (ret is byte[] bf)
+            {
+                Assert.IsTrue(it is ByteArrayStackItem);
+                CollectionAssert.AreEqual(bf, ((ByteArrayStackItem)it).Value);
+            }
+            else if (ret is bool bl)
+            {
+                Assert.IsTrue(it is BooleanStackItem);
+                Assert.AreEqual(bl, ((BooleanStackItem)it).Value);
             }
         }
 
@@ -339,7 +346,7 @@ namespace NeoSharp.VM.Interop.Tests
         /// </summary>
         /// <param name="operand">Operand</param>
         /// <param name="check">Check</param>
-        protected void InternalTestBigInteger(EVMOpCode operand, Action<IExecutionEngine, BigInteger, CancelEventArgs> check)
+        protected void InternalTestBigInteger(EVMOpCode operand, Func<BigInteger, object> check)
         {
             // Test without push
 
@@ -384,8 +391,6 @@ namespace NeoSharp.VM.Interop.Tests
 
             // Test with push
 
-            Stopwatch sw = new Stopwatch();
-
             foreach (var bi in IntSingleIteration())
             {
                 using (var script = new ScriptBuilder())
@@ -411,35 +416,29 @@ namespace NeoSharp.VM.Interop.Tests
 
                     // Operand
 
-                    CancelEventArgs cancel = new CancelEventArgs(false);
-
-#pragma warning disable CS0162
-                    if (CalculateNumericalTimes)
-                    {
-                        sw.Restart();
-                    }
-#pragma warning restore
-
                     engine.StepInto(2);
-                    check(engine, bi, cancel);
 
-#pragma warning disable CS0162
-                    if (CalculateNumericalTimes)
+                    try
                     {
-                        sw.Stop();
-                        Console.WriteLine("[" + sw.Elapsed.ToString() + "] " + bi);
+                        var ret = check(bi);
+
+                        using (var it = engine.ResultStack.Pop())
+                        {
+                            CheckValue(it, ret);
+                        }
+
+                        // RET
+
+                        Assert.AreEqual(EVMState.Halt, engine.State);
+                        CheckClean(engine);
                     }
-#pragma warning restore
+                    catch
+                    {
+                        // RET
 
-                    if (cancel.Cancel) continue;
-
-                    // RET
-                    engine.StepInto();
-                    Assert.AreEqual(EVMState.Halt, engine.State);
-
-                    // Check
-
-                    CheckClean(engine);
+                        Assert.AreEqual(EVMState.Fault, engine.State);
+                        CheckClean(engine, false);
+                    }
                 }
             }
         }
@@ -520,21 +519,26 @@ namespace NeoSharp.VM.Interop.Tests
             {
                 object val = values[x];
 
-                if (val is Int32)
+                using (var ait = arr[x])
                 {
-                    Assert.IsTrue(arr[x] is IIntegerStackItem);
-                    var i = arr[x] as IIntegerStackItem;
-                    Assert.AreEqual(i.Value, (int)values[x]);
-                }
-                else if (val is bool)
-                {
-                    Assert.IsTrue(arr[x] is IBooleanStackItem);
-                    var i = arr[x] as IBooleanStackItem;
-                    Assert.AreEqual(i.Value, (bool)values[x]);
-                }
-                else
-                {
-                    throw (new ArgumentException());
+                    if (val is int)
+                    {
+                        Assert.IsTrue(ait is IIntegerStackItem);
+                        var i = ait as IIntegerStackItem;
+
+                        Assert.AreEqual(i.Value, (int)val);
+                    }
+                    else if (val is bool)
+                    {
+                        Assert.IsTrue(ait is IBooleanStackItem);
+                        var i = ait as IBooleanStackItem;
+
+                        Assert.AreEqual(i.Value, (bool)val);
+                    }
+                    else
+                    {
+                        throw (new ArgumentException());
+                    }
                 }
             }
         }

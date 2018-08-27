@@ -16,10 +16,11 @@ void ExecutionEngine::Clean(uint32 iteration)
 	this->_state = EVMState::NONE;
 	this->_consumedGas = 0;
 	this->_maxGas = 0xFFFFFFFF;
-	this->ItemCounterClean();
 
 	this->InvocationStack.Clear();
 	this->ResultStack.Clear();
+
+	this->ItemCounterClean();
 }
 
 // Constructor
@@ -32,6 +33,7 @@ ExecutionEngine::ExecutionEngine
 	_iteration(0),
 	_consumedGas(0),
 	_maxGas(0xFFFFFFFF),
+	_counter(NULL),
 	_state(EVMState::NONE),
 	Log(NULL),
 
@@ -40,7 +42,9 @@ ExecutionEngine::ExecutionEngine
 	OnInvokeInterop(invokeInterop),
 	ResultStack(),
 	InvocationStack()
-{ }
+{
+	this->_counter = this;
+}
 
 ExecutionContext* ExecutionEngine::LoadScript(ExecutionScript* script, int32 rvcount)
 {
@@ -3794,6 +3798,7 @@ ExecutionEngine::~ExecutionEngine()
 	this->OnInvokeInterop = NULL;
 	this->OnGetMessage = NULL;
 	this->Log = NULL;
+	this->_counter = NULL;	// Need to set to NULL to ensure that is not used by `IStackItem.h`
 
 	// Clean stacks
 
