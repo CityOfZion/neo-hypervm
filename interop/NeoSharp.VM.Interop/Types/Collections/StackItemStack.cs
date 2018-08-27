@@ -3,7 +3,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using NeoSharp.VM.Interop.Extensions;
 using NeoSharp.VM.Interop.Native;
-using Newtonsoft.Json;
 
 namespace NeoSharp.VM.Interop.Types.Collections
 {
@@ -17,8 +16,7 @@ namespace NeoSharp.VM.Interop.Types.Collections
         /// <summary>
         /// Engine
         /// </summary>
-        [JsonIgnore]
-        private new readonly ExecutionEngine Engine;
+        private readonly ExecutionEngine _engine;
 
         /// <summary>
         /// Return the number of items in the stack
@@ -47,7 +45,7 @@ namespace NeoSharp.VM.Interop.Types.Collections
 
             if (ptr == IntPtr.Zero) throw new IndexOutOfRangeException();
 
-            return Engine.ConvertFromNative(ptr);
+            return _engine.ConvertFromNative(ptr);
         }
 
         /// <summary>
@@ -76,7 +74,7 @@ namespace NeoSharp.VM.Interop.Types.Collections
                 return false;
             }
 
-            obj = Engine.ConvertFromNative(ptr);
+            obj = _engine.ConvertFromNative(ptr);
             return true;
         }
 
@@ -96,7 +94,7 @@ namespace NeoSharp.VM.Interop.Types.Collections
                 return false;
             }
 
-            var ret = Engine.ConvertFromNative(ptr);
+            var ret = _engine.ConvertFromNative(ptr);
 
             if (ret is TStackItem ts)
             {
@@ -118,7 +116,7 @@ namespace NeoSharp.VM.Interop.Types.Collections
         internal StackItemStack(IExecutionEngine engine, IntPtr handle) : base(engine)
         {
             _handle = handle;
-            Engine = (ExecutionEngine)engine;
+            _engine = (ExecutionEngine)engine;
 
             if (handle == IntPtr.Zero) throw new ExternalException();
         }

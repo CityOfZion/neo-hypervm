@@ -16,11 +16,6 @@ namespace NeoSharp.VM.Interop
         internal const byte TRUE = 0x01;
         internal const byte FALSE = 0x00;
 
-        /// <summary>
-        /// Library core
-        /// </summary>
-        private static CrossPlatformLibrary Core;
-
         #endregion
 
         #region Public fields
@@ -211,31 +206,35 @@ namespace NeoSharp.VM.Interop
 
             // Detect OS
 
+            CrossPlatformLibrary core;
+
             switch (Environment.OSVersion.Platform)
             {
+                default: core = null; break;
+
                 case PlatformID.Win32NT:
                 case PlatformID.Win32S:
                 case PlatformID.Win32Windows:
                 case PlatformID.WinCE:
                     {
-                        Core = new WindowsCore();
+                        core = new WindowsCore();
                         break;
                     }
                 case PlatformID.Unix:
                 case (PlatformID)128:
                     {
-                        Core = new LinuxCore();
+                        core = new LinuxCore();
                         break;
                     }
                 case PlatformID.MacOSX:
                     {
-                        Core = new MacCore();
+                        core = new MacCore();
                         break;
                     }
             }
 
             // Check core
-            if (Core == null)
+            if (core == null)
             {
                 error = "Native library not found";
                 return false;
@@ -243,7 +242,7 @@ namespace NeoSharp.VM.Interop
 
             // Load library
             LibraryPath = Path.Combine(AppContext.BaseDirectory, "native",
-                Core.Architecture.ToString(), libraryName + Core.LibraryExtension);
+                core.Architecture.ToString(), libraryName + core.LibraryExtension);
 
             // Check Environment path
             if (!File.Exists(LibraryPath))
@@ -264,26 +263,25 @@ namespace NeoSharp.VM.Interop
                 }
             }
 
-            if (!Core.LoadLibrary(LibraryPath))
+            if (!core.LoadLibrary(LibraryPath))
             {
                 error = "Wrong library file: " + LibraryPath;
                 return false;
             }
 
-            // Static destructor
-            AppDomain.CurrentDomain.ProcessExit += (o, e) =>
-            {
-                Core?.Dispose();
-            };
+            // Free library
+
+            AppDomain.CurrentDomain.ProcessExit += (o, e) => core?.Dispose();
 
             // Cache delegates using reflection
 
             var delegateType = typeof(MulticastDelegate);
 
-            foreach (var fi in typeof(NeoVM).GetFields(BindingFlags.NonPublic | BindingFlags.Static)
+            foreach (var fi in typeof(NeoVM)
+                .GetFields(BindingFlags.NonPublic | BindingFlags.Static)
                 .Where(fi => fi.FieldType.BaseType == delegateType))
             {
-                var del = Core.GetDelegate(fi.Name, fi.FieldType);
+                var del = core.GetDelegate(fi.Name, fi.FieldType);
 
                 if (del == null)
                 {

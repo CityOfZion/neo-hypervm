@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using NeoSharp.VM.Interop.Types.Collections;
-using Newtonsoft.Json;
 
 namespace NeoSharp.VM.Interop.Types
 {
@@ -34,12 +33,6 @@ namespace NeoSharp.VM.Interop.Types
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return _handle; }
         }
-
-        /// <summary>
-        /// Engine
-        /// </summary>
-        [JsonIgnore]
-        public new readonly ExecutionEngine Engine;
 
         /// <summary>
         /// Is Disposed
@@ -123,7 +116,6 @@ namespace NeoSharp.VM.Interop.Types
         internal ExecutionContext(ExecutionEngine engine, IntPtr handle) : base(engine)
         {
             _handle = handle;
-            Engine = engine;
             NeoVM.ExecutionContext_Claim(_handle, out IntPtr evHandle, out IntPtr altHandle);
 
             _altStack = new StackItemStack(Engine, altHandle);

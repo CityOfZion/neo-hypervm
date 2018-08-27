@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Newtonsoft.Json;
 
 namespace NeoSharp.VM.Interop.Types.Collections
 {
@@ -15,8 +14,7 @@ namespace NeoSharp.VM.Interop.Types.Collections
         /// <summary>
         /// Engine
         /// </summary>
-        [JsonIgnore]
-        public new readonly ExecutionEngine Engine;
+        private readonly ExecutionEngine _engine;
 
         /// <summary>
         /// Return the number of items in the stack
@@ -61,7 +59,7 @@ namespace NeoSharp.VM.Interop.Types.Collections
                 return false;
             }
 
-            obj = new ExecutionContext(Engine, ptr);
+            obj = new ExecutionContext(_engine, ptr);
             return true;
         }
 
@@ -72,7 +70,7 @@ namespace NeoSharp.VM.Interop.Types.Collections
         /// <param name="handle">Handle</param>
         internal ExecutionContextStack(ExecutionEngine engine, IntPtr handle) : base(engine)
         {
-            Engine = engine;
+            _engine = engine;
             _handle = handle;
 
             if (handle == IntPtr.Zero) throw new ExternalException();

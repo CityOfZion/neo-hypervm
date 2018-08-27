@@ -16,12 +16,6 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// </summary>
         private IntPtr _handle;
 
-        /// <summary>
-        /// Engine
-        /// </summary>
-        [JsonIgnore]
-        private readonly new ExecutionEngine Engine;
-
         #endregion
 
         #region Public fields
@@ -29,10 +23,11 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <summary>
         /// Native engine
         /// </summary>
+        [JsonIgnore]
         public ExecutionEngine NativeEngine
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return Engine; }
+            get;
         }
 
         /// <summary>
@@ -81,7 +76,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         public override IStackItem this[int index]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return Engine.ConvertFromNative(NeoVM.ArrayStackItem_Get(_handle, index)); }
+            get { return NativeEngine.ConvertFromNative(NeoVM.ArrayStackItem_Get(_handle, index)); }
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set { Set(index, value); }
         }
@@ -96,7 +91,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         internal ArrayStackItem(ExecutionEngine engine, bool isStruct) :
             base(engine, isStruct)
         {
-            Engine = engine;
+            NativeEngine = engine;
             _handle = this.CreateNativeItem();
         }
 
@@ -109,7 +104,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         internal ArrayStackItem(ExecutionEngine engine, IEnumerable<IStackItem> data, bool isStruct) :
             base(engine, isStruct)
         {
-            Engine = engine;
+            NativeEngine = engine;
             _handle = this.CreateNativeItem();
 
             if (data != null)
@@ -130,7 +125,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         internal ArrayStackItem(ExecutionEngine engine, IntPtr handle, bool isStruct) :
             base(engine, isStruct)
         {
-            Engine = engine;
+            NativeEngine = engine;
             _handle = handle;
         }
 
@@ -142,10 +137,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
 
         #region Write
 
-        public override void Add(IStackItem item)
-        {
-            NeoVM.ArrayStackItem_Add(Handle, ((INativeStackItem)item).Handle);
-        }
+        public override void Add(IStackItem item) => NeoVM.ArrayStackItem_Add(Handle, ((INativeStackItem)item).Handle);
 
         public override void Add(params IStackItem[] items)
         {
@@ -163,25 +155,13 @@ namespace NeoSharp.VM.Interop.Types.StackItems
             }
         }
 
-        public override void Clear()
-        {
-            NeoVM.ArrayStackItem_Clear(Handle);
-        }
+        public override void Clear() => NeoVM.ArrayStackItem_Clear(Handle);
 
-        public override void Insert(int index, IStackItem item)
-        {
-            NeoVM.ArrayStackItem_Insert(Handle, ((INativeStackItem)item).Handle, index);
-        }
+        public override void Insert(int index, IStackItem item) => NeoVM.ArrayStackItem_Insert(Handle, ((INativeStackItem)item).Handle, index);
 
-        public override void Set(int index, IStackItem item)
-        {
-            NeoVM.ArrayStackItem_Set(Handle, ((INativeStackItem)item).Handle, index);
-        }
+        public override void Set(int index, IStackItem item) => NeoVM.ArrayStackItem_Set(Handle, ((INativeStackItem)item).Handle, index);
 
-        public override void RemoveAt(int index)
-        {
-            NeoVM.ArrayStackItem_RemoveAt(Handle, index);
-        }
+        public override void RemoveAt(int index) => NeoVM.ArrayStackItem_RemoveAt(Handle, index);
 
         #endregion
 

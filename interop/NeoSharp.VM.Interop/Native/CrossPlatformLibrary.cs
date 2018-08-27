@@ -92,7 +92,9 @@ namespace NeoSharp.VM.Interop.Interfaces
         public bool FreeLibrary()
         {
             if (_nativeHandle == IntPtr.Zero)
+            {
                 throw new NotSupportedException("Library not loaded");
+            }
 
             if (InternalFreeLibrary())
             {
