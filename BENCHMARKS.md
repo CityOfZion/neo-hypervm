@@ -12,8 +12,12 @@ Intel Core i7-6700HQ CPU 2.60GHz (Skylake), 1 CPU, 8 logical and 4 physical core
 
 ```
 
-|            Method |   OpCodes | Repetitions |       Mean |     Error |    StdDev |        Min |        Max |     Median | Rank |
-|------------------ |---------- |------------ |-----------:|----------:|----------:|-----------:|-----------:|-----------:|-----:|
+|            Method |   OpCodes | Iterations |       Mean |     Error |    StdDev |        Min |        Max |     Median | Rank |
+|------------------ |---------- |----------- |-----------:|----------:|----------:|-----------:|-----------:|-----------:|-----:|
+|           HyperVM |  VERIFY |        1000 | 154.1 ms | 3.230 ms | 5.307 ms | 147.2 ms | 167.4 ms | 152.2 ms |    1 |
+|             NeoVM |  VERIFY |        1000 | 359.4 ms | 5.102 ms | 4.772 ms | 354.0 ms | 367.8 ms | 357.9 ms |    2 |
+| ApplicationEngine |  VERIFY |        1000 | 365.1 ms | 3.084 ms | 2.885 ms | 357.1 ms | 368.3 ms | 365.5 ms |    3 |
+| | | | | | | | | | |
 |           HyperVM | FACTORIAL |           1 |   175.9 us |  3.378 us |  3.469 us |   166.1 us |   182.8 us |   175.7 us |    1 |
 |             NeoVM | FACTORIAL |           1 |   501.2 us | 10.006 us | 22.584 us |   462.0 us |   552.2 us |   502.3 us |    2 |
 | ApplicationEngine | FACTORIAL |           1 | 1,133.0 us | 22.495 us | 34.353 us | 1,060.5 us | 1,198.3 us | 1,129.2 us |    3 |
@@ -35,6 +39,7 @@ Intel Core i7-6700HQ CPU 2.60GHz (Skylake), 1 CPU, 8 logical and 4 physical core
 | ApplicationEngine | PUSH0+DROP |        1000 | 482.80 us |  9.946 us | 16.342 us | 475.53 us | 465.78 us | 532.22 us |    3 |
 
 *NeoVM and ApplicationEngine come form NEO 3.0 binaries*
+*VERIFY with OpenSSL*
 
 ### Other
 There is a `Makefile` in the root of the project. To build the `VM` source:
