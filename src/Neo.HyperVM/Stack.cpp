@@ -103,7 +103,7 @@ void Stack<T>::EnsureCapacity(int32 min)
 
 	if (num != this->_itemsLength)
 	{
-		T** array = new T*[num]();
+		T** array = new T*[num];
 
 		if (this->_size > 0)
 		{
@@ -153,7 +153,7 @@ void Stack<T>::SendTo(Stack<T>* stack, int32 count)
 		count = this->_size;
 	}
 
-	if (count == 0) return;
+	if (count <= 0) return;
 
 	stack->EnsureCapacity(stack->_size + count);
 

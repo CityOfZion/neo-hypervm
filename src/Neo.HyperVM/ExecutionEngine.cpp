@@ -155,7 +155,7 @@ void ExecutionEngine::StepInto()
 		return;
 	}
 
-	auto context = this->InvocationStack.Peek(0);
+	auto context = this->InvocationStack.Top();
 
 	if (context == NULL)
 	{
@@ -556,7 +556,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		auto contextnew = this->InvocationStack.Peek(0);
+		auto contextnew = this->InvocationStack.Top();
 		context->EvaluationStack.SendTo(&contextnew->EvaluationStack, pcount);
 
 		if (opcode == EVMOpCode::CALL_ET || opcode == EVMOpCode::CALL_EDT)
@@ -742,7 +742,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack.Push(context->AltStack.Peek(0));
+		context->EvaluationStack.Push(context->AltStack.Top());
 		return;
 	}
 	case EVMOpCode::TOALTSTACK:
@@ -866,7 +866,7 @@ ExecuteOpCode:
 		}
 
 		StackItemHelper::Free(it);
-		context->EvaluationStack.Insert(n, context->EvaluationStack.Peek(0));
+		context->EvaluationStack.Insert(n, context->EvaluationStack.Top());
 		return;
 	}
 	case EVMOpCode::DEPTH:
@@ -913,7 +913,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		context->EvaluationStack.Push(context->EvaluationStack.Peek(0));
+		context->EvaluationStack.Push(context->EvaluationStack.Top());
 		return;
 	}
 	case EVMOpCode::NIP:
@@ -1069,7 +1069,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		auto x1 = context->EvaluationStack.Peek(0);
+		auto x1 = context->EvaluationStack.Top();
 		context->EvaluationStack.Insert(2, x1);
 		return;
 	}
