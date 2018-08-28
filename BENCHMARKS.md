@@ -1,7 +1,5 @@
 # Benchmarks
 
-You could get the sources [here](https://github.com/CityOfZion/neo-hypervm/tree/development/tests/Neo.HyperVM.Benchmarks/Benchmarks)
-
 ``` ini
 BenchmarkDotNet=v0.11.1, OS=Windows 10.0.17134.228 (1803/April2018Update/Redstone4)
 Intel Core i7-6700HQ CPU 2.60GHz (Skylake), 1 CPU, 8 logical and 4 physical cores
@@ -12,6 +10,8 @@ Frequency=2531246 Hz, Resolution=395.0624 ns, Timer=TSC
 ```
 
 #### Factorial (1 iteration)
+
+You could get the source [here](https://github.com/CityOfZion/neo-hypervm/blob/development/tests/Neo.HyperVM.Benchmarks/Benchmarks/VMBenchmarkFACTORIAL.cs)
 
 <table>
 <thead>
@@ -32,6 +32,8 @@ Frequency=2531246 Hz, Resolution=395.0624 ns, Timer=TSC
 
 #### Fibonacci (1 iteration)
 
+You could get the source [here](https://github.com/CityOfZion/neo-hypervm/blob/development/tests/Neo.HyperVM.Benchmarks/Benchmarks/VMBenchmarkFB.cs)
+
 <table>
 <thead>
 <tr><th>Method</th><th>Mean</th><th>Error</th><th>StdDev</th><th>Median</th><th>Min</th><th> Max</th><th>Rank</th></tr>
@@ -51,6 +53,8 @@ Frequency=2531246 Hz, Resolution=395.0624 ns, Timer=TSC
 
 #### NOP (1000 iterations)
 
+You could get the source [here](https://github.com/CityOfZion/neo-hypervm/blob/development/tests/Neo.HyperVM.Benchmarks/Benchmarks/VMBenchmarkNOP.cs)
+
 <table>
 <thead>
 <tr><th>Method</th><th>Mean</th><th>Error</th><th>StdDev</th><th>Median</th><th>Min</th><th> Max</th><th>Rank</th></tr>
@@ -69,6 +73,8 @@ Frequency=2531246 Hz, Resolution=395.0624 ns, Timer=TSC
 </p>
 
 #### PUSH0+DROP (1000 iterations)
+
+You could get the source [here](https://github.com/CityOfZion/neo-hypervm/blob/development/tests/Neo.HyperVM.Benchmarks/Benchmarks/VMBenchmarkPUSH0.cs)
 
 <table>
 <thead>
@@ -101,6 +107,8 @@ Intel Core i7-6700HQ CPU 2.60GHz (Skylake), 1 CPU, 8 logical and 4 physical core
 
 #### VERIFY (1000 iterations)
 
+You could get the source [here](https://github.com/CityOfZion/neo-hypervm/blob/development/tests/Neo.HyperVM.Benchmarks/Benchmarks/VMBenchmarkVERIFY.cs)
+
 <table>
 <thead>
 <tr><th>Method</th><th>Mean</th><th>Error</th><th>StdDev</th><th>Median</th><th>Min</th><th> Max</th><th>Rank</th></tr>
@@ -115,6 +123,8 @@ Intel Core i7-6700HQ CPU 2.60GHz (Skylake), 1 CPU, 8 logical and 4 physical core
 </tbody></table>
 
 #### SHA1 (1000 iterations)
+
+You could get the source [here](https://github.com/CityOfZion/neo-hypervm/blob/development/tests/Neo.HyperVM.Benchmarks/Benchmarks/VMBenchmarkSHA1.cs)
 
 <table>
 <thead>
