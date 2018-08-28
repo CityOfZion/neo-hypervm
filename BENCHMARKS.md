@@ -74,6 +74,8 @@ Frequency=2531246 Hz, Resolution=395.0624 ns, Timer=TSC
 
 # Cryptography Benchmarks
 
+*Made with Linux OpenSSL version*
+
 ``` ini
 BenchmarkDotNet=v0.11.1, OS=ubuntu 16.04
 Intel Core i7-6700HQ CPU 2.60GHz (Skylake), 1 CPU, 8 logical and 4 physical cores
@@ -112,8 +114,6 @@ Intel Core i7-6700HQ CPU 2.60GHz (Skylake), 1 CPU, 8 logical and 4 physical core
 
 </tbody></table>
 
-### Notes
+# Notes
 
 *NeoVM and ApplicationEngine come form NEO 3.0 binaries*
-
-*VERIFY and SHA1 made with Linux OpenSSL version*
