@@ -68,7 +68,7 @@ namespace NeoSharp.VM.Interop.Types.Collections
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="handle">Handle</param>
-        internal ExecutionContextStack(ExecutionEngine engine, IntPtr handle) : base(engine)
+        internal ExecutionContextStack(ExecutionEngine engine, IntPtr handle)
         {
             _engine = engine;
             _handle = handle;

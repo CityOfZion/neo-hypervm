@@ -228,6 +228,8 @@ namespace NeoSharp.VM.Interop
                     }
                 case PlatformID.MacOSX:
                     {
+                        // TODO: Mac detection doesn't work
+
                         core = new MacCore();
                         break;
                     }

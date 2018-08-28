@@ -71,7 +71,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <param name="engine">Engine</param>
         /// <param name="data">Data</param>
         /// <param name="objKey">Object key</param>
-        internal InteropStackItem(ExecutionEngine engine, object data, int objKey) : base(engine, data)
+        internal InteropStackItem(ExecutionEngine engine, object data, int objKey) : base(data)
         {
             NativeEngine = engine;
 
@@ -91,7 +91,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <param name="handle">Handle</param>
         /// <param name="objKey">Object key</param>
         internal InteropStackItem(ExecutionEngine engine, IntPtr handle, int objKey) :
-            base(engine, engine.GetInteropObject(objKey))
+            base(engine.GetInteropObject(objKey))
         {
             NativeEngine = engine;
             _objKey = objKey;
