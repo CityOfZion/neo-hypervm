@@ -67,7 +67,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="data">Data</param>
-        internal ByteArrayStackItem(ExecutionEngine engine, byte[] data) : base(engine, data)
+        internal ByteArrayStackItem(ExecutionEngine engine, byte[] data) : base(data)
         {
             NativeEngine = engine;
             _handle = this.CreateNativeItem();
@@ -79,7 +79,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <param name="engine">Engine</param>
         /// <param name="handle">Handle</param>
         /// <param name="value">Raw value</param>
-        internal ByteArrayStackItem(ExecutionEngine engine, IntPtr handle, byte[] value) : base(engine, value)
+        internal ByteArrayStackItem(ExecutionEngine engine, IntPtr handle, byte[] value) : base(value)
         {
             NativeEngine = engine;
             _handle = handle;

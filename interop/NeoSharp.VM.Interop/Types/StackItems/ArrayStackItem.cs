@@ -89,7 +89,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <param name="engine">Engine</param>
         /// <param name="isStruct">Is struct?</param>
         internal ArrayStackItem(ExecutionEngine engine, bool isStruct) :
-            base(engine, isStruct)
+            base(isStruct)
         {
             NativeEngine = engine;
             _handle = this.CreateNativeItem();
@@ -102,7 +102,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <param name="data">Data</param>
         /// <param name="isStruct">Is struct?</param>
         internal ArrayStackItem(ExecutionEngine engine, IEnumerable<IStackItem> data, bool isStruct) :
-            base(engine, isStruct)
+            base(isStruct)
         {
             NativeEngine = engine;
             _handle = this.CreateNativeItem();
@@ -122,8 +122,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <param name="engine">Engine</param>
         /// <param name="handle">Handle</param>
         /// <param name="isStruct">Is struct?</param>
-        internal ArrayStackItem(ExecutionEngine engine, IntPtr handle, bool isStruct) :
-            base(engine, isStruct)
+        internal ArrayStackItem(ExecutionEngine engine, IntPtr handle, bool isStruct) : base(isStruct)
         {
             NativeEngine = engine;
             _handle = handle;

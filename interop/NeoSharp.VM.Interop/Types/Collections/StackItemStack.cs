@@ -113,10 +113,10 @@ namespace NeoSharp.VM.Interop.Types.Collections
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="handle">Handle</param>
-        internal StackItemStack(IExecutionEngine engine, IntPtr handle) : base(engine)
+        internal StackItemStack(ExecutionEngine engine, IntPtr handle)
         {
             _handle = handle;
-            _engine = (ExecutionEngine)engine;
+            _engine = engine;
 
             if (handle == IntPtr.Zero) throw new ExternalException();
         }

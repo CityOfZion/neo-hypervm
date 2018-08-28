@@ -113,13 +113,13 @@ namespace NeoSharp.VM.Interop.Types
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="handle">Handle</param>
-        internal ExecutionContext(ExecutionEngine engine, IntPtr handle) : base(engine)
+        internal ExecutionContext(ExecutionEngine engine, IntPtr handle)
         {
             _handle = handle;
             NeoVM.ExecutionContext_Claim(_handle, out IntPtr evHandle, out IntPtr altHandle);
 
-            _altStack = new StackItemStack(Engine, altHandle);
-            _evaluationStack = new StackItemStack(Engine, evHandle);
+            _altStack = new StackItemStack(engine, altHandle);
+            _evaluationStack = new StackItemStack(engine, evHandle);
         }
 
         #region IDisposable Support

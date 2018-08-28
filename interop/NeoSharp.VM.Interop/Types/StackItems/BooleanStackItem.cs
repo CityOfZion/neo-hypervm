@@ -69,7 +69,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="data">Data</param>
-        internal BooleanStackItem(ExecutionEngine engine, bool data) : base(engine, data)
+        internal BooleanStackItem(ExecutionEngine engine, bool data) : base(data)
         {
             NativeEngine = engine;
             _handle = this.CreateNativeItem();
@@ -82,7 +82,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <param name="handle">Handle</param>
         /// <param name="value">Raw value</param>
         internal BooleanStackItem(ExecutionEngine engine, IntPtr handle, byte[] value) :
-            base(engine, value != null && value[0] == NeoVM.TRUE)
+            base(value != null && value[0] == NeoVM.TRUE)
         {
             NativeEngine = engine;
             _handle = handle;

@@ -68,7 +68,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="data">Data</param>
-        internal IntegerStackItem(ExecutionEngine engine, int data) : base(engine, new BigInteger(data))
+        internal IntegerStackItem(ExecutionEngine engine, int data) : base(new BigInteger(data))
         {
             NativeEngine = engine;
             _handle = this.CreateNativeItem();
@@ -79,7 +79,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="data">Data</param>
-        internal IntegerStackItem(ExecutionEngine engine, long data) : base(engine, new BigInteger(data))
+        internal IntegerStackItem(ExecutionEngine engine, long data) : base(new BigInteger(data))
         {
             NativeEngine = engine;
             _handle = this.CreateNativeItem();
@@ -90,7 +90,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="data">Data</param>
-        internal IntegerStackItem(ExecutionEngine engine, byte[] data) : base(engine, new BigInteger(data))
+        internal IntegerStackItem(ExecutionEngine engine, byte[] data) : base(new BigInteger(data))
         {
             NativeEngine = engine;
             _handle = this.CreateNativeItem();
@@ -101,7 +101,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="data">Data</param>
-        internal IntegerStackItem(ExecutionEngine engine, BigInteger data) : base(engine, data)
+        internal IntegerStackItem(ExecutionEngine engine, BigInteger data) : base(data)
         {
             NativeEngine = engine;
             _handle = this.CreateNativeItem();
@@ -114,7 +114,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <param name="handle">Handle</param>
         /// <param name="value">Raw value</param>
         internal IntegerStackItem(ExecutionEngine engine, IntPtr handle, byte[] value) :
-            base(engine, new BigInteger(value))
+            base(new BigInteger(value))
         {
             NativeEngine = engine;
             _handle = handle;

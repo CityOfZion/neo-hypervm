@@ -9,22 +9,19 @@ namespace Neo.HyperVM.Benchmarks
         {
             //var c = new VMBenchmarkNOP()
             //{
-            //    Repetitions = 1000
+            //    Repetitions = 10000
             //};
             //c.Setup();
 
-            //for (int x = 0; x < 100; x++)
-            //{
-            //    c.HyperVM();
-            //}
+            //for (int x = 0; x < 100; x++) c.HyperVM();
 
             //return;
 
             foreach (var type in new Type[]
             {
+                typeof(VMBenchmarkVERIFY),
                 typeof(VMBenchmarkFACTORIAL),
                 typeof(VMBenchmarkFB),
-                typeof(VMBenchmarkVERIFY),
                 typeof(VMBenchmarkSHA1),
                 typeof(VMBenchmarkNOP),
                 typeof(VMBenchmarkPUSH0)

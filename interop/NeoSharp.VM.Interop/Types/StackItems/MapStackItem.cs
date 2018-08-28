@@ -89,7 +89,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="value">Value</param>
-        internal MapStackItem(ExecutionEngine engine, Dictionary<IStackItem, IStackItem> value) : base(engine)
+        internal MapStackItem(ExecutionEngine engine, Dictionary<IStackItem, IStackItem> value) : base()
         {
             NativeEngine = engine;
             _handle = this.CreateNativeItem();
@@ -105,7 +105,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="handle">Handle</param>
-        internal MapStackItem(ExecutionEngine engine, IntPtr handle) : base(engine)
+        internal MapStackItem(ExecutionEngine engine, IntPtr handle) : base()
         {
             NativeEngine = engine;
             _handle = handle;
