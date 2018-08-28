@@ -15,6 +15,11 @@ public:
 		return this->_stack.Count();
 	}
 
+	inline IStackItem* Top()
+	{
+		return this->_stack.Top();
+	}
+	
 	inline IStackItem* Peek(int32 index)
 	{
 		return this->_stack.Peek(index);

@@ -5,7 +5,7 @@ namespace Neo.HyperVM.Benchmarks
 {
     public class VMBenchmarkPUSH0 : VMBenchmarkBase
     {
-        [Params("PUSH0+DROP")]
+        [Params("(PUSH0+DROP)*1K")]
         public override string OpCodes { get; set; }
 
         [GlobalSetup]
@@ -13,7 +13,7 @@ namespace Neo.HyperVM.Benchmarks
         {
             using (var script = new ScriptBuilder())
             {
-                for (int x = 0; x < Repetitions; x++)
+                for (int x = 0; x < 1000; x++)
                 {
                     script.Emit(EVMOpCode.PUSH0);
                     script.Emit(EVMOpCode.DROP);

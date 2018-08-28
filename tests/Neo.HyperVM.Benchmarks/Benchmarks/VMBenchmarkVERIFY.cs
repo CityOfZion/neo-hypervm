@@ -5,7 +5,7 @@ namespace Neo.HyperVM.Benchmarks
 {
     public class VMBenchmarkVERIFY : VMBenchmarkBase
     {
-        [Params("VERIFY")]
+        [Params("VERIFY*1K")]
         public override string OpCodes { get; set; }
 
         [GlobalSetup]
@@ -17,7 +17,7 @@ namespace Neo.HyperVM.Benchmarks
 
             using (var script = new ScriptBuilder())
             {
-                for (int x = 0; x < Repetitions; x++)
+                for (int x = 0; x < 1000; x++)
                 {
                     // Message
 

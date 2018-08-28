@@ -5,7 +5,7 @@ namespace Neo.HyperVM.Benchmarks
 {
     public class VMBenchmarkSHA1 : VMBenchmarkBase
     {
-        [Params("SHA1")]
+        [Params("SHA1*1K")]
         public override string OpCodes { get; set; }
 
         [GlobalSetup]
@@ -13,7 +13,7 @@ namespace Neo.HyperVM.Benchmarks
         {
             using (var script = new ScriptBuilder())
             {
-                for (int x = 0; x < Repetitions; x++)
+                for (int x = 0; x < 1000; x++)
                 {
                     script.Emit(EVMOpCode.PUSHBYTES1);
                     script.Emit(new byte[] { 0x01 });

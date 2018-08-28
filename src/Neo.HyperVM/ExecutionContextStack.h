@@ -16,6 +16,11 @@ public:
 		return this->_stack.Count();
 	}
 
+	inline ExecutionContext* Top()
+	{
+		return this->_stack.Top();
+	}
+
 	inline ExecutionContext* Peek(int32 index)
 	{
 		return this->_stack.Peek(index);
