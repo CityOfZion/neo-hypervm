@@ -1526,7 +1526,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		if (bi->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
+		if (bi->SizeExceeded())
 		{
 			delete(bi);
 			this->SetFault();
@@ -1544,7 +1544,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		if (reti->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
+		if (reti->SizeExceeded())
 		{
 			delete(reti);
 			this->SetFault();
@@ -1582,7 +1582,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		if (bi->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
+		if (bi->SizeExceeded())
 		{
 			delete(bi);
 			this->SetFault();
@@ -1600,7 +1600,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		if (reti->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
+		if (reti->SizeExceeded())
 		{
 			delete(reti);
 			this->SetFault();
@@ -1806,8 +1806,8 @@ ExecuteOpCode:
 		StackItemHelper::Free(i2, i1);
 
 		if (x2 == NULL || x1 == NULL ||
-			x2->ToByteArraySize() > MAX_BIGINTEGER_SIZE ||
-			x1->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
+			x2->SizeExceeded() ||
+			x1->SizeExceeded())
 		{
 			if (x2 != NULL) delete(x2);
 			if (x1 != NULL) delete(x1);
@@ -1826,7 +1826,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		if (reti->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
+		if (reti->SizeExceeded())
 		{
 			delete(reti);
 			this->SetFault();
@@ -1861,8 +1861,8 @@ ExecuteOpCode:
 		StackItemHelper::Free(i2, i1);
 
 		if (x2 == NULL || x1 == NULL ||
-			x2->ToByteArraySize() > MAX_BIGINTEGER_SIZE ||
-			x1->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
+			x2->SizeExceeded() ||
+			x1->SizeExceeded())
 		{
 			if (x2 != NULL) delete(x2);
 			if (x1 != NULL) delete(x1);
@@ -1881,7 +1881,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		if (reti->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
+		if (reti->SizeExceeded())
 		{
 			delete(reti);
 			this->SetFault();
@@ -1917,8 +1917,6 @@ ExecuteOpCode:
 
 		if (
 			x2 == NULL || x1 == NULL ||
-			x1->ToByteArraySize() > MAX_BIGINTEGER_SIZE ||
-			x2->ToByteArraySize() > MAX_BIGINTEGER_SIZE ||
 			x2->ToByteArraySize() + x1->ToByteArraySize() > MAX_BIGINTEGER_SIZE
 			)
 		{
@@ -1967,8 +1965,8 @@ ExecuteOpCode:
 		StackItemHelper::Free(i2, i1);
 
 		if (x2 == NULL || x1 == NULL ||
-			x1->ToByteArraySize() > MAX_BIGINTEGER_SIZE ||
-			x2->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
+			x1->SizeExceeded() ||
+			x2->SizeExceeded())
 		{
 			if (x2 != NULL) delete(x2);
 			if (x1 != NULL) delete(x1);
@@ -2015,8 +2013,8 @@ ExecuteOpCode:
 		StackItemHelper::Free(i2, i1);
 
 		if (x2 == NULL || x1 == NULL ||
-			x1->ToByteArraySize() > MAX_BIGINTEGER_SIZE ||
-			x2->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
+			x1->SizeExceeded() ||
+			x2->SizeExceeded())
 		{
 			if (x2 != NULL) delete(x2);
 			if (x1 != NULL) delete(x1);
@@ -2083,7 +2081,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		if (reti->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
+		if (reti->SizeExceeded())
 		{
 			delete(reti);
 			this->SetFault();
@@ -2138,7 +2136,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		if (reti->ToByteArraySize() > MAX_BIGINTEGER_SIZE)
+		if (reti->SizeExceeded())
 		{
 			delete(reti);
 			this->SetFault();

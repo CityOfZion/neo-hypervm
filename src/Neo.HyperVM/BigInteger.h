@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Types.h"
+#include "Limits.h"
 
 // Ported from 
 // - https://referencesource.microsoft.com/#System.Numerics/System/Numerics/BigInteger.cs
@@ -27,6 +28,26 @@ public:
 
 	bool ToInt32(int32 &ret);
 	int32 ToByteArraySize();
+
+	inline bool SizeExceeded()
+	{
+		// Check fast size
+
+		if (this->_bitsSize == 0)
+		{
+			return false;
+		}
+
+		if ((this->_bitsSize * 4) + 1 < MAX_BIGINTEGER_SIZE)
+		{
+			return false;
+		}
+
+		// Check real size
+
+		return this->ToByteArraySize() > MAX_BIGINTEGER_SIZE;
+	}
+
 	int32 ToByteArray(byte* output, int32 length);
 
 	BigInteger* Div(BigInteger* reg);
