@@ -26,6 +26,10 @@ Frequency=2531246 Hz, Resolution=395.0624 ns, Timer=TSC
 
 </tbody></table>
 
+<p align="center">
+<img src="https://github.com/CityOfZion/neo-hypervm/raw/development/images/Neo.HyperVM.Benchmarks.VMBenchmarkFACTORIAL-barplot.jpg" width="300">
+</p>
+
 #### Fibonacci (1 iteration)
 
 <table>
@@ -40,6 +44,10 @@ Frequency=2531246 Hz, Resolution=395.0624 ns, Timer=TSC
 </tr>
 
 </tbody></table>
+
+<p align="center">
+<img src="https://github.com/CityOfZion/neo-hypervm/raw/development/images/Neo.HyperVM.Benchmarks.VMBenchmarkFB-barplot.jpg" width="300">
+</p>
 
 #### NOP (1000 iterations)
 
@@ -56,6 +64,10 @@ Frequency=2531246 Hz, Resolution=395.0624 ns, Timer=TSC
 
 </tbody></table>
 
+<p align="center">
+<img src="https://github.com/CityOfZion/neo-hypervm/raw/development/images/Neo.HyperVM.Benchmarks.VMBenchmarkNOP-barplot.jpg" width="300">
+</p>
+
 #### PUSH0+DROP (1000 iterations)
 
 <table>
@@ -71,6 +83,9 @@ Frequency=2531246 Hz, Resolution=395.0624 ns, Timer=TSC
 
 </tbody></table>
 
+<p align="center">
+<img src="https://github.com/CityOfZion/neo-hypervm/raw/development/images/Neo.HyperVM.Benchmarks.VMBenchmarkPUSH0-barplot.jpg" width="300">
+</p>
 
 # Cryptography Benchmarks
 
