@@ -26,6 +26,7 @@
 * Neo.HyperVM - C++ Native Virtual Machine
 * NeoVM.Interop - Interoperability for C# calls
 * NeoVM.Interop.Tests - Unit Tests
+* Neo.HyperVM.Benchmarks - Benchmarks
 
 # Installation
 
