@@ -51,7 +51,12 @@ public:
 		return this->_items[0];
 	}
 
-	inline Stack() : _size(0), _itemsLength(0), _items(NULL) { }
+	// Constructor & Destructor
+
+	inline Stack() : _size(0), _itemsLength(4), _items(new T*[4]) 
+	{
+
+	}
 	
 	inline ~Stack() 
 	{

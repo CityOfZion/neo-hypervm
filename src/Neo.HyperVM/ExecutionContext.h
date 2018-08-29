@@ -9,8 +9,9 @@ class ExecutionContext :public IClaimable
 {
 private:
 
-	int32 _instructionIndex;
 	ExecutionScript* _script;
+	int32 _instructionIndex;
+	byte* _instructionPointer;
 
 	const int32 _scriptLength;
 
@@ -50,7 +51,7 @@ public:
 			return EVMOpCode::RET;
 		}
 
-		return (EVMOpCode)this->_script->Content[this->_instructionIndex];
+		return (EVMOpCode)*(this->_instructionPointer);
 	}
 
 	inline EVMOpCode ReadNextInstruction()
@@ -60,14 +61,14 @@ public:
 			return EVMOpCode::RET;
 		}
 
-		return (EVMOpCode)this->_script->Content[this->_instructionIndex++];
+		this->_instructionIndex++;
+		return (EVMOpCode)*(this->_instructionPointer++);
 	}
 
 	inline ExecutionContext* Clone(int32 rvcount, int32 pcount)
 	{
-		auto clone = new ExecutionContext(this->_script, 0, rvcount);
-		clone->_instructionIndex = this->_instructionIndex;
-
+		auto clone = new ExecutionContext(this->_script, this->_instructionIndex, rvcount);
+		
 		this->EvaluationStack.SendTo(&clone->EvaluationStack, pcount);
 
 		return clone;
@@ -95,6 +96,8 @@ public:
 		}
 
 		this->_instructionIndex = newPos;
+		this->_instructionPointer += offset;
+
 		return true;
 	}
 
@@ -109,8 +112,9 @@ public:
 
 	inline ExecutionContext(ExecutionScript* script, int32 instructorPointer, int32 rvcount) :
 		IClaimable(),
-		_instructionIndex(instructorPointer),
 		_script(script),
+		_instructionIndex(instructorPointer),
+		_instructionPointer(&script->Content[instructorPointer]),
 		_scriptLength(script->ScriptLength),
 		RVCount(rvcount),
 		AltStack(),
