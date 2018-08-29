@@ -40,6 +40,8 @@ private:
 
 	std::list<ExecutionScript*> Scripts;
 
+	void InternalStepInto();
+
 	inline void SetHalt()
 	{
 		this->_state = EVMState::HALT;
@@ -94,7 +96,7 @@ public:
 
 	inline ExecutionContext* GetCurrentContext()
 	{
-		return this->InvocationStack.Peek(0);
+		return this->InvocationStack.Top();
 	}
 
 	inline ExecutionContext* GetCallingContext()

@@ -48,7 +48,7 @@ T* Stack<T>::Pop(int32 index)
 	}
 
 	int32 pos = this->_size - index - 1;
-	T* ret = this->_items[pos];
+	auto ret = this->_items[pos];
 
 	this->RealRemoveAt(pos);
 
@@ -103,7 +103,7 @@ void Stack<T>::EnsureCapacity(int32 min)
 
 	if (num != this->_itemsLength)
 	{
-		T** array = new T*[num];
+		auto array = new T*[num];
 
 		if (this->_size > 0)
 		{
@@ -159,7 +159,7 @@ void Stack<T>::SendTo(Stack<T>* stack, int32 count)
 
 	for (int32 x = this->_size - count, mx = x + count; x < mx; x++)
 	{
-		T* item = this->_items[x];
+		auto item = this->_items[x];
 
 		if (item == NULL) break;
 
@@ -219,5 +219,6 @@ void Stack<T>::Clear()
 }
 
 // Explicit template instantiation
+
 template class Stack<ExecutionContext>;
 template class Stack<IStackItem>;

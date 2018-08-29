@@ -29,7 +29,7 @@ int32 ExecutionScript::GetScriptHash(byte* hash)
 
 bool ExecutionScript::IsTheSameHash(byte* hash, int32 length)
 {
-	if (length != ScriptHashLength) return false;
+	if (length != this->ScriptHashLength) return false;
 
 	if (!this->_isScriptHashCalculated)
 	{
@@ -39,7 +39,7 @@ bool ExecutionScript::IsTheSameHash(byte* hash, int32 length)
 		Crypto::ComputeHash160(this->Content, this->ScriptLength, &this->ScriptHash[0]);
 	}
 
-	for (int32 x = 0; x < ScriptHashLength; x++)
+	for (int32 x = 0; x < this->ScriptHashLength; x++)
 		if (this->ScriptHash[x] != hash[x])
 			return false;
 
