@@ -1106,6 +1106,7 @@ int32 BigInteger::ToByteArraySize()
 		else
 		{
 			dwords = NULL;
+			dwordsSize = 0;
 		}
 
 		highByte = 0xff;
@@ -1195,6 +1196,7 @@ int32 BigInteger::ToByteArray(byte* output, int32 length)
 		else
 		{
 			dwords = NULL;
+			dwordsSize = 0;
 		}
 
 		highByte = 0xff;

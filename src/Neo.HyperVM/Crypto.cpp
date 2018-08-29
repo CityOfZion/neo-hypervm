@@ -129,7 +129,7 @@ int16 Crypto::VerifySignature
 
 	if (realPubKey != pubKey)
 	{
-		free(realPubKey);
+		delete[](realPubKey);
 	}
 
 	return ret == 0x01 ? 0x01 : 0x00;

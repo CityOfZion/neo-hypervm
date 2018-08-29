@@ -298,26 +298,15 @@ void BigIntegerBuilder::EnsureWritable(int32 cuExtra)
 	// AssertValid(false);
 	// Contract.Assert(_iuLast > 0);
 
-	int l = _iuLast + 1 + cuExtra;
-
 	if (this->_fWritable)
 	{
-		// Check length (Microsoft don't do it)
-
-		if (this->_rguLength >= l)
-		{
-			return;
-		}
-
-		if (this->_rgu != NULL)
-		{
-			delete[](this->_rgu);
-		}
+		return;
 	}
 
+	int32 l = _iuLast + 1 + cuExtra;
 	uint32* rgu = new uint32[l];
 
-	for (int x = l - 1; x >= 0; x--)
+	for (int32 x = l - 1; x >= 0; x--)
 		rgu[x] = this->_rgu[x];
 
 	this->_rgu = rgu;
