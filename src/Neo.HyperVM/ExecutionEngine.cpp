@@ -299,7 +299,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		byte* data = new byte[length];
+		auto data = new byte[length];
 
 		if (context->Read(data, length) != length)
 		{
@@ -413,7 +413,7 @@ ExecuteOpCode:
 			return;
 		}
 
-		BigInteger* bi = new BigInteger(BigInteger::MinusOne);
+		auto bi = new BigInteger(BigInteger::MinusOne);
 		auto ret = this->CreateInteger(bi);
 
 		if (ret != NULL)
