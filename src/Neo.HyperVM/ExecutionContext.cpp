@@ -130,21 +130,28 @@ bool ExecutionContext::ReadVarBytes(uint32 &ret, uint32 max)
 
 int32 ExecutionContext::Read(byte* data, int32 length)
 {
+	int32 read = 0;
+
 	if (data == NULL)
 	{
 		// Seek
 
-		this->_instructionIndex += length;
-		return length;
+		read = this->_scriptLength - this->_instructionIndex;
+		read = read < length ? read : length;
+
+		this->_instructionIndex += read;
+		this->_instructionPointer += read;
 	}
-
-	int32 read = 0;
-
-	for (int32 x = 0; x < length && this->_instructionIndex < this->_scriptLength; ++x)
+	else
 	{
-		data[x] = this->_script->Content[this->_instructionIndex];
-		++this->_instructionIndex;
-		++read;
+		for (int32 x = 0; x < length && this->_instructionIndex < this->_scriptLength; ++x)
+		{
+			data[x] = this->_script->Content[this->_instructionIndex];
+
+			++this->_instructionIndex;
+			++this->_instructionPointer;
+			++read;
+		}
 	}
 
 	return read;

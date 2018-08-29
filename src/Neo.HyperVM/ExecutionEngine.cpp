@@ -27,7 +27,7 @@ void ExecutionEngine::Clean(uint32 iteration)
 
 ExecutionEngine::ExecutionEngine
 (
-	InvokeInteropCallback &invokeInterop, LoadScriptCallback &loadScript, GetMessageCallback &getMessage
+	InvokeInteropCallback invokeInterop, LoadScriptCallback loadScript, GetMessageCallback getMessage
 ) :
 	_iteration(0),
 	_consumedGas(0),
