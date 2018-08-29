@@ -51,7 +51,7 @@ bool ByteArrayStackItem::Equals(IStackItem* it)
 		auto t = (ByteArrayStackItem*)it;
 		if (t->_payloadLength != this->_payloadLength) return false;
 
-		for (int x = t->_payloadLength - 1; x >= 0; x--)
+		for (int32 x = t->_payloadLength - 1; x >= 0; x--)
 			if (t->_payload[x] != this->_payload[x])
 				return false;
 
@@ -59,7 +59,7 @@ bool ByteArrayStackItem::Equals(IStackItem* it)
 	}
 	default:
 	{
-		int iz = it->ReadByteArraySize();
+		int32 iz = it->ReadByteArraySize();
 
 		if (iz < 0)
 			return false;
@@ -76,7 +76,7 @@ bool ByteArrayStackItem::Equals(IStackItem* it)
 			return false;
 		}
 
-		for (int x = 0; x < iz; ++x)
+		for (int32 x = 0; x < iz; ++x)
 			if (data[x] != this->_payload[x])
 			{
 				delete[](data);

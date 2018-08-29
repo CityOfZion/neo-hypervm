@@ -13,14 +13,14 @@ bool IntegerStackItem::Equals(IStackItem* it)
 	}
 	default:
 	{
-		int i1 = it->ReadByteArraySize();
+		int32 i1 = it->ReadByteArraySize();
 
 		if (i1 < 0)
 		{
 			return false;
 		}
 
-		int i0 = this->ReadByteArraySize();
+		int32 i0 = this->ReadByteArraySize();
 		byte* d0 = new byte[i0];
 		byte* d1 = new byte[i1];
 
@@ -35,7 +35,7 @@ bool IntegerStackItem::Equals(IStackItem* it)
 		}
 
 		bool ret = true;
-		for (int x = 0; x < i0; ++x)
+		for (int32 x = 0; x < i0; ++x)
 			if (d0[x] != d1[x])
 			{
 				ret = false;
