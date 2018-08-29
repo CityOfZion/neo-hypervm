@@ -15,6 +15,11 @@ public:
 		return this->_stack.Count();
 	}
 
+	inline IStackItem* Top()
+	{
+		return this->_stack.Top();
+	}
+	
 	inline IStackItem* Peek(int32 index)
 	{
 		return this->_stack.Peek(index);
@@ -34,7 +39,8 @@ public:
 
 	inline IStackItem* Remove(int32 index)
 	{
-		IStackItem* it = this->_stack.Pop(index);
+		auto it = this->_stack.Pop(index);
+		
 		if (it != NULL) it->UnClaim();
 
 		return it;
@@ -42,13 +48,13 @@ public:
 
 	inline void Drop()
 	{
-		IStackItem* it = this->_stack.Pop();
+		auto it = this->_stack.Pop();
 		StackItemHelper::UnclaimAndFree(it);
 	}
 
 	inline IStackItem* Pop()
 	{
-		IStackItem* it = this->_stack.Pop();
+		auto it = this->_stack.Pop();
 		if (it != NULL) it->UnClaim();
 
 		return it;
@@ -58,7 +64,7 @@ public:
 	{
 		for (int32 x = 0, count = this->_stack.Count(); x < count; x++)
 		{
-			IStackItem* ptr = this->_stack.Peek(x);
+			auto ptr = this->_stack.Peek(x);
 			StackItemHelper::UnclaimAndFree(ptr);
 		}
 
@@ -67,7 +73,7 @@ public:
 
 	inline void SendTo(StackItems* stack, int32 count)
 	{
-		if (stack == NULL || count == 0) return;
+		if (stack == NULL) return;
 
 		this->_stack.SendTo(&stack->_stack, count);
 	}

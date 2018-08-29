@@ -16,6 +16,11 @@ public:
 		return this->_stack.Count();
 	}
 
+	inline ExecutionContext* Top()
+	{
+		return this->_stack.Top();
+	}
+
 	inline ExecutionContext* Peek(int32 index)
 	{
 		return this->_stack.Peek(index);
@@ -29,13 +34,13 @@ public:
 
 	inline void Remove(int32 index)
 	{
-		ExecutionContext* it = this->_stack.Pop(index);
+		auto it = this->_stack.Pop(index);
 		ExecutionContext::UnclaimAndFree(it);
 	}
 
 	inline void Drop()
 	{
-		ExecutionContext* it = this->_stack.Pop();
+		auto it = this->_stack.Pop();
 		ExecutionContext::UnclaimAndFree(it);
 	}
 
@@ -43,7 +48,7 @@ public:
 	{
 		for (int32 x = 0, count = this->_stack.Count(); x < count; x++)
 		{
-			ExecutionContext* ptr = this->_stack.Peek(x);
+			auto ptr = this->_stack.Peek(x);
 			ExecutionContext::UnclaimAndFree(ptr);
 		}
 

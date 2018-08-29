@@ -31,9 +31,6 @@ namespace Neo.HyperVM.Benchmarks
         protected ExecutionEngineArgs _args;
         protected NeoVM _HyperVM;
 
-        [Params(1000)]
-        public virtual int Repetitions { get; set; }
-
         [Params(nameof(VMBenchmarkBase))]
         public abstract string OpCodes { get; set; }
 

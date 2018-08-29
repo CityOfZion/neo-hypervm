@@ -9,12 +9,6 @@ namespace Neo.HyperVM.Benchmarks
         [Params("FIBONACCI")]
         public override string OpCodes { get; set; }
 
-        /// <summary>
-        /// 1 Repetition
-        /// </summary>
-        [Params(1)]
-        public override int Repetitions { get; set; }
-
         /*
             public class ContractRec : SmartContract
             {
@@ -48,7 +42,7 @@ namespace Neo.HyperVM.Benchmarks
 
             using (var script = new ScriptBuilder())
             {
-                for (int x = 0; x < Repetitions; x++)
+                for (int x = 0; x < 1; x++)
                 {
                     script.EmitPush(new BigInteger(21));
                     script.Emit(avm);
