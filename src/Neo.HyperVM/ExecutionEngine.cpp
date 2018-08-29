@@ -118,7 +118,7 @@ EVMState ExecutionEngine::Execute(uint32 gas)
 
 	do
 	{
-		this->StepInto();
+		this->InternalStepInto();
 	}
 	while (this->_state == EVMState::NONE);
 
@@ -131,7 +131,7 @@ void ExecutionEngine::StepOut()
 
 	while (this->_state == EVMState::NONE && this->InvocationStack.Count() >= c)
 	{
-		this->StepInto();
+		this->InternalStepInto();
 	}
 }
 
@@ -143,18 +143,20 @@ void ExecutionEngine::StepOver()
 
 	do
 	{
-		this->StepInto();
+		this->InternalStepInto();
 	}
 	while (this->_state == EVMState::NONE && this->InvocationStack.Count() > c);
 }
 
 void ExecutionEngine::StepInto()
 {
-	if (this->_state != EVMState::NONE)
+	if (this->_state == EVMState::NONE)
 	{
-		return;
+		this->InternalStepInto();
 	}
-
+}
+void ExecutionEngine::InternalStepInto()
+{
 	auto context = this->InvocationStack.Top();
 
 	if (context == NULL)
