@@ -39,12 +39,12 @@ public:
 
 	// Get/Read next instruction
 
-	inline int32 GetInstructionPointer()
+	inline int32 GetInstructionPointer() const
 	{
 		return this->_instructionIndex;
 	}
 
-	inline EVMOpCode GetNextInstruction()
+	inline EVMOpCode GetNextInstruction() const
 	{
 		if (this->_instructionIndex >= this->_scriptLength)
 		{
@@ -74,7 +74,7 @@ public:
 		return clone;
 	}
 
-	inline bool CouldSeekFromHere(int32 offset)
+	inline bool CouldSeekFromHere(int32 offset) const
 	{
 		int32 newPos = this->_instructionIndex + offset;
 
@@ -103,7 +103,7 @@ public:
 
 	// Get script hash
 
-	inline int32 GetScriptHash(byte* hash)
+	inline int32 GetScriptHash(byte* hash) const
 	{
 		return this->_script->GetScriptHash(hash);
 	}
