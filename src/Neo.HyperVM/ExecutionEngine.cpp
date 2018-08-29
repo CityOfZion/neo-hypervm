@@ -175,22 +175,124 @@ void ExecutionEngine::InternalStepInto()
 
 ExecuteOpCode:
 
-	// Check PushBytes
+	// Execute opcode
 
-	if (opcode >= EVMOpCode::PUSH0 && opcode <= EVMOpCode::PUSHBYTES75)
+	switch (opcode)
+	{
+		// Push value
+
+	case EVMOpCode::PUSH0:
+	{
+		auto ret = this->CreateByteArray(NULL, 0, false);
+
+		if (ret != NULL)
+		{
+			context->EvaluationStack.Push(ret);
+		}
+		return;
+	}
+	case EVMOpCode::PUSH1:
+	case EVMOpCode::PUSH2:
+	case EVMOpCode::PUSH3:
+	case EVMOpCode::PUSH4:
+	case EVMOpCode::PUSH5:
+	case EVMOpCode::PUSH6:
+	case EVMOpCode::PUSH7:
+	case EVMOpCode::PUSH8:
+	case EVMOpCode::PUSH9:
+	case EVMOpCode::PUSH10:
+	case EVMOpCode::PUSH11:
+	case EVMOpCode::PUSH12:
+	case EVMOpCode::PUSH13:
+	case EVMOpCode::PUSH14:
+	case EVMOpCode::PUSH15:
+	case EVMOpCode::PUSH16:
+	{
+		auto ret = this->CreateInteger((opcode - EVMOpCode::PUSH1) + 1);
+
+		if (ret != NULL)
+		{
+			context->EvaluationStack.Push(ret);
+		}
+		return;
+	}
+	case EVMOpCode::PUSHBYTES1:
+	case EVMOpCode::PUSHBYTES2:
+	case EVMOpCode::PUSHBYTES3:
+	case EVMOpCode::PUSHBYTES4:
+	case EVMOpCode::PUSHBYTES5:
+	case EVMOpCode::PUSHBYTES6:
+	case EVMOpCode::PUSHBYTES7:
+	case EVMOpCode::PUSHBYTES8:
+	case EVMOpCode::PUSHBYTES9:
+	case EVMOpCode::PUSHBYTES10:
+	case EVMOpCode::PUSHBYTES11:
+	case EVMOpCode::PUSHBYTES12:
+	case EVMOpCode::PUSHBYTES13:
+	case EVMOpCode::PUSHBYTES14:
+	case EVMOpCode::PUSHBYTES15:
+	case EVMOpCode::PUSHBYTES16:
+	case EVMOpCode::PUSHBYTES17:
+	case EVMOpCode::PUSHBYTES18:
+	case EVMOpCode::PUSHBYTES19:
+	case EVMOpCode::PUSHBYTES20:
+	case EVMOpCode::PUSHBYTES21:
+	case EVMOpCode::PUSHBYTES22:
+	case EVMOpCode::PUSHBYTES23:
+	case EVMOpCode::PUSHBYTES24:
+	case EVMOpCode::PUSHBYTES25:
+	case EVMOpCode::PUSHBYTES26:
+	case EVMOpCode::PUSHBYTES27:
+	case EVMOpCode::PUSHBYTES28:
+	case EVMOpCode::PUSHBYTES29:
+	case EVMOpCode::PUSHBYTES30:
+	case EVMOpCode::PUSHBYTES31:
+	case EVMOpCode::PUSHBYTES32:
+	case EVMOpCode::PUSHBYTES33:
+	case EVMOpCode::PUSHBYTES34:
+	case EVMOpCode::PUSHBYTES35:
+	case EVMOpCode::PUSHBYTES36:
+	case EVMOpCode::PUSHBYTES37:
+	case EVMOpCode::PUSHBYTES38:
+	case EVMOpCode::PUSHBYTES39:
+	case EVMOpCode::PUSHBYTES40:
+	case EVMOpCode::PUSHBYTES41:
+	case EVMOpCode::PUSHBYTES42:
+	case EVMOpCode::PUSHBYTES43:
+	case EVMOpCode::PUSHBYTES44:
+	case EVMOpCode::PUSHBYTES45:
+	case EVMOpCode::PUSHBYTES46:
+	case EVMOpCode::PUSHBYTES47:
+	case EVMOpCode::PUSHBYTES48:
+	case EVMOpCode::PUSHBYTES49:
+	case EVMOpCode::PUSHBYTES50:
+	case EVMOpCode::PUSHBYTES51:
+	case EVMOpCode::PUSHBYTES52:
+	case EVMOpCode::PUSHBYTES53:
+	case EVMOpCode::PUSHBYTES54:
+	case EVMOpCode::PUSHBYTES55:
+	case EVMOpCode::PUSHBYTES56:
+	case EVMOpCode::PUSHBYTES57:
+	case EVMOpCode::PUSHBYTES58:
+	case EVMOpCode::PUSHBYTES59:
+	case EVMOpCode::PUSHBYTES60:
+	case EVMOpCode::PUSHBYTES61:
+	case EVMOpCode::PUSHBYTES62:
+	case EVMOpCode::PUSHBYTES63:
+	case EVMOpCode::PUSHBYTES64:
+	case EVMOpCode::PUSHBYTES65:
+	case EVMOpCode::PUSHBYTES66:
+	case EVMOpCode::PUSHBYTES67:
+	case EVMOpCode::PUSHBYTES68:
+	case EVMOpCode::PUSHBYTES69:
+	case EVMOpCode::PUSHBYTES70:
+	case EVMOpCode::PUSHBYTES71:
+	case EVMOpCode::PUSHBYTES72:
+	case EVMOpCode::PUSHBYTES73:
+	case EVMOpCode::PUSHBYTES74:
+	case EVMOpCode::PUSHBYTES75:
 	{
 		byte length = (byte)opcode;
-
-		if (length == 0)
-		{
-			auto ret = this->CreateByteArray(NULL, 0, false);
-
-			if (ret != NULL)
-			{
-				context->EvaluationStack.Push(ret);
-			}
-			return;
-		}
 
 		if (!this->AddGasCost())
 		{
@@ -214,26 +316,6 @@ ExecuteOpCode:
 		}
 		return;
 	}
-
-	// Check Push
-
-	else if (opcode >= EVMOpCode::PUSH1 && opcode <= EVMOpCode::PUSH16)
-	{
-		auto ret = this->CreateInteger((opcode - EVMOpCode::PUSH1) + 1);
-
-		if (ret != NULL)
-		{
-			context->EvaluationStack.Push(ret);
-		}
-		return;
-	}
-
-	// Execute opcode
-
-	switch (opcode)
-	{
-		// Push value
-
 	case EVMOpCode::PUSHDATA1:
 	{
 		if (!this->AddGasCost())
