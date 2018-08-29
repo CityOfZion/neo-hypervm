@@ -38,7 +38,7 @@ int32 ExecutionContext_GetInstructionPointer(ExecutionContext* context)
 {
 	if (context == NULL) return 0;
 
-	return context->InstructionPointer;
+	return context->GetInstructionPointer();
 }
 
 void ExecutionContext_Claim(ExecutionContext* context, StackItems* &evStack, StackItems* &altStack)

@@ -7,17 +7,16 @@
 
 class ExecutionContext :public IClaimable
 {
+private:
+
+	int32 _instructionIndex;
+	ExecutionScript* _script;
+
+	const int32 _scriptLength;
+
 public:
 
-	// Consts
-
-	const int32 ScriptLength;
 	const int32 RVCount;
-
-	// Script
-
-	ExecutionScript* Script;
-	int32 InstructionPointer;
 
 	// Stacks
 
@@ -39,41 +38,86 @@ public:
 
 	// Get/Read next instruction
 
+	inline int32 GetInstructionPointer()
+	{
+		return this->_instructionIndex;
+	}
+
 	inline EVMOpCode GetNextInstruction()
 	{
-		if (this->InstructionPointer >= this->ScriptLength)
+		if (this->_instructionIndex >= this->_scriptLength)
 		{
 			return EVMOpCode::RET;
 		}
 
-		return (EVMOpCode)this->Script->Content[this->InstructionPointer];
+		return (EVMOpCode)this->_script->Content[this->_instructionIndex];
 	}
 
 	inline EVMOpCode ReadNextInstruction()
 	{
-		if (this->InstructionPointer >= this->ScriptLength)
+		if (this->_instructionIndex >= this->_scriptLength)
 		{
 			return EVMOpCode::RET;
 		}
 
-		return (EVMOpCode)this->Script->Content[this->InstructionPointer++];
+		return (EVMOpCode)this->_script->Content[this->_instructionIndex++];
 	}
 
-	inline void Seek(int32 position)
+	inline ExecutionContext* Clone(int32 rvcount, int32 pcount)
 	{
-		this->InstructionPointer = position;
+		auto clone = new ExecutionContext(this->_script, 0, rvcount);
+		clone->_instructionIndex = this->_instructionIndex;
+
+		this->EvaluationStack.SendTo(&clone->EvaluationStack, pcount);
+
+		return clone;
+	}
+
+	inline bool CouldSeekFromHere(int32 offset)
+	{
+		int32 newPos = this->_instructionIndex + offset;
+
+		if (newPos < 0 || newPos > this->_scriptLength)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	inline bool SeekFromHere(int32 offset)
+	{
+		int32 newPos = this->_instructionIndex + offset;
+
+		if (newPos < 0 || newPos > this->_scriptLength)
+		{
+			return false;
+		}
+
+		this->_instructionIndex = newPos;
+		return true;
 	}
 
 	// Get script hash
 
 	inline int32 GetScriptHash(byte* hash)
 	{
-		return this->Script->GetScriptHash(hash);
+		return this->_script->GetScriptHash(hash);
 	}
 
 	// Constructor
 
-	ExecutionContext(ExecutionScript* script, int32 instructorPointer, int32 rvcount);
+	inline ExecutionContext(ExecutionScript* script, int32 instructorPointer, int32 rvcount) :
+		IClaimable(),
+		_instructionIndex(instructorPointer),
+		_script(script),
+		_scriptLength(script->ScriptLength),
+		RVCount(rvcount),
+		AltStack(),
+		EvaluationStack()
+	{
+		script->Claim();
+	}
 
 	// Destructor
 
@@ -82,7 +126,7 @@ public:
 		this->EvaluationStack.Clear();
 		this->AltStack.Clear();
 
-		ExecutionScript::UnclaimAndFree(this->Script);
+		ExecutionScript::UnclaimAndFree(this->_script);
 	}
 
 	// Claims

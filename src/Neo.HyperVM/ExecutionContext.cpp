@@ -1,18 +1,6 @@
 #include "ExecutionContext.h"
 #include "Crypto.h"
 
-ExecutionContext::ExecutionContext(ExecutionScript* script, int32 instructorPointer, int32 rvcount) :
-	IClaimable(),
-	ScriptLength(script->ScriptLength),
-	RVCount(rvcount),
-	Script(script),
-	InstructionPointer(instructorPointer),
-	AltStack(),
-	EvaluationStack()
-{
-	script->Claim();
-}
-
 bool ExecutionContext::ReadUInt8(byte &ret)
 {
 	byte data[1];
@@ -145,16 +133,17 @@ int32 ExecutionContext::Read(byte* data, int32 length)
 	if (data == NULL)
 	{
 		// Seek
-		this->InstructionPointer += length;
+
+		this->_instructionIndex += length;
 		return length;
 	}
 
 	int32 read = 0;
 
-	for (int32 x = 0; x < length && this->InstructionPointer < this->ScriptLength; ++x)
+	for (int32 x = 0; x < length && this->_instructionIndex < this->_scriptLength; ++x)
 	{
-		data[x] = this->Script->Content[this->InstructionPointer];
-		++this->InstructionPointer;
+		data[x] = this->_script->Content[this->_instructionIndex];
+		++this->_instructionIndex;
 		++read;
 	}
 
