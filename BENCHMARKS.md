@@ -19,9 +19,9 @@ You could get the source [here](https://github.com/CityOfZion/neo-hypervm/blob/d
 </thead>
 <tbody>
 
-<tr><td>HyperVM</td><td>169.0 us</td><td>1.442 us</td><td>1.278 us</td><td>167.0 us</td><td>170.8 us</td><td>168.9 us</td><td>1</td>
-</tr><tr><td>NeoVM</td><td>419.2 us</td><td>3.526 us</td><td>2.944 us</td><td>415.0 us</td><td>423.1 us</td><td>418.8 us</td><td>2</td>
-</tr><tr><td>ApplicationEngine</td><td>926.2 us</td><td>8.375 us</td><td>7.425 us</td><td>912.1 us</td><td>943.7 us</td><td>924.7 us</td><td>3</td>
+<tr><td>HyperVM</td><td>155.0 us</td><td>2.740 us</td><td>2.563 us</td><td>152.0 us</td><td>158.5 us</td><td>156.4 us</td><td>1</td>
+</tr><tr><td>NeoVM</td><td>370.0 us</td><td>4.978 us</td><td>4.656 us</td><td>360.6 us</td><td>375.0 us</td><td>371.5 us</td><td>2</td>
+</tr><tr><td>ApplicationEngine</td><td>835.7 us</td><td>3.422 us</td><td>3.033 us</td><td>832.2 us</td><td>842.4 us</td><td>834.8 us</td><td>3</td>
 </tr>
 
 </tbody></table>
@@ -40,9 +40,9 @@ You could get the source [here](https://github.com/CityOfZion/neo-hypervm/blob/d
 </thead>
 <tbody>
 
-<tr><td>HyperVM</td><td>78.18 ms</td><td>0.7943 ms</td><td>0.6633 ms</td><td>77.46 ms</td><td>79.68 ms</td><td>77.98 ms</td><td>1</td>
-</tr><tr><td>NeoVM</td><td>250.81 ms</td><td>1.7531 ms</td><td>1.6398 ms</td><td>247.62 ms</td><td>253.24 ms</td><td>251.37 ms</td><td>2</td>
-</tr><tr><td>ApplicationEngine</td><td>463.75 ms</td><td>5.4130 ms</td><td>4.7985 ms</td><td>455.83 ms</td><td>472.76 ms</td><td>463.05 ms</td><td>3</td>
+<tr><td>HyperVM</td><td>71.05 ms</td><td>0.2146 ms</td><td>0.2008 ms</td><td>70.64 ms</td><td>71.43 ms</td><td>71.01 ms</td><td>1</td>
+</tr><tr><td>NeoVM</td><td>219.39 ms</td><td>3.2529 ms</td><td>3.0428 ms</td><td>215.43 ms</td><td>223.30 ms</td><td>220.91 ms</td><td>2</td>
+</tr><tr><td>ApplicationEngine</td><td>425.10 ms</td><td>1.4836 ms</td><td>1.3877 ms</td><td>422.33 ms</td><td>426.93 ms</td><td>424.94 ms</td><td>3</td>
 </tr>
 
 </tbody></table>
@@ -61,9 +61,9 @@ You could get the source [here](https://github.com/CityOfZion/neo-hypervm/blob/d
 </thead>
 <tbody>
 
-<tr><td>HyperVM</td><td>16.00 us</td><td>1.1392 us</td><td>3.3590 us</td><td>11.27 us</td><td>26.89 us</td><td>15.69 us</td><td>1</td>
-</tr><tr><td>NeoVM</td><td>93.77 us</td><td>0.9077 us</td><td>0.8491 us</td><td>92.67 us</td><td>95.12 us</td><td>93.71 us</td><td>2</td>
-</tr><tr><td>ApplicationEngine</td><td>174.88 us</td><td>1.7343 us</td><td>1.5374 us</td><td>170.79 us</td><td>177.40 us</td><td>175.12 us</td><td>3</td>
+<tr><td>HyperVM</td><td>8.710 us</td><td>0.1290 us</td><td>0.1207 us</td><td>8.491 us</td><td>8.909 us</td><td>8.674 us</td><td>1</td>
+</tr><tr><td>NeoVM</td><td>76.813 us</td><td>1.4280 us</td><td>1.4025 us</td><td>74.833 us</td><td>78.383 us</td><td>77.630 us</td><td>2</td>
+</tr><tr><td>ApplicationEngine</td><td>154.212 us</td><td>2.3578 us</td><td>2.2054 us</td><td>150.994 us</td><td>156.369 us</td><td>155.476 us</td><td>3</td>
 </tr>
 
 </tbody></table>
@@ -82,9 +82,9 @@ You could get the source [here](https://github.com/CityOfZion/neo-hypervm/blob/d
 </thead>
 <tbody>
 
-<tr><td>HyperVM</td><td>86.60 us</td><td>0.5659 us</td><td>0.4418 us</td><td>85.80 us</td><td>87.33 us</td><td>86.47 us</td><td>1</td>
-</tr><tr><td>NeoVM</td><td>194.28 us</td><td>1.9218 us</td><td>1.5004 us</td><td>191.20 us</td><td>196.11 us</td><td>194.54 us</td><td>2</td>
-</tr><tr><td>ApplicationEngine</td><td>431.37 us</td><td>8.5261 us</td><td>15.3742 us</td><td>399.66 us</td><td>465.16 us</td><td>433.15 us</td><td>3</td>
+<tr><td>HyperVM</td><td>77.03 us</td><td>0.8370 us</td><td>0.7830 us</td><td>74.46 us</td><td>77.87 us</td><td>77.11 us</td><td>1</td>
+</tr><tr><td>NeoVM</td><td>178.27 us</td><td>2.2009 us</td><td>2.0587 us</td><td>172.49 us</td><td>180.58 us</td><td>178.53 us</td><td>2</td>
+</tr><tr><td>ApplicationEngine</td><td>358.92 us</td><td>0.9572 us</td><td>0.8954 us</td><td>357.71 us</td><td>361.06 us</td><td>358.85 us</td><td>3</td>
 </tr>
 
 </tbody></table>
