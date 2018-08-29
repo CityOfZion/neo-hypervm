@@ -149,7 +149,7 @@
       <PreprocessorDefinitions>NDEBUG;NEOVM_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile />
-      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
     </ClCompile>
     <Link>
