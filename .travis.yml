@@ -8,10 +8,13 @@ matrix:
   include:
     - os: linux
       dist: xenial
+      dotnet: 2.1.300
+      mono: none
     - os: osx
       osx_image: xcode9.4
+      dotnet: 2.1.300
+      mono: none
 
-dotnet: 2.1.300
 
 addons:
   apt:
@@ -19,6 +22,9 @@ addons:
       - binutils
       - binutils-multiarch
       - g++-multilib
+
+before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; sudo apt-get update && sudo apt-get install binutils binutils-multiarch g++-multilib; fi
 
 script:
  - cd scripts
