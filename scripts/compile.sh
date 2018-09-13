@@ -18,5 +18,7 @@ echo "************************"
 if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
     make --file=Makefile-osx
 else
+    sudo apt-get update
+    sudo apt-get install binutils binutils-multiarch g++-multilib
     make
 fi
