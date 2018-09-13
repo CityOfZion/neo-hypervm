@@ -222,15 +222,15 @@ namespace NeoSharp.VM.Interop
                     }
                 case PlatformID.Unix:
                 case (PlatformID)128:
-                    {
-                        core = new LinuxCore();
-                        break;
-                    }
                 case PlatformID.MacOSX:
                     {
-                        // TODO: Mac detection doesn't work
-
-                        core = new MacCore();
+                        // OSX detection workaround
+                        if (File.Exists(@"/System/Library/CoreServices/SystemVersion.plist"))
+                        {
+                            core = new MacCore();
+                            break;
+                        }
+                        core = new LinuxCore();
                         break;
                     }
             }
