@@ -4,17 +4,10 @@ os:
  - linux
  - osx
 
-matrix:
-  include:
-    - os: linux
-      dist: xenial
-      dotnet: 2.1.300
-      mono: none
-    - os: osx
-      osx_image: xcode9.4
-      dotnet: 2.1.300
-      mono: none
-
+dist: xenial
+osx_image: xcode9.4
+dotnet: 2.1.300
+mono: none
 
 addons:
   apt:
@@ -23,9 +16,6 @@ addons:
       - binutils-multiarch
       - g++-multilib
 
-before_install:
-  - sudo apt-get update
-  - sudo apt-get install binutils binutils-multiarch g++-multilib
 
 script:
  - cd scripts
