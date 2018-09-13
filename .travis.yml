@@ -12,7 +12,6 @@ matrix:
       osx_image: xcode9.4
 
 dotnet: 2.1.300
-mono: none
 
 addons:
   apt:
