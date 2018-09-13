@@ -15,4 +15,8 @@ echo "************************"
 echo "**        MAKE        **"
 echo "************************"
 
-make
+if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
+    make --file=Makefile-osx
+else
+    make
+fi
