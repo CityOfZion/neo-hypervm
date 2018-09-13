@@ -24,7 +24,8 @@ addons:
       - g++-multilib
 
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; sudo apt-get update && sudo apt-get install binutils binutils-multiarch g++-multilib; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; sudo apt-get update; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; sudo apt-get install binutils binutils-multiarch g++-multilib; fi
 
 script:
  - cd scripts
