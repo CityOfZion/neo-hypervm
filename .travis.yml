@@ -17,6 +17,5 @@ addons:
       - g++-multilib
 
 script:
- - echo $TITLE
  - cd scripts
  - ./testAndCompile.sh
