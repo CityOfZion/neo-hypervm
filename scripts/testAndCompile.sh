@@ -2,10 +2,7 @@
 
 ./compile.sh
 
-SCRIPT=$(readlink -f "$0")
-SCRIPTPATH=$(dirname "$SCRIPT")
-
-cd $SCRIPTPATH/../tests/
+SCRIPTPATH=$(pwd)
 
 if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
     export NEO_VM_PATH=$SCRIPTPATH/../src/bin/Neo.HyperVM.dylib
@@ -17,4 +14,5 @@ echo "************************"
 echo "**      UNIT TEST     **"
 echo "************************"
 
+cd $SCRIPTPATH/../tests/
 dotnet test NeoSharp.VM.Interop.Tests --verbosity n

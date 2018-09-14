@@ -1,7 +1,6 @@
 #!/bin/bash
 
-SCRIPT=$(readlink -f "$0")
-SCRIPTPATH=$(dirname "$SCRIPT")
+SCRIPTPATH=$(pwd)
 
 cd $SCRIPTPATH/../src
 
@@ -16,7 +15,6 @@ echo "**        MAKE        **"
 echo "************************"
 
 if [[ $TRAVIS_OS_NAME == 'osx' ]]; then
-    ls -la /System/Library/CoreServices/
     make --file=Makefile-osx
 else
     sudo apt-get update
