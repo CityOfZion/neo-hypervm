@@ -16,7 +16,7 @@ addons:
       - binutils-multiarch
       - g++-multilib
 
-
 script:
+ - echo $TITLE
  - cd scripts
  - ./testAndCompile.sh
