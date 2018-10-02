@@ -10,9 +10,9 @@ SRCS := $(shell find $(SRC_DIRS) -name *.cpp -or -name *.c -or -name *.s)
 OBJS := $(SRCS:%=$(BUILD_DIR)/%.o)
 DEPS := $(OBJS:.o=.d)
 
-INC_DIRS  := $(shell find $(SRC_DIRS) -type d) $(LIBS_DIR)/openssl-1.1.0i/include
+INC_DIRS  := $(shell find $(SRC_DIRS) -type d) $(LIBS_DIR)/openssl/include
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
-LIBS := $(LIBS_DIR)/openssl-1.1.0i/liblinux-openssl-crypto-x86_64.a
+LIBS := $(LIBS_DIR)/openssl/liblinux-openssl-crypto-x86_64.a
 
 CPPFLAGS ?= $(INC_FLAGS) -Ofast -MMD -MP -Wall -fPIC --std=c++11 -ldl
 

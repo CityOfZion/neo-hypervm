@@ -122,6 +122,9 @@
     <ClInclude Include="HyperVM.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ExecutionEngine.cpp">
@@ -169,5 +172,8 @@
     <ClCompile Include="HyperVM.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Neo.HyperVM.rc" />
   </ItemGroup>
 </Project>
