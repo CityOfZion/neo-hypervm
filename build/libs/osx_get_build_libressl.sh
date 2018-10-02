@@ -17,7 +17,7 @@ mv $LIBRESSL_VER libressl_src
 # =================
 mkdir tmp_build
 cd tmp_build
-../libressl_src/configure --prefix=/opt/libressl --with-openssldir=/System/Library/OpenSSL --with-enginesdir=/opt/libress
+../libressl_src/configure --prefix=/opt/libressl --with-openssldir=/System/Library/OpenSSL
 make depend
 make check
 cd ..
