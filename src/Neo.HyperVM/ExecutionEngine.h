@@ -94,7 +94,7 @@ public:
 		return this->_state;
 	}
 
-	inline ExecutionContext* GetCurrentContext()
+	inline ExecutionContext* GetCurrentContext() const
 	{
 		return this->InvocationStack.Top();
 	}

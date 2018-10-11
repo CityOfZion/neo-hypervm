@@ -11,12 +11,12 @@ private:
 
 public:
 
-	inline int32 Count()
+	inline int32 Count() const
 	{
 		return this->_stack.Count();
 	}
 
-	inline ExecutionContext* Top()
+	inline ExecutionContext* Top() const
 	{
 		return this->_stack.Top();
 	}
