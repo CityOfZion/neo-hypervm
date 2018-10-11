@@ -186,7 +186,7 @@ void Stack<T>::Push(T* item)
 }
 
 template <class T>
-T* Stack<T>::Peek(int32 index) const
+T* Stack<T>::Peek(int32 index)
 {
 	if (this->_size == 0)
 	{
