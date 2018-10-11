@@ -75,15 +75,15 @@ bool ExecutionContext::ReadInt64(int64 &ret)
 
 	uint32 a = ((uint32)
 		(
-				(int32)this->_buffer[0] | (int32)this->_buffer[1] << 8 |
-				(int32)this->_buffer[2] << 16 | (int32)this->_buffer[3] << 24)
-				);
+		(int32)this->_buffer[0] | (int32)this->_buffer[1] << 8 |
+		(int32)this->_buffer[2] << 16 | (int32)this->_buffer[3] << 24)
+		);
 
 	uint32 b = ((uint32)
 		(
-				(int32)this->_buffer[4] | (int32)this->_buffer[5] << 8 |
-				(int32)this->_buffer[6] << 16 | (int32)this->_buffer[7] << 24)
-				);
+		(int32)this->_buffer[4] | (int32)this->_buffer[5] << 8 |
+		(int32)this->_buffer[6] << 16 | (int32)this->_buffer[7] << 24)
+		);
 
 	ret = (int64)((uint64)b << 32 | (uint64)a);
 	return true;
@@ -98,15 +98,15 @@ bool ExecutionContext::ReadUInt64(uint64 &ret)
 
 	uint32 a = ((uint32)
 		(
-				(int32)this->_buffer[0] | (int32)this->_buffer[1] << 8 |
-				(int32)this->_buffer[2] << 16 | (int32)this->_buffer[3] << 24)
-				);
+		(int32)this->_buffer[0] | (int32)this->_buffer[1] << 8 |
+		(int32)this->_buffer[2] << 16 | (int32)this->_buffer[3] << 24)
+		);
 
 	uint32 b = ((uint32)
 		(
-				(int32)this->_buffer[4] | (int32)this->_buffer[5] << 8 |
-				(int32)this->_buffer[6] << 16 | (int32)this->_buffer[7] << 24)
-				);
+		(int32)this->_buffer[4] | (int32)this->_buffer[5] << 8 |
+		(int32)this->_buffer[6] << 16 | (int32)this->_buffer[7] << 24)
+		);
 
 	ret = ((uint64)b << 32 | (uint64)a);
 	return true;
