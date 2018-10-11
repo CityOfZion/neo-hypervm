@@ -38,7 +38,7 @@ int32 ExecutionContext_GetInstructionPointer(ExecutionContext* context)
 {
 	if (context == NULL) return 0;
 
-	return context->InstructionPointer;
+	return context->GetInstructionPointer();
 }
 
 void ExecutionContext_Claim(ExecutionContext* context, StackItems* &evStack, StackItems* &altStack)
@@ -238,7 +238,7 @@ void StackItem_Free(IStackItem*& item)
 
 IStackItem* StackItem_Create(ExecutionEngine* engine, EStackItemType type, byte* data, int32 size)
 {
-	if (engine == NULL) 
+	if (engine == NULL)
 	{
 		return NULL;
 	}
