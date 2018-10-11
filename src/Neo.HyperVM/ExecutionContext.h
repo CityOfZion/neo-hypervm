@@ -12,6 +12,7 @@ private:
 	ExecutionScript* _script;
 	int32 _instructionIndex;
 	byte* _instructionPointer;
+	byte _buffer[8];
 
 	const int32 _scriptLength;
 
@@ -68,7 +69,7 @@ public:
 	inline ExecutionContext* Clone(int32 rvcount, int32 pcount)
 	{
 		auto clone = new ExecutionContext(this->_script, this->_instructionIndex, rvcount);
-		
+
 		this->EvaluationStack.SendTo(&clone->EvaluationStack, pcount);
 
 		return clone;
@@ -115,6 +116,7 @@ public:
 		_script(script),
 		_instructionIndex(instructorPointer),
 		_instructionPointer(&script->Content[instructorPointer]),
+		_buffer(),
 		_scriptLength(script->ScriptLength),
 		RVCount(rvcount),
 		AltStack(),
