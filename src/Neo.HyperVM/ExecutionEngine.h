@@ -89,12 +89,12 @@ public:
 
 	// Getters
 
-	inline byte GetState()
+	inline byte GetState() const
 	{
 		return this->_state;
 	}
 
-	inline ExecutionContext* GetCurrentContext()
+	inline ExecutionContext* GetCurrentContext() const
 	{
 		return this->InvocationStack.Top();
 	}
@@ -109,7 +109,7 @@ public:
 		return this->InvocationStack.Peek(-1);
 	}
 
-	inline uint32 GetConsumedGas()
+	inline uint32 GetConsumedGas() const
 	{
 		return this->_consumedGas;
 	}
