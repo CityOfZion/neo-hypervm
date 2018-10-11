@@ -270,7 +270,7 @@ public:
 
 	// Constructor
 
-	ExecutionEngine(InvokeInteropCallback invokeInterop, LoadScriptCallback loadScript, GetMessageCallback getMessage);
+	ExecutionEngine(InvokeInteropCallback &invokeInterop, LoadScriptCallback &loadScript, GetMessageCallback &getMessage);
 
 	// Destructor
 
