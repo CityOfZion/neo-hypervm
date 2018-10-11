@@ -18,7 +18,7 @@ public:
 
 	// static const int32 SizeOf = sizeof(void*);
 
-	inline int32 Count() { return this->_size; }
+	inline int32 Count() const { return this->_size; }
 
 	void SendTo(Stack<T>* stack, int32 count);
 
@@ -31,7 +31,7 @@ public:
 	void Insert(int32 index, T* item);
 	T* Peek(int32 index);
 
-	inline T* Top()
+	inline T* Top() const
 	{
 		if (this->_size == 0)
 		{
@@ -41,7 +41,7 @@ public:
 		return this->_items[this->_size - 1];
 	}
 
-	inline T* Bottom()
+	inline T* Bottom() const
 	{
 		if (this->_size == 0)
 		{
@@ -51,9 +51,11 @@ public:
 		return this->_items[0];
 	}
 
-	inline Stack() : _size(0), _itemsLength(0), _items(NULL) { }
-	
-	inline ~Stack() 
+	// Constructor & Destructor
+
+	inline Stack() : _size(0), _itemsLength(4), _items(new T*[4]) { }
+
+	inline ~Stack()
 	{
 		this->Clear();
 	}

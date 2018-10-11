@@ -119,8 +119,7 @@ EVMState ExecutionEngine::Execute(uint32 gas)
 	do
 	{
 		this->InternalStepInto();
-	}
-	while (this->_state == EVMState::NONE);
+	} while (this->_state == EVMState::NONE);
 
 	return this->_state;
 }
@@ -144,8 +143,7 @@ void ExecutionEngine::StepOver()
 	do
 	{
 		this->InternalStepInto();
-	}
-	while (this->_state == EVMState::NONE && this->InvocationStack.Count() > c);
+	} while (this->_state == EVMState::NONE && this->InvocationStack.Count() > c);
 }
 
 void ExecutionEngine::StepInto()
@@ -172,8 +170,6 @@ void ExecutionEngine::InternalStepInto()
 	}
 
 	EVMOpCode opcode = context->ReadNextInstruction();
-
-ExecuteOpCode:
 
 	// Execute opcode
 
@@ -427,6 +423,7 @@ ExecuteOpCode:
 
 	case EVMOpCode::NOP: return;
 	case EVMOpCode::JMP:
+	JmpLabel:
 	{
 		if (!this->AddGasCost())
 		{
@@ -434,21 +431,17 @@ ExecuteOpCode:
 		}
 
 		int16 offset = 0;
+
 		if (!context->ReadInt16(offset))
 		{
 			this->SetFault();
 			return;
 		}
 
-		offset = context->InstructionPointer + offset - 3;
-
-		if (offset < 0 || offset > context->ScriptLength)
+		if (!context->SeekFromHere(offset - 3))
 		{
 			this->SetFault();
-			return;
 		}
-
-		context->InstructionPointer = offset;
 		return;
 	}
 	case EVMOpCode::JMPIF:
@@ -460,15 +453,8 @@ ExecuteOpCode:
 		}
 
 		int16 offset = 0;
-		if (!context->ReadInt16(offset))
-		{
-			this->SetFault();
-			return;
-		}
 
-		offset = context->InstructionPointer + offset - 3;
-
-		if (offset < 0 || offset > context->ScriptLength || context->EvaluationStack.Count() < 1)
+		if (context->EvaluationStack.Count() < 1 || !context->ReadInt16(offset))
 		{
 			this->SetFault();
 			return;
@@ -477,7 +463,27 @@ ExecuteOpCode:
 		auto it = context->EvaluationStack.Pop();
 
 		if ((opcode == EVMOpCode::JMPIF) == it->GetBoolean())
-			context->InstructionPointer = offset;
+		{
+			if (!context->SeekFromHere(offset - 3))
+			{
+				// Do the same logic as official release
+
+				context->EvaluationStack.Push(it);
+				this->SetFault();
+				return;
+			}
+		}
+		else
+		{
+			if (!context->CouldSeekFromHere(offset - 3))
+			{
+				// Do the same logic as official release
+
+				context->EvaluationStack.Push(it);
+				this->SetFault();
+				return;
+			}
+		}
 
 		StackItemHelper::Free(it);
 		return;
@@ -495,16 +501,15 @@ ExecuteOpCode:
 			return;
 		}
 
-		auto clone = this->LoadScript(context->Script, -1);
-		context->EvaluationStack.SendTo(&clone->EvaluationStack, -1);
-		clone->InstructionPointer = context->InstructionPointer;
-		context->InstructionPointer += 2;
+		auto clone = context->Clone(-1, -1);
+		this->InvocationStack.Push(clone);
+		context->SeekFromHere(2);  // Official release don't check if is valid like JMP does
 
 		// Jump
 
 		opcode = EVMOpCode::JMP;
 		context = clone;
-		goto ExecuteOpCode;
+		goto JmpLabel;
 	}
 	// Stack isolation (NEP8)
 	case EVMOpCode::CALL_I:
@@ -533,16 +538,16 @@ ExecuteOpCode:
 			return;
 		}
 
-		auto clone = this->LoadScript(context->Script, rvcount);
-		context->EvaluationStack.SendTo(&clone->EvaluationStack, pcount);
-		clone->InstructionPointer = context->InstructionPointer;
-		context->InstructionPointer += 2;
+		auto clone = context->Clone(rvcount, pcount);
+		this->InvocationStack.Push(clone);
+
+		context->SeekFromHere(2); // Official release don't check if is valid like JMP does
 
 		// Jump
 
 		opcode = EVMOpCode::JMP;
 		context = clone;
-		goto ExecuteOpCode;
+		goto JmpLabel;
 	}
 	case EVMOpCode::CALL_E:
 	case EVMOpCode::CALL_ED:
