@@ -1,0 +1,23 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <!-- Win -->
+    <Content Include="$(MSBuildThisFileDirectory)..\runtimes\win\native\Neo.HyperVM.dll">
+       <Link>native\amd64\Neo.HyperVM.dll</Link>
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)..\lib\native\libcrypto-1_1-x64.dll" Condition=" '$(OS)' == 'Windows_NT' ">
+       <Link>libcrypto-1_1-x64.dll</Link>
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- Linux -->
+    <Content Include="$(MSBuildThisFileDirectory)..\runtimes\linux\native\Neo.HyperVM.so">
+       <Link>native\amd64\Neo.HyperVM.so</Link>
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- OSX -->
+    <Content Include="$(MSBuildThisFileDirectory)..\runtimes\osx\native\Neo.HyperVM.dylib">
+       <Link>native\amd64\Neo.HyperVM.dylib</Link>
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>
