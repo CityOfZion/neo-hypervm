@@ -119,7 +119,8 @@ EVMState ExecutionEngine::Execute(uint32 gas)
 	do
 	{
 		this->InternalStepInto();
-	} while (this->_state == EVMState::NONE);
+	}
+	while (this->_state == EVMState::NONE);
 
 	return this->_state;
 }
@@ -143,7 +144,8 @@ void ExecutionEngine::StepOver()
 	do
 	{
 		this->InternalStepInto();
-	} while (this->_state == EVMState::NONE && this->InvocationStack.Count() > c);
+	}
+	while (this->_state == EVMState::NONE && this->InvocationStack.Count() > c);
 }
 
 void ExecutionEngine::StepInto()

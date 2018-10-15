@@ -29,7 +29,7 @@ public:
 
 	void Push(T* item);
 	void Insert(int32 index, T* item);
-	T* Peek(int32 index);
+	T* Peek(int32 index) const;
 
 	inline T* Top() const
 	{

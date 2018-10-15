@@ -99,12 +99,12 @@ public:
 		return this->InvocationStack.Top();
 	}
 
-	inline ExecutionContext* GetCallingContext()
+	inline ExecutionContext* GetCallingContext() const
 	{
 		return this->InvocationStack.Peek(1);
 	}
 
-	inline ExecutionContext* GetEntryContext()
+	inline ExecutionContext* GetEntryContext() const
 	{
 		return this->InvocationStack.Peek(-1);
 	}

@@ -182,14 +182,12 @@ int32 ExecutionContext::Read(byte* data, int32 length)
 	{
 		int32 read = 0;
 
-		for (int32 x = 0; x < length && this->_instructionIndex < this->_scriptLength; ++x)
+		for (; read < length && this->_instructionIndex < this->_scriptLength; ++read)
 		{
-			data[x] = this->_script->Content[this->_instructionIndex];
-
-			++this->_instructionIndex;
-			++this->_instructionPointer;
-			++read;
+			data[read] = this->_script->Content[this->_instructionIndex++];
 		}
+
+		this->_instructionPointer += read;
 
 		return read;
 	}
