@@ -21,7 +21,7 @@ public:
 		return this->_stack.Top();
 	}
 
-	inline ExecutionContext* Peek(int32 index)
+	inline ExecutionContext* Peek(int32 index) const
 	{
 		return this->_stack.Peek(index);
 	}

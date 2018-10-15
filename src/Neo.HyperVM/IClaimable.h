@@ -18,7 +18,7 @@ public:
 		return this->_claims == 0;
 	}
 
-	inline bool IsUnClaimed()
+	inline bool IsUnClaimed() const
 	{
 		return this->_claims == 0;
 	}

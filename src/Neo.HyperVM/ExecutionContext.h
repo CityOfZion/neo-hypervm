@@ -79,7 +79,7 @@ public:
 	{
 		int32 newPos = this->_instructionIndex + offset;
 
-		if (newPos < 0 || newPos > this->_scriptLength)
+		if (newPos < 0 || newPos >= this->_scriptLength)
 		{
 			return false;
 		}
@@ -91,7 +91,7 @@ public:
 	{
 		int32 newPos = this->_instructionIndex + offset;
 
-		if (newPos < 0 || newPos > this->_scriptLength)
+		if (newPos < 0 || newPos >= this->_scriptLength)
 		{
 			return false;
 		}

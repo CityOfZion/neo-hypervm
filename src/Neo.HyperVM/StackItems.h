@@ -10,17 +10,17 @@ class StackItems
 
 public:
 
-	inline int32 Count()
+	inline int32 Count() const
 	{
 		return this->_stack.Count();
 	}
 
-	inline IStackItem* Top()
+	inline IStackItem* Top() const
 	{
 		return this->_stack.Top();
 	}
 	
-	inline IStackItem* Peek(int32 index)
+	inline IStackItem* Peek(int32 index) const
 	{
 		return this->_stack.Peek(index);
 	}
