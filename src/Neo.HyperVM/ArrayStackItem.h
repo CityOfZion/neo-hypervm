@@ -15,7 +15,7 @@ public:
 	// Converters
 
 	inline bool GetBoolean() { return true; }
-	inline BigInteger* GetBigInteger() { return NULL; }
+	inline BigInteger* GetBigInteger() { return nullptr; }
 	inline bool GetInt32(int32 &ret) { return false; }
 	inline int32 ReadByteArray(byte* output, int32 sourceIndex, int32 count) { return -1; }
 	inline int32 ReadByteArraySize() { return -1; }

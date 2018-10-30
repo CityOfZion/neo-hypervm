@@ -5,7 +5,7 @@ ByteArrayStackItem::ByteArrayStackItem(IStackItemCounter* counter, byte* data, i
 	IStackItem(counter, EStackItemType::ByteArray),
 	_payloadLength(size)
 {
-	if (size > 0 && data != NULL)
+	if (size > 0 && data != nullptr)
 	{
 		if (copyPointer)
 		{
@@ -19,7 +19,7 @@ ByteArrayStackItem::ByteArrayStackItem(IStackItemCounter* counter, byte* data, i
 	}
 	else
 	{
-		this->_payload = NULL;
+		this->_payload = nullptr;
 	}
 }
 

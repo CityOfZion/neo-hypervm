@@ -14,7 +14,7 @@ BigInteger::BigInteger(uint32 value) : _cachedSize(-1)
 	if (value <= Int32MaxValue)
 	{
 		this->_sign = (int32)value;
-		this->_bits = NULL;
+		this->_bits = nullptr;
 		this->_bitsSize = 0;
 	}
 	else
@@ -31,9 +31,9 @@ BigInteger::BigInteger(int32 sign, uint32* rgu, int32 rguSize) : _cachedSize(-1)
 {
 	this->_sign = sign;
 
-	if (rgu == NULL || rguSize <= 0)
+	if (rgu == nullptr || rguSize <= 0)
 	{
-		this->_bits = NULL;
+		this->_bits = nullptr;
 		this->_bitsSize = 0;
 
 		// AssertValid();
@@ -49,16 +49,16 @@ BigInteger::BigInteger(int32 sign, uint32* rgu, int32 rguSize) : _cachedSize(-1)
 	// AssertValid();
 }
 
-BigInteger::BigInteger(int32 value) : _sign(value), _bits(NULL), _bitsSize(0), _cachedSize(-1)
+BigInteger::BigInteger(int32 value) : _sign(value), _bits(nullptr), _bitsSize(0), _cachedSize(-1)
 {
 	// AssertValid();
 }
 
 BigInteger::BigInteger(BigInteger* value) : _sign(value->_sign), _cachedSize(-1)
 {
-	if (value->_bits == NULL || value->_bitsSize <= 0)
+	if (value->_bits == nullptr || value->_bitsSize <= 0)
 	{
-		this->_bits = NULL;
+		this->_bits = nullptr;
 		this->_bitsSize = 0;
 	}
 	else
@@ -75,9 +75,9 @@ BigInteger::BigInteger(BigInteger* value) : _sign(value->_sign), _cachedSize(-1)
 
 BigInteger::BigInteger(const BigInteger &value) : _sign(value._sign), _cachedSize(-1)
 {
-	if (value._bits == NULL || value._bitsSize <= 0)
+	if (value._bits == nullptr || value._bitsSize <= 0)
 	{
-		this->_bits = NULL;
+		this->_bits = nullptr;
 		this->_bitsSize = 0;
 	}
 	else
@@ -92,9 +92,9 @@ BigInteger::BigInteger(const BigInteger &value) : _sign(value._sign), _cachedSiz
 	// AssertValid();
 }
 
-BigInteger::BigInteger(uint32* value, int32 valueSize, bool negative) :_sign(0), _bits(NULL), _bitsSize(0), _cachedSize(-1)
+BigInteger::BigInteger(uint32* value, int32 valueSize, bool negative) :_sign(0), _bits(nullptr), _bitsSize(0), _cachedSize(-1)
 {
-	if (value == NULL)
+	if (value == nullptr)
 	{
 		return;
 	}
@@ -133,9 +133,9 @@ BigInteger::BigInteger(uint32* value, int32 valueSize, bool negative) :_sign(0),
 	// AssertValid();
 }
 
-BigInteger::BigInteger(uint32* value, int32 size) :_sign(0), _bits(NULL), _bitsSize(0), _cachedSize(-1)
+BigInteger::BigInteger(uint32* value, int32 size) :_sign(0), _bits(nullptr), _bitsSize(0), _cachedSize(-1)
 {
-	if (value == NULL)
+	if (value == nullptr)
 	{
 		return;
 	}
@@ -248,9 +248,9 @@ BigInteger::BigInteger(uint32* value, int32 size) :_sign(0), _bits(NULL), _bitsS
 	//AssertValid();
 }
 
-BigInteger::BigInteger(byte* value, int32 byteCount) : _sign(0), _bits(NULL), _bitsSize(0), _cachedSize(-1)
+BigInteger::BigInteger(byte* value, int32 byteCount) : _sign(0), _bits(nullptr), _bitsSize(0), _cachedSize(-1)
 {
-	if (byteCount <= 0 || value == NULL)
+	if (byteCount <= 0 || value == nullptr)
 	{
 		// BigInteger.Zero
 		return;
@@ -416,10 +416,10 @@ void BigInteger::CopyInternal(const BigInteger &reg)
 	}
 	else
 	{
-		if (this->_bits != NULL)
+		if (this->_bits != nullptr)
 		{
 			delete[]this->_bits;
-			this->_bits = NULL;
+			this->_bits = nullptr;
 		}
 	}
 }
@@ -479,7 +479,7 @@ int32 BigInteger::GetDiffLength(uint32* rgu1, uint32* rgu2, int32 cu)
 
 int32 BigInteger::ToUInt32Array(uint32* &output)
 {
-	if (this->_bits == NULL && this->_sign == 0)
+	if (this->_bits == nullptr && this->_sign == 0)
 	{
 		output = new uint32[1]{ 0 };
 		return 1;
@@ -489,7 +489,7 @@ int32 BigInteger::ToUInt32Array(uint32* &output)
 	uint32* dwords;
 	uint32 highDWord;
 
-	if (this->_bits == NULL)
+	if (this->_bits == nullptr)
 	{
 		dwords = new uint32[1]{ (uint32)this->_sign };
 		dwords_size = 1;
@@ -536,7 +536,7 @@ int32 BigInteger::ToUInt32Array(uint32* &output)
 
 BigInteger* BigInteger::Or(BigInteger* bi)
 {
-	if (bi == NULL || bi->_sign == 0) // IsZero
+	if (bi == nullptr || bi->_sign == 0) // IsZero
 	{
 		return this->Clone();
 	}
@@ -577,7 +577,7 @@ BigInteger* BigInteger::Or(BigInteger* bi)
 
 BigInteger* BigInteger::Xor(BigInteger* bi)
 {
-	if (bi == NULL || bi->_sign == 0) // IsZero
+	if (bi == nullptr || bi->_sign == 0) // IsZero
 	{
 		return this->Clone();
 	}
@@ -618,7 +618,7 @@ BigInteger* BigInteger::Xor(BigInteger* bi)
 
 bool BigInteger::GetPartsForBitManipulation(BigInteger* x, uint32* &xd, int32 &xl)
 {
-	if (x->_bits == NULL)
+	if (x->_bits == nullptr)
 	{
 		if (x->_sign < 0)
 		{
@@ -643,7 +643,7 @@ bool BigInteger::GetPartsForBitManipulation(BigInteger* x, uint32* &xd, int32 &x
 		}
 		else
 		{
-			xd = NULL;
+			xd = nullptr;
 		}
 	}
 
@@ -766,7 +766,7 @@ BigInteger* BigInteger::Shr(int32 shift)
 
 BigInteger* BigInteger::And(BigInteger* bi)
 {
-	if (bi == NULL || bi->_sign == 0 || this->_sign == 0) // IsZero
+	if (bi == nullptr || bi->_sign == 0 || this->_sign == 0) // IsZero
 	{
 		return new BigInteger(BigInteger::Zero);
 	}
@@ -807,7 +807,7 @@ BigInteger* BigInteger::Div(BigInteger* bi)
 
 	if (bi->_sign == 0) // IsZero
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	int32 sign = +1;
@@ -848,7 +848,7 @@ BigInteger* BigInteger::Mod(BigInteger* bi)
 
 	if (bi->_sign == 0) // IsZero
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	int32 signNum = +1;
@@ -969,16 +969,16 @@ int32 BigInteger::CompareTo(const BigInteger &bi)
 	}
 
 	// Same signs
-	if (this->_bits == NULL)
+	if (this->_bits == nullptr)
 	{
-		if (bi._bits == NULL)
+		if (bi._bits == nullptr)
 			return this->_sign < bi._sign ? -1 : this->_sign > bi._sign ? +1 : 0;
 
 		return -bi._sign;
 	}
 
 	int32 cuThis, cuOther;
-	if (bi._bits == NULL || (cuThis = Length(this->_bits, this->_bitsSize)) > (cuOther = Length(bi._bits, bi._bitsSize)))
+	if (bi._bits == nullptr || (cuThis = Length(this->_bits, this->_bitsSize)) > (cuOther = Length(bi._bits, bi._bitsSize)))
 		return this->_sign;
 
 	if (cuThis < cuOther)
@@ -1003,16 +1003,16 @@ int32 BigInteger::CompareTo(BigInteger* bi)
 	}
 
 	// Same signs
-	if (this->_bits == NULL)
+	if (this->_bits == nullptr)
 	{
-		if (bi->_bits == NULL)
+		if (bi->_bits == nullptr)
 			return this->_sign < bi->_sign ? -1 : this->_sign > bi->_sign ? +1 : 0;
 
 		return -bi->_sign;
 	}
 
 	int32 cuThis, cuOther;
-	if (bi->_bits == NULL || (cuThis = Length(this->_bits, this->_bitsSize)) > (cuOther = Length(bi->_bits, bi->_bitsSize)))
+	if (bi->_bits == nullptr || (cuThis = Length(this->_bits, this->_bitsSize)) > (cuOther = Length(bi->_bits, bi->_bitsSize)))
 		return this->_sign;
 
 	if (cuThis < cuOther)
@@ -1028,7 +1028,7 @@ int32 BigInteger::CompareTo(BigInteger* bi)
 bool BigInteger::ToInt32(int32 &ret)
 {
 	// value.AssertValid();
-	if (this->_bits == NULL)
+	if (this->_bits == nullptr)
 	{
 		ret = this->_sign;  // value packed into int32 sign
 		return true;
@@ -1094,7 +1094,7 @@ int32 BigInteger::ToByteArraySize()
 	{
 		dwordsSize = this->_bitsSize;
 
-		if (this->_bits != NULL)
+		if (this->_bits != nullptr)
 		{
 			// Clone
 			dwords = new uint32[dwordsSize];
@@ -1105,7 +1105,7 @@ int32 BigInteger::ToByteArraySize()
 		}
 		else
 		{
-			dwords = NULL;
+			dwords = nullptr;
 			dwordsSize = 0;
 		}
 
@@ -1184,7 +1184,7 @@ int32 BigInteger::ToByteArray(byte* output, int32 length)
 	{
 		dwordsSize = this->_bitsSize;
 
-		if (this->_bits != NULL)
+		if (this->_bits != nullptr)
 		{
 			// Clone
 			dwords = new uint32[dwordsSize];
@@ -1195,7 +1195,7 @@ int32 BigInteger::ToByteArray(byte* output, int32 length)
 		}
 		else
 		{
-			dwords = NULL;
+			dwords = nullptr;
 			dwordsSize = 0;
 		}
 
@@ -1254,9 +1254,9 @@ int32 BigInteger::ToByteArray(byte* output, int32 length)
 
 BigInteger::~BigInteger()
 {
-	if (this->_bits == NULL) return;
+	if (this->_bits == nullptr) return;
 
 	delete[]this->_bits;
-	this->_bits = NULL;
+	this->_bits = nullptr;
 	this->_bitsSize = 0;
 }

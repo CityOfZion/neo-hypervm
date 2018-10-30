@@ -2,19 +2,19 @@
 
 void StackItemHelper::Free(IStackItem* &item)
 {
-	if (item != NULL && item->IsUnClaimed())
+	if (item != nullptr && item->IsUnClaimed())
 	{
 		// Is zero because if the item is cloned you can call this method twice (PUSH1,DUP,EQUAL)
 		// But in Linux doesn't work (next call is not NULL) careful!
 
 		delete(item);
-		item = NULL;
+		item = nullptr;
 	}
 }
 
 void StackItemHelper::Free(IStackItem* &itemA, IStackItem* &itemB, IStackItem* &itemC)
 {
-	if (itemA != NULL && itemA == itemB && itemB == itemC)
+	if (itemA != nullptr && itemA == itemB && itemB == itemC)
 	{
 		// All equals
 
@@ -25,7 +25,7 @@ void StackItemHelper::Free(IStackItem* &itemA, IStackItem* &itemB, IStackItem* &
 		return;
 	}
 
-	if (itemA != NULL && itemA == itemB)
+	if (itemA != nullptr && itemA == itemB)
 	{
 		// A=B
 
@@ -36,7 +36,7 @@ void StackItemHelper::Free(IStackItem* &itemA, IStackItem* &itemB, IStackItem* &
 		return;
 	}
 
-	if (itemB != NULL && itemB == itemC)
+	if (itemB != nullptr && itemB == itemC)
 	{
 		// B=C
 
@@ -47,7 +47,7 @@ void StackItemHelper::Free(IStackItem* &itemA, IStackItem* &itemB, IStackItem* &
 		return;
 	}
 
-	if (itemA != NULL && itemA == itemC)
+	if (itemA != nullptr && itemA == itemC)
 	{
 		// A=C
 
@@ -60,43 +60,43 @@ void StackItemHelper::Free(IStackItem* &itemA, IStackItem* &itemB, IStackItem* &
 
 	// Differents
 
-	if (itemA != NULL) Free(itemA);
-	if (itemB != NULL) Free(itemB);
-	if (itemC != NULL) Free(itemC);
+	if (itemA != nullptr) Free(itemA);
+	if (itemB != nullptr) Free(itemB);
+	if (itemC != nullptr) Free(itemC);
 }
 
 void StackItemHelper::Free(IStackItem* &itemA, IStackItem* &itemB)
 {
-	if (itemA != NULL && itemA->IsUnClaimed())
+	if (itemA != nullptr && itemA->IsUnClaimed())
 	{
 		// Check equals
 
 		if (itemB == itemA)
 		{
-			itemB = NULL;
+			itemB = nullptr;
 			delete(itemA);
-			itemA = NULL;
+			itemA = nullptr;
 			return;
 		}
 
 		delete(itemA);
-		itemA = NULL;
+		itemA = nullptr;
 	}
 
-	if (itemB != NULL && itemB->IsUnClaimed())
+	if (itemB != nullptr && itemB->IsUnClaimed())
 	{
 		delete(itemB);
-		itemB = NULL;
+		itemB = nullptr;
 	}
 }
 
 void StackItemHelper::UnclaimAndFree(IStackItem* &item)
 {
-	if (item != NULL && item->UnClaim())
+	if (item != nullptr && item->UnClaim())
 	{
 		// Is zero because if the item is cloned you can call this method twice (PUSH1,DUP,EQUAL)
 
 		delete(item);
-		item = NULL;
+		item = nullptr;
 	}
 }

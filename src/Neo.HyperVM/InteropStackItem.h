@@ -19,7 +19,7 @@ public:
 		return this->_payloadLength > 0;
 	}
 
-	inline BigInteger* GetBigInteger() { return NULL; }
+	inline BigInteger* GetBigInteger() { return nullptr; }
 
 	inline bool GetInt32(int32 &ret) { return false; }
 
@@ -43,10 +43,10 @@ public:
 
 	inline ~InteropStackItem()
 	{
-		if (this->_payload != NULL)
+		if (this->_payload != nullptr)
 		{
 			delete[](this->_payload);
-			this->_payload = NULL;
+			this->_payload = nullptr;
 		}
 	}
 

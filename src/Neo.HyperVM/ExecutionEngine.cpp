@@ -34,7 +34,7 @@ ExecutionEngine::ExecutionEngine
 	_maxGas(0xFFFFFFFF),
 	_counter(new IStackItemCounter(MAX_STACK_SIZE)),
 	_state(EVMState::NONE),
-	Log(NULL),
+	Log(nullptr),
 
 	OnGetMessage(getMessage),
 	OnLoadScript(loadScript),
@@ -81,7 +81,7 @@ ExecutionContext* ExecutionEngine::LoadScript(ExecutionScript* script, int32 rvc
 
 bool ExecutionEngine::LoadScript(byte scriptIndex, int32 rvcount)
 {
-	ExecutionScript* sc = NULL;
+	ExecutionScript* sc = nullptr;
 
 	if (this->Scripts.size() > scriptIndex)
 	{
@@ -91,7 +91,7 @@ bool ExecutionEngine::LoadScript(byte scriptIndex, int32 rvcount)
 		sc = (ExecutionScript*)*it;
 	}
 
-	if (sc == NULL) return false;
+	if (sc == nullptr) return false;
 
 	auto context = new ExecutionContext(sc, 0, rvcount);
 	this->InvocationStack.Push(context);
@@ -160,13 +160,13 @@ void ExecutionEngine::InternalStepInto()
 {
 	auto context = this->InvocationStack.Top();
 
-	if (context == NULL)
+	if (context == nullptr)
 	{
 		this->SetHalt();
 		return;
 	}
 
-	if (this->Log != NULL)
+	if (this->Log != nullptr)
 	{
 		this->Log(context);
 	}
@@ -181,9 +181,9 @@ void ExecutionEngine::InternalStepInto()
 
 	case EVMOpCode::PUSH0:
 	{
-		auto ret = this->CreateByteArray(NULL, 0, false);
+		auto ret = this->CreateByteArray(nullptr, 0, false);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -208,7 +208,7 @@ void ExecutionEngine::InternalStepInto()
 	{
 		auto ret = this->CreateInteger((opcode - EVMOpCode::PUSH1) + 1);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -308,7 +308,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateByteArray(data, length, true);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -338,7 +338,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateByteArray(data, length, true);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -368,7 +368,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateByteArray(data, length, true);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -398,7 +398,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateByteArray(data, length, true);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -414,7 +414,7 @@ void ExecutionEngine::InternalStepInto()
 		auto bi = new BigInteger(BigInteger::MinusOne);
 		auto ret = this->CreateInteger(bi);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -497,7 +497,7 @@ void ExecutionEngine::InternalStepInto()
 			return;
 		}
 
-		if (context == NULL || this->InvocationStack.Count() >= MAX_INVOCATION_STACK_SIZE)
+		if (context == nullptr || this->InvocationStack.Count() >= MAX_INVOCATION_STACK_SIZE)
 		{
 			this->SetFault();
 			return;
@@ -521,7 +521,7 @@ void ExecutionEngine::InternalStepInto()
 			return;
 		}
 
-		if (context == NULL || this->InvocationStack.Count() >= MAX_INVOCATION_STACK_SIZE)
+		if (context == nullptr || this->InvocationStack.Count() >= MAX_INVOCATION_STACK_SIZE)
 		{
 			this->SetFault();
 			return;
@@ -561,7 +561,7 @@ void ExecutionEngine::InternalStepInto()
 			return;
 		}
 
-		if (this->OnLoadScript == NULL)
+		if (this->OnLoadScript == nullptr)
 		{
 			this->SetFault();
 			return;
@@ -665,7 +665,7 @@ void ExecutionEngine::InternalStepInto()
 			return;
 		}
 
-		if (context != NULL)
+		if (context != nullptr)
 		{
 			context->Claim();
 			this->InvocationStack.Drop();
@@ -712,7 +712,7 @@ void ExecutionEngine::InternalStepInto()
 			return;
 		}
 
-		if (this->OnLoadScript == NULL)
+		if (this->OnLoadScript == nullptr)
 		{
 			this->SetFault();
 			return;
@@ -789,7 +789,7 @@ void ExecutionEngine::InternalStepInto()
 	case EVMOpCode::SYSCALL:
 	{
 		uint32 length = 0;
-		if (this->OnInvokeInterop == NULL || !context->ReadVarBytes(length, 252) || length == 0)
+		if (this->OnInvokeInterop == nullptr || !context->ReadVarBytes(length, 252) || length == 0)
 		{
 			this->SetFault();
 			return;
@@ -970,7 +970,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateInteger(context->EvaluationStack.Count());
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -1199,7 +1199,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateByteArray(data, size1 + size2, true);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -1254,7 +1254,7 @@ void ExecutionEngine::InternalStepInto()
 		StackItemHelper::Free(it);
 
 		auto ret = this->CreateByteArray(data, count, true);
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -1298,7 +1298,7 @@ void ExecutionEngine::InternalStepInto()
 		StackItemHelper::Free(it);
 
 		auto ret = this->CreateByteArray(data, count, true);
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -1342,7 +1342,7 @@ void ExecutionEngine::InternalStepInto()
 		StackItemHelper::Free(it);
 
 		auto ret = this->CreateByteArray(data, count, true);
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -1372,7 +1372,7 @@ void ExecutionEngine::InternalStepInto()
 		}
 
 		auto ret = this->CreateInteger(size);
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -1398,7 +1398,7 @@ void ExecutionEngine::InternalStepInto()
 		auto bi = it->GetBigInteger();
 		StackItemHelper::Free(it);
 
-		if (bi == NULL)
+		if (bi == nullptr)
 		{
 			this->SetFault();
 			return;
@@ -1407,7 +1407,7 @@ void ExecutionEngine::InternalStepInto()
 		auto reti = bi->Invert();
 		delete(bi);
 
-		if (reti == NULL)
+		if (reti == nullptr)
 		{
 			this->SetFault();
 			return;
@@ -1415,7 +1415,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateInteger(reti);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -1442,10 +1442,10 @@ void ExecutionEngine::InternalStepInto()
 
 		StackItemHelper::Free(x1, x2);
 
-		if (i2 == NULL || i1 == NULL)
+		if (i2 == nullptr || i1 == nullptr)
 		{
-			if (i2 != NULL) delete(i2);
-			if (i1 != NULL) delete(i1);
+			if (i2 != nullptr) delete(i2);
+			if (i1 != nullptr) delete(i1);
 
 			this->SetFault();
 			return;
@@ -1456,7 +1456,7 @@ void ExecutionEngine::InternalStepInto()
 		delete(i2);
 		delete(i1);
 
-		if (reti == NULL)
+		if (reti == nullptr)
 		{
 			this->SetFault();
 			return;
@@ -1464,7 +1464,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateInteger(reti);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -1491,10 +1491,10 @@ void ExecutionEngine::InternalStepInto()
 
 		StackItemHelper::Free(x1, x2);
 
-		if (i2 == NULL || i1 == NULL)
+		if (i2 == nullptr || i1 == nullptr)
 		{
-			if (i2 != NULL) delete(i2);
-			if (i1 != NULL) delete(i1);
+			if (i2 != nullptr) delete(i2);
+			if (i1 != nullptr) delete(i1);
 
 			this->SetFault();
 			return;
@@ -1505,7 +1505,7 @@ void ExecutionEngine::InternalStepInto()
 		delete(i2);
 		delete(i1);
 
-		if (reti == NULL)
+		if (reti == nullptr)
 		{
 			this->SetFault();
 			return;
@@ -1513,7 +1513,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateInteger(reti);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -1540,10 +1540,10 @@ void ExecutionEngine::InternalStepInto()
 
 		StackItemHelper::Free(x1, x2);
 
-		if (i2 == NULL || i1 == NULL)
+		if (i2 == nullptr || i1 == nullptr)
 		{
-			if (i2 != NULL) delete(i2);
-			if (i1 != NULL) delete(i1);
+			if (i2 != nullptr) delete(i2);
+			if (i1 != nullptr) delete(i1);
 
 			this->SetFault();
 			return;
@@ -1554,7 +1554,7 @@ void ExecutionEngine::InternalStepInto()
 		delete(i2);
 		delete(i1);
 
-		if (reti == NULL)
+		if (reti == nullptr)
 		{
 			this->SetFault();
 			return;
@@ -1562,7 +1562,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateInteger(reti);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -1586,7 +1586,7 @@ void ExecutionEngine::InternalStepInto()
 		auto ret = this->CreateBool(x1->Equals(x2));
 		StackItemHelper::Free(x2, x1);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -1612,7 +1612,7 @@ void ExecutionEngine::InternalStepInto()
 		auto bi = it->GetBigInteger();
 		StackItemHelper::Free(it);
 
-		if (bi == NULL)
+		if (bi == nullptr)
 		{
 			this->SetFault();
 			return;
@@ -1630,7 +1630,7 @@ void ExecutionEngine::InternalStepInto()
 		delete(add);
 		delete(bi);
 
-		if (reti == NULL)
+		if (reti == nullptr)
 		{
 			this->SetFault();
 			return;
@@ -1645,7 +1645,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateInteger(reti);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -1668,7 +1668,7 @@ void ExecutionEngine::InternalStepInto()
 		auto bi = it->GetBigInteger();
 		StackItemHelper::Free(it);
 
-		if (bi == NULL)
+		if (bi == nullptr)
 		{
 			this->SetFault();
 			return;
@@ -1686,7 +1686,7 @@ void ExecutionEngine::InternalStepInto()
 		delete(add);
 		delete(bi);
 
-		if (reti == NULL)
+		if (reti == nullptr)
 		{
 			this->SetFault();
 			return;
@@ -1701,7 +1701,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateInteger(reti);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -1724,7 +1724,7 @@ void ExecutionEngine::InternalStepInto()
 		auto bi = it->GetBigInteger();
 		StackItemHelper::Free(it);
 
-		if (bi == NULL)
+		if (bi == nullptr)
 		{
 			this->SetFault();
 			return;
@@ -1735,7 +1735,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateInteger(reti);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -1758,7 +1758,7 @@ void ExecutionEngine::InternalStepInto()
 		auto bi = it->GetBigInteger();
 		StackItemHelper::Free(it);
 
-		if (bi == NULL)
+		if (bi == nullptr)
 		{
 			this->SetFault();
 			return;
@@ -1767,7 +1767,7 @@ void ExecutionEngine::InternalStepInto()
 		auto reti = bi->Negate();
 		delete(bi);
 
-		if (reti == NULL)
+		if (reti == nullptr)
 		{
 			this->SetFault();
 			return;
@@ -1775,7 +1775,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateInteger(reti);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -1798,7 +1798,7 @@ void ExecutionEngine::InternalStepInto()
 		auto bi = it->GetBigInteger();
 		StackItemHelper::Free(it);
 
-		if (bi == NULL)
+		if (bi == nullptr)
 		{
 			this->SetFault();
 			return;
@@ -1807,7 +1807,7 @@ void ExecutionEngine::InternalStepInto()
 		auto reti = bi->Abs();
 		delete(bi);
 
-		if (reti == NULL)
+		if (reti == nullptr)
 		{
 			this->SetFault();
 			return;
@@ -1815,7 +1815,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateInteger(reti);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -1838,7 +1838,7 @@ void ExecutionEngine::InternalStepInto()
 		auto ret = this->CreateBool(!it->GetBoolean());
 		StackItemHelper::Free(it);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -1862,7 +1862,7 @@ void ExecutionEngine::InternalStepInto()
 		auto i = x->GetBigInteger();
 		StackItemHelper::Free(x);
 
-		if (i == NULL)
+		if (i == nullptr)
 		{
 			this->SetFault();
 			return;
@@ -1871,7 +1871,7 @@ void ExecutionEngine::InternalStepInto()
 		auto ret = this->CreateBool(i->CompareTo(BigInteger::Zero) != 0);
 		delete(i);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -1897,12 +1897,12 @@ void ExecutionEngine::InternalStepInto()
 		auto x1 = i1->GetBigInteger();
 		StackItemHelper::Free(i2, i1);
 
-		if (x2 == NULL || x1 == NULL ||
+		if (x2 == nullptr || x1 == nullptr ||
 			x2->SizeExceeded() ||
 			x1->SizeExceeded())
 		{
-			if (x2 != NULL) delete(x2);
-			if (x1 != NULL) delete(x1);
+			if (x2 != nullptr) delete(x2);
+			if (x1 != nullptr) delete(x1);
 
 			this->SetFault();
 			return;
@@ -1912,7 +1912,7 @@ void ExecutionEngine::InternalStepInto()
 		delete(x2);
 		delete(x1);
 
-		if (reti == NULL)
+		if (reti == nullptr)
 		{
 			this->SetFault();
 			return;
@@ -1927,7 +1927,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateInteger(reti);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -1952,12 +1952,12 @@ void ExecutionEngine::InternalStepInto()
 		auto x1 = i1->GetBigInteger();
 		StackItemHelper::Free(i2, i1);
 
-		if (x2 == NULL || x1 == NULL ||
+		if (x2 == nullptr || x1 == nullptr ||
 			x2->SizeExceeded() ||
 			x1->SizeExceeded())
 		{
-			if (x2 != NULL) delete(x2);
-			if (x1 != NULL) delete(x1);
+			if (x2 != nullptr) delete(x2);
+			if (x1 != nullptr) delete(x1);
 
 			this->SetFault();
 			return;
@@ -1967,7 +1967,7 @@ void ExecutionEngine::InternalStepInto()
 		delete(x2);
 		delete(x1);
 
-		if (reti == NULL)
+		if (reti == nullptr)
 		{
 			this->SetFault();
 			return;
@@ -1982,7 +1982,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateInteger(reti);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -2008,12 +2008,12 @@ void ExecutionEngine::InternalStepInto()
 		StackItemHelper::Free(i2, i1);
 
 		if (
-			x2 == NULL || x1 == NULL ||
+			x2 == nullptr || x1 == nullptr ||
 			x2->ToByteArraySize() + x1->ToByteArraySize() > MAX_BIGINTEGER_SIZE
 			)
 		{
-			if (x2 != NULL) delete(x2);
-			if (x1 != NULL) delete(x1);
+			if (x2 != nullptr) delete(x2);
+			if (x1 != nullptr) delete(x1);
 
 			this->SetFault();
 			return;
@@ -2023,7 +2023,7 @@ void ExecutionEngine::InternalStepInto()
 		delete(x2);
 		delete(x1);
 
-		if (reti == NULL)
+		if (reti == nullptr)
 		{
 			this->SetFault();
 			return;
@@ -2031,7 +2031,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateInteger(reti);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -2056,12 +2056,12 @@ void ExecutionEngine::InternalStepInto()
 		auto x1 = i1->GetBigInteger();
 		StackItemHelper::Free(i2, i1);
 
-		if (x2 == NULL || x1 == NULL ||
+		if (x2 == nullptr || x1 == nullptr ||
 			x1->SizeExceeded() ||
 			x2->SizeExceeded())
 		{
-			if (x2 != NULL) delete(x2);
-			if (x1 != NULL) delete(x1);
+			if (x2 != nullptr) delete(x2);
+			if (x1 != nullptr) delete(x1);
 
 			this->SetFault();
 			return;
@@ -2071,7 +2071,7 @@ void ExecutionEngine::InternalStepInto()
 		delete(x2);
 		delete(x1);
 
-		if (reti == NULL)
+		if (reti == nullptr)
 		{
 			this->SetFault();
 			return;
@@ -2079,7 +2079,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateInteger(reti);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -2104,12 +2104,12 @@ void ExecutionEngine::InternalStepInto()
 		auto x1 = i1->GetBigInteger();
 		StackItemHelper::Free(i2, i1);
 
-		if (x2 == NULL || x1 == NULL ||
+		if (x2 == nullptr || x1 == nullptr ||
 			x1->SizeExceeded() ||
 			x2->SizeExceeded())
 		{
-			if (x2 != NULL) delete(x2);
-			if (x1 != NULL) delete(x1);
+			if (x2 != nullptr) delete(x2);
+			if (x1 != nullptr) delete(x1);
 
 			this->SetFault();
 			return;
@@ -2119,7 +2119,7 @@ void ExecutionEngine::InternalStepInto()
 		delete(x2);
 		delete(x1);
 
-		if (reti == NULL)
+		if (reti == nullptr)
 		{
 			this->SetFault();
 			return;
@@ -2127,7 +2127,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateInteger(reti);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -2154,10 +2154,10 @@ void ExecutionEngine::InternalStepInto()
 		StackItemHelper::Free(n, x);
 
 		int32 ishift;
-		if (in == NULL || ix == NULL || !in->ToInt32(ishift) || (ishift > MAX_SHL_SHR || ishift < MIN_SHL_SHR))
+		if (in == nullptr || ix == nullptr || !in->ToInt32(ishift) || (ishift > MAX_SHL_SHR || ishift < MIN_SHL_SHR))
 		{
-			if (ix != NULL) delete(ix);
-			if (in != NULL) delete(in);
+			if (ix != nullptr) delete(ix);
+			if (in != nullptr) delete(in);
 
 			this->SetFault();
 			return;
@@ -2167,7 +2167,7 @@ void ExecutionEngine::InternalStepInto()
 		auto reti = ix->Shl(ishift);
 		delete(ix);
 
-		if (reti == NULL)
+		if (reti == nullptr)
 		{
 			this->SetFault();
 			return;
@@ -2182,7 +2182,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateInteger(reti);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -2209,10 +2209,10 @@ void ExecutionEngine::InternalStepInto()
 		StackItemHelper::Free(n, x);
 
 		int32 ishift;
-		if (in == NULL || ix == NULL || !in->ToInt32(ishift) || (ishift > MAX_SHL_SHR || ishift < MIN_SHL_SHR))
+		if (in == nullptr || ix == nullptr || !in->ToInt32(ishift) || (ishift > MAX_SHL_SHR || ishift < MIN_SHL_SHR))
 		{
-			if (ix != NULL) delete(ix);
-			if (in != NULL) delete(in);
+			if (ix != nullptr) delete(ix);
+			if (in != nullptr) delete(in);
 
 			this->SetFault();
 			return;
@@ -2222,7 +2222,7 @@ void ExecutionEngine::InternalStepInto()
 		auto reti = ix->Shr(ishift);
 		delete(ix);
 
-		if (reti == NULL)
+		if (reti == nullptr)
 		{
 			this->SetFault();
 			return;
@@ -2237,7 +2237,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateInteger(reti);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -2261,7 +2261,7 @@ void ExecutionEngine::InternalStepInto()
 		auto ret = this->CreateBool(x1->GetBoolean() && x2->GetBoolean());
 		StackItemHelper::Free(x2, x1);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -2285,7 +2285,7 @@ void ExecutionEngine::InternalStepInto()
 		auto ret = this->CreateBool(x1->GetBoolean() || x2->GetBoolean());
 		StackItemHelper::Free(x2, x1);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -2312,10 +2312,10 @@ void ExecutionEngine::InternalStepInto()
 
 		StackItemHelper::Free(x1, x2);
 
-		if (i2 == NULL || i1 == NULL)
+		if (i2 == nullptr || i1 == nullptr)
 		{
-			if (i2 != NULL) delete(i2);
-			if (i1 != NULL) delete(i1);
+			if (i2 != nullptr) delete(i2);
+			if (i1 != nullptr) delete(i1);
 
 			this->SetFault();
 			return;
@@ -2326,7 +2326,7 @@ void ExecutionEngine::InternalStepInto()
 		delete(i2);
 		delete(i1);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -2353,10 +2353,10 @@ void ExecutionEngine::InternalStepInto()
 
 		StackItemHelper::Free(x1, x2);
 
-		if (i2 == NULL || i1 == NULL)
+		if (i2 == nullptr || i1 == nullptr)
 		{
-			if (i2 != NULL) delete(i2);
-			if (i1 != NULL) delete(i1);
+			if (i2 != nullptr) delete(i2);
+			if (i1 != nullptr) delete(i1);
 
 			this->SetFault();
 			return;
@@ -2367,7 +2367,7 @@ void ExecutionEngine::InternalStepInto()
 		delete(i2);
 		delete(i1);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -2394,10 +2394,10 @@ void ExecutionEngine::InternalStepInto()
 
 		StackItemHelper::Free(x1, x2);
 
-		if (i2 == NULL || i1 == NULL)
+		if (i2 == nullptr || i1 == nullptr)
 		{
-			if (i2 != NULL) delete(i2);
-			if (i1 != NULL) delete(i1);
+			if (i2 != nullptr) delete(i2);
+			if (i1 != nullptr) delete(i1);
 
 			this->SetFault();
 			return;
@@ -2408,7 +2408,7 @@ void ExecutionEngine::InternalStepInto()
 		delete(i1);
 		delete(i2);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -2435,10 +2435,10 @@ void ExecutionEngine::InternalStepInto()
 
 		StackItemHelper::Free(x1, x2);
 
-		if (i2 == NULL || i1 == NULL)
+		if (i2 == nullptr || i1 == nullptr)
 		{
-			if (i2 != NULL) delete(i2);
-			if (i1 != NULL) delete(i1);
+			if (i2 != nullptr) delete(i2);
+			if (i1 != nullptr) delete(i1);
 
 			this->SetFault();
 			return;
@@ -2449,7 +2449,7 @@ void ExecutionEngine::InternalStepInto()
 		delete(i2);
 		delete(i1);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -2476,10 +2476,10 @@ void ExecutionEngine::InternalStepInto()
 
 		StackItemHelper::Free(x1, x2);
 
-		if (i2 == NULL || i1 == NULL)
+		if (i2 == nullptr || i1 == nullptr)
 		{
-			if (i2 != NULL) delete(i2);
-			if (i1 != NULL) delete(i1);
+			if (i2 != nullptr) delete(i2);
+			if (i1 != nullptr) delete(i1);
 
 			this->SetFault();
 			return;
@@ -2490,7 +2490,7 @@ void ExecutionEngine::InternalStepInto()
 		delete(i2);
 		delete(i1);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -2517,10 +2517,10 @@ void ExecutionEngine::InternalStepInto()
 
 		StackItemHelper::Free(x1, x2);
 
-		if (i2 == NULL || i1 == NULL)
+		if (i2 == nullptr || i1 == nullptr)
 		{
-			if (i2 != NULL) delete(i2);
-			if (i1 != NULL) delete(i1);
+			if (i2 != nullptr) delete(i2);
+			if (i1 != nullptr) delete(i1);
 
 			this->SetFault();
 			return;
@@ -2531,7 +2531,7 @@ void ExecutionEngine::InternalStepInto()
 		delete(i2);
 		delete(i1);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -2558,10 +2558,10 @@ void ExecutionEngine::InternalStepInto()
 
 		StackItemHelper::Free(x1, x2);
 
-		if (i2 == NULL || i1 == NULL)
+		if (i2 == nullptr || i1 == nullptr)
 		{
-			if (i2 != NULL) delete(i2);
-			if (i1 != NULL) delete(i1);
+			if (i2 != nullptr) delete(i2);
+			if (i1 != nullptr) delete(i1);
 
 			this->SetFault();
 			return;
@@ -2579,7 +2579,7 @@ void ExecutionEngine::InternalStepInto()
 			ret = this->CreateInteger(i1);
 		}
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -2606,10 +2606,10 @@ void ExecutionEngine::InternalStepInto()
 
 		StackItemHelper::Free(x1, x2);
 
-		if (i2 == NULL || i1 == NULL)
+		if (i2 == nullptr || i1 == nullptr)
 		{
-			if (i2 != NULL) delete(i2);
-			if (i1 != NULL) delete(i1);
+			if (i2 != nullptr) delete(i2);
+			if (i1 != nullptr) delete(i1);
 
 			this->SetFault();
 			return;
@@ -2627,7 +2627,7 @@ void ExecutionEngine::InternalStepInto()
 			ret = this->CreateInteger(i2);
 		}
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -2656,11 +2656,11 @@ void ExecutionEngine::InternalStepInto()
 
 		StackItemHelper::Free(b, a, x);
 
-		if (ib == NULL || ia == NULL || ix == NULL)
+		if (ib == nullptr || ia == nullptr || ix == nullptr)
 		{
-			if (ib != NULL) delete(ib);
-			if (ia != NULL) delete(ia);
-			if (ix != NULL) delete(ix);
+			if (ib != nullptr) delete(ib);
+			if (ia != nullptr) delete(ia);
+			if (ix != nullptr) delete(ix);
 
 			this->SetFault();
 			return;
@@ -2672,7 +2672,7 @@ void ExecutionEngine::InternalStepInto()
 		delete(ia);
 		delete(ix);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -2721,7 +2721,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateByteArray(hash, Crypto::SHA1_LENGTH, true);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -2767,7 +2767,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateByteArray(hash, Crypto::SHA256_LENGTH, true);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -2813,7 +2813,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateByteArray(hash, Crypto::HASH160_LENGTH, true);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -2859,7 +2859,7 @@ void ExecutionEngine::InternalStepInto()
 
 		auto ret = this->CreateByteArray(hash, Crypto::HASH256_LENGTH, true);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -2884,12 +2884,12 @@ void ExecutionEngine::InternalStepInto()
 		int32 pubKeySize = ipubKey->ReadByteArraySize();
 		int32 signatureSize = isignature->ReadByteArraySize();
 
-		if (this->OnGetMessage == NULL || pubKeySize < 33 || signatureSize < 32)
+		if (this->OnGetMessage == nullptr || pubKeySize < 33 || signatureSize < 32)
 		{
 			StackItemHelper::Free(ipubKey, isignature);
 
 			auto ret = this->CreateBool(false);
-			if (ret != NULL)
+			if (ret != nullptr)
 			{
 				context->EvaluationStack.Push(ret);
 			}
@@ -2906,7 +2906,7 @@ void ExecutionEngine::InternalStepInto()
 		{
 			StackItemHelper::Free(ipubKey, isignature);
 			auto ret = this->CreateBool(false);
-			if (ret != NULL)
+			if (ret != nullptr)
 			{
 				context->EvaluationStack.Push(ret);
 			}
@@ -2931,7 +2931,7 @@ void ExecutionEngine::InternalStepInto()
 		StackItemHelper::Free(ipubKey, isignature);
 
 		auto retres = this->CreateBool(ret == 0x01);
-		if (retres != NULL)
+		if (retres != nullptr)
 		{
 			context->EvaluationStack.Push(retres);
 		}
@@ -2962,7 +2962,7 @@ void ExecutionEngine::InternalStepInto()
 		{
 			StackItemHelper::Free(ipubKey, isignature, imsg);
 			auto ret = this->CreateBool(false);
-			if (ret != NULL)
+			if (ret != nullptr)
 			{
 				context->EvaluationStack.Push(ret);
 			}
@@ -2993,7 +2993,7 @@ void ExecutionEngine::InternalStepInto()
 		StackItemHelper::Free(imsg, ipubKey, isignature);
 
 		auto retres = this->CreateBool(ret == 0x01);
-		if (retres != NULL)
+		if (retres != nullptr)
 		{
 			context->EvaluationStack.Push(retres);
 		}
@@ -3009,10 +3009,10 @@ void ExecutionEngine::InternalStepInto()
 			return;
 		}
 
-		byte** pubKeys = NULL;
-		byte** signatures = NULL;
-		int32* pubKeysL = NULL;
-		int32* signaturesL = NULL;
+		byte** pubKeys = nullptr;
+		byte** signatures = nullptr;
+		int32* pubKeysL = nullptr;
+		int32* signaturesL = nullptr;
 		int32 pubKeysCount = 0, signaturesCount = 0;
 
 		for (byte x = 0; x < 2; ++x)
@@ -3041,7 +3041,7 @@ void ExecutionEngine::InternalStepInto()
 						int32 c = ret->ReadByteArraySize();
 						if (c < 0)
 						{
-							data[i] = NULL;
+							data[i] = nullptr;
 							dataL[i] = c;
 							this->SetFault();
 							continue;
@@ -3087,7 +3087,7 @@ void ExecutionEngine::InternalStepInto()
 						int32 c = ret->ReadByteArraySize();
 						if (c < 0)
 						{
-							data[i] = NULL;
+							data[i] = nullptr;
 							dataL[i] = c;
 							this->SetFault();
 							continue;
@@ -3128,14 +3128,14 @@ void ExecutionEngine::InternalStepInto()
 
 		this->AddGasCost(100 * signaturesCount);
 
-		if (this->_state != EVMState::NONE || this->OnGetMessage == NULL)
+		if (this->_state != EVMState::NONE || this->OnGetMessage == nullptr)
 		{
 			// Free
 
-			if (pubKeys != NULL)	delete[](pubKeys);
-			if (signatures != NULL) delete[](signatures);
-			if (pubKeysL != NULL)	delete[](pubKeysL);
-			if (signaturesL != NULL)delete[](signaturesL);
+			if (pubKeys != nullptr)	delete[](pubKeys);
+			if (signatures != nullptr) delete[](signatures);
+			if (pubKeysL != nullptr)	delete[](pubKeysL);
+			if (signaturesL != nullptr)delete[](signaturesL);
 
 			// Return
 
@@ -3143,7 +3143,7 @@ void ExecutionEngine::InternalStepInto()
 			{
 				auto ret = this->CreateBool(false);
 
-				if (ret != NULL)
+				if (ret != nullptr)
 				{
 					context->EvaluationStack.Push(ret);
 				}
@@ -3161,14 +3161,14 @@ void ExecutionEngine::InternalStepInto()
 
 		if (msgL <= 0)
 		{
-			if (pubKeys != NULL)	delete[](pubKeys);
-			if (signatures != NULL) delete[](signatures);
-			if (pubKeysL != NULL)	delete[](pubKeysL);
-			if (signaturesL != NULL)delete[](signaturesL);
+			if (pubKeys != nullptr)	delete[](pubKeys);
+			if (signatures != nullptr) delete[](signatures);
+			if (pubKeysL != nullptr)	delete[](pubKeysL);
+			if (signaturesL != nullptr)delete[](signaturesL);
 
 			auto ret = this->CreateBool(false);
 
-			if (ret != NULL)
+			if (ret != nullptr)
 			{
 				context->EvaluationStack.Push(ret);
 			}
@@ -3190,14 +3190,14 @@ void ExecutionEngine::InternalStepInto()
 			}
 		}
 
-		if (pubKeys != NULL)	delete[](pubKeys);
-		if (signatures != NULL) delete[](signatures);
-		if (pubKeysL != NULL)	delete[](pubKeysL);
-		if (signaturesL != NULL)delete[](signaturesL);
+		if (pubKeys != nullptr)	delete[](pubKeys);
+		if (signatures != nullptr) delete[](signatures);
+		if (pubKeysL != nullptr)	delete[](pubKeysL);
+		if (signaturesL != nullptr)delete[](signaturesL);
 
 		auto ret = this->CreateBool(fSuccess);
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			context->EvaluationStack.Push(ret);
 		}
@@ -3253,7 +3253,7 @@ void ExecutionEngine::InternalStepInto()
 		else
 		{
 			auto ret = this->CreateInteger(size);
-			if (ret != NULL)
+			if (ret != nullptr)
 			{
 				context->EvaluationStack.Push(ret);
 			}
@@ -3288,7 +3288,7 @@ void ExecutionEngine::InternalStepInto()
 		StackItemHelper::Free(item);
 		auto items = this->CreateArray();
 
-		if (items == NULL) return;
+		if (items == nullptr) return;
 
 		for (int32 i = 0; i < size; ++i)
 		{
@@ -3326,7 +3326,7 @@ void ExecutionEngine::InternalStepInto()
 			StackItemHelper::Free(it);
 
 			auto ret = this->CreateInteger(count);
-			if (ret != NULL)
+			if (ret != nullptr)
 			{
 				context->EvaluationStack.Push(ret);
 			}
@@ -3363,7 +3363,7 @@ void ExecutionEngine::InternalStepInto()
 			return;
 		}
 
-		IStackItem* ret = NULL;
+		IStackItem* ret = nullptr;
 		auto item = context->EvaluationStack.Pop();
 
 		switch (item->Type)
@@ -3391,7 +3391,7 @@ void ExecutionEngine::InternalStepInto()
 		default: break;
 		}
 
-		if (ret != NULL)
+		if (ret != nullptr)
 		{
 			if (ret->Type == EStackItemType::Struct)
 			{
@@ -3514,7 +3514,7 @@ void ExecutionEngine::InternalStepInto()
 		StackItemHelper::Free(item);
 
 		auto it = this->CreateArray(count);
-		if (it != NULL)
+		if (it != nullptr)
 		{
 			context->EvaluationStack.Push(it);
 		}
@@ -3546,7 +3546,7 @@ void ExecutionEngine::InternalStepInto()
 		StackItemHelper::Free(item);
 
 		auto it = this->CreateStruct(count);
-		if (it != NULL)
+		if (it != nullptr)
 		{
 			context->EvaluationStack.Push(it);
 		}
@@ -3561,7 +3561,7 @@ void ExecutionEngine::InternalStepInto()
 
 		MapStackItem* it = this->CreateMap();
 
-		if (it != NULL)
+		if (it != nullptr)
 		{
 			context->EvaluationStack.Push(it);
 		}
@@ -3751,7 +3751,7 @@ void ExecutionEngine::InternalStepInto()
 			auto ret = this->CreateBool(index < arr->Count());
 			StackItemHelper::Free(key, item);
 
-			if (ret != NULL)
+			if (ret != nullptr)
 			{
 				context->EvaluationStack.Push(ret);
 			}
@@ -3760,10 +3760,10 @@ void ExecutionEngine::InternalStepInto()
 		case EStackItemType::Map:
 		{
 			auto arr = (MapStackItem*)item;
-			auto ret = this->CreateBool(arr->Get(key) != NULL);
+			auto ret = this->CreateBool(arr->Get(key) != nullptr);
 			StackItemHelper::Free(key, item);
 
-			if (ret != NULL)
+			if (ret != nullptr)
 			{
 				context->EvaluationStack.Push(ret);
 			}
@@ -3799,7 +3799,7 @@ void ExecutionEngine::InternalStepInto()
 			auto arr = (MapStackItem*)it;
 			auto ap = this->CreateArray();
 
-			if (ap != NULL)
+			if (ap != nullptr)
 			{
 				arr->FillKeys(ap);
 				context->EvaluationStack.Push(ap);
@@ -3846,7 +3846,7 @@ void ExecutionEngine::InternalStepInto()
 			auto arr = (MapStackItem*)it;
 			auto ap = this->CreateArray();
 
-			if (ap != NULL)
+			if (ap != nullptr)
 			{
 				arr->FillValues(ap);
 				context->EvaluationStack.Push(ap);

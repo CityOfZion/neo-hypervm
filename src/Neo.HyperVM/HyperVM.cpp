@@ -22,28 +22,28 @@ void GetVersion(int32 &major, int32 &minor, int32 &build, int32 &revision)
 
 int32 ExecutionContext_GetScriptHash(ExecutionContext* context, byte* output, int32 index)
 {
-	if (context == NULL) return 0;
+	if (context == nullptr) return 0;
 
 	return context->GetScriptHash(&output[index]);
 }
 
 EVMOpCode ExecutionContext_GetNextInstruction(ExecutionContext* context)
 {
-	if (context == NULL) return EVMOpCode::RET;
+	if (context == nullptr) return EVMOpCode::RET;
 
 	return context->GetNextInstruction();
 }
 
 int32 ExecutionContext_GetInstructionPointer(ExecutionContext* context)
 {
-	if (context == NULL) return 0;
+	if (context == nullptr) return 0;
 
 	return context->GetInstructionPointer();
 }
 
 void ExecutionContext_Claim(ExecutionContext* context, StackItems* &evStack, StackItems* &altStack)
 {
-	if (context == NULL) return;
+	if (context == nullptr) return;
 
 	evStack = &context->EvaluationStack;
 	altStack = &context->AltStack;
@@ -53,10 +53,10 @@ void ExecutionContext_Claim(ExecutionContext* context, StackItems* &evStack, Sta
 
 void ExecutionContext_Free(ExecutionContext* &context)
 {
-	if (context == NULL) return;
+	if (context == nullptr) return;
 
 	ExecutionContext::UnclaimAndFree(context);
-	context = NULL;
+	context = nullptr;
 }
 
 // ExecutionEngine
@@ -77,85 +77,85 @@ ExecutionEngine* ExecutionEngine_Create
 
 void ExecutionEngine_Clean(ExecutionEngine* engine, uint32 iteration)
 {
-	if (engine == NULL) return;
+	if (engine == nullptr) return;
 
 	engine->Clean(iteration);
 }
 
 void ExecutionEngine_AddLog(ExecutionEngine* engine, OnStepIntoCallback callback)
 {
-	if (engine == NULL) return;
+	if (engine == nullptr) return;
 
 	engine->SetLogCallback(callback);
 }
 
 void ExecutionEngine_Free(ExecutionEngine* & engine)
 {
-	if (engine == NULL) return;
+	if (engine == nullptr) return;
 
 	delete(engine);
-	engine = NULL;
+	engine = nullptr;
 }
 
 int32 ExecutionEngine_LoadScript(ExecutionEngine* engine, byte* script, int32 scriptLength, int32 rvcount)
 {
-	if (engine == NULL) return -1;
+	if (engine == nullptr) return -1;
 
 	return engine->LoadScript(script, scriptLength, rvcount);
 }
 
 byte ExecutionEngine_LoadCachedScript(ExecutionEngine* engine, int32 scriptIndex, int32 rvcount)
 {
-	if (engine == NULL) return 0x00;
+	if (engine == nullptr) return 0x00;
 
 	return engine->LoadScript(scriptIndex, rvcount) ? 0x01 : 0x00;
 }
 
 byte ExecutionEngine_IncreaseGas(ExecutionEngine* engine, uint32 gas)
 {
-	if (engine == NULL) return 0x00;
+	if (engine == nullptr) return 0x00;
 
 	return engine->AddGasCost(gas) ? 0x01 : 0x00;
 }
 
 byte ExecutionEngine_Execute(ExecutionEngine* engine, uint32 gas)
 {
-	if (engine == NULL) return 0x00;
+	if (engine == nullptr) return 0x00;
 
 	return (byte)engine->Execute(gas);
 }
 
 void ExecutionEngine_StepInto(ExecutionEngine* engine)
 {
-	if (engine == NULL) return;
+	if (engine == nullptr) return;
 
 	engine->StepInto();
 }
 
 void ExecutionEngine_StepOver(ExecutionEngine* engine)
 {
-	if (engine == NULL) return;
+	if (engine == nullptr) return;
 
 	engine->StepOver();
 }
 
 void ExecutionEngine_StepOut(ExecutionEngine* engine)
 {
-	if (engine == NULL) return;
+	if (engine == nullptr) return;
 
 	engine->StepOut();
 }
 
 byte ExecutionEngine_GetState(ExecutionEngine* engine)
 {
-	if (engine == NULL) return 0;
+	if (engine == nullptr) return 0;
 
 	return engine->GetState();
 }
 
 uint32 ExecutionEngine_GetConsumedGas(ExecutionEngine* engine)
 {
-	if (engine == NULL) return 0;
+	if (engine == nullptr) return 0;
 
 	return engine->GetConsumedGas();
 }
@@ -164,7 +164,7 @@ uint32 ExecutionEngine_GetConsumedGas(ExecutionEngine* engine)
 
 int32 StackItems_Drop(StackItems* stack, int32 count)
 {
-	if (stack == NULL) return 0;
+	if (stack == nullptr) return 0;
 
 	int ret = stack->Count();
 	ret = ret > count ? count : ret;
@@ -175,28 +175,28 @@ int32 StackItems_Drop(StackItems* stack, int32 count)
 
 IStackItem* StackItems_Pop(StackItems* stack)
 {
-	if (stack == NULL) return NULL;
+	if (stack == nullptr) return nullptr;
 
 	return stack->Pop();
 }
 
 void StackItems_Push(StackItems* stack, IStackItem* item)
 {
-	if (stack == NULL) return;
+	if (stack == nullptr) return;
 
 	stack->Push(item);
 }
 
 IStackItem* StackItems_Peek(StackItems* stack, int32 index)
 {
-	if (stack == NULL) return NULL;
+	if (stack == nullptr) return nullptr;
 
 	return stack->Peek(index);
 }
 
 int32 StackItems_Count(StackItems* stack)
 {
-	if (stack == NULL) return 0;
+	if (stack == nullptr) return 0;
 
 	return stack->Count();
 }
@@ -205,7 +205,7 @@ int32 StackItems_Count(StackItems* stack)
 
 int32 ExecutionContextStack_Drop(ExecutionContextStack* stack, int32 count)
 {
-	if (stack == NULL) return 0;
+	if (stack == nullptr) return 0;
 
 	int ret = stack->Count();
 	ret = ret > count ? count : ret;
@@ -216,14 +216,14 @@ int32 ExecutionContextStack_Drop(ExecutionContextStack* stack, int32 count)
 
 ExecutionContext* ExecutionContextStack_Peek(ExecutionContextStack* stack, int32 index)
 {
-	if (stack == NULL) return NULL;
+	if (stack == nullptr) return nullptr;
 
 	return stack->Peek(index);
 }
 
 int32 ExecutionContextStack_Count(ExecutionContextStack* stack)
 {
-	if (stack == NULL) return 0;
+	if (stack == nullptr) return 0;
 
 	return stack->Count();
 }
@@ -233,14 +233,14 @@ int32 ExecutionContextStack_Count(ExecutionContextStack* stack)
 void StackItem_Free(IStackItem*& item)
 {
 	StackItemHelper::UnclaimAndFree(item);
-	item = NULL;
+	item = nullptr;
 }
 
 IStackItem* StackItem_Create(ExecutionEngine* engine, EStackItemType type, byte* data, int32 size)
 {
-	if (engine == NULL)
+	if (engine == nullptr)
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	IStackItem* it;
@@ -248,7 +248,7 @@ IStackItem* StackItem_Create(ExecutionEngine* engine, EStackItemType type, byte*
 	switch (type)
 	{
 	default:
-	case EStackItemType::None: return NULL;
+	case EStackItemType::None: return nullptr;
 	case EStackItemType::Bool:
 	{
 		// https://github.com/neo-project/neo-vm/blob/master/src/neo-vm/StackItem.cs#L37
@@ -262,7 +262,7 @@ IStackItem* StackItem_Create(ExecutionEngine* engine, EStackItemType type, byte*
 		{
 			if (size <= 0)
 			{
-				return NULL;
+				return nullptr;
 			}
 
 			bool ret = false;
@@ -292,12 +292,12 @@ IStackItem* StackItem_Create(ExecutionEngine* engine, EStackItemType type, byte*
 
 int32 StackItem_Serialize(IStackItem* item, byte* output, int32 length)
 {
-	return item == NULL ? -1 : item->Serialize(output, length);
+	return item == nullptr ? -1 : item->Serialize(output, length);
 }
 
 void StackItem_Claim(IStackItem* item)
 {
-	if (item != NULL)
+	if (item != nullptr)
 	{
 		item->Claim();
 	}
@@ -305,7 +305,7 @@ void StackItem_Claim(IStackItem* item)
 
 EStackItemType StackItem_SerializeInfo(IStackItem* item, int32 &size)
 {
-	if (item == NULL)
+	if (item == nullptr)
 	{
 		size = 0;
 		return EStackItemType::None;
@@ -321,49 +321,49 @@ EStackItemType StackItem_SerializeInfo(IStackItem* item, int32 &size)
 
 int32 MapStackItem_Count(MapStackItem* map)
 {
-	if (map == NULL) return 0;
+	if (map == nullptr) return 0;
 
 	return map->Count();
 }
 
 void MapStackItem_Clear(MapStackItem* map)
 {
-	if (map == NULL) return;
+	if (map == nullptr) return;
 
 	return map->Clear();
 }
 
 byte MapStackItem_Remove(MapStackItem* map, IStackItem* key)
 {
-	if (map == NULL) return 0x00;
+	if (map == nullptr) return 0x00;
 
 	return map->Remove(key) ? 0x01 : 0x00;
 }
 
 void MapStackItem_Set(MapStackItem* map, IStackItem* key, IStackItem* value)
 {
-	if (map == NULL) return;
+	if (map == nullptr) return;
 
 	map->Set(key, value);
 }
 
 IStackItem* MapStackItem_Get(MapStackItem* map, IStackItem* key)
 {
-	if (map == NULL) return NULL;
+	if (map == nullptr) return nullptr;
 
 	return map->Get(key);
 }
 
 IStackItem* MapStackItem_GetKey(MapStackItem* map, int index)
 {
-	if (map == NULL) return NULL;
+	if (map == nullptr) return nullptr;
 
 	return map->GetKey(index);
 }
 
 IStackItem* MapStackItem_GetValue(MapStackItem* map, int index)
 {
-	if (map == NULL) return NULL;
+	if (map == nullptr) return nullptr;
 
 	return map->GetValue(index);
 }
@@ -372,56 +372,56 @@ IStackItem* MapStackItem_GetValue(MapStackItem* map, int index)
 
 int32 ArrayStackItem_Count(ArrayStackItem* array)
 {
-	if (array == NULL) return 0;
+	if (array == nullptr) return 0;
 
 	return array->Count();
 }
 
 void ArrayStackItem_Clear(ArrayStackItem* array)
 {
-	if (array == NULL) return;
+	if (array == nullptr) return;
 
 	array->Clear();
 }
 
 IStackItem* ArrayStackItem_Get(ArrayStackItem* array, int32 index)
 {
-	if (array == NULL) return NULL;
+	if (array == nullptr) return nullptr;
 
 	return array->Get(index);
 }
 
 void ArrayStackItem_Add(ArrayStackItem* array, IStackItem* item)
 {
-	if (array == NULL) return;
+	if (array == nullptr) return;
 
 	array->Add(item);
 }
 
 void ArrayStackItem_Set(ArrayStackItem* array, IStackItem* item, int32 index)
 {
-	if (array == NULL) return;
+	if (array == nullptr) return;
 
 	array->Set(index, item);
 }
 
 int32 ArrayStackItem_IndexOf(ArrayStackItem* array, IStackItem* item)
 {
-	if (array == NULL) return 0;
+	if (array == nullptr) return 0;
 
 	return array->IndexOf(item);
 }
 
 void ArrayStackItem_Insert(ArrayStackItem* array, IStackItem* item, int32 index)
 {
-	if (array == NULL) return;
+	if (array == nullptr) return;
 
 	array->Insert(index, item);
 }
 
 void ArrayStackItem_RemoveAt(ArrayStackItem* array, int32 index)
 {
-	if (array == NULL) return;
+	if (array == nullptr) return;
 
 	array->RemoveAt(index);
 }

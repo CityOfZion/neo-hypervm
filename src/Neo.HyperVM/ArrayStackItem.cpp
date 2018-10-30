@@ -51,7 +51,7 @@ IStackItem* ArrayStackItem::Clone()
 
 bool ArrayStackItem::Equals(IStackItem* it)
 {
-	if (it == NULL) return false;
+	if (it == nullptr) return false;
 	if (it == this) return true;
 
 	// Different type (Array must be equal pointer)
@@ -151,7 +151,7 @@ void ArrayStackItem::Clear()
 
 void ArrayStackItem::Insert(int32 index, IStackItem* item)
 {
-	if (item != NULL)
+	if (item != nullptr)
 		item->Claim();
 
 	if (index == 0)
@@ -169,7 +169,7 @@ void ArrayStackItem::Insert(int32 index, IStackItem* item)
 
 void ArrayStackItem::Add(IStackItem* item)
 {
-	if (item != NULL)
+	if (item != nullptr)
 		item->Claim();
 
 	this->_list.push_back(item);
@@ -196,7 +196,7 @@ void ArrayStackItem::RemoveAt(int32 index)
 
 void ArrayStackItem::Set(int32 index, IStackItem* item)
 {
-	if (item != NULL)
+	if (item != nullptr)
 		item->Claim();
 
 	if (index == 0)

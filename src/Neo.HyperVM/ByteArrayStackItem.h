@@ -40,7 +40,7 @@ public:
 		}
 
 		auto bi = new BigInteger(this->_payload, this->_payloadLength);
-		if (bi == NULL) return false;
+		if (bi == nullptr) return false;
 
 		bool bret = bi->ToInt32(ret);
 		delete(bi);
@@ -65,10 +65,10 @@ public:
 
 	inline ~ByteArrayStackItem()
 	{
-		if (this->_payload != NULL)
+		if (this->_payload != nullptr)
 		{
 			delete[](this->_payload);
-			this->_payload = NULL;
+			this->_payload = nullptr;
 		}
 	}
 
