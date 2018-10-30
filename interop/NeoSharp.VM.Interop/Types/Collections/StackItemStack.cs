@@ -49,7 +49,7 @@ namespace NeoSharp.VM.Interop.Types.Collections
         }
 
         /// <summary>
-        /// Push objet to the stack
+        /// Push object to the stack
         /// </summary>
         /// <param name="item">Object</param>
         public override void Push(IStackItem item)

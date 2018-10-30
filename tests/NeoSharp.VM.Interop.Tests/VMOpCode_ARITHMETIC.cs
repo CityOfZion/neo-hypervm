@@ -222,7 +222,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                 if (shift > MAX_SHL_SHR || shift < MIN_SHL_SHR)
                 {
-                    throw new ArgumentException("Limit exceded");
+                    throw new ArgumentException("Limit exceeded");
                 }
 
                 int ishift = (int)shift;
@@ -246,7 +246,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                 if (shift > MAX_SHL_SHR || shift < MIN_SHL_SHR)
                 {
-                    throw new ArgumentException("Limit exceded");
+                    throw new ArgumentException("Limit exceeded");
                 }
 
                 int ishift = (int)shift;

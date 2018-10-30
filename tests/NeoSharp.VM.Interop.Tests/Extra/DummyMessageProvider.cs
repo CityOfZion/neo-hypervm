@@ -6,7 +6,7 @@ namespace NeoSharp.VM.Interop.Tests.Extra
 {
     internal class DummyMessageProvider : IMessageProvider
     {
-        readonly Dictionary<uint, byte[]> _mesasges = new Dictionary<uint, byte[]>();
+        readonly Dictionary<uint, byte[]> _messages = new Dictionary<uint, byte[]>();
 
         /// <summary>
         /// Constructor
@@ -14,7 +14,7 @@ namespace NeoSharp.VM.Interop.Tests.Extra
         /// <param name="messages">Messages</param>
         public DummyMessageProvider(Dictionary<uint, byte[]> messages = null)
         {
-            _mesasges = messages;
+            _messages = messages;
         }
 
         /// <summary>
@@ -24,8 +24,8 @@ namespace NeoSharp.VM.Interop.Tests.Extra
         /// <param name="data">Data</param>
         public DummyMessageProvider(uint iteration, byte[] data)
         {
-            _mesasges = new Dictionary<uint, byte[]>();
-            _mesasges.Add(iteration, data);
+            _messages = new Dictionary<uint, byte[]>();
+            _messages.Add(iteration, data);
         }
 
         /// <summary>
@@ -35,9 +35,9 @@ namespace NeoSharp.VM.Interop.Tests.Extra
         /// <returns>Return the message or NULL</returns>
         public byte[] GetMessage(uint iteration)
         {
-            if (_mesasges != null && _mesasges.Count > 0)
+            if (_messages != null && _messages.Count > 0)
             {
-                if (_mesasges.TryGetValue(iteration, out byte[] ret))
+                if (_messages.TryGetValue(iteration, out byte[] ret))
                     return ret;
 
                 return null;

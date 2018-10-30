@@ -3,7 +3,7 @@
 namespace NeoSharp.VM.Interop.Tests
 {
     [TestClass]
-    public class VMOpCode_LIMMITS : VMOpCodeTest
+    public class VMOpCode_LIMITS : VMOpCodeTest
     {
         [TestMethod]
         public void MAX_STACK_SIZE()

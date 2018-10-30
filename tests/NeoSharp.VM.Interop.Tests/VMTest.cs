@@ -303,7 +303,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                     using (var btest = engine.CreateBool(true))
                     {
-                        // Apend item to array
+                        // Append item to array
 
                         ar.Add(btest);
                     }
