@@ -61,7 +61,7 @@ public:
 		// TODO: I don't like this, should be used the same pointer
 
 		delete(value);
-		value = NULL;
+		value = nullptr;
 	}
 
 	// Destructor

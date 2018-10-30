@@ -166,7 +166,7 @@ bool ExecutionContext::ReadVarBytes(uint32 &ret, uint32 max)
 
 int32 ExecutionContext::Read(byte* data, int32 length)
 {
-	if (data == NULL)
+	if (data == nullptr)
 	{
 		// Seek
 
@@ -195,18 +195,18 @@ int32 ExecutionContext::Read(byte* data, int32 length)
 
 void ExecutionContext::Free(ExecutionContext* &item)
 {
-	if (item != NULL && item->IsUnClaimed())
+	if (item != nullptr && item->IsUnClaimed())
 	{
 		delete(item);
-		item = NULL;
+		item = nullptr;
 	}
 }
 
 void ExecutionContext::UnclaimAndFree(ExecutionContext* &item)
 {
-	if (item != NULL && item->UnClaim())
+	if (item != nullptr && item->UnClaim())
 	{
 		delete(item);
-		item = NULL;
+		item = nullptr;
 	}
 }

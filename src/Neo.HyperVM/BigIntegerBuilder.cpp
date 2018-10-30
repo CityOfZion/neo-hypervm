@@ -3,7 +3,7 @@
 BigIntegerBuilder::BigIntegerBuilder()
 {
 	this->_fWritable = false;
-	this->_rgu = NULL;
+	this->_rgu = nullptr;
 	this->_rguLength = 0;
 	this->_iuLast = 0;
 	this->_uSmall = 0;
@@ -21,7 +21,7 @@ BigIntegerBuilder::BigIntegerBuilder(int32 sign, uint32* bits, int32 bitSize, in
 	int32 mask = n >> (kcbitUint - 1);
 	outSign = (outSign ^ mask) - mask;
 
-	if (this->_rgu == NULL)
+	if (this->_rgu == nullptr)
 	{
 		this->_iuLast = 0;
 		this->_uSmall = (uint32)((n ^ mask) - mask);
@@ -52,12 +52,12 @@ void BigIntegerBuilder::GetInteger(int32 &sign, uint32* &bits, int32 &bitSize)
 		if (this->_uSmall <= Int32MaxValue)
 		{
 			sign = sign * (int32)this->_uSmall;
-			bits = NULL;
+			bits = nullptr;
 			bitSize = 0;
 			return;
 		}
 
-		if (this->_rgu == NULL)
+		if (this->_rgu == nullptr)
 		{
 			this->_rgu = new uint32[1]{ this->_uSmall };
 			this->_rguLength = 1;
@@ -132,7 +132,7 @@ void BigIntegerBuilder::Div(BigIntegerBuilder &regDen)
 
 	// Swap(this, regTmp);
 
-	if (this->_fWritable && this->_rgu != NULL)
+	if (this->_fWritable && this->_rgu != nullptr)
 	{
 		// Clean
 		delete[](this->_rgu);
@@ -330,7 +330,7 @@ void BigIntegerBuilder::SetSizeLazy(int32 cu)
 	}
 	if (!this->_fWritable || this->_rguLength < cu)
 	{
-		if (this->_fWritable && this->_rgu != NULL)
+		if (this->_fWritable && this->_rgu != nullptr)
 			delete[](this->_rgu);
 
 		this->_rguLength = cu;
@@ -668,7 +668,7 @@ void BigIntegerBuilder::SetSizeKeep(int32 cu, int32 cuExtra)
 				rgu[i] = 0;
 		}
 
-		if (this->_fWritable && this->_rgu != NULL)
+		if (this->_fWritable && this->_rgu != nullptr)
 			delete[](this->_rgu);
 
 		this->_rguLength = l;
@@ -706,7 +706,7 @@ void BigIntegerBuilder::Load(BigIntegerBuilder &reg, int cuExtra)
 	{
 		if (!this->_fWritable || this->_rguLength <= reg._iuLast)
 		{
-			if (this->_fWritable && this->_rgu != NULL)
+			if (this->_fWritable && this->_rgu != nullptr)
 			{
 				// Free
 				delete[](this->_rgu);
@@ -1046,8 +1046,8 @@ void BigIntegerBuilder::Sub(int32 &sign, BigIntegerBuilder &reg)
 
 BigIntegerBuilder::~BigIntegerBuilder()
 {
-	if (this->_rgu == NULL || !this->_fWritable) return;
+	if (this->_rgu == nullptr || !this->_fWritable) return;
 
 	delete[](this->_rgu);
-	this->_rgu = NULL;
+	this->_rgu = nullptr;
 }

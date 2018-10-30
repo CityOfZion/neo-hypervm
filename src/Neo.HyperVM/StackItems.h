@@ -41,7 +41,7 @@ public:
 	{
 		auto it = this->_stack.Pop(index);
 		
-		if (it != NULL) it->UnClaim();
+		if (it != nullptr) it->UnClaim();
 
 		return it;
 	}
@@ -55,7 +55,7 @@ public:
 	inline IStackItem* Pop()
 	{
 		auto it = this->_stack.Pop();
-		if (it != NULL) it->UnClaim();
+		if (it != nullptr) it->UnClaim();
 
 		return it;
 	}
@@ -73,7 +73,7 @@ public:
 
 	inline void SendTo(StackItems* stack, int32 count)
 	{
-		if (stack == NULL) return;
+		if (stack == nullptr) return;
 
 		this->_stack.SendTo(&stack->_stack, count);
 	}

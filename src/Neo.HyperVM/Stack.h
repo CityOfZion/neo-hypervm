@@ -35,7 +35,7 @@ public:
 	{
 		if (this->_size == 0)
 		{
-			return NULL;
+			return nullptr;
 		}
 
 		return this->_items[this->_size - 1];
@@ -45,7 +45,7 @@ public:
 	{
 		if (this->_size == 0)
 		{
-			return NULL;
+			return nullptr;
 		}
 
 		return this->_items[0];

@@ -54,7 +54,7 @@ IStackItem* MapStackItem::Get(IStackItem* key)
 		return it->second;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 IStackItem* MapStackItem::GetKey(int index)
@@ -68,7 +68,7 @@ IStackItem* MapStackItem::GetKey(int index)
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 IStackItem* MapStackItem::GetValue(int index)
@@ -82,7 +82,7 @@ IStackItem* MapStackItem::GetValue(int index)
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void MapStackItem::FillKeys(ArrayStackItem* arr)

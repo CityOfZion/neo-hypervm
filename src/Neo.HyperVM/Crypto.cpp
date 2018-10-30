@@ -40,7 +40,7 @@ int16 Crypto::VerifySignature
 	if (signatureLength != 64)
 		return -1;
 
-	byte* realPubKey = NULL;
+	byte* realPubKey = nullptr;
 	int realPublicKeyLength = 65;
 
 	if (pubKeyLength == 33 && (pubKey[0] == 0x02 || pubKey[0] == 0x03))
@@ -72,16 +72,16 @@ int16 Crypto::VerifySignature
 	int32 ret = -1;
 	EC_GROUP* ecgroup = EC_GROUP_new_by_curve_name(_curve);
 
-	if (ecgroup != NULL)
+	if (ecgroup != nullptr)
 	{
 		EC_KEY* eckey = EC_KEY_new_by_curve_name(_curve);
 
-		if (eckey != NULL)
+		if (eckey != nullptr)
 		{
 			BIGNUM* bn = BN_bin2bn(realPubKey, realPublicKeyLength, NULL);
 			EC_POINT* pub = EC_POINT_bn2point(ecgroup, bn, NULL, NULL);
 
-			if (pub != NULL)
+			if (pub != nullptr)
 			{
 				int32 gen_status = EC_KEY_set_public_key(eckey, pub);
 
@@ -95,7 +95,7 @@ int16 Crypto::VerifySignature
 					ECDSA_SIG* sig = ECDSA_SIG_new();
 					gen_status = ECDSA_SIG_set0(sig, r, s);
 
-					if (sig != NULL)
+					if (sig != nullptr)
 					{
 						if (gen_status == 0x01)
 						{

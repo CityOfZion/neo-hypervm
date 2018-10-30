@@ -48,18 +48,18 @@ bool ExecutionScript::IsTheSameHash(byte* hash, int32 length)
 
 void ExecutionScript::Free(ExecutionScript* &item)
 {
-	if (item != NULL && item->IsUnClaimed())
+	if (item != nullptr && item->IsUnClaimed())
 	{
 		delete(item);
-		item = NULL;
+		item = nullptr;
 	}
 }
 
 void ExecutionScript::UnclaimAndFree(ExecutionScript* &item)
 {
-	if (item != NULL && item->UnClaim())
+	if (item != nullptr && item->UnClaim())
 	{
 		delete(item);
-		item = NULL;
+		item = nullptr;
 	}
 }

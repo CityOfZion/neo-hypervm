@@ -138,7 +138,7 @@ public:
 		if (!this->_counter->ItemCounterInc())
 		{
 			this->_state = EVMState::FAULT;
-			return NULL;
+			return nullptr;
 		}
 
 		return new MapStackItem(_counter);
@@ -149,7 +149,7 @@ public:
 		if (!this->_counter->ItemCounterInc())
 		{
 			this->_state = EVMState::FAULT;
-			return NULL;
+			return nullptr;
 		}
 
 		return new IntegerStackItem(_counter, value);
@@ -160,7 +160,7 @@ public:
 		if (!this->_counter->ItemCounterInc())
 		{
 			this->_state = EVMState::FAULT;
-			return NULL;
+			return nullptr;
 		}
 
 		return new IntegerStackItem(_counter, value);
@@ -171,7 +171,7 @@ public:
 		if (!this->_counter->ItemCounterInc())
 		{
 			this->_state = EVMState::FAULT;
-			return NULL;
+			return nullptr;
 		}
 
 		return new IntegerStackItem(_counter, data, length);
@@ -182,7 +182,7 @@ public:
 		if (!this->_counter->ItemCounterInc())
 		{
 			this->_state = EVMState::FAULT;
-			return NULL;
+			return nullptr;
 		}
 
 		return new InteropStackItem(_counter, data, length);
@@ -193,7 +193,7 @@ public:
 		if (!this->_counter->ItemCounterInc())
 		{
 			this->_state = EVMState::FAULT;
-			return NULL;
+			return nullptr;
 		}
 
 		return new ByteArrayStackItem(_counter, data, length, copyPointer);
@@ -204,7 +204,7 @@ public:
 		if (!this->_counter->ItemCounterInc())
 		{
 			this->_state = EVMState::FAULT;
-			return NULL;
+			return nullptr;
 		}
 
 		return new BoolStackItem(_counter, value);
@@ -215,7 +215,7 @@ public:
 		if (!this->_counter->ItemCounterInc())
 		{
 			this->_state = EVMState::FAULT;
-			return NULL;
+			return nullptr;
 		}
 
 		return new ArrayStackItem(_counter);
@@ -226,7 +226,7 @@ public:
 		if (!this->_counter->ItemCounterInc())
 		{
 			this->_state = EVMState::FAULT;
-			return NULL;
+			return nullptr;
 		}
 
 		return new ArrayStackItem(_counter, true);
@@ -237,7 +237,7 @@ public:
 		if (!this->_counter->ItemCounterInc(count + 1))
 		{
 			this->_state = EVMState::FAULT;
-			return NULL;
+			return nullptr;
 		}
 
 		auto ret = new ArrayStackItem(_counter, false);
@@ -255,7 +255,7 @@ public:
 		if (!this->_counter->ItemCounterInc(count + 1))
 		{
 			this->_state = EVMState::FAULT;
-			return NULL;
+			return nullptr;
 		}
 
 		auto ret = new ArrayStackItem(_counter, true);

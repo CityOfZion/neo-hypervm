@@ -44,7 +44,7 @@ T* Stack<T>::Pop(int32 index)
 
 	if (index >= this->_size)
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	int32 pos = this->_size - index - 1;
@@ -115,7 +115,7 @@ void Stack<T>::EnsureCapacity(int32 min)
 			}
 		}
 
-		if (this->_items != NULL)
+		if (this->_items != nullptr)
 		{
 			delete[](this->_items);
 		}
@@ -130,7 +130,7 @@ T* Stack<T>::Pop()
 {
 	if (this->_size == 0)
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	auto pos = this->_size - 1;
@@ -190,7 +190,7 @@ T* Stack<T>::Peek(int32 index) const
 {
 	if (this->_size == 0)
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	if (index < 0)
@@ -200,7 +200,7 @@ T* Stack<T>::Peek(int32 index) const
 
 	if (index >= this->_size)
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	return this->_items[this->_size - index - 1];
