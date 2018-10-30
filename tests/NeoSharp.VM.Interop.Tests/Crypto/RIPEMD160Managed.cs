@@ -34,7 +34,7 @@ namespace NeoSharp.VM.Interop.Tests.Crypto
         {
             InitializeState();
 
-            // Zeroize potentially sensitive information.
+            // Fill with zeros potentially sensitive information.
             Array.Clear(_blockDWords, 0, _blockDWords.Length);
             Array.Clear(_buffer, 0, _buffer.Length);
         }

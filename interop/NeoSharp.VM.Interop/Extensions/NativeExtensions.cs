@@ -22,7 +22,7 @@ namespace NeoSharp.VM.Interop.Extensions
             var state = (EStackItemType)NeoVM.StackItem_SerializeInfo(item, out int size);
             if (state == EStackItemType.None) return null;
 
-            int readed;
+            int read;
             byte[] payload;
 
             if (size > 0)
@@ -30,12 +30,12 @@ namespace NeoSharp.VM.Interop.Extensions
                 payload = new byte[size];
                 fixed (byte* p = payload)
                 {
-                    readed = NeoVM.StackItem_Serialize(item, (IntPtr)p, size);
+                    read = NeoVM.StackItem_Serialize(item, (IntPtr)p, size);
                 }
             }
             else
             {
-                readed = 0;
+                read = 0;
                 payload = null;
             }
 
@@ -53,10 +53,10 @@ namespace NeoSharp.VM.Interop.Extensions
                 case EStackItemType.ByteArray: return new ByteArrayStackItem(engine, item, payload ?? (new byte[] { }));
                 case EStackItemType.Integer:
                     {
-                        if (readed != size)
+                        if (read != size)
                         {
                             // TODO: Try to fix this issue with BigInteger
-                            Array.Resize(ref payload, readed);
+                            Array.Resize(ref payload, read);
                         }
 
                         return new IntegerStackItem(engine, item, payload ?? (new byte[] { }));
