@@ -3559,7 +3559,7 @@ void ExecutionEngine::InternalStepInto()
 			return;
 		}
 
-		MapStackItem* it = this->CreateMap();
+		auto it = this->CreateMap();
 
 		if (it != nullptr)
 		{
