@@ -41,7 +41,7 @@ int16 Crypto::VerifySignature
 		return -1;
 
 	byte* realPubKey = nullptr;
-	int realPublicKeyLength = 65;
+	int32 realPublicKeyLength = 65;
 
 	if (pubKeyLength == 33 && (pubKey[0] == 0x02 || pubKey[0] == 0x03))
 	{

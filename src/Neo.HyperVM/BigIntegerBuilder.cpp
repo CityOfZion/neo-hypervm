@@ -163,7 +163,7 @@ uint32 BigIntegerBuilder::Mod(BigIntegerBuilder* regNum, uint32 uDen)
 		return regNum->_uSmall % uDen;
 
 	uint64 uu = 0;
-	for (int iv = regNum->_iuLast; iv >= 0; iv--)
+	for (int32 iv = regNum->_iuLast; iv >= 0; iv--)
 	{
 		uu = (uint64)(((uint64)uu << kcbitUint) | (uint64)regNum->_rgu[iv]);
 		uu %= uDen;
@@ -279,7 +279,7 @@ void BigIntegerBuilder::EnsureWritable(int32 cu, int32 cuExtra)
 			this->_iuLast = cu - 1;
 
 		// Array.Copy(_rgu, rgu, _iuLast + 1);
-		for (int x = this->_iuLast; x >= 0; x--)
+		for (int32 x = this->_iuLast; x >= 0; x--)
 			rgu[x] = this->_rgu[x];
 	}
 
@@ -407,7 +407,7 @@ int32 BigIntegerBuilder::CbitHighZero(uint32 u)
 	if (u == 0)
 		return 32;
 
-	int cbit = 0;
+	int32 cbit = 0;
 	if ((u & 0xFFFF0000) == 0)
 	{
 		cbit += 16;
@@ -589,7 +589,7 @@ void BigIntegerBuilder::ApplyCarry(int32 iu)
 			{
 				//Array.Resize(ref _rgu, _iuLast + 2);
 				uint32* nrgu = new uint32[_iuLast + 2];
-				for (int x = _iuLast + 1; x >= 0; x--)
+				for (int32 x = _iuLast + 1; x >= 0; x--)
 					nrgu[x] = this->_rgu[x];
 
 				// TODO: Check this!
@@ -652,19 +652,19 @@ void BigIntegerBuilder::SetSizeKeep(int32 cu, int32 cuExtra)
 		{
 			rgu[0] = this->_uSmall;
 
-			for (int i = 1; i < l; ++i)
+			for (int32 i = 1; i < l; ++i)
 				rgu[i] = 0;
 		}
 		else
 		{
-			int to = cu < _iuLast + 1 ? cu : _iuLast + 1;
+			int32 to = cu < _iuLast + 1 ? cu : _iuLast + 1;
 
 			// Array.Copy(_rgu, rgu, to);
-			for (int i = 0; i < to; ++i)
+			for (int32 i = 0; i < to; ++i)
 				rgu[i] = this->_rgu[i];
 
 			// Clear rest
-			for (int i = to; i < l; ++i)
+			for (int32 i = to; i < l; ++i)
 				rgu[i] = 0;
 		}
 
@@ -678,7 +678,7 @@ void BigIntegerBuilder::SetSizeKeep(int32 cu, int32 cuExtra)
 	else if (_iuLast + 1 < cu)
 	{
 		// Array.Clear(_rgu, _iuLast + 1, cu - _iuLast - 1);
-		for (int i = _iuLast + 1, m = i + cu - _iuLast - 1; i < m; ++i)
+		for (int32 i = _iuLast + 1, m = i + cu - _iuLast - 1; i < m; ++i)
 			this->_rgu[i] = 0;
 
 		if (this->_iuLast == 0)
@@ -691,7 +691,7 @@ void BigIntegerBuilder::SetSizeKeep(int32 cu, int32 cuExtra)
 
 // Loads the value of reg into this register. If we need to allocate memory
 // to perform the load, allocate cuExtra elements.
-void BigIntegerBuilder::Load(BigIntegerBuilder &reg, int cuExtra)
+void BigIntegerBuilder::Load(BigIntegerBuilder &reg, int32 cuExtra)
 {
 	// Contract.Requires(cuExtra >= 0);
 	// AssertValid(false);
@@ -719,7 +719,7 @@ void BigIntegerBuilder::Load(BigIntegerBuilder &reg, int cuExtra)
 
 		this->_iuLast = reg._iuLast;
 		//Array.Copy(reg._rgu, _rgu, _iuLast + 1);
-		for (int x = _iuLast; x >= 0; x--)
+		for (int32 x = _iuLast; x >= 0; x--)
 			this->_rgu[x] = reg._rgu[x];
 	}
 
@@ -745,7 +745,7 @@ void BigIntegerBuilder::Mul(uint32 u)
 	EnsureWritable(1);
 
 	uint32 uCarry = 0;
-	for (int iu = 0; iu <= this->_iuLast; iu++)
+	for (int32 iu = 0; iu <= this->_iuLast; iu++)
 		uCarry = MulCarry(this->_rgu[iu], u, uCarry);
 
 	if (uCarry != 0)
@@ -824,7 +824,7 @@ void BigIntegerBuilder::Add(BigIntegerBuilder &reg)
 		cuAdd = this->_iuLast + 1;
 
 		//Array.Copy(reg._rgu, _iuLast + 1, _rgu, _iuLast + 1, reg._iuLast - _iuLast);
-		for (int x = 0; x < reg._iuLast - this->_iuLast; ++x)
+		for (int32 x = 0; x < reg._iuLast - this->_iuLast; ++x)
 			this->_rgu[x + this->_iuLast + 1] = reg._rgu[x + this->_iuLast + 1];
 
 		// Contract.Assert(_iuLast > 0);
@@ -883,13 +883,13 @@ void BigIntegerBuilder::SubRev(BigIntegerBuilder* reg)
 
 	EnsureWritable(reg->_iuLast + 1, 0);
 
-	int cuSub = this->_iuLast + 1;
+	int32 cuSub = this->_iuLast + 1;
 	if (this->_iuLast < reg->_iuLast)
 	{
 		// Array.Copy(reg->_rgu, _iuLast + 1, _rgu, _iuLast + 1, reg->_iuLast - _iuLast);
 
-		int index = _iuLast + 1;
-		for (int x = reg->_iuLast - _iuLast - 1; x >= 0; x--)
+		int32 index = _iuLast + 1;
+		for (int32 x = reg->_iuLast - _iuLast - 1; x >= 0; x--)
 			this->_rgu[x + index] = reg->_rgu[x + index];
 
 		// Contract.Assert(_iuLast > 0);
@@ -897,7 +897,7 @@ void BigIntegerBuilder::SubRev(BigIntegerBuilder* reg)
 	}
 
 	uint32 uBorrow = 0;
-	for (int iu = 0; iu < cuSub; iu++)
+	for (int32 iu = 0; iu < cuSub; iu++)
 	{
 		uBorrow = SubRevBorrow(this->_rgu[iu], reg->_rgu[iu], uBorrow);
 		// Contract.Assert(uBorrow <= 1);

@@ -9,7 +9,7 @@ bool InteropStackItem::Equals(IStackItem* it)
 	if (it->Type != EStackItemType::Interop)
 		return false;
 
-	InteropStackItem* ii = (InteropStackItem*)it;
+	auto ii = (InteropStackItem*)it;
 
 	// Check content of the raw data
 

@@ -49,7 +49,7 @@ private:
 	void EnsureWritable(int32 cuExtra);
 	void EnsureWritable(int32 cu, int32 cuExtra);
 	void ApplyCarry(int32 iu);
-	void Load(BigIntegerBuilder &reg, int cuExtra);
+	void Load(BigIntegerBuilder &reg, int32 cuExtra);
 
 	BigIntegerBuilder();
 

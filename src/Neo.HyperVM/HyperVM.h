@@ -77,8 +77,8 @@ extern "C"
 	DllExport byte __stdcall MapStackItem_Remove(MapStackItem* map, IStackItem* key);
 	DllExport void __stdcall MapStackItem_Set(MapStackItem* map, IStackItem* key, IStackItem* value);
 	DllExport IStackItem* __stdcall MapStackItem_Get(MapStackItem* map, IStackItem* key);
-	DllExport IStackItem* __stdcall MapStackItem_GetKey(MapStackItem* map, int index);
-	DllExport IStackItem* __stdcall MapStackItem_GetValue(MapStackItem* map, int index);
+	DllExport IStackItem* __stdcall MapStackItem_GetKey(MapStackItem* map, int32 index);
+	DllExport IStackItem* __stdcall MapStackItem_GetValue(MapStackItem* map, int32 index);
 
 	// ArrayStackItem
 
