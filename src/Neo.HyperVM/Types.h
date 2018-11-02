@@ -10,10 +10,6 @@ typedef unsigned int            uint32;
 typedef long long               int64;
 typedef unsigned long long      uint64;
 
-#ifndef NULL
-#define NULL 0
-#endif
-
 // ExecutionEngine Callbacks
 
 #if _WINDOWS
