@@ -78,8 +78,8 @@ int16 Crypto::VerifySignature
 
 		if (eckey != nullptr)
 		{
-			BIGNUM* bn = BN_bin2bn(realPubKey, realPublicKeyLength, NULL);
-			EC_POINT* pub = EC_POINT_bn2point(ecgroup, bn, NULL, NULL);
+			BIGNUM* bn = BN_bin2bn(realPubKey, realPublicKeyLength, nullptr);
+			EC_POINT* pub = EC_POINT_bn2point(ecgroup, bn, nullptr, nullptr);
 
 			if (pub != nullptr)
 			{
@@ -89,8 +89,8 @@ int16 Crypto::VerifySignature
 				{
 					// DER encoding
 
-					BIGNUM* r = BN_bin2bn(&signature[0], 32, NULL);
-					BIGNUM* s = BN_bin2bn(&signature[32], 32, NULL);
+					BIGNUM* r = BN_bin2bn(&signature[0], 32, nullptr);
+					BIGNUM* s = BN_bin2bn(&signature[32], 32, nullptr);
 
 					ECDSA_SIG* sig = ECDSA_SIG_new();
 					gen_status = ECDSA_SIG_set0(sig, r, s);

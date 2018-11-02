@@ -15,7 +15,7 @@ void Stack<T>::RealRemoveAt(int32 index)
 		}
 	}
 
-	this->_items[this->_size] = NULL;
+	this->_items[this->_size] = nullptr;
 }
 
 template <class T>
@@ -161,14 +161,14 @@ void Stack<T>::SendTo(Stack<T>* stack, int32 count)
 	{
 		auto item = this->_items[x];
 
-		if (item == NULL) break;
+		if (item == nullptr) break;
 
 		stack->_items[stack->_size] = item;
 		++stack->_size;
 
 		// Send to
 
-		this->_items[x] = NULL;
+		this->_items[x] = nullptr;
 		--this->_size;
 	}
 }
@@ -215,7 +215,7 @@ void Stack<T>::Clear()
 	this->_itemsLength = 0;
 
 	delete[](this->_items);
-	this->_items = NULL;
+	this->_items = nullptr;
 }
 
 // Explicit template instantiation
