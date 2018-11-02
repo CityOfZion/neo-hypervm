@@ -140,9 +140,9 @@ int32 ArrayStackItem::IndexOf(IStackItem* item)
 
 void ArrayStackItem::Clear()
 {
-	for (std::list<IStackItem*>::iterator it = this->_list.begin(); it != this->_list.end(); ++it)
+	for (auto it = this->_list.begin(); it != this->_list.end(); ++it)
 	{
-		IStackItem* ptr = (IStackItem*)*it;
+		auto ptr = (IStackItem*)*it;
 		StackItemHelper::UnclaimAndFree(ptr);
 	}
 
@@ -160,7 +160,7 @@ void ArrayStackItem::Insert(int32 index, IStackItem* item)
 	}
 	else
 	{
-		std::list<IStackItem*>::iterator it = this->_list.begin();
+		auto it = this->_list.begin();
 		std::advance(it, index);
 
 		this->_list.insert(it, item);
@@ -179,16 +179,16 @@ void ArrayStackItem::RemoveAt(int32 index)
 {
 	if (index == 0)
 	{
-		IStackItem* it = this->_list.front();
+		auto it = this->_list.front();
 		this->_list.pop_front();
 		StackItemHelper::UnclaimAndFree(it);
 	}
 	else
 	{
-		std::list<IStackItem*>::iterator it = this->_list.begin();
+		auto it = this->_list.begin();
 		std::advance(it, index);
 
-		IStackItem* s = (IStackItem*)*it;
+		auto s = (IStackItem*)*it;
 		this->_list.erase(it);
 		StackItemHelper::UnclaimAndFree(s);
 	}
@@ -201,17 +201,17 @@ void ArrayStackItem::Set(int32 index, IStackItem* item)
 
 	if (index == 0)
 	{
-		IStackItem* it = this->_list.front();
+		auto it = this->_list.front();
 		this->_list.pop_front();
 		StackItemHelper::UnclaimAndFree(it);
 		this->_list.push_front(item);
 	}
 	else
 	{
-		std::list<IStackItem*>::iterator it = this->_list.begin();
+		auto it = this->_list.begin();
 		std::advance(it, index);
 
-		IStackItem* s = (IStackItem*)*it;
+		auto s = (IStackItem*)*it;
 		StackItemHelper::UnclaimAndFree(s);
 
 		*it = item;

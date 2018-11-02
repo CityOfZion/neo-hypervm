@@ -67,7 +67,7 @@ ExecutionEngine* ExecutionEngine_Create
 	ExecutionContextStack* &invStack, StackItems* &resStack
 )
 {
-	ExecutionEngine* engine = new ExecutionEngine(interopCallback, getScriptCallback, getMessageCallback);
+	auto engine = new ExecutionEngine(interopCallback, getScriptCallback, getMessageCallback);
 
 	invStack = &engine->InvocationStack;
 	resStack = &engine->ResultStack;
@@ -166,10 +166,10 @@ int32 StackItems_Drop(StackItems* stack, int32 count)
 {
 	if (stack == nullptr) return 0;
 
-	int ret = stack->Count();
+	int32 ret = stack->Count();
 	ret = ret > count ? count : ret;
 
-	for (int x = 0; x < ret; ++x) stack->Drop();
+	for (int32 x = 0; x < ret; ++x) stack->Drop();
 	return ret;
 }
 
@@ -207,10 +207,10 @@ int32 ExecutionContextStack_Drop(ExecutionContextStack* stack, int32 count)
 {
 	if (stack == nullptr) return 0;
 
-	int ret = stack->Count();
+	int32 ret = stack->Count();
 	ret = ret > count ? count : ret;
 
-	for (int x = 0; x < ret; ++x) stack->Drop();
+	for (int32 x = 0; x < ret; ++x) stack->Drop();
 	return ret;
 }
 
@@ -267,7 +267,7 @@ IStackItem* StackItem_Create(ExecutionEngine* engine, EStackItemType type, byte*
 
 			bool ret = false;
 
-			for (int x = 0; x < size; ++x)
+			for (int32 x = 0; x < size; ++x)
 				if (data[x] != 0x00)
 				{
 					ret = true;
@@ -354,14 +354,14 @@ IStackItem* MapStackItem_Get(MapStackItem* map, IStackItem* key)
 	return map->Get(key);
 }
 
-IStackItem* MapStackItem_GetKey(MapStackItem* map, int index)
+IStackItem* MapStackItem_GetKey(MapStackItem* map, int32 index)
 {
 	if (map == nullptr) return nullptr;
 
 	return map->GetKey(index);
 }
 
-IStackItem* MapStackItem_GetValue(MapStackItem* map, int index)
+IStackItem* MapStackItem_GetValue(MapStackItem* map, int32 index)
 {
 	if (map == nullptr) return nullptr;
 

@@ -8,7 +8,7 @@ bool IntegerStackItem::Equals(IStackItem* it)
 	{
 	case EStackItemType::Integer:
 	{
-		IntegerStackItem* t = (IntegerStackItem*)it;
+		auto t = (IntegerStackItem*)it;
 		return this->_value.CompareTo(t->_value) == 0;
 	}
 	default:

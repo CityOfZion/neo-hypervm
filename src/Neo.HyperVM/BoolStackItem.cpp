@@ -8,7 +8,7 @@ bool BoolStackItem::Equals(IStackItem* it)
 	{
 	case EStackItemType::Bool:
 	{
-		BoolStackItem* t = (BoolStackItem*)it;
+		auto t = (BoolStackItem*)it;
 		return this->_value == t->_value;
 	}
 	default:
@@ -18,7 +18,7 @@ bool BoolStackItem::Equals(IStackItem* it)
 		case 1:
 		{
 			byte* data = new byte[1];
-			int iz = it->ReadByteArray(data, 0, 1);
+			int32 iz = it->ReadByteArray(data, 0, 1);
 
 			// Current true
 

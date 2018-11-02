@@ -39,8 +39,8 @@ public:
 	bool Remove(IStackItem* &key);
 	void FillKeys(ArrayStackItem* arr);
 	void FillValues(ArrayStackItem* arr);
-	IStackItem* GetKey(int index);
-	IStackItem* GetValue(int index);
+	IStackItem* GetKey(int32 index);
+	IStackItem* GetValue(int32 index);
 
 	// Constructor & Destructor
 

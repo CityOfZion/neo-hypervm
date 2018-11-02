@@ -3,15 +3,15 @@
 
 bool MapStackItem::Remove(IStackItem* &key)
 {
-	for (std::map<IStackItem*, IStackItem*>::iterator it = this->_dictionary.begin(); it != this->_dictionary.end(); ++it)
+	for (auto it = this->_dictionary.begin(); it != this->_dictionary.end(); ++it)
 	{
 		if (!it->first->Equals(key)) continue;
 
-		IStackItem* value = it->second;
+		auto value = it->second;
 
 		// Unclaim
 
-		IStackItem* ckey = it->first; // Could be different
+		auto ckey = it->first; // Could be different
 
 		ckey->UnClaim();
 		value->UnClaim();
@@ -34,10 +34,10 @@ bool MapStackItem::Remove(IStackItem* &key)
 
 void MapStackItem::Clear()
 {
-	for (std::map<IStackItem*, IStackItem*>::iterator it = this->_dictionary.begin(); it != this->_dictionary.end(); ++it)
+	for (auto it = this->_dictionary.begin(); it != this->_dictionary.end(); ++it)
 	{
-		IStackItem* key = it->first;
-		IStackItem* value = it->second;
+		auto key = it->first;
+		auto value = it->second;
 
 		StackItemHelper::UnclaimAndFree(key);
 		StackItemHelper::UnclaimAndFree(value);
@@ -48,7 +48,7 @@ void MapStackItem::Clear()
 
 IStackItem* MapStackItem::Get(IStackItem* key)
 {
-	for (std::map<IStackItem*, IStackItem*>::iterator it = this->_dictionary.begin(); it != this->_dictionary.end(); ++it)
+	for (auto it = this->_dictionary.begin(); it != this->_dictionary.end(); ++it)
 	{
 		if (!it->first->Equals(key)) continue;
 		return it->second;
@@ -57,10 +57,10 @@ IStackItem* MapStackItem::Get(IStackItem* key)
 	return nullptr;
 }
 
-IStackItem* MapStackItem::GetKey(int index)
+IStackItem* MapStackItem::GetKey(int32 index)
 {
 	int32 ix = 0;
-	for (std::map<IStackItem*, IStackItem*>::iterator it = this->_dictionary.begin(); it != this->_dictionary.end(); ++it, ++ix)
+	for (auto it = this->_dictionary.begin(); it != this->_dictionary.end(); ++it, ++ix)
 	{
 		if (ix == index)
 		{
@@ -71,10 +71,10 @@ IStackItem* MapStackItem::GetKey(int index)
 	return nullptr;
 }
 
-IStackItem* MapStackItem::GetValue(int index)
+IStackItem* MapStackItem::GetValue(int32 index)
 {
 	int32 ix = 0;
-	for (std::map<IStackItem*, IStackItem*>::iterator it = this->_dictionary.begin(); it != this->_dictionary.end(); ++it, ++ix)
+	for (auto it = this->_dictionary.begin(); it != this->_dictionary.end(); ++it, ++ix)
 	{
 		if (ix == index)
 		{
@@ -87,7 +87,7 @@ IStackItem* MapStackItem::GetValue(int index)
 
 void MapStackItem::FillKeys(ArrayStackItem* arr)
 {
-	for (std::map<IStackItem*, IStackItem*>::iterator it = this->_dictionary.begin(); it != this->_dictionary.end(); ++it)
+	for (auto it = this->_dictionary.begin(); it != this->_dictionary.end(); ++it)
 	{
 		if (it->first->Type == EStackItemType::Struct)
 		{
@@ -102,7 +102,7 @@ void MapStackItem::FillKeys(ArrayStackItem* arr)
 
 void MapStackItem::FillValues(ArrayStackItem* arr)
 {
-	for (std::map<IStackItem*, IStackItem*>::iterator it = this->_dictionary.begin(); it != this->_dictionary.end(); ++it)
+	for (auto it = this->_dictionary.begin(); it != this->_dictionary.end(); ++it)
 	{
 		if (it->second->Type == EStackItemType::Struct)
 		{
@@ -117,11 +117,11 @@ void MapStackItem::FillValues(ArrayStackItem* arr)
 
 bool MapStackItem::Set(IStackItem* key, IStackItem* value)
 {
-	for (std::map<IStackItem*, IStackItem*>::iterator it = this->_dictionary.begin(); it != this->_dictionary.end(); ++it)
+	for (auto it = this->_dictionary.begin(); it != this->_dictionary.end(); ++it)
 	{
 		if (!it->first->Equals(key)) continue;
 
-		IStackItem* v = it->second;
+		auto v = it->second;
 		if (v == value) return false;
 
 		StackItemHelper::UnclaimAndFree(v);
