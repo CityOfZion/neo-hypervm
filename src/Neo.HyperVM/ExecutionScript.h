@@ -1,34 +1,44 @@
 #pragma once
 
+#include <string.h>
 #include "Types.h"
-#include "IClaimable.h"
 
-class ExecutionScript : public IClaimable
+class ExecutionScript
 {
-private:
-
-	// Is Script hash calculated?
-
-	bool _isScriptHashCalculated;
-
 public:
 
 	// Constants
 
 	static const int32 ScriptHashLength = 20;
+	const int32 ScriptLength;
+
+private:
+
+	// Is Script hash calculated?
+
+	bool _isScriptHashCalculated;
+	byte _scriptHash[ScriptHashLength];
+
+public:
 
 	byte* Content;
-	const int32 ScriptLength;
-	byte ScriptHash[ScriptHashLength];
 
 	// Get ScriptHash
 
 	int32 GetScriptHash(byte* hash);
-	bool IsTheSameHash(byte* hash, int32 length);
+	bool  IsTheSameHash(byte* hash, int32 length);
 
 	// Constructor
 
-	ExecutionScript(byte* script, int32 scriptLength);
+	inline ExecutionScript(byte* script, int32 scriptLength) :
+		_isScriptHashCalculated(false), 
+		ScriptLength(scriptLength)
+	{
+		// Copy script
+
+		this->Content = new byte[scriptLength];
+		memcpy(this->Content, script, scriptLength);
+	}
 
 	// Destructor
 
@@ -36,9 +46,4 @@ public:
 	{
 		delete(this->Content);
 	}
-
-	// Claims
-
-	static void Free(ExecutionScript* &item);
-	static void UnclaimAndFree(ExecutionScript* &item);
 };

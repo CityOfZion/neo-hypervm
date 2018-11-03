@@ -60,19 +60,10 @@ ExecutionEngine::~ExecutionEngine()
 
 	this->InvocationStack.Clear();
 	this->ResultStack.Clear();
-
-	// Clean scripts
-
-	for (auto it = this->Scripts.begin(); it != this->Scripts.end(); ++it)
-	{
-		auto ptr = (ExecutionScript*)*it;
-		ExecutionScript::UnclaimAndFree(ptr);
-	}
-
 	this->Scripts.clear();
 }
 
-ExecutionContext* ExecutionEngine::LoadScript(ExecutionScript* script, int32 rvcount)
+ExecutionContext* ExecutionEngine::LoadScript(std::shared_ptr<ExecutionScript> script, int32 rvcount)
 {
 	auto context = new ExecutionContext(script, 0, rvcount);
 	this->InvocationStack.Push(context);
@@ -81,14 +72,14 @@ ExecutionContext* ExecutionEngine::LoadScript(ExecutionScript* script, int32 rvc
 
 bool ExecutionEngine::LoadScript(byte scriptIndex, int32 rvcount)
 {
-	ExecutionScript* sc = nullptr;
+	std::shared_ptr<ExecutionScript> sc = nullptr;
 
 	if (this->Scripts.size() > scriptIndex)
 	{
 		auto it = this->Scripts.begin();
 		std::advance(it, scriptIndex);
 
-		sc = (ExecutionScript*)*it;
+		sc = (std::shared_ptr<ExecutionScript>)*it;
 	}
 
 	if (sc == nullptr) return false;
@@ -102,9 +93,7 @@ int32 ExecutionEngine::LoadScript(byte* script, int32 scriptLength, int32 rvcoun
 {
 	int32 index = Scripts.size();
 
-	auto sc = new ExecutionScript(script, scriptLength);
-	sc->Claim();
-
+	auto sc = std::shared_ptr<ExecutionScript>(new ExecutionScript(script, scriptLength));
 	Scripts.push_back(sc);
 
 	auto context = new ExecutionContext(sc, 0, rvcount);
@@ -632,7 +621,7 @@ void ExecutionEngine::InternalStepInto()
 
 			for (auto it = this->Scripts.begin(); it != this->Scripts.end(); ++it)
 			{
-				auto ptr = (ExecutionScript*)*it;
+				auto ptr = (std::shared_ptr<ExecutionScript>)*it;
 				if (ptr->IsTheSameHash(script_hash, scriptLength))
 				{
 					this->LoadScript(ptr, rvcount);
@@ -755,7 +744,7 @@ void ExecutionEngine::InternalStepInto()
 
 			for (auto it = this->Scripts.begin(); it != this->Scripts.end(); ++it)
 			{
-				auto ptr = (ExecutionScript*)*it;
+				auto ptr = (std::shared_ptr<ExecutionScript>)*it;
 				if (ptr->IsTheSameHash(script_hash, scriptLength))
 				{
 					this->LoadScript(ptr, -1);

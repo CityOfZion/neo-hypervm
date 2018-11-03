@@ -1,6 +1,7 @@
 #pragma once
 
 #include <list>
+#include <memory>
 #include "Types.h"
 #include "Limits.h"
 #include "StackItems.h"
@@ -38,7 +39,7 @@ private:
 
 	// Stacks
 
-	std::list<ExecutionScript*> Scripts;
+	std::list<std::shared_ptr<ExecutionScript>> Scripts;
 
 	void InternalStepInto();
 
@@ -61,7 +62,7 @@ public:
 
 	// Load scripts
 
-	ExecutionContext* LoadScript(ExecutionScript* script, int32 rvcount);
+	ExecutionContext* LoadScript(std::shared_ptr<ExecutionScript> script, int32 rvcount);
 	int32 LoadScript(byte* script, int32 scriptLength, int32 rvcount);
 	bool LoadScript(byte scriptIndex, int32 rvcount);
 

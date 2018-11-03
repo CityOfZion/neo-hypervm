@@ -1,17 +1,5 @@
 #include "ExecutionScript.h"
 #include "Crypto.h"
-#include <string.h>
-
-ExecutionScript::ExecutionScript(byte* script, int32 scriptLength) :
-	IClaimable(),
-	_isScriptHashCalculated(false),
-	ScriptLength(scriptLength)
-{
-	// Copy script
-
-	this->Content = new byte[scriptLength];
-	memcpy(this->Content, script, scriptLength);
-}
 
 int32 ExecutionScript::GetScriptHash(byte* hash)
 {
@@ -20,10 +8,10 @@ int32 ExecutionScript::GetScriptHash(byte* hash)
 		// Compute script hash
 
 		this->_isScriptHashCalculated = true;
-		Crypto::ComputeHash160(this->Content, this->ScriptLength, &this->ScriptHash[0]);
+		Crypto::ComputeHash160(this->Content, this->ScriptLength, &this->_scriptHash[0]);
 	}
 
-	memcpy(hash, this->ScriptHash, this->ScriptHashLength);
+	memcpy(hash, this->_scriptHash, this->ScriptHashLength);
 	return this->ScriptHashLength;
 }
 
@@ -36,30 +24,12 @@ bool ExecutionScript::IsTheSameHash(byte* hash, int32 length)
 		// Compute script hash
 
 		this->_isScriptHashCalculated = true;
-		Crypto::ComputeHash160(this->Content, this->ScriptLength, &this->ScriptHash[0]);
+		Crypto::ComputeHash160(this->Content, this->ScriptLength, &this->_scriptHash[0]);
 	}
 
 	for (int32 x = 0; x < this->ScriptHashLength; x++)
-		if (this->ScriptHash[x] != hash[x])
+		if (this->_scriptHash[x] != hash[x])
 			return false;
 
 	return true;
-}
-
-void ExecutionScript::Free(ExecutionScript* &item)
-{
-	if (item != nullptr && item->IsUnClaimed())
-	{
-		delete(item);
-		item = nullptr;
-	}
-}
-
-void ExecutionScript::UnclaimAndFree(ExecutionScript* &item)
-{
-	if (item != nullptr && item->UnClaim())
-	{
-		delete(item);
-		item = nullptr;
-	}
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include "EVMOpCode.h"
 #include "Types.h"
 #include "StackItems.h"
@@ -9,7 +10,7 @@ class ExecutionContext :public IClaimable
 {
 private:
 
-	ExecutionScript* _script;
+	std::shared_ptr<ExecutionScript> _script;
 	int32 _instructionIndex;
 	byte* _instructionPointer;
 	byte _buffer[8];
@@ -111,7 +112,7 @@ public:
 
 	// Constructor
 
-	inline ExecutionContext(ExecutionScript* script, int32 instructorPointer, int32 rvcount) :
+	inline ExecutionContext(std::shared_ptr<ExecutionScript> script, int32 instructorPointer, int32 rvcount) :
 		IClaimable(),
 		_script(script),
 		_instructionIndex(instructorPointer),
@@ -122,7 +123,7 @@ public:
 		AltStack(),
 		EvaluationStack()
 	{
-		script->Claim();
+		
 	}
 
 	// Destructor
@@ -131,8 +132,6 @@ public:
 	{
 		this->EvaluationStack.Clear();
 		this->AltStack.Clear();
-
-		ExecutionScript::UnclaimAndFree(this->_script);
 	}
 
 	// Claims
