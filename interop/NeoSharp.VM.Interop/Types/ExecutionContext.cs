@@ -95,20 +95,12 @@ namespace NeoSharp.VM.Interop.Types
         /// <summary>
         /// AltStack
         /// </summary>
-        public override Stack AltStack
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return _altStack; }
-        }
+        public override Stack AltStack => _altStack;
 
         /// <summary>
         /// EvaluationStack
         /// </summary>
-        public override Stack EvaluationStack
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return _evaluationStack; }
-        }
+        public override Stack EvaluationStack => _evaluationStack;
 
         #endregion
 
