@@ -43,8 +43,7 @@ namespace NeoSharp.VM.Interop.Types
         /// <summary>
         /// Interop Cache
         /// </summary>
-        private readonly List<InteropCacheEntry> _interopCache;
-        private readonly List<object> _interopCacheIndex;
+        private readonly IDictionary<object, InteropCacheEntry> _interopCache;
 
         #endregion
 
@@ -88,8 +87,7 @@ namespace NeoSharp.VM.Interop.Types
         /// <param name="e">Arguments</param>
         public ExecutionEngine(ExecutionEngineArgs e) : base(e)
         {
-            _interopCache = new List<InteropCacheEntry>();
-            _interopCacheIndex = new List<object>();
+            _interopCache = new Dictionary<object, InteropCacheEntry>();
 
             _internalInvokeInterop = new NeoVM.InvokeInteropCallback(InternalInvokeInterop);
             _internalLoadScript = new NeoVM.LoadScriptCallback(InternalLoadScript);
@@ -358,23 +356,20 @@ namespace NeoSharp.VM.Interop.Types
         /// <param name="obj">Object</param>
         public override InteropStackItemBase<T> CreateInterop<T>(T obj)
         {
-            var objKey = _interopCacheIndex.IndexOf(obj);
-
-            if (objKey == -1)
+            if (!_interopCache.TryGetValue(obj, out var entry))
             {
-                objKey = _interopCache.Count;
-
-                _interopCache.Add(new InteropCacheEntry()
+                entry = new InteropCacheEntry()
                 {
                     Value = obj,
+                    Index = _interopCache.Count,
                     Instanciator = (engine, ptr, key, value) =>
                         new InteropStackItem<T>(engine, ptr, key, (T)value)
-                });
+                };
 
-                _interopCacheIndex.Add(obj);
+                _interopCache.Add(obj, entry);
             }
 
-            return new InteropStackItem<T>(this, obj, objKey);
+            return new InteropStackItem<T>(this, obj, entry.Index);
         }
 
         /// <summary>
@@ -434,7 +429,7 @@ namespace NeoSharp.VM.Interop.Types
             {
                 // Clear interop cache
 
-                foreach (var v in _interopCacheIndex)
+                foreach (var v in _interopCache.Keys)
                 {
                     if (v is IDisposable dsp)
                     {
@@ -443,7 +438,6 @@ namespace NeoSharp.VM.Interop.Types
                 }
 
                 _interopCache.Clear();
-                _interopCacheIndex.Clear();
             }
 
             // free unmanaged resources (unmanaged objects) and override a finalizer below. set large fields to null.
