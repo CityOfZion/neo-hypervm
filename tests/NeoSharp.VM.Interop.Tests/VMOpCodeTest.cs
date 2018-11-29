@@ -30,7 +30,7 @@ namespace NeoSharp.VM.Interop.Tests
         /// </summary>
         /// <param name="args">Arguments</param>
         /// <returns>Return new engine</returns>
-        public IExecutionEngine CreateEngine(ExecutionEngineArgs args)
+        public ExecutionEngineBase CreateEngine(ExecutionEngineArgs args)
         {
             return _VMFactory.Create(args);
         }
@@ -212,7 +212,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                     // Execute
 
-                    using (var currentContext = engine.CurrentContext)
+                    var currentContext = engine.CurrentContext;
                     {
                         // PUSH A
                         engine.StepInto();
@@ -272,7 +272,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                     // Execute
 
-                    using (var currentContext = engine.CurrentContext)
+                    var currentContext = engine.CurrentContext;
                     {
                         // PUSH A
                         engine.StepInto();
@@ -312,7 +312,7 @@ namespace NeoSharp.VM.Interop.Tests
             }
         }
 
-        private void CheckValue(IStackItem it, object ret)
+        private void CheckValue(StackItemBase it, object ret)
         {
             if (ret is BigInteger bi)
             {
@@ -397,7 +397,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                     // Execute
 
-                    using (var currentContext = engine.CurrentContext)
+                    var currentContext = engine.CurrentContext;
                     {
                         // PUSH A
                         engine.StepInto();
@@ -438,7 +438,7 @@ namespace NeoSharp.VM.Interop.Tests
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="invocationStack">True for Check invocationStack</param>
-        protected void CheckClean(IExecutionEngine engine, bool invocationStack = true)
+        protected void CheckClean(ExecutionEngineBase engine, bool invocationStack = true)
         {
             Assert.AreEqual(0, engine.ResultStack.Count);
 
@@ -458,8 +458,6 @@ namespace NeoSharp.VM.Interop.Tests
                 {
                     Assert.AreEqual(0, current.EvaluationStack.Count);
                     Assert.AreEqual(0, current.AltStack.Count);
-
-                    current.Dispose();
                 }
             }
         }
@@ -471,9 +469,9 @@ namespace NeoSharp.VM.Interop.Tests
         /// <param name="isStruct">Is struct</param>
         /// <param name="count">Count</param>
         /// <param name="values">Values</param>
-        protected void CheckArrayPeek(IStackItemsStack stack, int index, bool isStruct, params object[] values)
+        protected void CheckArrayPeek(Stack stack, int index, bool isStruct, params object[] values)
         {
-            using (var arr = stack.Peek<IArrayStackItem>(index))
+            using (var arr = stack.Peek<ArrayStackItemBase>(index))
             {
                 Assert.IsTrue(arr != null);
                 Assert.AreEqual(isStruct, arr.IsStruct);
@@ -486,9 +484,9 @@ namespace NeoSharp.VM.Interop.Tests
         /// <param name="stack">Stack</param>
         /// <param name="isStruct">Is struct</param>
         /// <param name="values">Values</param>
-        protected void CheckArrayPop(IStackItemsStack stack, bool isStruct, params object[] values)
+        protected void CheckArrayPop(Stack stack, bool isStruct, params object[] values)
         {
-            using (var arr = stack.Pop<IArrayStackItem>())
+            using (var arr = stack.Pop<ArrayStackItemBase>())
             {
                 Assert.IsTrue(arr != null);
                 CheckArray(arr, isStruct, values);
@@ -500,7 +498,7 @@ namespace NeoSharp.VM.Interop.Tests
         /// <param name="arr">Array</param>
         /// <param name="isStruct">Is struct</param>
         /// <param name="values">Values</param>
-        protected void CheckArray(IArrayStackItem arr, bool isStruct, params object[] values)
+        protected void CheckArray(ArrayStackItemBase arr, bool isStruct, params object[] values)
         {
             Assert.AreEqual(isStruct, arr.IsStruct);
             Assert.IsTrue(arr.Count == values.Length);
@@ -513,15 +511,15 @@ namespace NeoSharp.VM.Interop.Tests
                 {
                     if (val is int)
                     {
-                        Assert.IsTrue(ait is IIntegerStackItem);
-                        var i = ait as IIntegerStackItem;
+                        Assert.IsTrue(ait is IntegerStackItemBase);
+                        var i = ait as IntegerStackItemBase;
 
                         Assert.AreEqual(i.Value, (int)val);
                     }
                     else if (val is bool)
                     {
-                        Assert.IsTrue(ait is IBooleanStackItem);
-                        var i = ait as IBooleanStackItem;
+                        Assert.IsTrue(ait is BooleanStackItemBase);
+                        var i = ait as BooleanStackItemBase;
 
                         Assert.AreEqual(i.Value, (bool)val);
                     }

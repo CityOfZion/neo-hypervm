@@ -9,13 +9,15 @@ namespace NeoSharp.VM.Interop.Extensions
 {
     public unsafe static class NativeExtensions
     {
+        private static readonly Type InteropType = typeof(InteropStackItem<>);
+
         /// <summary>
         /// Convert native pointer to stack item
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="item">Item</param>
         /// <returns>Return StackItem</returns>
-        public static IStackItem ConvertFromNative(this ExecutionEngine engine, IntPtr item)
+        public static StackItemBase ConvertFromNative(this ExecutionEngine engine, IntPtr item)
         {
             if (item == IntPtr.Zero) return null;
 
@@ -46,9 +48,10 @@ namespace NeoSharp.VM.Interop.Extensions
                 case EStackItemType.Map: return new MapStackItem(engine, item);
                 case EStackItemType.Interop:
                     {
-                        // Extract object
+                        var key = payload.ToInt32(0);
+                        var cache = engine.GetInteropObject(key);
 
-                        return new InteropStackItem(engine, item, payload.ToInt32(0));
+                        return cache.Instanciator(engine, item, key, cache.Value);
                     }
                 case EStackItemType.ByteArray: return new ByteArrayStackItem(engine, item, payload ?? (new byte[] { }));
                 case EStackItemType.Integer:
@@ -56,6 +59,7 @@ namespace NeoSharp.VM.Interop.Extensions
                         if (read != size)
                         {
                             // TODO: Try to fix this issue with BigInteger
+
                             Array.Resize(ref payload, read);
                         }
 

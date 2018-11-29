@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace NeoSharp.VM.Interop.Types.StackItems
 {
-    public class MapStackItem : IMapStackItem, INativeStackItem
+    public class MapStackItem : MapStackItemBase, INativeStackItem
     {
         #region Private fields
 
@@ -28,12 +28,6 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get;
-        }
-
-        public override bool CanConvertToByteArray
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return false; }
         }
 
         /// <summary>
@@ -89,14 +83,14 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// </summary>
         /// <param name="engine">Engine</param>
         /// <param name="value">Value</param>
-        internal MapStackItem(ExecutionEngine engine, Dictionary<IStackItem, IStackItem> value) : base()
+        internal MapStackItem(ExecutionEngine engine, Dictionary<StackItemBase, StackItemBase> value) : base()
         {
             NativeEngine = engine;
             _handle = this.CreateNativeItem();
 
             if (value == null) return;
 
-            foreach (KeyValuePair<IStackItem, IStackItem> pair in value)
+            foreach (KeyValuePair<StackItemBase, StackItemBase> pair in value)
                 Set(pair.Key, pair.Value);
         }
 
@@ -115,12 +109,12 @@ namespace NeoSharp.VM.Interop.Types.StackItems
 
         #region Write
 
-        public override bool Remove(IStackItem key)
+        public override bool Remove(StackItemBase key)
             => NeoVM.MapStackItem_Remove(_handle, key == null ? IntPtr.Zero : ((INativeStackItem)key).Handle) == NeoVM.TRUE;
 
-        public override void Set(KeyValuePair<IStackItem, IStackItem> item) => Set(item.Key, item.Value);
+        public override void Set(KeyValuePair<StackItemBase, StackItemBase> item) => Set(item.Key, item.Value);
 
-        public override void Set(IStackItem key, IStackItem value) =>
+        public override void Set(StackItemBase key, StackItemBase value) =>
 
             NeoVM.MapStackItem_Set
                 (
@@ -135,10 +129,10 @@ namespace NeoSharp.VM.Interop.Types.StackItems
 
         #region Read
 
-        public override bool ContainsKey(IStackItem key)
+        public override bool ContainsKey(StackItemBase key)
             => NeoVM.MapStackItem_Get(_handle, key == null ? IntPtr.Zero : ((INativeStackItem)key).Handle) != IntPtr.Zero;
 
-        public override bool TryGetValue(IStackItem key, out IStackItem value)
+        public override bool TryGetValue(StackItemBase key, out StackItemBase value)
         {
             var ret = NeoVM.MapStackItem_Get(_handle, key == null ? IntPtr.Zero : ((INativeStackItem)key).Handle);
 
@@ -156,30 +150,36 @@ namespace NeoSharp.VM.Interop.Types.StackItems
 
         #region Enumerables
 
-        public override IEnumerable<IStackItem> GetKeys()
+        public override IEnumerable<StackItemBase> Keys
         {
-            for (int x = 0, c = Count; x < c; x++)
+            get
             {
-                yield return NativeEngine.ConvertFromNative(NeoVM.MapStackItem_GetKey(_handle, x));
+                for (int x = 0, c = Count; x < c; x++)
+                {
+                    yield return NativeEngine.ConvertFromNative(NeoVM.MapStackItem_GetKey(_handle, x));
+                }
             }
         }
 
-        public override IEnumerable<IStackItem> GetValues()
+        public override IEnumerable<StackItemBase> Values
         {
-            for (int x = 0, c = Count; x < c; x++)
+            get
             {
-                yield return NativeEngine.ConvertFromNative(NeoVM.MapStackItem_GetValue(_handle, x));
+                for (int x = 0, c = Count; x < c; x++)
+                {
+                    yield return NativeEngine.ConvertFromNative(NeoVM.MapStackItem_GetValue(_handle, x));
+                }
             }
         }
 
-        public override IEnumerator<KeyValuePair<IStackItem, IStackItem>> GetEnumerator()
+        public override IEnumerator<KeyValuePair<StackItemBase, StackItemBase>> GetEnumerator()
         {
             for (int x = 0, c = Count; x < c; x++)
             {
                 var key = NativeEngine.ConvertFromNative(NeoVM.MapStackItem_GetKey(_handle, x));
                 var value = NativeEngine.ConvertFromNative(NeoVM.MapStackItem_GetValue(_handle, x));
 
-                yield return new KeyValuePair<IStackItem, IStackItem>(key, value);
+                yield return new KeyValuePair<StackItemBase, StackItemBase>(key, value);
             }
         }
 

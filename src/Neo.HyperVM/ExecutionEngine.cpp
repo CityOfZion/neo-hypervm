@@ -656,7 +656,6 @@ void ExecutionEngine::InternalStepInto()
 
 		if (context != nullptr)
 		{
-			context->Claim();
 			this->InvocationStack.Drop();
 
 			int32 rvcount = context->RVCount;
@@ -669,7 +668,6 @@ void ExecutionEngine::InternalStepInto()
 			{
 				if (rvcount > 0 && context->EvaluationStack.Count() < rvcount)
 				{
-					ExecutionContext::UnclaimAndFree(context);
 					this->SetFault();
 					return;
 				}
@@ -682,8 +680,6 @@ void ExecutionEngine::InternalStepInto()
 				else
 					context->EvaluationStack.SendTo(&this->GetCurrentContext()->EvaluationStack, rvcount);
 			}
-
-			ExecutionContext::UnclaimAndFree(context);
 		}
 
 		if (this->InvocationStack.Count() == 0)

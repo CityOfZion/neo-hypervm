@@ -6,12 +6,12 @@ using NeoSharp.VM.Interop.Native;
 
 namespace NeoSharp.VM.Interop.Types.Collections
 {
-    public class StackItemStack : IStackItemsStack
+    public class StackItemStack : Stack
     {
         /// <summary>
         /// Native handle
         /// </summary>
-        private IntPtr _handle;
+        private readonly IntPtr _handle;
 
         /// <summary>
         /// Engine
@@ -24,7 +24,12 @@ namespace NeoSharp.VM.Interop.Types.Collections
         public override int Count
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return NeoVM.StackItems_Count(_handle); }
+            get
+            {
+                if (_engine.IsDisposed) throw new ObjectDisposedException(nameof(ExecutionEngine));
+
+                return NeoVM.StackItems_Count(_handle);
+            }
         }
 
         /// <summary>
@@ -32,15 +37,22 @@ namespace NeoSharp.VM.Interop.Types.Collections
         /// </summary>
         /// <param name="count">Number of items to drop</param>
         /// <returns>Return the first element of the stack</returns>
-        public override int Drop(int count = 0) => NeoVM.StackItems_Drop(_handle, count);
+        public override int Drop(int count = 0)
+        {
+            if (_engine.IsDisposed) throw new ObjectDisposedException(nameof(ExecutionEngine));
+
+            return NeoVM.StackItems_Drop(_handle, count);
+        }
 
         /// <summary>
         /// Pop object from the stack
         /// </summary>
         /// <param name="free">True for free object</param>
         /// <returns>Return the first element of the stack</returns>
-        public override IStackItem Pop()
+        public override StackItemBase Pop()
         {
+            if (_engine.IsDisposed) throw new ObjectDisposedException(nameof(ExecutionEngine));
+
             var ptr = NeoVM.StackItems_Pop(_handle);
 
             if (ptr == IntPtr.Zero) throw new IndexOutOfRangeException();
@@ -52,8 +64,10 @@ namespace NeoSharp.VM.Interop.Types.Collections
         /// Push object to the stack
         /// </summary>
         /// <param name="item">Object</param>
-        public override void Push(IStackItem item)
+        public override void Push(StackItemBase item)
         {
+            if (_engine.IsDisposed) throw new ObjectDisposedException(nameof(ExecutionEngine));
+
             NeoVM.StackItems_Push(_handle, ((INativeStackItem)item).Handle);
         }
 
@@ -64,8 +78,10 @@ namespace NeoSharp.VM.Interop.Types.Collections
         /// <param name="index">Index</param>
         /// <param name="obj">Object</param>
         /// <returns>Return tru eif object exists</returns>
-        public override bool TryPeek(int index, out IStackItem obj)
+        public override bool TryPeek(int index, out StackItemBase obj)
         {
+            if (_engine.IsDisposed) throw new ObjectDisposedException(nameof(ExecutionEngine));
+
             var ptr = NeoVM.StackItems_Peek(_handle, index);
 
             if (ptr == IntPtr.Zero)
@@ -86,6 +102,8 @@ namespace NeoSharp.VM.Interop.Types.Collections
         /// <returns>Return false if it is something wrong</returns>
         public override bool TryPop<TStackItem>(out TStackItem item)
         {
+            if (_engine.IsDisposed) throw new ObjectDisposedException(nameof(ExecutionEngine));
+
             var ptr = NeoVM.StackItems_Pop(_handle);
 
             if (ptr == IntPtr.Zero)
@@ -119,19 +137,12 @@ namespace NeoSharp.VM.Interop.Types.Collections
             _engine = engine;
 
             if (handle == IntPtr.Zero) throw new ExternalException();
+            if (_engine.IsDisposed) throw new ObjectDisposedException(nameof(ExecutionEngine));
         }
 
         /// <summary>
         /// String representation
         /// </summary>
         public override string ToString() => Count.ToString();
-
-        /// <summary>
-        /// Free resources
-        /// </summary>
-        protected override void Dispose(bool disposing)
-        {
-            _handle = IntPtr.Zero;
-        }
     }
 }

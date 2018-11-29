@@ -43,7 +43,7 @@ namespace NeoSharp.VM.Interop.Tests
                     realHash = ripe.ComputeHash(realHash);
                 }
 
-                using (var context = engine.EntryContext)
+                var context = engine.EntryContext;
                 {
                     Assert.IsTrue(context.ScriptHash.SequenceEqual(realHash));
                 }
@@ -64,7 +64,7 @@ namespace NeoSharp.VM.Interop.Tests
             {
                 engine.LoadScript(script);
 
-                using (var context = engine.CurrentContext)
+                var context = engine.CurrentContext;
                 {
                     engine.StepInto();
 
@@ -136,7 +136,7 @@ namespace NeoSharp.VM.Interop.Tests
 
             // 5 Scripts
 
-            var engines = new List<IExecutionEngine>()
+            var engines = new List<ExecutionEngineBase>()
             {
                 CreateEngine(args),
                 CreateEngine(args),
@@ -237,8 +237,8 @@ namespace NeoSharp.VM.Interop.Tests
         [TestMethod]
         public void TestFreeEngineBefore()
         {
-            IExecutionContext context;
-            IStackItem item;
+            ExecutionContextBase context;
+            StackItemBase item;
 
             using (var script = new ScriptBuilder(EVMOpCode.PUSH1))
             using (var engine = CreateEngine(null))
@@ -263,7 +263,6 @@ namespace NeoSharp.VM.Interop.Tests
             // Check
 
             item.Dispose();
-            context.Dispose();
         }
 
         /// <summary>
@@ -272,7 +271,7 @@ namespace NeoSharp.VM.Interop.Tests
         [TestMethod]
         public void TestDoubleFree()
         {
-            IExecutionContext context;
+            ExecutionContextBase context;
 
             byte[] realHash;
             using (var script = new ScriptBuilder(EVMOpCode.RET))
@@ -313,17 +312,20 @@ namespace NeoSharp.VM.Interop.Tests
                     Assert.IsTrue(ar[0] is BooleanStackItem b0 && b0.Value);
                 }
 
-                Assert.IsFalse(context.IsDisposed);
                 Assert.AreEqual(context.NextInstruction, EVMOpCode.RET);
+                Assert.IsTrue(context.ScriptHash.SequenceEqual(realHash));
             }
 
             // Check
 
-            Assert.IsFalse(context.IsDisposed);
-            Assert.AreEqual(context.NextInstruction, EVMOpCode.RET);
-            Assert.IsTrue(context.ScriptHash.SequenceEqual(realHash));
-
-            context.Dispose();
+            Assert.ThrowsException<ObjectDisposedException>(() =>
+            {
+                Assert.AreEqual(context.NextInstruction, EVMOpCode.RET);
+            });
+            Assert.ThrowsException<ObjectDisposedException>(() =>
+            {
+                Assert.IsTrue(context.ScriptHash.SequenceEqual(realHash));
+            });
         }
 
         /// <summary>
@@ -393,10 +395,10 @@ namespace NeoSharp.VM.Interop.Tests
 
                         // Create new array
 
-                        IArrayStackItem ar2;
+                        ArrayStackItemBase ar2;
 
                         {
-                            var art = new IStackItem[] { engine.CreateBool(true), engine.CreateBool(false) };
+                            var art = new StackItemBase[] { engine.CreateBool(true), engine.CreateBool(false) };
                             ar2 = engine.CreateArray(art);
                             foreach (var it in art) it.Dispose();
                         }
@@ -426,7 +428,7 @@ namespace NeoSharp.VM.Interop.Tests
                         // Add 1,2,3
 
                         {
-                            var art = new IStackItem[]
+                            var art = new StackItemBase[]
                             {
                                 engine.CreateInteger(1),
                                 engine.CreateInteger(2),
@@ -676,7 +678,7 @@ namespace NeoSharp.VM.Interop.Tests
                 // Empty stack
 
                 Assert.AreEqual(engine.ResultStack.Count, 0);
-                Assert.IsFalse(engine.ResultStack.TryPeek(0, out IStackItem obj));
+                Assert.IsFalse(engine.ResultStack.TryPeek(0, out StackItemBase obj));
 
                 // Check integer
 
@@ -726,20 +728,20 @@ namespace NeoSharp.VM.Interop.Tests
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
 
-                using (var id = engine.ResultStack.Pop<InteropStackItem>())
+                using (var id = engine.ResultStack.Pop<InteropStackItem<DisposableDummy>>())
                 {
-                    Assert.IsTrue(id != null && id.Value is DisposableDummy dd && !dd.IsDisposed);
+                    Assert.IsTrue(id != null && id.Value is DisposableDummy dd && !id.IsDisposed);
                 }
             }
         }
 
-        void CheckItem(IExecutionEngine engine, IStackItem item)
+        void CheckItem(ExecutionEngineBase engine, StackItemBase item)
         {
             int c = engine.ResultStack.Count;
             engine.ResultStack.Push(item);
             Assert.AreEqual(engine.ResultStack.Count, c + 1);
 
-            Assert.IsTrue(engine.ResultStack.TryPeek(0, out IStackItem obj));
+            Assert.IsTrue(engine.ResultStack.TryPeek(0, out StackItemBase obj));
 
             // PEEK
 

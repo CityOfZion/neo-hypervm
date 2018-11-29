@@ -97,7 +97,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                 // Check
 
-                using (var currentContext = engine.CurrentContext)
+                var currentContext = engine.CurrentContext;
                 {
                     using (var i = currentContext.EvaluationStack.Pop<IntegerStackItem>())
                     {
@@ -259,7 +259,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                 // Check
 
-                using (var currentContext = engine.CurrentContext)
+                var currentContext = engine.CurrentContext;
                 {
                     using (var i = currentContext.EvaluationStack.Pop<IntegerStackItem>())
                     {
@@ -385,7 +385,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                 // Check
 
-                using (var currentContext = engine.CurrentContext)
+                var currentContext = engine.CurrentContext;
                 {
                     using (var i = currentContext.EvaluationStack.Pop<IntegerStackItem>())
                     {
@@ -528,7 +528,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                 // Check
 
-                using (var currentContext = engine.CurrentContext)
+                var currentContext = engine.CurrentContext;
                 {
                     using (var i = currentContext.EvaluationStack.Pop<ByteArrayStackItem>())
                     {

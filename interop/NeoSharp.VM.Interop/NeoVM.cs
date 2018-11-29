@@ -69,7 +69,7 @@ namespace NeoSharp.VM.Interop
         internal delegate int delInt_Handle(IntPtr pointer);
         internal delegate void delVoid_Handle(IntPtr pointer);
         internal delegate byte delByte_Handle(IntPtr pointer);
-        internal delegate uint delUInt32_Handle(IntPtr pointer);
+        internal delegate ulong delUInt64_Handle(IntPtr pointer);
         internal delegate IntPtr delHandle_Handle(IntPtr pointer);
         internal delegate void delVoid_RefHandle(ref IntPtr pointer);
 
@@ -77,11 +77,11 @@ namespace NeoSharp.VM.Interop
 
         internal delegate int delInt_HandleInt(IntPtr pointer, int value);
         internal delegate void delVoid_HandleUInt(IntPtr pointer, uint value);
+        internal delegate byte delByte_HandleInt64(IntPtr pointer, long value);
         internal delegate void delVoid_HandleInt(IntPtr pointer, int value);
         internal delegate int delInt_HandleHandle(IntPtr handle, IntPtr item);
         internal delegate byte delByte_HandleRefInt(IntPtr item, out int size);
         internal delegate IntPtr delHandle_HandleInt(IntPtr pointer, int value);
-        internal delegate byte delByte_HandleUInt32(IntPtr pointer, uint value);
         internal delegate byte delByte_HandleUInt64(IntPtr pointer, ulong value);
         internal delegate void delVoid_HandleHandle(IntPtr pointer1, IntPtr pointer2);
         internal delegate byte delByte_HandleHandle(IntPtr pointer1, IntPtr pointer2);
@@ -120,14 +120,14 @@ namespace NeoSharp.VM.Interop
         internal static delVoid_RefHandle ExecutionEngine_Free;
         internal static delInt_HandleHandleIntInt ExecutionEngine_LoadScript;
         internal static delByte_HandleIntInt ExecutionEngine_LoadCachedScript;
-        internal static delByte_HandleUInt32 ExecutionEngine_Execute;
+        internal static delByte_HandleUInt64 ExecutionEngine_Execute;
         internal static delVoid_Handle ExecutionEngine_StepInto;
         internal static delVoid_Handle ExecutionEngine_StepOver;
         internal static delVoid_Handle ExecutionEngine_StepOut;
         internal static delByte_Handle ExecutionEngine_GetState;
-        internal static delUInt32_Handle ExecutionEngine_GetConsumedGas;
+        internal static delUInt64_Handle ExecutionEngine_GetConsumedGas;
         internal static delVoid_HandleUInt ExecutionEngine_Clean;
-        internal static delByte_HandleUInt32 ExecutionEngine_IncreaseGas;
+        internal static delByte_HandleUInt64 ExecutionEngine_IncreaseGas;
         internal static delVoid_HandleOnStepIntoCallback ExecutionEngine_AddLog;
 
         internal static delInt_Handle StackItems_Count;
@@ -166,7 +166,6 @@ namespace NeoSharp.VM.Interop
         internal static delInt_HandleHandleInt ExecutionContext_GetScriptHash;
         internal static delByte_Handle ExecutionContext_GetNextInstruction;
         internal static delInt_Handle ExecutionContext_GetInstructionPointer;
-        internal static delVoid_RefHandle ExecutionContext_Free;
         internal static delExecutionContextClaim ExecutionContext_Claim;
 
 #pragma warning restore CS0649
@@ -308,7 +307,7 @@ namespace NeoSharp.VM.Interop
         /// Create new Execution Engine
         /// </summary>
         /// <param name="e">Arguments</param>
-        public IExecutionEngine Create(ExecutionEngineArgs e)
+        public ExecutionEngineBase Create(ExecutionEngineArgs e)
         {
             return new ExecutionEngine(e);
         }

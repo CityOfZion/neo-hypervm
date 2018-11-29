@@ -4,12 +4,12 @@ using System.Runtime.InteropServices;
 
 namespace NeoSharp.VM.Interop.Types.Collections
 {
-    public class ExecutionContextStack : IStack<IExecutionContext>
+    public class ExecutionContextStack : StackBase<ExecutionContextBase>
     {
         /// <summary>
         /// Native handle
         /// </summary>
-        private IntPtr _handle;
+        private readonly IntPtr _handle;
 
         /// <summary>
         /// Engine
@@ -22,7 +22,12 @@ namespace NeoSharp.VM.Interop.Types.Collections
         public override int Count
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return NeoVM.ExecutionContextStack_Count(_handle); }
+            get
+            {
+                if (_engine.IsDisposed) throw new ObjectDisposedException(nameof(ExecutionEngine));
+
+                return NeoVM.ExecutionContextStack_Count(_handle);
+            }
         }
 
         /// <summary>
@@ -32,13 +37,15 @@ namespace NeoSharp.VM.Interop.Types.Collections
         /// <returns>Return the first element of the stack</returns>
         public override int Drop(int count = 0)
         {
+            if (_engine.IsDisposed) throw new ObjectDisposedException(nameof(ExecutionEngine));
+
             return NeoVM.ExecutionContextStack_Drop(_handle, count);
         }
 
         #region Not implemented
 
-        public override IExecutionContext Pop() => throw new NotImplementedException();
-        public override void Push(IExecutionContext item) => throw new NotImplementedException();
+        public override ExecutionContextBase Pop() => throw new NotImplementedException();
+        public override void Push(ExecutionContextBase item) => throw new NotImplementedException();
 
         #endregion
 
@@ -49,8 +56,10 @@ namespace NeoSharp.VM.Interop.Types.Collections
         /// <param name="index">Index</param>
         /// <param name="obj">Object</param>
         /// <returns>Return tru eif object exists</returns>
-        public override bool TryPeek(int index, out IExecutionContext obj)
+        public override bool TryPeek(int index, out ExecutionContextBase obj)
         {
+            if (_engine.IsDisposed) throw new ObjectDisposedException(nameof(ExecutionEngine));
+
             var ptr = NeoVM.ExecutionContextStack_Peek(_handle, index);
 
             if (ptr == IntPtr.Zero)
@@ -74,19 +83,12 @@ namespace NeoSharp.VM.Interop.Types.Collections
             _handle = handle;
 
             if (handle == IntPtr.Zero) throw new ExternalException();
+            if (_engine.IsDisposed) throw new ObjectDisposedException(nameof(ExecutionEngine));
         }
 
         /// <summary>
         /// String representation
         /// </summary>
         public override string ToString() => Count.ToString();
-
-        /// <summary>
-        /// Free resources
-        /// </summary>
-        protected override void Dispose(bool disposing)
-        {
-            _handle = IntPtr.Zero;
-        }
     }
 }

@@ -192,21 +192,3 @@ int32 ExecutionContext::Read(byte* data, int32 length)
 		return read;
 	}
 }
-
-void ExecutionContext::Free(ExecutionContext* &item)
-{
-	if (item != nullptr && item->IsUnClaimed())
-	{
-		delete(item);
-		item = nullptr;
-	}
-}
-
-void ExecutionContext::UnclaimAndFree(ExecutionContext* &item)
-{
-	if (item != nullptr && item->UnClaim())
-	{
-		delete(item);
-		item = nullptr;
-	}
-}

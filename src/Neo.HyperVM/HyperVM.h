@@ -26,7 +26,6 @@ extern "C"
 	DllExport EVMOpCode __stdcall ExecutionContext_GetNextInstruction(ExecutionContext* context);
 	DllExport int32 __stdcall ExecutionContext_GetInstructionPointer(ExecutionContext* context);
 	DllExport void __stdcall ExecutionContext_Claim(ExecutionContext* context, StackItems* &evStack, StackItems* &altStack);
-	DllExport void __stdcall ExecutionContext_Free(ExecutionContext* &context);
 
 	// ExecutionEngine
 
@@ -40,12 +39,12 @@ extern "C"
 	DllExport int32 __stdcall ExecutionEngine_LoadScript(ExecutionEngine* engine, byte* script, int32 scriptLength, int32 rvcount);
 	DllExport byte __stdcall ExecutionEngine_LoadCachedScript(ExecutionEngine* engine, int32 scriptIndex, int32 rvcount);
 	DllExport byte __stdcall ExecutionEngine_Execute(ExecutionEngine* engine, uint32 gas);
-	DllExport byte __stdcall ExecutionEngine_IncreaseGas(ExecutionEngine* engine, uint32 gas);
+	DllExport byte __stdcall ExecutionEngine_IncreaseGas(ExecutionEngine* engine, uint64 gas);
 	DllExport void __stdcall ExecutionEngine_StepInto(ExecutionEngine* engine);
 	DllExport void __stdcall ExecutionEngine_StepOver(ExecutionEngine* engine);
 	DllExport void __stdcall ExecutionEngine_StepOut(ExecutionEngine* engine);
 	DllExport byte __stdcall ExecutionEngine_GetState(ExecutionEngine* engine);
-	DllExport uint32 __stdcall ExecutionEngine_GetConsumedGas(ExecutionEngine* engine);
+	DllExport uint64 __stdcall ExecutionEngine_GetConsumedGas(ExecutionEngine* engine);
 	DllExport void __stdcall ExecutionEngine_AddLog(ExecutionEngine* engine, OnStepIntoCallback callback);
 
 	// StackItems

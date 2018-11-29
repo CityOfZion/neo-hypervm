@@ -26,9 +26,11 @@ namespace NeoSharp.VM.Interop.Tests
 
                 // Execute
 
+                ExecutionContextBase currentContext;
+
                 for (int x = 0; x < 5; x++)
                 {
-                    using (var currentContext = engine.CurrentContext)
+                    currentContext = engine.CurrentContext;
                     {
                         Assert.AreEqual(EVMOpCode.NOP, currentContext.NextInstruction);
                     }
@@ -37,7 +39,7 @@ namespace NeoSharp.VM.Interop.Tests
                     Assert.AreEqual(EVMState.None, engine.State);
                 }
 
-                using (var currentContext = engine.CurrentContext)
+                currentContext = engine.CurrentContext;
                 {
                     Assert.AreEqual(EVMOpCode.RET, currentContext.NextInstruction);
                 }
@@ -176,7 +178,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                 Assert.AreEqual(engine.InvocationStack.Count, 1);
 
-                using (var currentContext = engine.CurrentContext)
+                var currentContext = engine.CurrentContext;
                 using (var it = currentContext.EvaluationStack.Pop<IntegerStackItem>())
                 {
                     Assert.AreEqual(it.Value, 1);
@@ -207,7 +209,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                 Assert.AreEqual(engine.InvocationStack.Count, 1);
 
-                using (var currentContext = engine.CurrentContext)
+                var currentContext = engine.CurrentContext;
                 using (var it = currentContext.EvaluationStack.Pop<IntegerStackItem>())
                 {
                     Assert.AreEqual(it.Value, 1);
@@ -238,7 +240,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                 Assert.AreEqual(engine.InvocationStack.Count, 1);
 
-                using (var currentContext = engine.CurrentContext)
+                var currentContext = engine.CurrentContext;
                 using (var it = currentContext.EvaluationStack.Pop<IntegerStackItem>())
                 {
                     Assert.AreEqual(it.Value, 1);
@@ -529,7 +531,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                 // Execute
 
-                using (var currentContext = engine.CurrentContext)
+                var currentContext = engine.CurrentContext;
                 {
                     Assert.AreEqual(EVMOpCode.RET, currentContext.NextInstruction);
                 }
@@ -694,7 +696,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                     // Check
 
-                    using (var currentContext = engine.CurrentContext)
+                    var currentContext = engine.CurrentContext;
                     using (var it = currentContext.EvaluationStack.Pop<ByteArrayStackItem>())
                     {
                         Assert.IsTrue(it.Value.SequenceEqual
@@ -1225,7 +1227,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                 engine.StepInto();
 
-                using (var currentContext = engine.CurrentContext)
+                var currentContext = engine.CurrentContext;
                 {
                     Assert.AreEqual(0, currentContext.AltStack.Count);
                     Assert.AreEqual(1, currentContext.EvaluationStack.Count);
@@ -1237,7 +1239,7 @@ namespace NeoSharp.VM.Interop.Tests
                     // APP CALL
 
                     engine.StepInto();
-                    using (var currentContext = engine.CurrentContext)
+                    currentContext = engine.CurrentContext;
                     {
                         Assert.AreEqual(0, currentContext.AltStack.Count);
                         Assert.AreEqual(0, currentContext.EvaluationStack.Count);
@@ -1247,7 +1249,7 @@ namespace NeoSharp.VM.Interop.Tests
                     // PUSH 0x05
 
                     engine.StepInto();
-                    using (var currentContext = engine.CurrentContext)
+                    currentContext = engine.CurrentContext;
                     {
                         Assert.AreEqual(0, currentContext.AltStack.Count);
                         Assert.AreEqual(1, currentContext.EvaluationStack.Count);
@@ -1257,7 +1259,7 @@ namespace NeoSharp.VM.Interop.Tests
                     // RET 1
 
                     engine.StepInto();
-                    using (var currentContext = engine.CurrentContext)
+                    currentContext = engine.CurrentContext;
                     {
                         Assert.AreEqual(0, currentContext.AltStack.Count);
                         Assert.AreEqual(1, currentContext.EvaluationStack.Count);
@@ -1275,7 +1277,7 @@ namespace NeoSharp.VM.Interop.Tests
                     // TAIL CALL
 
                     engine.StepInto();
-                    using (var currentContext = engine.CurrentContext)
+                    currentContext = engine.CurrentContext;
                     {
                         Assert.AreEqual(0, currentContext.AltStack.Count);
                         Assert.AreEqual(0, currentContext.EvaluationStack.Count);
@@ -1285,7 +1287,7 @@ namespace NeoSharp.VM.Interop.Tests
                     // PUSH 0x05
 
                     engine.StepInto();
-                    using (var currentContext = engine.CurrentContext)
+                    currentContext = engine.CurrentContext;
                     {
                         Assert.AreEqual(0, currentContext.AltStack.Count);
                         Assert.AreEqual(1, currentContext.EvaluationStack.Count);
@@ -1338,7 +1340,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                     // Check
 
-                    using (var it = engine.ResultStack.Pop<InteropStackItem>())
+                    using (var it = engine.ResultStack.Pop<InteropStackItem<IMessageProvider>>())
                     {
                         Assert.AreEqual(it.Value, Args.MessageProvider);
                     }
