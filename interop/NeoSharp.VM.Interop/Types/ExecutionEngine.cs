@@ -367,7 +367,6 @@ namespace NeoSharp.VM.Interop.Types
                 _interopCache.Add(new InteropCacheEntry()
                 {
                     Value = obj,
-                    StackItemType = typeof(InteropStackItem<T>),
                     Instanciator = (engine, ptr, key, value) =>
                         new InteropStackItem<T>(engine, ptr, key, (T)value)
                 });
