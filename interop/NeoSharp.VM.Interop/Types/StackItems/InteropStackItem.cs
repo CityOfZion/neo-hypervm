@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace NeoSharp.VM.Interop.Types.StackItems
 {
-    public class InteropStackItem : IInteropStackItem, INativeStackItem
+    public class InteropStackItem<T> : InteropStackItemBase<T>, INativeStackItem where T : class
     {
         #region Private fields
 
@@ -71,7 +71,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <param name="engine">Engine</param>
         /// <param name="data">Data</param>
         /// <param name="objKey">Object key</param>
-        internal InteropStackItem(ExecutionEngine engine, object data, int objKey) : base(data)
+        internal InteropStackItem(ExecutionEngine engine, T data, int objKey) : base(data)
         {
             NativeEngine = engine;
 
@@ -90,8 +90,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <param name="engine">Engine</param>
         /// <param name="handle">Handle</param>
         /// <param name="objKey">Object key</param>
-        internal InteropStackItem(ExecutionEngine engine, IntPtr handle, int objKey) :
-            base(engine.GetInteropObject(objKey))
+        internal InteropStackItem(ExecutionEngine engine, IntPtr handle, int objKey, T obj) : base(obj)
         {
             NativeEngine = engine;
             _objKey = objKey;

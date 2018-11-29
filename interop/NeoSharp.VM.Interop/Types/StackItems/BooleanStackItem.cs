@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace NeoSharp.VM.Interop.Types.StackItems
 {
-    public class BooleanStackItem : IBooleanStackItem, INativeStackItem
+    public class BooleanStackItem : BooleanStackItemBase, INativeStackItem
     {
         #region Private fields
 
@@ -29,6 +29,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get;
+
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private set;
         }
@@ -89,7 +90,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public byte[] GetNativeByteArray() => Value ? TRUE : FALSE_0;
+        public byte[] GetNativeByteArray() => Value ? True : FALSE_0;
 
         #region IDisposable Support
 

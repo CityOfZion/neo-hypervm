@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 using NeoSharp.VM.Extensions;
-using NeoSharp.VM.Interop.Tests.Helpers;
 using NeoSharp.VM.Interop.Types.StackItems;
 
 namespace NeoSharp.VM.Interop.Tests.Extra
@@ -20,7 +19,7 @@ namespace NeoSharp.VM.Interop.Tests.Extra
         /// </summary>
         public DummyInteropService() : base()
         {
-            Register("Test", TestMethod);
+            Register("UT.Test", TestMethod);
 
             // Fake storages
 
@@ -38,13 +37,13 @@ namespace NeoSharp.VM.Interop.Tests.Extra
             //Register("Neo.Iterator.Value", Iterator_Value);
         }
 
-        private bool Runtime_Serialize(IExecutionEngine engine)
+        private bool Runtime_Serialize(ExecutionEngineBase engine)
         {
-            using (var context = engine.CurrentContext)
+            var context = engine.CurrentContext;
             {
                 if (context == null) return false;
 
-                if (!context.EvaluationStack.TryPop(out IStackItem it))
+                if (!context.EvaluationStack.TryPop(out StackItemBase it))
                     return false;
 
                 using (it)
@@ -72,13 +71,13 @@ namespace NeoSharp.VM.Interop.Tests.Extra
             return true;
         }
 
-        private bool Runtime_Deserialize(IExecutionEngine engine)
+        private bool Runtime_Deserialize(ExecutionEngineBase engine)
         {
-            using (var context = engine.CurrentContext)
+            var context = engine.CurrentContext;
             {
                 if (context == null) return false;
 
-                if (!context.EvaluationStack.TryPop(out IStackItem it))
+                if (!context.EvaluationStack.TryPop(out StackItemBase it))
                     return false;
 
                 var data = it.ToByteArray();
@@ -87,7 +86,7 @@ namespace NeoSharp.VM.Interop.Tests.Extra
                 using (MemoryStream ms = new MemoryStream(data, false))
                 using (BinaryReader reader = new BinaryReader(ms))
                 {
-                    IStackItem item = null;
+                    StackItemBase item = null;
 
                     try
                     {
@@ -107,7 +106,7 @@ namespace NeoSharp.VM.Interop.Tests.Extra
             return true;
         }
 
-        private IStackItem DeserializeStackItem(IExecutionEngine engine, BinaryReader reader)
+        private StackItemBase DeserializeStackItem(ExecutionEngineBase engine, BinaryReader reader)
         {
             EStackItemType type = (EStackItemType)reader.ReadByte();
 
@@ -122,7 +121,7 @@ namespace NeoSharp.VM.Interop.Tests.Extra
                 case EStackItemType.Array:
                 case EStackItemType.Struct:
                     {
-                        IArrayStackItem array;
+                        ArrayStackItemBase array;
 
                         if (type == EStackItemType.Struct)
                             array = engine.CreateStruct();
@@ -137,13 +136,13 @@ namespace NeoSharp.VM.Interop.Tests.Extra
                     }
                 case EStackItemType.Map:
                     {
-                        IMapStackItem map = engine.CreateMap();
+                        var map = engine.CreateMap();
 
                         ulong count = reader.ReadVarInt();
                         while (count-- > 0)
                         {
-                            IStackItem key = DeserializeStackItem(engine, reader);
-                            IStackItem value = DeserializeStackItem(engine, reader);
+                            StackItemBase key = DeserializeStackItem(engine, reader);
+                            StackItemBase value = DeserializeStackItem(engine, reader);
 
                             map[key] = value;
 
@@ -157,7 +156,7 @@ namespace NeoSharp.VM.Interop.Tests.Extra
             }
         }
 
-        private void SerializeStackItem(IStackItem item, BinaryWriter writer)
+        private void SerializeStackItem(StackItemBase item, BinaryWriter writer)
         {
             switch (item)
             {
@@ -179,7 +178,6 @@ namespace NeoSharp.VM.Interop.Tests.Extra
                         writer.WriteVarBytes(item.ToByteArray());
                         break;
                     }
-                case InteropStackItem _: throw new NotSupportedException();
                 case ArrayStackItem array:
                     {
                         if (array.IsStruct)
@@ -189,7 +187,7 @@ namespace NeoSharp.VM.Interop.Tests.Extra
 
                         writer.WriteVarInt(array.Count);
 
-                        foreach (IStackItem subitem in array)
+                        foreach (StackItemBase subitem in array)
                         {
                             SerializeStackItem(subitem, writer);
                         }
@@ -209,23 +207,24 @@ namespace NeoSharp.VM.Interop.Tests.Extra
 
                         break;
                     }
+                default: throw new NotSupportedException();
             }
         }
 
-        bool CheckWitness(IExecutionEngine engine)
+        bool CheckWitness(ExecutionEngineBase engine)
         {
             // Fake CheckWitness
 
-            using (var context = engine.CurrentContext)
+            var context = engine.CurrentContext;
             {
                 if (context == null) return false;
 
-                if (!context.EvaluationStack.TryPop(out IStackItem it))
+                if (!context.EvaluationStack.TryPop(out StackItemBase it))
                     return false;
 
                 using (it)
                 {
-                    if (!it.CanConvertToByteArray) return false;
+                    if (it.ToByteArray() == null) return false;
 
                     using (var itb = engine.CreateBool(true))
                         context.EvaluationStack.Push(itb);
@@ -235,9 +234,9 @@ namespace NeoSharp.VM.Interop.Tests.Extra
             return true;
         }
 
-        bool Storage_GetContext(IExecutionEngine engine)
+        bool Storage_GetContext(ExecutionEngineBase engine)
         {
-            using (var context = engine.CurrentContext)
+            var context = engine.CurrentContext;
             {
                 if (context == null) return false;
 
@@ -255,27 +254,26 @@ namespace NeoSharp.VM.Interop.Tests.Extra
             return true;
         }
 
-        bool Storage_Get(IExecutionEngine engine)
+        bool Storage_Get(ExecutionEngineBase engine)
         {
-            using (var context = engine.CurrentContext)
+            var context = engine.CurrentContext;
             {
                 if (context == null) return false;
 
-                if (!context.EvaluationStack.TryPop(out InteropStackItem inter))
+                if (!context.EvaluationStack.TryPop(out InteropStackItemBase<DummyStorageContext> inter))
                     return false;
 
                 using (inter)
                 {
                     if (!(inter.Value is DummyStorageContext stContext)) return false;
 
-                    if (!context.EvaluationStack.TryPop(out IStackItem it))
+                    if (!context.EvaluationStack.TryPop(out StackItemBase it))
                         return false;
 
                     using (it)
                     {
-                        if (!it.CanConvertToByteArray) return false;
-
                         var key = it.ToByteArray();
+                        if (key == null) return false;
 
                         if (stContext.Storage.TryGetValue(key.ToHexString(), out byte[] value))
                         {
@@ -294,13 +292,13 @@ namespace NeoSharp.VM.Interop.Tests.Extra
             return true;
         }
 
-        bool Storage_Delete(IExecutionEngine engine)
+        bool Storage_Delete(ExecutionEngineBase engine)
         {
-            using (var context = engine.CurrentContext)
+            var context = engine.CurrentContext;
             {
                 if (context == null) return false;
 
-                if (!context.EvaluationStack.TryPop(out InteropStackItem inter))
+                if (!context.EvaluationStack.TryPop(out InteropStackItemBase<DummyStorageContext> inter))
                     return false;
 
                 using (inter)
@@ -308,13 +306,14 @@ namespace NeoSharp.VM.Interop.Tests.Extra
                     if (!(inter.Value is DummyStorageContext stContext))
                         return false;
 
-                    if (!context.EvaluationStack.TryPop(out IStackItem it))
+                    if (!context.EvaluationStack.TryPop(out StackItemBase it))
                         return false;
 
                     using (it)
                     {
-                        if (!it.CanConvertToByteArray) return false;
                         var key = it.ToByteArray();
+
+                        if (key == null) return false;
                         stContext.Storage.Remove(key.ToHexString());
                     }
                 }
@@ -323,13 +322,13 @@ namespace NeoSharp.VM.Interop.Tests.Extra
             return true;
         }
 
-        bool Storage_Put(IExecutionEngine engine)
+        bool Storage_Put(ExecutionEngineBase engine)
         {
-            using (var context = engine.CurrentContext)
+            var context = engine.CurrentContext;
             {
                 if (context == null) return false;
 
-                if (!context.EvaluationStack.TryPop(out InteropStackItem inter))
+                if (!context.EvaluationStack.TryPop(out InteropStackItemBase<DummyStorageContext> inter))
                     return false;
 
                 using (inter)
@@ -337,15 +336,15 @@ namespace NeoSharp.VM.Interop.Tests.Extra
                     if (!(inter.Value is DummyStorageContext stContext))
                         return false;
 
-                    if (!context.EvaluationStack.TryPop(out IStackItem it))
+                    if (!context.EvaluationStack.TryPop(out StackItemBase it))
                         return false;
 
                     byte[] key;
                     using (it)
                     {
-                        if (!it.CanConvertToByteArray) return false;
-
                         key = it.ToByteArray();
+
+                        if (key == null) return false;
                         if (key.Length > 1024) return false;
                     }
 
@@ -355,9 +354,9 @@ namespace NeoSharp.VM.Interop.Tests.Extra
                     byte[] value;
                     using (it)
                     {
-                        if (!it.CanConvertToByteArray) return false;
-
                         value = it.ToByteArray();
+
+                        if (value == null) return false;
                     }
 
                     stContext.Storage[key.ToHexString()] = value;
@@ -367,9 +366,9 @@ namespace NeoSharp.VM.Interop.Tests.Extra
             return true;
         }
 
-        bool TestMethod(IExecutionEngine engine)
+        bool TestMethod(ExecutionEngineBase engine)
         {
-            using (var context = engine.CurrentContext)
+            var context = engine.CurrentContext;
             {
                 if (context == null) return false;
 

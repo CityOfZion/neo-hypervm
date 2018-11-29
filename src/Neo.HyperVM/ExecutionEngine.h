@@ -22,8 +22,8 @@ private:
 	// Used for MessageCallback
 
 	uint32 _iteration;
-	uint32 _consumedGas;
-	uint32 _maxGas;
+	uint64 _consumedGas;
+	uint64 _maxGas;
 	IStackItemCounter *_counter;
 
 	// Save the state of the execution
@@ -77,7 +77,7 @@ public:
 		return true;
 	}
 
-	inline bool AddGasCost(uint32 cost)
+	inline bool AddGasCost(uint64 cost)
 	{
 		if ((this->_consumedGas += cost) > this->_maxGas)
 		{
@@ -110,7 +110,7 @@ public:
 		return this->InvocationStack.Peek(-1);
 	}
 
-	inline uint32 GetConsumedGas() const
+	inline uint64 GetConsumedGas() const
 	{
 		return this->_consumedGas;
 	}

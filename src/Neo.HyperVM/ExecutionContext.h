@@ -6,7 +6,7 @@
 #include "StackItems.h"
 #include "ExecutionScript.h"
 
-class ExecutionContext :public IClaimable
+class ExecutionContext
 {
 private:
 
@@ -16,6 +16,7 @@ private:
 	byte _buffer[8];
 
 	const int32 _scriptLength;
+	bool _isGarbageCollected;
 
 public:
 
@@ -113,7 +114,6 @@ public:
 	// Constructor
 
 	inline ExecutionContext(std::shared_ptr<ExecutionScript> script, int32 instructorPointer, int32 rvcount) :
-		IClaimable(),
 		_script(script),
 		_instructionIndex(instructorPointer),
 		_instructionPointer(&script->Content[instructorPointer]),
@@ -121,21 +121,28 @@ public:
 		_scriptLength(script->ScriptLength),
 		RVCount(rvcount),
 		AltStack(),
-		EvaluationStack()
+		EvaluationStack(),
+		_isGarbageCollected(false)
 	{
 		
 	}
 
 	// Destructor
 
+	inline bool Collect()
+	{
+		if (this->_isGarbageCollected)
+		{
+			return false;
+		}
+
+		this->_isGarbageCollected = true;
+		return true;
+	}
+
 	inline ~ExecutionContext()
 	{
 		this->EvaluationStack.Clear();
 		this->AltStack.Clear();
 	}
-
-	// Claims
-
-	static void Free(ExecutionContext* &item);
-	static void UnclaimAndFree(ExecutionContext* &item);
 };

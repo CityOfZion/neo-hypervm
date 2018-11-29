@@ -32,7 +32,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                 Assert.AreEqual(engine.InvocationStack.Count, 1);
 
-                using (var currentContext = engine.CurrentContext)
+                var currentContext = engine.CurrentContext;
                 using (var it = currentContext.EvaluationStack.Pop<IntegerStackItem>())
                 {
                     Assert.AreEqual(11, it.Value);
@@ -63,7 +63,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                 Assert.AreEqual(engine.InvocationStack.Count, 1);
 
-                using (var currentContext = engine.CurrentContext)
+                var currentContext = engine.CurrentContext;
                 using (var it = currentContext.EvaluationStack.Pop<IntegerStackItem>())
                 {
                     Assert.AreEqual(4, it.Value);
@@ -149,7 +149,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                 Assert.AreEqual(engine.InvocationStack.Count, 1);
 
-                using (var currentContext = engine.CurrentContext)
+                var currentContext = engine.CurrentContext;
                 using (var it = currentContext.EvaluationStack.Pop<IntegerStackItem>())
                 {
                     Assert.AreEqual(11, it.Value);
@@ -180,7 +180,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                 Assert.AreEqual(engine.InvocationStack.Count, 1);
 
-                using (var currentContext = engine.CurrentContext)
+                var currentContext = engine.CurrentContext;
                 using (var it = currentContext.EvaluationStack.Pop<IntegerStackItem>())
                 {
                     Assert.AreEqual(4, it.Value);
@@ -349,7 +349,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                 Assert.AreEqual(engine.InvocationStack.Count, 1);
 
-                using (var currentContext = engine.CurrentContext)
+                var currentContext = engine.CurrentContext;
                 {
                     using (var it = currentContext.EvaluationStack.Pop<IntegerStackItem>())
                     {
@@ -388,7 +388,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                 Assert.AreEqual(engine.InvocationStack.Count, 1);
 
-                using (var currentContext = engine.CurrentContext)
+                var currentContext = engine.CurrentContext;
                 {
                     using (var it = currentContext.EvaluationStack.Pop<IntegerStackItem>())
                     {
@@ -427,7 +427,7 @@ namespace NeoSharp.VM.Interop.Tests
 
                 Assert.AreEqual(engine.InvocationStack.Count, 1);
 
-                using (var currentContext = engine.CurrentContext)
+                var currentContext = engine.CurrentContext;
                 using (var it = currentContext.EvaluationStack.Pop<IntegerStackItem>())
                 {
                     Assert.AreEqual(1, it.Value);

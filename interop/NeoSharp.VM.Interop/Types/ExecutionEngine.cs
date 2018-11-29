@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using NeoSharp.VM.Interop.Types.Collections;
 using NeoSharp.VM.Interop.Types.StackItems;
 
 namespace NeoSharp.VM.Interop.Types
 {
-    public unsafe class ExecutionEngine : IExecutionEngine
+    public unsafe class ExecutionEngine : ExecutionEngineBase
     {
         #region Private fields
 
@@ -34,17 +33,18 @@ namespace NeoSharp.VM.Interop.Types
         /// <summary>
         /// Result stack
         /// </summary>
-        private readonly IStackItemsStack _resultStack;
+        private readonly Stack _resultStack;
 
         /// <summary>
         /// Invocation stack
         /// </summary>
-        private readonly IStack<IExecutionContext> _invocationStack;
+        private readonly StackBase<ExecutionContextBase> _invocationStack;
 
         /// <summary>
         /// Interop Cache
         /// </summary>
-        private readonly List<object> _interopCache;
+        private readonly List<InteropCacheEntry> _interopCache;
+        private readonly List<object> _interopCacheIndex;
 
         #endregion
 
@@ -53,56 +53,32 @@ namespace NeoSharp.VM.Interop.Types
         /// <summary>
         /// Native handle
         /// </summary>
-        public IntPtr Handle
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return _handle; }
-        }
+        public IntPtr Handle => _handle;
 
         /// <summary>
         /// Is Disposed
         /// </summary>
-        public override bool IsDisposed
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return _handle == IntPtr.Zero; }
-        }
+        public override bool IsDisposed => _handle == IntPtr.Zero;
 
         /// <summary>
         /// Invocation Stack
         /// </summary>
-        public override IStack<IExecutionContext> InvocationStack
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return _invocationStack; }
-        }
+        public override StackBase<ExecutionContextBase> InvocationStack => _invocationStack;
 
         /// <summary>
         /// Result Stack
         /// </summary>
-        public override IStackItemsStack ResultStack
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return _resultStack; }
-        }
+        public override Stack ResultStack => _resultStack;
 
         /// <summary>
         /// Virtual Machine State
         /// </summary>
-        public override EVMState State
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return (EVMState)NeoVM.ExecutionEngine_GetState(_handle); }
-        }
+        public override EVMState State => (EVMState)NeoVM.ExecutionEngine_GetState(_handle);
 
         /// <summary>
         /// Consumed Gas
         /// </summary>
-        public override uint ConsumedGas
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return NeoVM.ExecutionEngine_GetConsumedGas(_handle); }
-        }
+        public override ulong ConsumedGas => NeoVM.ExecutionEngine_GetConsumedGas(_handle);
 
         #endregion
 
@@ -112,7 +88,8 @@ namespace NeoSharp.VM.Interop.Types
         /// <param name="e">Arguments</param>
         public ExecutionEngine(ExecutionEngineArgs e) : base(e)
         {
-            _interopCache = new List<object>();
+            _interopCache = new List<InteropCacheEntry>();
+            _interopCacheIndex = new List<object>();
 
             _internalInvokeInterop = new NeoVM.InvokeInteropCallback(InternalInvokeInterop);
             _internalLoadScript = new NeoVM.LoadScriptCallback(InternalLoadScript);
@@ -144,7 +121,7 @@ namespace NeoSharp.VM.Interop.Types
         /// </summary>
         /// <param name="objKey">Object key</param>
         /// <returns>Object</returns>
-        internal object GetInteropObject(int objKey)
+        internal InteropCacheEntry GetInteropObject(int objKey)
         {
             return _interopCache[objKey];
         }
@@ -155,10 +132,7 @@ namespace NeoSharp.VM.Interop.Types
         /// <param name="it">Context</param>
         void InternalOnStepInto(IntPtr it)
         {
-            using (var context = new ExecutionContext(this, it))
-            {
-                Logger.RaiseOnStepInto(context);
-            }
+            Logger.RaiseOnStepInto(new ExecutionContext(this, it));
         }
 
         /// <summary>
@@ -235,7 +209,8 @@ namespace NeoSharp.VM.Interop.Types
                 return NeoVM.FALSE;
             }
 
-            var method = Marshal.PtrToStringUTF8(ptr, size);
+            var method = new byte[size];
+            Marshal.Copy(ptr, method, 0, size);
 
             try
             {
@@ -285,7 +260,7 @@ namespace NeoSharp.VM.Interop.Types
         /// Increase gas
         /// </summary>
         /// <param name="gas">Gas</param>
-        public override bool IncreaseGas(uint gas)
+        public override bool IncreaseGas(ulong gas)
         {
             return NeoVM.ExecutionEngine_IncreaseGas(_handle, gas) == 0x01;
         }
@@ -303,7 +278,7 @@ namespace NeoSharp.VM.Interop.Types
         /// Execute until
         /// </summary>
         /// <param name="gas">Gas</param>
-        public override bool Execute(uint gas = uint.MaxValue)
+        public override bool Execute(ulong gas = uint.MaxValue)
         {
             // HALT=TRUE
 
@@ -345,7 +320,7 @@ namespace NeoSharp.VM.Interop.Types
         /// <summary>
         /// Create Map StackItem
         /// </summary>
-        public override IMapStackItem CreateMap()
+        public override MapStackItemBase CreateMap()
         {
             return new MapStackItem(this);
         }
@@ -354,7 +329,7 @@ namespace NeoSharp.VM.Interop.Types
         /// Create Array StackItem
         /// </summary>
         /// <param name="items">Items</param>
-        public override IArrayStackItem CreateArray(IEnumerable<IStackItem> items = null)
+        public override ArrayStackItemBase CreateArray(IEnumerable<StackItemBase> items = null)
         {
             return new ArrayStackItem(this, items, false);
         }
@@ -363,7 +338,7 @@ namespace NeoSharp.VM.Interop.Types
         /// Create Struct StackItem
         /// </summary>
         /// <param name="items">Items</param>
-        public override IArrayStackItem CreateStruct(IEnumerable<IStackItem> items = null)
+        public override ArrayStackItemBase CreateStruct(IEnumerable<StackItemBase> items = null)
         {
             return new ArrayStackItem(this, items, true);
         }
@@ -372,7 +347,7 @@ namespace NeoSharp.VM.Interop.Types
         /// Create ByteArrayStackItem
         /// </summary>
         /// <param name="data">Buffer</param>
-        public override IByteArrayStackItem CreateByteArray(byte[] data)
+        public override ByteArrayStackItemBase CreateByteArray(byte[] data)
         {
             return new ByteArrayStackItem(this, data);
         }
@@ -381,26 +356,33 @@ namespace NeoSharp.VM.Interop.Types
         /// Create InteropStackItem
         /// </summary>
         /// <param name="obj">Object</param>
-        public override IInteropStackItem CreateInterop(object obj)
+        public override InteropStackItemBase<T> CreateInterop<T>(T obj)
         {
-            var objKey = _interopCache.IndexOf(obj);
-
-            // New
+            var objKey = _interopCacheIndex.IndexOf(obj);
 
             if (objKey == -1)
             {
                 objKey = _interopCache.Count;
-                _interopCache.Add(obj);
+
+                _interopCache.Add(new InteropCacheEntry()
+                {
+                    Value = obj,
+                    StackItemType = typeof(InteropStackItem<T>),
+                    Instanciator = (engine, ptr, key, value) =>
+                        new InteropStackItem<T>(engine, ptr, key, (T)value)
+                });
+
+                _interopCacheIndex.Add(obj);
             }
 
-            return new InteropStackItem(this, obj, objKey);
+            return new InteropStackItem<T>(this, obj, objKey);
         }
 
         /// <summary>
         /// Create BooleanStackItem
         /// </summary>
         /// <param name="value">Value</param>
-        public override IBooleanStackItem CreateBool(bool value)
+        public override BooleanStackItemBase CreateBool(bool value)
         {
             return new BooleanStackItem(this, value);
         }
@@ -409,7 +391,7 @@ namespace NeoSharp.VM.Interop.Types
         /// Create IntegerStackItem
         /// </summary>
         /// <param name="value">Value</param>
-        public override IIntegerStackItem CreateInteger(int value)
+        public override IntegerStackItemBase CreateInteger(int value)
         {
             return new IntegerStackItem(this, value);
         }
@@ -418,7 +400,7 @@ namespace NeoSharp.VM.Interop.Types
         /// Create IntegerStackItem
         /// </summary>
         /// <param name="value">Value</param>
-        public override IIntegerStackItem CreateInteger(long value)
+        public override IntegerStackItemBase CreateInteger(long value)
         {
             return new IntegerStackItem(this, value);
         }
@@ -427,7 +409,7 @@ namespace NeoSharp.VM.Interop.Types
         /// Create IntegerStackItem
         /// </summary>
         /// <param name="value">Value</param>
-        public override IIntegerStackItem CreateInteger(BigInteger value)
+        public override IntegerStackItemBase CreateInteger(BigInteger value)
         {
             return new IntegerStackItem(this, value);
         }
@@ -436,7 +418,7 @@ namespace NeoSharp.VM.Interop.Types
         /// Create IntegerStackItem
         /// </summary>
         /// <param name="value">Value</param>
-        public override IIntegerStackItem CreateInteger(byte[] value)
+        public override IntegerStackItemBase CreateInteger(byte[] value)
         {
             return new IntegerStackItem(this, value);
         }
@@ -453,7 +435,7 @@ namespace NeoSharp.VM.Interop.Types
             {
                 // Clear interop cache
 
-                foreach (var v in _interopCache)
+                foreach (var v in _interopCacheIndex)
                 {
                     if (v is IDisposable dsp)
                     {
@@ -462,12 +444,10 @@ namespace NeoSharp.VM.Interop.Types
                 }
 
                 _interopCache.Clear();
+                _interopCacheIndex.Clear();
             }
 
             // free unmanaged resources (unmanaged objects) and override a finalizer below. set large fields to null.
-
-            _resultStack.Dispose();
-            _invocationStack.Dispose();
 
             NeoVM.ExecutionEngine_Free(ref _handle);
         }

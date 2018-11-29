@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 namespace NeoSharp.VM.Interop.Types.StackItems
 {
-    public class ArrayStackItem : IArrayStackItem, INativeStackItem
+    public class ArrayStackItem : ArrayStackItemBase, INativeStackItem
     {
         #region Private fields
 
@@ -73,10 +73,11 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// </summary>
         /// <param name="index">Position</param>
         /// <returns>Returns the StackItem element</returns>
-        public override IStackItem this[int index]
+        public override StackItemBase this[int index]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return NativeEngine.ConvertFromNative(NeoVM.ArrayStackItem_Get(_handle, index)); }
+
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set { Set(index, value); }
         }
@@ -101,7 +102,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
         /// <param name="engine">Engine</param>
         /// <param name="data">Data</param>
         /// <param name="isStruct">Is struct?</param>
-        internal ArrayStackItem(ExecutionEngine engine, IEnumerable<IStackItem> data, bool isStruct) :
+        internal ArrayStackItem(ExecutionEngine engine, IEnumerable<StackItemBase> data, bool isStruct) :
             base(isStruct)
         {
             NativeEngine = engine;
@@ -130,15 +131,15 @@ namespace NeoSharp.VM.Interop.Types.StackItems
 
         #region Read
 
-        public override int IndexOf(IStackItem item) => NeoVM.ArrayStackItem_IndexOf(Handle, ((INativeStackItem)item).Handle);
+        public override int IndexOf(StackItemBase item) => NeoVM.ArrayStackItem_IndexOf(Handle, ((INativeStackItem)item).Handle);
 
         #endregion
 
         #region Write
 
-        public override void Add(IStackItem item) => NeoVM.ArrayStackItem_Add(Handle, ((INativeStackItem)item).Handle);
+        public override void Add(StackItemBase item) => NeoVM.ArrayStackItem_Add(Handle, ((INativeStackItem)item).Handle);
 
-        public override void Add(params IStackItem[] items)
+        public override void Add(params StackItemBase[] items)
         {
             foreach (var item in items)
             {
@@ -146,7 +147,7 @@ namespace NeoSharp.VM.Interop.Types.StackItems
             }
         }
 
-        public override void Add(IEnumerable<IStackItem> items)
+        public override void Add(IEnumerable<StackItemBase> items)
         {
             foreach (var item in items)
             {
@@ -156,9 +157,9 @@ namespace NeoSharp.VM.Interop.Types.StackItems
 
         public override void Clear() => NeoVM.ArrayStackItem_Clear(Handle);
 
-        public override void Insert(int index, IStackItem item) => NeoVM.ArrayStackItem_Insert(Handle, ((INativeStackItem)item).Handle, index);
+        public override void Insert(int index, StackItemBase item) => NeoVM.ArrayStackItem_Insert(Handle, ((INativeStackItem)item).Handle, index);
 
-        public override void Set(int index, IStackItem item) => NeoVM.ArrayStackItem_Set(Handle, ((INativeStackItem)item).Handle, index);
+        public override void Set(int index, StackItemBase item) => NeoVM.ArrayStackItem_Set(Handle, ((INativeStackItem)item).Handle, index);
 
         public override void RemoveAt(int index) => NeoVM.ArrayStackItem_RemoveAt(Handle, index);
 

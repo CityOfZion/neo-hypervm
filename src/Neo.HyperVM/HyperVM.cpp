@@ -47,16 +47,6 @@ void ExecutionContext_Claim(ExecutionContext* context, StackItems* &evStack, Sta
 
 	evStack = &context->EvaluationStack;
 	altStack = &context->AltStack;
-
-	context->Claim();
-}
-
-void ExecutionContext_Free(ExecutionContext* &context)
-{
-	if (context == nullptr) return;
-
-	ExecutionContext::UnclaimAndFree(context);
-	context = nullptr;
 }
 
 // ExecutionEngine
@@ -111,7 +101,7 @@ byte ExecutionEngine_LoadCachedScript(ExecutionEngine* engine, int32 scriptIndex
 	return engine->LoadScript(scriptIndex, rvcount) ? 0x01 : 0x00;
 }
 
-byte ExecutionEngine_IncreaseGas(ExecutionEngine* engine, uint32 gas)
+byte ExecutionEngine_IncreaseGas(ExecutionEngine* engine, uint64 gas)
 {
 	if (engine == nullptr) return 0x00;
 
@@ -153,7 +143,7 @@ byte ExecutionEngine_GetState(ExecutionEngine* engine)
 	return engine->GetState();
 }
 
-uint32 ExecutionEngine_GetConsumedGas(ExecutionEngine* engine)
+uint64 ExecutionEngine_GetConsumedGas(ExecutionEngine* engine)
 {
 	if (engine == nullptr) return 0;
 
