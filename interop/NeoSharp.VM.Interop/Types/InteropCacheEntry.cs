@@ -6,6 +6,8 @@ namespace NeoSharp.VM.Interop.Types
     {
         public object Value;
 
+        public int Index;
+
         public Func<ExecutionEngine, IntPtr, int, object, StackItemBase> Instanciator;
     }
 }
