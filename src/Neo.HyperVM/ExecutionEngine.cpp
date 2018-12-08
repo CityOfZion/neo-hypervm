@@ -642,7 +642,8 @@ void ExecutionEngine::InternalStepInto()
 
 		if (opcode == EVMOpCode::CALL_ET || opcode == EVMOpCode::CALL_EDT)
 		{
-			this->InvocationStack.Remove(1);
+			auto drop = this->InvocationStack.Pop(1);
+			if (drop != nullptr) drop->Clear();
 		}
 
 		return;
@@ -656,7 +657,7 @@ void ExecutionEngine::InternalStepInto()
 
 		if (context != nullptr)
 		{
-			this->InvocationStack.Drop();
+			this->InvocationStack.Pop();
 
 			int32 rvcount = context->RVCount;
 
@@ -680,6 +681,10 @@ void ExecutionEngine::InternalStepInto()
 				else
 					context->EvaluationStack.SendTo(&this->GetCurrentContext()->EvaluationStack, rvcount);
 			}
+
+			// Clean remaning stack items from the counter
+
+			context->Clear();
 		}
 
 		if (this->InvocationStack.Count() == 0)
@@ -766,7 +771,8 @@ void ExecutionEngine::InternalStepInto()
 
 		if (opcode == EVMOpCode::TAILCALL)
 		{
-			this->InvocationStack.Remove(1);
+			auto drop = this->InvocationStack.Pop(1);
+			if (drop != nullptr) drop->Clear();
 		}
 
 		return;

@@ -137,7 +137,6 @@ namespace NeoSharp.VM.Interop
         internal static delInt_HandleInt StackItems_Drop;
 
         internal static delInt_Handle ExecutionContextStack_Count;
-        internal static delInt_HandleInt ExecutionContextStack_Drop;
         internal static delHandle_HandleInt ExecutionContextStack_Peek;
 
         internal static delHandle_HandleByteHandleInt StackItem_Create;

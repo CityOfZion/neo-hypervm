@@ -58,7 +58,6 @@ extern "C"
 	// ExecutionContextStack
 
 	DllExport int32 __stdcall ExecutionContextStack_Count(ExecutionContextStack* stack);
-	DllExport int32 __stdcall ExecutionContextStack_Drop(ExecutionContextStack* stack, int32 count);
 	DllExport ExecutionContext* __stdcall ExecutionContextStack_Peek(ExecutionContextStack* stack, int32 index);
 
 	// StackItem

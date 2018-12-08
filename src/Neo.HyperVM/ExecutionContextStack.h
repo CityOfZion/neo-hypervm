@@ -37,14 +37,14 @@ public:
 		this->_stack.Push(i);
 	}
 
-	inline void Remove(int32 index)
+	inline ExecutionContext* Pop(int32 index)
 	{
-		this->_stack.Pop(index);
+		return this->_stack.Pop(index);
 	}
 
-	inline void Drop()
+	inline ExecutionContext* Pop()
 	{
-		this->_stack.Pop();
+		return this->_stack.Pop();
 	}
 
 	inline void Clear()
