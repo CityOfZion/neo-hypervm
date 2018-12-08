@@ -30,20 +30,9 @@ namespace NeoSharp.VM.Interop.Types.Collections
             }
         }
 
-        /// <summary>
-        /// Drop object from the stack
-        /// </summary>
-        /// <param name="count">Number of items to drop</param>
-        /// <returns>Return the first element of the stack</returns>
-        public override int Drop(int count = 0)
-        {
-            if (_engine.IsDisposed) throw new ObjectDisposedException(nameof(ExecutionEngine));
-
-            return NeoVM.ExecutionContextStack_Drop(_handle, count);
-        }
-
         #region Not implemented
 
+        public override int Drop(int count = 0) => throw new NotImplementedException();
         public override ExecutionContextBase Pop() => throw new NotImplementedException();
         public override void Push(ExecutionContextBase item) => throw new NotImplementedException();
 

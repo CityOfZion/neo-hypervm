@@ -140,9 +140,14 @@ public:
 		return true;
 	}
 
-	inline ~ExecutionContext()
+	inline void Clear()
 	{
 		this->EvaluationStack.Clear();
 		this->AltStack.Clear();
+	}
+
+	inline ~ExecutionContext()
+	{
+		this->Clear();
 	}
 };

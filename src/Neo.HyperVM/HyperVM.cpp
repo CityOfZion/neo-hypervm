@@ -193,17 +193,6 @@ int32 StackItems_Count(StackItems* stack)
 
 // ExecutionContextStack
 
-int32 ExecutionContextStack_Drop(ExecutionContextStack* stack, int32 count)
-{
-	if (stack == nullptr) return 0;
-
-	int32 ret = stack->Count();
-	ret = ret > count ? count : ret;
-
-	for (int32 x = 0; x < ret; ++x) stack->Drop();
-	return ret;
-}
-
 ExecutionContext* ExecutionContextStack_Peek(ExecutionContextStack* stack, int32 index)
 {
 	if (stack == nullptr) return nullptr;
